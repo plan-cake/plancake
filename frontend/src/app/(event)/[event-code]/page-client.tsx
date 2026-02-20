@@ -12,7 +12,7 @@ import { AvailabilityDataResponse } from "@/features/event/availability/fetch-da
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
 import EventInfoDrawer, { EventInfo } from "@/features/event/info-drawer";
-import AttendeesPanel from "@/features/event/results/attendees-panel";
+import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
 import { getResultBanners } from "@/features/event/results/banners";
 import { useEventResults } from "@/features/event/results/use-results";
 import { cn } from "@/lib/utils/classname";
