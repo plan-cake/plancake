@@ -41,7 +41,7 @@ export interface BaseDrawerProps {
   modal?: boolean;
   /**
    * Whether to show an overlay behind the drawer when open. Defaults to true.
-   * @default true
+   * @default !frostedGlass && modal
    */
   showOverlay?: boolean;
 }
