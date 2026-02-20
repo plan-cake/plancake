@@ -59,12 +59,9 @@ export function BaseDrawer({
   showHandle = true,
   frostedGlass = false,
   modal = true,
-  showOverlay = true,
+  // By default, show overlay unless frostedGlass is enabled or if it's not a modal
+  showOverlay = !frostedGlass && modal,
 }: BaseDrawerProps) {
-  // overlay is only needed if it's a modal and frostedGlass is not enabled or
-  // if show overlay is explicitly set to true.
-  const overlay = showOverlay || (modal && !frostedGlass);
-
   return (
     <Drawer.Root
       open={open}
@@ -74,7 +71,9 @@ export function BaseDrawer({
     >
       {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
 
-      {overlay && <Drawer.Overlay className="fixed inset-0 z-40 bg-black/30" />}
+      {showOverlay && (
+        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/30" />
+      )}
       <Drawer.Portal>
         <Drawer.Content
           className={cn(
