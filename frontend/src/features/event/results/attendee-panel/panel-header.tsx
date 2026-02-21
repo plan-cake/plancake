@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import {
   CheckIcon,
   EraserIcon,
@@ -23,27 +21,20 @@ export default function PanelHeader({
 }: PanelHeaderProps) {
   const {
     hoveredSlot,
-    availabilities,
     participants,
-    selectedParticipants,
+    filteredAvailabilities,
+    gridNumParticipants,
     isCreator,
+    selectedParticipants,
     clearSelectedParticipants,
     currentUser,
   } = useResultsContext();
 
-  const displayParticipants = useMemo(() => {
-    if (selectedParticipants.length === 0) return participants;
-    return selectedParticipants;
-  }, [selectedParticipants, participants]);
-
-  const activeCount = useMemo(() => {
-    if (!hoveredSlot) return null;
-    return displayParticipants.filter((p) =>
-      availabilities[hoveredSlot]?.includes(p),
-    ).length;
-  }, [hoveredSlot, displayParticipants, availabilities]);
-
-  const displayCount = displayParticipants.length;
+  const activeCount = hoveredSlot
+    ? filteredAvailabilities[hoveredSlot]
+      ? filteredAvailabilities[hoveredSlot].length
+      : 0
+    : null;
   const totalParticipants = participants.length;
   const hasSelection = selectedParticipants.length > 0;
   const showSelfRemove =
@@ -55,13 +46,13 @@ export default function PanelHeader({
         <h2 className="text-md font-semibold">
           {isRemoving ? "Removing a" : "A"}ttendees
         </h2>
-        {displayCount > 0 && (
+        {gridNumParticipants > 0 && (
           <span className="text-sm opacity-75">
             {isRemoving
               ? `Select to remove`
               : activeCount === null
                 ? "Hover grid for availability"
-                : `${activeCount}/${displayCount} available`}
+                : `${activeCount}/${gridNumParticipants} available`}
           </span>
         )}
       </div>
