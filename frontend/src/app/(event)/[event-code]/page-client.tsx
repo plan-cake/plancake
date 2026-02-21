@@ -14,7 +14,10 @@ import { ScheduleGrid } from "@/features/event/grid";
 import EventInfoDrawer, { EventInfo } from "@/features/event/info-drawer";
 import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
 import { getResultBanners } from "@/features/event/results/banners";
-import { useEventResults } from "@/features/event/results/use-results";
+import {
+  ResultsProvider,
+  useResultsContext,
+} from "@/features/event/results/context";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -32,10 +35,47 @@ export default function ClientPage({
   initialAvailabilityData: AvailabilityDataResponse;
   isCreator: boolean;
 }) {
-  /* PARTICIPANT INFO */
-  const participated: boolean =
-    initialAvailabilityData.user_display_name != null;
-  const userName = initialAvailabilityData.user_display_name || "";
+  const initialData = {
+    eventCode,
+    isCreator,
+    participants: initialAvailabilityData.participants,
+    availability: initialAvailabilityData.availability,
+    userName: initialAvailabilityData.user_display_name,
+  };
+
+  return (
+    <ResultsProvider initialData={initialData}>
+      <ResultsPage
+        eventCode={eventCode}
+        eventName={eventName}
+        eventRange={eventRange}
+        timeslots={timeslots}
+      />
+    </ResultsProvider>
+  );
+}
+
+function ResultsPage({
+  eventCode,
+  eventName,
+  eventRange,
+  timeslots,
+}: {
+  eventCode: string;
+  eventName: string;
+  eventRange: EventRange;
+  timeslots: Date[];
+}) {
+  const {
+    hoveredSlot,
+    participants,
+    availabilities,
+    filteredAvailabilities,
+    gridNumParticipants,
+    setHoveredSlot,
+    currentUser,
+    isCreator,
+  } = useResultsContext();
 
   /* FORM ERROR & TIMEZONE HANDLING */
   const [timezone, setTimezone] = useState(
@@ -45,21 +85,6 @@ export default function ClientPage({
   const handleTZChange = (newTZ: string | number) => {
     setTimezone(newTZ.toString());
   };
-
-  /* LOGIC HOOK */
-  const {
-    participants,
-    availabilities,
-    filteredAvailabilities,
-    gridNumParticipants,
-    hoveredSlot,
-    selectedParticipants,
-    clearSelectedParticipants,
-    setHoveredSlot,
-    setHoveredParticipant,
-    toggleParticipant,
-    handleRemoveParticipant,
-  } = useEventResults(initialAvailabilityData, eventCode, isCreator, userName);
 
   /* SIDEBAR SPACING HANDLING */
   const DEFAULT_SPACER_HEIGHT = 200;
@@ -86,7 +111,7 @@ export default function ClientPage({
     participants,
     timeslots,
     eventRange.type === "weekday",
-    participated,
+    currentUser !== null,
   );
 
   return (
@@ -111,7 +136,7 @@ export default function ClientPage({
           <LinkButton
             buttonStyle="primary"
             icon={<Pencil2Icon />}
-            label={(participated ? "Edit" : "Add") + " Availability"}
+            label={(currentUser ? "Edit" : "Add") + " Availability"}
             href={`/${eventCode}/painting`}
           />
         </div>
@@ -146,18 +171,7 @@ export default function ClientPage({
         >
           <div className="hidden md:block">{banners}</div>
 
-          <AttendeesPanel
-            hoveredSlot={hoveredSlot}
-            participants={participants}
-            availabilities={availabilities}
-            selectedParticipants={selectedParticipants}
-            clearSelectedParticipants={clearSelectedParticipants}
-            onParticipantToggle={toggleParticipant}
-            setHoveredParticipant={setHoveredParticipant}
-            isCreator={isCreator}
-            currentUser={userName}
-            onRemoveParticipant={handleRemoveParticipant}
-          />
+          <AttendeesPanel />
 
           <div className="bg-panel hidden rounded-3xl p-6 md:block">
             <EventInfo eventRange={eventRange} timezone={timezone} />

@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import {
   CheckIcon,
   EraserIcon,
@@ -5,35 +7,48 @@ import {
   ResetIcon,
 } from "@radix-ui/react-icons";
 
+import { useResultsContext } from "@/features/event/results/context";
 import { cn } from "@/lib/utils/classname";
 
 type PanelHeaderProps = {
   isRemoving: boolean;
-  activeCount: number | null;
-  displayCount: number;
-  totalParticipants: number;
-  hasSelection: boolean;
-  isCreator: boolean;
-  showSelfRemove: boolean;
-  currentUser: string;
-  clearSelectedParticipants: () => void;
   toggleRemoving: () => void;
   promptRemove: (person: string) => void;
 };
 
 export default function PanelHeader({
   isRemoving,
-  activeCount,
-  displayCount,
-  totalParticipants,
-  hasSelection,
-  isCreator,
-  showSelfRemove,
-  currentUser,
-  clearSelectedParticipants,
   toggleRemoving,
   promptRemove,
 }: PanelHeaderProps) {
+  const {
+    hoveredSlot,
+    availabilities,
+    participants,
+    selectedParticipants,
+    isCreator,
+    clearSelectedParticipants,
+    currentUser,
+  } = useResultsContext();
+
+  const displayParticipants = useMemo(() => {
+    if (selectedParticipants.length === 0) return participants;
+    return selectedParticipants;
+  }, [selectedParticipants, participants]);
+
+  const activeCount = useMemo(() => {
+    if (!hoveredSlot) return null;
+    return displayParticipants.filter((p) =>
+      availabilities[hoveredSlot]?.includes(p),
+    ).length;
+  }, [hoveredSlot, displayParticipants, availabilities]);
+
+  const displayCount = displayParticipants.length;
+  const totalParticipants = participants.length;
+  const hasSelection = selectedParticipants.length > 0;
+  const showSelfRemove =
+    !isCreator && currentUser && participants.includes(currentUser);
+
   return (
     <div className="flex touch-none select-none justify-between px-6 pt-6">
       <div className="flex flex-col">

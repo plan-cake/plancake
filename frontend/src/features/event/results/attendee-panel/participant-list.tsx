@@ -1,29 +1,23 @@
-import { ResultsAvailabilityMap } from "@/core/availability/types";
 import ParticipantChip from "@/features/event/results/attendee-panel/participant-chip";
-
-type ParticipantListProps = {
-  participants: string[];
-  hoveredSlot: string | null;
-  availabilities: ResultsAvailabilityMap;
-  selectedParticipants: string[];
-  isRemoving: boolean;
-  isCreator: boolean;
-  promptRemove: (person: string) => void;
-  setHoveredParticipant: (participant: string | null) => void;
-  onParticipantToggle: (participant: string) => void;
-};
+import { useResultsContext } from "@/features/event/results/context";
 
 export default function ParticipantList({
-  participants,
-  hoveredSlot,
-  availabilities,
-  selectedParticipants,
   isRemoving,
-  isCreator,
   promptRemove,
-  setHoveredParticipant,
-  onParticipantToggle,
-}: ParticipantListProps) {
+}: {
+  isRemoving: boolean;
+  promptRemove: (person: string) => void;
+}) {
+  const {
+    participants,
+    hoveredSlot,
+    availabilities,
+    selectedParticipants,
+    isCreator,
+    setHoveredParticipant,
+    toggleParticipant: onParticipantToggle,
+  } = useResultsContext();
+
   if (participants.length === 0) {
     return (
       <ul className="flex flex-wrap gap-3 overflow-y-auto px-6 pb-6 pt-1 md:max-h-none md:gap-2.5">

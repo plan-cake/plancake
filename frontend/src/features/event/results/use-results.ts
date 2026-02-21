@@ -7,17 +7,15 @@ import {
 } from "react";
 
 import { ResultsAvailabilityMap } from "@/core/availability/types";
-import { AvailabilityDataResponse } from "@/features/event/availability/fetch-data";
 import { removePerson } from "@/features/event/results/remove-person";
+import { ResultsInformation } from "@/features/event/results/types";
 import { useToast } from "@/features/system-feedback/toast/context";
 
-export function useEventResults(
-  initialData: AvailabilityDataResponse,
-  eventCode: string,
-  isCreator: boolean,
-  userName: string | null,
-) {
+export function useEventResults(initialData: ResultsInformation) {
   const { addToast } = useToast();
+
+  const { eventCode, isCreator, participants, availability, userName } =
+    initialData;
 
   /* STATES */
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
@@ -29,14 +27,14 @@ export function useEventResults(
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
 
   const [optimisticParticipants, removeOptimisticParticipant] = useOptimistic(
-    initialData.participants || [],
+    participants || [],
     (state, personToRemove: string) => {
       return state.filter((p) => p !== personToRemove);
     },
   );
 
   const [optimisticAvailabilities, updateOptimisticAvailabilities] =
-    useOptimistic(initialData.availability || {}, (state, person: string) => {
+    useOptimistic(availability || {}, (state, person: string) => {
       const updatedState = { ...state };
       for (const slot in updatedState) {
         updatedState[slot] = updatedState[slot].filter((p) => p !== person);
@@ -133,6 +131,10 @@ export function useEventResults(
     availabilities: optimisticAvailabilities,
     filteredAvailabilities,
     gridNumParticipants,
+
+    // User Info
+    currentUser: userName,
+    isCreator,
 
     // UI State
     hoveredSlot,

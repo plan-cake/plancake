@@ -1,61 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { ResultsAvailabilityMap } from "@/core/availability/types";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
+import { useResultsContext } from "@/features/event/results/context";
 import { ConfirmationDialog } from "@/features/system-feedback";
 
-type AttendeesPanelProps = {
-  // Data
-  hoveredSlot: string | null;
-  participants: string[];
-  availabilities: ResultsAvailabilityMap;
-  selectedParticipants: string[];
+export default function AttendeesPanel() {
+  const {
+    participants,
+    currentUser,
+    clearSelectedParticipants,
+    handleRemoveParticipant: onRemoveParticipant,
+  } = useResultsContext();
 
-  // State Handlers
-  clearSelectedParticipants: () => void;
-  onParticipantToggle: (participant: string) => void;
-  setHoveredParticipant: (participant: string | null) => void;
-
-  // Context / Actions
-  isCreator: boolean;
-  currentUser: string;
-  onRemoveParticipant: (person: string) => Promise<boolean>;
-};
-
-export default function AttendeesPanel({
-  hoveredSlot,
-  participants,
-  availabilities,
-  selectedParticipants,
-  clearSelectedParticipants,
-  onParticipantToggle,
-  setHoveredParticipant,
-  isCreator,
-  currentUser,
-  onRemoveParticipant,
-}: AttendeesPanelProps) {
   /* REMOVING STATES */
   const [isRemoving, setIsRemoving] = useState(false);
-  const showSelfRemove =
-    !isCreator && currentUser && participants.includes(currentUser);
-
   const [personToRemove, setPersonToRemove] = useState<string | null>(null);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
-
-  const hasSelection = selectedParticipants.length > 0;
-
-  const displayParticipants = useMemo(() => {
-    if (selectedParticipants.length === 0) return participants;
-    return selectedParticipants;
-  }, [selectedParticipants, participants]);
-
-  const activeCount = useMemo(() => {
-    if (!hoveredSlot) return null;
-    return displayParticipants.filter((p) =>
-      availabilities[hoveredSlot]?.includes(p),
-    ).length;
-  }, [hoveredSlot, displayParticipants, availabilities]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -79,29 +40,11 @@ export default function AttendeesPanel({
     <div className="max-h-53 bg-panel flex flex-col gap-2 overflow-hidden rounded-3xl shadow-md md:shadow-none">
       <PanelHeader
         isRemoving={isRemoving}
-        activeCount={activeCount}
-        displayCount={displayParticipants.length}
-        totalParticipants={participants.length}
-        hasSelection={hasSelection}
-        isCreator={isCreator}
-        showSelfRemove={!!showSelfRemove}
-        currentUser={currentUser}
-        clearSelectedParticipants={clearSelectedParticipants}
         toggleRemoving={toggleRemoving}
         promptRemove={promptRemove}
       />
 
-      <ParticipantList
-        participants={participants}
-        hoveredSlot={hoveredSlot}
-        availabilities={availabilities}
-        selectedParticipants={selectedParticipants}
-        isRemoving={isRemoving}
-        isCreator={isCreator}
-        promptRemove={promptRemove}
-        setHoveredParticipant={setHoveredParticipant}
-        onParticipantToggle={onParticipantToggle}
-      />
+      <ParticipantList isRemoving={isRemoving} promptRemove={promptRemove} />
 
       <ConfirmationDialog
         type="delete"
