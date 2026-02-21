@@ -14,7 +14,7 @@ import { useToast } from "@/features/system-feedback/toast/context";
 export function useEventResults(initialData: ResultsInformation) {
   const { addToast } = useToast();
 
-  const { eventCode, isCreator, participants, availability, userName } =
+  const { eventCode, isCreator, participants, availability, currentUser } =
     initialData;
 
   /* STATES */
@@ -59,7 +59,7 @@ export function useEventResults(initialData: ResultsInformation) {
   };
 
   const handleRemoveParticipant = async (person: string) => {
-    const isRemovingSelf = userName === person;
+    const isRemovingSelf = currentUser === person;
 
     // Immediate UI update
     if (selectedParticipants.includes(person)) {
@@ -133,7 +133,7 @@ export function useEventResults(initialData: ResultsInformation) {
     gridNumParticipants,
 
     // User Info
-    currentUser: userName,
+    currentUser,
     isCreator,
 
     // UI State
