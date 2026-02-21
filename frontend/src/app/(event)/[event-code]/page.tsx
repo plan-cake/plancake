@@ -57,12 +57,19 @@ export default async function Page({ params }: EventCodePageProps) {
 
   return (
     <ClientPage
-      eventCode={eventCode}
-      eventName={eventName}
-      eventRange={eventRange}
-      timeslots={timeslots}
-      initialAvailabilityData={availabilityData}
-      isCreator={isCreator}
+      eventData={{
+        title: eventName,
+        customCode: eventCode,
+        eventRange,
+        timeslots,
+      }}
+      initialAvailabilityData={{
+        participants: availabilityData.participants,
+        availability: availabilityData.availability,
+        currentUser: availabilityData.user_display_name,
+        eventCode: eventCode,
+        isCreator,
+      }}
     />
   );
 }

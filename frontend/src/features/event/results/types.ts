@@ -5,5 +5,5 @@ export type ResultsInformation = {
   isCreator: boolean;
   participants: AvailabilityDataResponse["participants"];
   availability: AvailabilityDataResponse["availability"];
-  userName: AvailabilityDataResponse["user_display_name"] | null;
+  currentUser: AvailabilityDataResponse["user_display_name"] | null;
 };

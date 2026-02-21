@@ -6,9 +6,8 @@ import { Pencil1Icon, Pencil2Icon } from "@radix-ui/react-icons";
 
 import CopyToastButton from "@/components/copy-toast-button";
 import HeaderSpacer from "@/components/header-spacer";
-import { EventRange } from "@/core/event/types";
+import { EventInformation } from "@/core/event/types";
 import LinkButton from "@/features/button/components/link";
-import { AvailabilityDataResponse } from "@/features/event/availability/fetch-data";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
 import EventInfoDrawer, { EventInfo } from "@/features/event/info-drawer";
@@ -18,54 +17,24 @@ import {
   ResultsProvider,
   useResultsContext,
 } from "@/features/event/results/context";
+import { ResultsInformation } from "@/features/event/results/types";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
-  eventCode,
-  eventName,
-  eventRange,
-  timeslots,
+  eventData,
   initialAvailabilityData,
-  isCreator,
 }: {
-  eventCode: string;
-  eventName: string;
-  eventRange: EventRange;
-  timeslots: Date[];
-  initialAvailabilityData: AvailabilityDataResponse;
-  isCreator: boolean;
+  eventData: EventInformation;
+  initialAvailabilityData: ResultsInformation;
 }) {
-  const initialData = {
-    eventCode,
-    isCreator,
-    participants: initialAvailabilityData.participants,
-    availability: initialAvailabilityData.availability,
-    userName: initialAvailabilityData.user_display_name,
-  };
-
   return (
-    <ResultsProvider initialData={initialData}>
-      <ResultsPage
-        eventCode={eventCode}
-        eventName={eventName}
-        eventRange={eventRange}
-        timeslots={timeslots}
-      />
+    <ResultsProvider initialData={initialAvailabilityData}>
+      <ResultsPage eventData={eventData} />
     </ResultsProvider>
   );
 }
 
-function ResultsPage({
-  eventCode,
-  eventName,
-  eventRange,
-  timeslots,
-}: {
-  eventCode: string;
-  eventName: string;
-  eventRange: EventRange;
-  timeslots: Date[];
-}) {
+function ResultsPage({ eventData }: { eventData: EventInformation }) {
   const {
     hoveredSlot,
     participants,
@@ -76,6 +45,13 @@ function ResultsPage({
     currentUser,
     isCreator,
   } = useResultsContext();
+
+  const {
+    customCode: eventCode,
+    title: eventName,
+    eventRange,
+    timeslots,
+  } = eventData;
 
   /* FORM ERROR & TIMEZONE HANDLING */
   const [timezone, setTimezone] = useState(
