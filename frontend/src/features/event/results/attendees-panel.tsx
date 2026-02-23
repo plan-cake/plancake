@@ -124,6 +124,10 @@ export default function AttendeesPanel({
                 aria-label={
                   isRemoving ? "Stop Removing" : "Remove Participants"
                 }
+                className={cn(
+                  !isRemoving &&
+                    "hover:bg-error/25 hover:text-error active:bg-error/40",
+                )}
               />
             )}
 
@@ -136,6 +140,7 @@ export default function AttendeesPanel({
                   return true;
                 }}
                 aria-label="Remove Self from Event"
+                className="hover:bg-error/25 hover:text-error active:bg-error/40"
               />
             )}
           </div>
