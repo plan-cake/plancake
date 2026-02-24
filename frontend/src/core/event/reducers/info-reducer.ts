@@ -33,6 +33,7 @@ export function EventInfoReducer(
         customCode: "",
         eventRange: DEFAULT_RANGE_SPECIFIC,
         timeslots: expandEventRange(DEFAULT_RANGE_SPECIFIC),
+        originalEventRange: state.originalEventRange,
       };
     default:
       const newEventRange = EventRangeReducer(

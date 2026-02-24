@@ -4,6 +4,7 @@ export type EventInformation = {
   title: string;
   customCode: string;
   eventRange: EventRange;
+  originalEventRange?: EventRange; // only used for editing, to compare against changes
   timeslots: Date[];
 };
 
