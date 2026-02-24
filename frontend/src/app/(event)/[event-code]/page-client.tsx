@@ -165,13 +165,11 @@ export default function ClientPage({
 
           <div className="bg-panel hidden rounded-3xl p-6 text-sm md:block">
             Displaying event in
-            <span className="text-accent ml-1 font-bold">
-              <TimeZoneSelector
-                id="timezone-select"
-                value={timezone}
-                onChange={handleTZChange}
-              />
-            </span>
+            <TimeZoneSelector
+              id="timezone-select"
+              value={timezone}
+              onChange={handleTZChange}
+            />
           </div>
         </div>
       </div>

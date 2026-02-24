@@ -97,16 +97,14 @@ export default function GridPreviewDialog({
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <label
                 htmlFor="timezone-select"
-                className="flex items-center text-sm md:ml-[50px]"
+                className="flex items-center gap-1 text-sm md:ml-[50px]"
               >
                 See event in{" "}
-                <span className="text-accent-text ml-1 font-bold">
-                  <TimeZoneSelector
-                    id="timezone-select"
-                    value={timezone}
-                    onChange={handleTZChange}
-                  />
-                </span>
+                <TimeZoneSelector
+                  id="timezone-select"
+                  value={timezone}
+                  onChange={handleTZChange}
+                />
               </label>
               <label className="text-sm md:mr-[20px]">
                 Original Event in{" "}
