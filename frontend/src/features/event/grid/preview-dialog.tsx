@@ -10,6 +10,7 @@ import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import ScheduleGrid from "@/features/event/grid/grid";
 import { cn } from "@/lib/utils/classname";
 import { findTimezoneLabel } from "@/lib/utils/date-time-format";
+import ActionButton from "@/features/button/components/action";
 
 interface GridPreviewDialogProps {
   eventRange: EventRange;
@@ -74,21 +75,31 @@ export default function GridPreviewDialog({
         >
           <p className="">Grid Preview</p>
           {isOpen ? (
-            <button
-              aria-label="Close Preview"
-              onClick={() => closeDialog()}
-              className="hover:text-accent hover:bg-accent/25 active:bg-accent/40 cursor-pointer rounded-full p-2"
-            >
-              <Cross2Icon className="h-5 w-5" />
-            </button>
+            <div>
+              <ActionButton
+                buttonStyle="semi-transparent"
+                icon={<Cross2Icon />}
+                onClick={() => {
+                  closeDialog();
+                  return true;
+                }}
+                className="bg-transparent p-1.5"
+                aria-label="Close Preview"
+              />
+            </div>
           ) : (
-            <button
-              aria-label="Open Preview"
-              onClick={() => setIsOpen(!isOpen)}
-              className="hover:text-accent hover:bg-accent/25 active:bg-accent/40 cursor-pointer rounded-full p-2"
-            >
-              <EnterFullScreenIcon className="h-5 w-5" />
-            </button>
+            <div>
+              <ActionButton
+                buttonStyle="semi-transparent"
+                icon={<EnterFullScreenIcon />}
+                onClick={() => {
+                  setIsOpen(!isOpen);
+                  return true;
+                }}
+                className="bg-transparent p-1.5"
+                aria-label="Open Preview"
+              />
+            </div>
           )}
         </motion.div>
         {isOpen ? (
