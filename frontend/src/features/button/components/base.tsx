@@ -264,7 +264,7 @@ function getStyleClasses(
           break;
         case "disabled":
           styleClasses =
-            "bg-gray-200 text-[#ffffff] dark:bg-gray-300/25 dark:text-gray-300";
+            "bg-gray-200 text-[#ffffff] dark:bg-gray-300/25 dark:text-gray-300 font-bold";
           break;
       }
       break;
