@@ -19,6 +19,7 @@ function createInitialState(initialData?: EventInformation): EventInformation {
     title: initialData?.title || "",
     customCode: initialData?.customCode || "",
     eventRange: initialData?.eventRange || DEFAULT_RANGE_SPECIFIC,
+    originalEventRange: initialData?.originalEventRange,
     timeslots:
       initialData?.timeslots ||
       expandEventRange(initialData?.eventRange || DEFAULT_RANGE_SPECIFIC),

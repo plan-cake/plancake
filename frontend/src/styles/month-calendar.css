@@ -3,10 +3,90 @@
 .rdp-root {
   --rdp-accent-color: var(--calendar-accent);
   --rdp-accent-background-color: var(--calendar-accent-background);
-  --rdp-day_button-border: 3px solid transparent;
 }
 
 .rdp-months {
   display: flex;
   justify-content: center;
+}
+
+.rdp-caption_label {
+  padding-left: 12px;
+}
+
+/* DAY MODIFIERS */
+.rdp-day {
+  padding: 0 !important;
+  width: var(--rdp-day-width, 44px);
+  height: var(--rdp-day-height, 44px);
+}
+
+/* expands the hitbox of the day buttons to the entire cell and
+ * lets pseudoelement (::before) handle the styling on top of the button
+ */
+.rdp-day_button {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  position: relative;
+  z-index: 0;
+}
+
+.rdp-day_button::before {
+  content: "";
+  position: absolute;
+  inset: 0px;
+  border-radius: 100%;
+  z-index: -1; /* place behind the date text */
+
+  background-color: transparent;
+  border: 1px solid transparent;
+}
+
+.rdp-focused > .rdp-day_button::before,
+.rdp-selected > .rdp-day_button::before {
+  border-color: var(--rdp-accent-color);
+  border: 2px solid var(--rdp-accent-color);
+}
+
+.rdp-range_middle > .rdp-day_button::before {
+  border: 1px solid transparent;
+}
+
+.rdp-range_start > .rdp-day_button::before,
+.rdp-range_end > .rdp-day_button::before {
+  background-color: var(--rdp-accent-color);
+}
+
+.rdp-disabled > .rdp-day_button::before {
+  border: none !important;
+}
+
+/* RANGE PREVIEW MODIFIERS */
+.rdp-range_preview > .rdp-day_button::before {
+  background-color: var(--rdp-accent-background-color);
+  border-color: transparent;
+}
+
+.rdp-range_preview_start > .rdp-day_button::before {
+  border: 2px solid var(--rdp-accent-color);
+}
+
+/**
+ * HOVER RULES
+ * only apply on non-touch devices so to ensure this, we
+ * wrap it inside this query
+ */
+@media (hover: hover) {
+  .rdp-day:hover > .rdp-day_button::before {
+    border-color: var(--rdp-accent-color);
+  }
+
+  .rdp-button_previous:hover,
+  .rdp-button_next:hover {
+    background-color: var(--calendar-accent-background) !important;
+    border-radius: 100% !important;
+  }
 }
