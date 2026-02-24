@@ -100,7 +100,7 @@ export default function GridPreviewDialog({
                 className="flex items-center text-sm md:ml-[50px]"
               >
                 See event in{" "}
-                <span className="text-accent ml-1 font-bold">
+                <span className="text-accent-text ml-1 font-bold">
                   <TimeZoneSelector
                     id="timezone-select"
                     value={timezone}

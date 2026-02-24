@@ -17,7 +17,7 @@ export default function SpecificDateRangeDisplay({
   const displayTo = endDate ? format(endDate, "EEE MMMM d, yyyy") : "";
 
   const displayStyle =
-    "text-accent bg-accent/15 hover:bg-accent/25 active:bg-accent/40 rounded-2xl px-3 py-1 focus:outline-none";
+    "text-accent-text bg-accent/15 hover:bg-accent/25 active:bg-accent/40 rounded-2xl px-3 py-1 focus:outline-none";
 
   return (
     <form className="flex w-full flex-col gap-y-2 md:flex-row md:gap-4">

@@ -57,7 +57,7 @@ export default function WeekdayCalendar({
               !isActive && "text-muted-foreground rounded-full",
 
               // Active State
-              isActive && "bg-accent/15 text-accent",
+              isActive && "bg-accent/15 text-accent-text",
 
               // Contiguous Rounding Logic
               isActive && isRangeStart && "rounded-l-full",
