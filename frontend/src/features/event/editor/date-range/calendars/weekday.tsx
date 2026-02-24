@@ -54,7 +54,7 @@ export default function WeekdayCalendar({
               "hover:bg-accent/25 active:bg-accent/40",
 
               // Inactive State
-              !isActive && "text-muted-foreground rounded-full",
+              !isActive && "text-foreground/50 rounded-full",
 
               // Active State
               isActive && "bg-accent/15 text-accent-text",
