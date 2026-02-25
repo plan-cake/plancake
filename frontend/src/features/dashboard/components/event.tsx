@@ -1,6 +1,6 @@
 import { MouseEvent, useMemo } from "react";
 
-import { ClockIcon, Pencil1Icon } from "@radix-ui/react-icons";
+import { ClockIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -8,6 +8,7 @@ import DashboardCopyButton from "@/features/dashboard/components/copy-button";
 import DateRangeRow from "@/features/dashboard/components/date-range-row";
 import ParticipantRow from "@/features/dashboard/components/participant-row";
 import WeekdayRow from "@/features/dashboard/components/weekday-row";
+import { cn } from "@/lib/utils/classname";
 import {
   formatTimeRange,
   getTimezoneDetails,
@@ -24,6 +25,7 @@ export type DashboardEventProps = {
   startDate: string;
   endDate: string;
   timezone: string;
+  onDelete?: () => void;
 };
 
 export default function DashboardEvent({
@@ -33,9 +35,15 @@ export default function DashboardEvent({
   type,
   participants,
   timezone,
+  onDelete,
   ...dateTimeProps
 }: DashboardEventProps) {
   const router = useRouter();
+
+  function handleDelete(e: MouseEvent<HTMLButtonElement>) {
+    e.preventDefault(); // prevent the link behind it triggering
+    if (onDelete) onDelete();
+  }
 
   function navigateToEdit(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault(); // prevent the link behind it triggering
@@ -87,15 +95,35 @@ export default function DashboardEvent({
         <div className="mt-2.5 flex items-center gap-2">
           <DashboardCopyButton code={code} />
           {myEvent && (
-            <button className="cursor-pointer" onClick={navigateToEdit}>
-              <div
-                className={
-                  "border-foreground hover:bg-foreground/25 w-fit rounded-full border p-1.5"
-                }
+            <>
+              <button
+                className="cursor-pointer"
+                onClick={navigateToEdit}
+                aria-label="Edit Event"
               >
-                <Pencil1Icon className="h-4 w-4" />
-              </div>
-            </button>
+                <div
+                  className={
+                    "border-foreground hover:bg-foreground/25 w-fit rounded-full border p-1.5"
+                  }
+                >
+                  <Pencil1Icon className="h-4 w-4" />
+                </div>
+              </button>
+              <button
+                className="cursor-pointer"
+                onClick={handleDelete}
+                aria-label="Delete Event"
+              >
+                <div
+                  className={cn(
+                    "border-foreground w-fit rounded-full border p-1.5",
+                    "hover:bg-error/25 hover:text-error hover:border-error",
+                  )}
+                >
+                  <TrashIcon className="h-4 w-4" />
+                </div>
+              </button>
+            </>
           )}
         </div>
       </div>

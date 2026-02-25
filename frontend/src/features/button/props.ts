@@ -5,6 +5,7 @@ export type ButtonStyle =
   | "secondary"
   | "frosted glass"
   | "frosted glass inset"
+  | "semi-transparent"
   | "transparent"
   | "danger";
 
@@ -12,11 +13,14 @@ export type BaseButtonProps = {
   /** The HTML button type. Defaults to "button". */
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   /**
-   * The style of the button. There are four styles:
+   * The style of the button.
    * - `primary`: An important button, filled with the main accent color.
    * - `secondary`: A less important button, outlined with the main accent color.
-   * - `frosted glass`: A button with a frosted glass appearance, used only in the header.
+   * - `frosted glass`: A button with a frosted glass appearance.
+   * - `frosted glass inset`: A button with the style of a frosted glass inset element.
+   * - `semi-transparent`: A button with a semi-transparent background.
    * - `transparent`: A button with no background until hovered.
+   * - `danger`: A button style used for destructive actions, filled with a red color.
    *
    * `transparent` buttons cannot have icons.
    */
@@ -82,6 +86,10 @@ export type BaseButtonProps = {
    * `onClick`.
    */
   loadOnSuccess?: boolean;
+  /**
+   * Additional className to apply to the button, for further customization.
+   */
+  className?: string;
 };
 
 type CommonButtonProps = {
@@ -99,6 +107,8 @@ type CommonButtonProps = {
   loading?: boolean;
   /** @inheritdoc BaseButtonProps */
   disabled?: boolean;
+  /** @inheritdoc BaseButtonProps */
+  className?: string;
 };
 
 export type ActionButtonProps = CommonButtonProps & {

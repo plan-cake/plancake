@@ -1,37 +1,82 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useOptimistic, useRef, useState } from "react";
 
 import Link from "next/link";
 
 import HeaderSpacer from "@/components/header-spacer";
 import SegmentedControl from "@/components/segmented-control";
 import { useAccount } from "@/features/account/context";
-import EventGrid, {
-  EventGridProps,
-} from "@/features/dashboard/components/event-grid";
-import { Banner } from "@/features/system-feedback";
+import { DashboardEventProps } from "@/features/dashboard/components/event";
+import EventGrid from "@/features/dashboard/components/event-grid";
+import { deleteEvent } from "@/features/dashboard/delete-event";
+import {
+  Banner,
+  ConfirmationDialog,
+  useToast,
+} from "@/features/system-feedback";
+import { MESSAGES } from "@/lib/messages";
 
 type DashboardTab = "created" | "participated";
 
 export type DashboardPageProps = {
-  created_events: EventGridProps;
-  participated_events: EventGridProps;
+  created_events: DashboardEventProps[];
+  participated_events: DashboardEventProps[];
 };
 
 export default function ClientPage({
   created_events,
   participated_events,
 }: DashboardPageProps) {
+  const [optimisticCreatedEvents, deleteOptimisticCreatedEvent] = useOptimistic(
+    created_events,
+    (state, eventToDelete: string) => {
+      return state.filter((e) => e.code !== eventToDelete);
+    },
+  );
+  const [optimisticParticipatedEvents, deleteOptimisticParticipatedEvent] =
+    useOptimistic(participated_events, (state, eventToDelete: string) => {
+      return state.filter((e) => e.code !== eventToDelete);
+    });
   const [tab, setTab] = useState<DashboardTab>(
     !created_events.length && participated_events.length
       ? "participated"
       : "created",
   );
+
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const eventToDelete = useRef<string | null>(null);
+  const { addToast } = useToast();
+
   const { loginState } = useAccount();
 
   const currentTabEvents =
-    tab === "created" ? created_events : participated_events;
+    tab === "created" ? optimisticCreatedEvents : optimisticParticipatedEvents;
+
+  const handleDeleteEvent = async (eventCode: string) => {
+    // Immediate UI update
+    startTransition(() => {
+      if (tab === "created") {
+        deleteOptimisticCreatedEvent(eventCode);
+      } else {
+        deleteOptimisticParticipatedEvent(eventCode);
+      }
+    });
+
+    // Server Action
+    const result = await deleteEvent(eventCode);
+
+    if (!result.success) {
+      addToast("error", result.error || MESSAGES.ERROR_GENERIC);
+    } else {
+      addToast("success", MESSAGES.SUCCESS_EVENT_DELETE);
+    }
+  };
+
+  const onDeleteEvent = (eventCode: string) => {
+    eventToDelete.current = eventCode;
+    setConfirmationOpen(true);
+  };
 
   return (
     <div className="flex min-h-screen flex-col gap-4 px-6 pb-4">
@@ -64,7 +109,10 @@ export default function ClientPage({
         </div>
         <div className="p-4 pt-2">
           {currentTabEvents.length ? (
-            <EventGrid events={currentTabEvents} />
+            <EventGrid
+              events={currentTabEvents}
+              onDeleteEvent={onDeleteEvent}
+            />
           ) : (
             <div className="flex flex-col items-center justify-center gap-4 p-4 text-center italic opacity-75">
               <div>
@@ -77,6 +125,19 @@ export default function ClientPage({
           )}
         </div>
       </div>
+      <ConfirmationDialog
+        type="delete"
+        autoClose={true}
+        title="Delete Event"
+        description="Are you sure you want to delete this event?"
+        open={confirmationOpen}
+        onOpenChange={setConfirmationOpen}
+        onConfirm={() => {
+          if (!eventToDelete.current) return false;
+          handleDeleteEvent(eventToDelete.current!);
+          return true;
+        }}
+      />
     </div>
   );
 }
