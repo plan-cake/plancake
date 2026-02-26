@@ -73,7 +73,7 @@ export default function GridPreviewDialog({
           layout
           className="flex shrink-0 items-center justify-end space-x-2 px-4"
         >
-          <p className="">Grid Preview</p>
+          <p>Grid Preview</p>
           {isOpen ? (
             <div>
               <ActionButton
