@@ -77,7 +77,7 @@ export default function GridPreviewDialog({
           {isOpen ? (
             <div>
               <ActionButton
-                buttonStyle="semi-transparent"
+                buttonStyle="transparent"
                 icon={<Cross2Icon />}
                 onClick={() => {
                   closeDialog();
@@ -90,7 +90,7 @@ export default function GridPreviewDialog({
           ) : (
             <div>
               <ActionButton
-                buttonStyle="semi-transparent"
+                buttonStyle="transparent"
                 icon={<EnterFullScreenIcon />}
                 onClick={() => {
                   setIsOpen(!isOpen);
