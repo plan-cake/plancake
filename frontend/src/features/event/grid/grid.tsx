@@ -82,8 +82,10 @@ export default function ScheduleGrid({
 
   return (
     <div
-      className="relative mb-8 grid w-full grid-cols-[1fr] grid-rows-[auto_1fr]"
-      style={{ maxHeight: "90%" }}
+      className={cn(
+        "relative mb-8 grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]",
+        mode === "preview" && "mb-0",
+      )}
     >
       <ScheduleHeader
         preview={mode === "preview"}

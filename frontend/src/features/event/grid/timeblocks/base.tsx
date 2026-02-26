@@ -18,7 +18,7 @@ export default function BaseTimeBlock({
       ref={ref}
       className="relative isolate grid"
       style={{
-        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${SIDE_WIDTH}px`,
+        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${hasNext ? SIDE_WIDTH : 10}px`,
       }}
     >
       <div

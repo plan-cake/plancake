@@ -21,8 +21,6 @@ export type BaseButtonProps = {
    * - `semi-transparent`: A button with a semi-transparent background.
    * - `transparent`: A button with no background until hovered.
    * - `danger`: A button style used for destructive actions, filled with a red color.
-   *
-   * `transparent` buttons cannot have icons.
    */
   buttonStyle: ButtonStyle;
   /**
@@ -46,7 +44,7 @@ export type BaseButtonProps = {
   shrinkOnMobile?: boolean;
   /**
    * If `true`, the button will show a loading spinner and be unclickable.
-   * 
+   *
    * Typically, the loading state is managed internally by the button when `onClick` is
    * provided. However, this can be helpful if a button shouldn't be accessible until
    * something else has loaded.
@@ -81,7 +79,7 @@ export type BaseButtonProps = {
    * If specified, the button will stay in a loading state after a successful action. This
    * behavior should be used for buttons that trigger navigation, to avoid multiple clicks
    * before the new page loads.
-   * 
+   *
    * Otherwise, the button will return to a normal state no matter the result of
    * `onClick`.
    */

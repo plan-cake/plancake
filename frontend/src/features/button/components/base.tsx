@@ -47,8 +47,6 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
     if (isLink && !href) throw new Error("Link Button must specify href");
     if (!isLink && !onClick)
       throw new Error("Non-Link Button must specify onClick");
-    if (buttonStyle === "transparent" && icon)
-      throw new Error("Transparent Button cannot have an icon");
 
     const [isLoading, setIsLoading] = useState(loading);
     useEffect(() => {
