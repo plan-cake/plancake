@@ -25,9 +25,12 @@ export default function ClientPage({
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col justify-end">
+    <div className="flex min-h-screen flex-col gap-2">
+      <HeaderSpacer />
+      <div className="top-25 bg-background z-15 sticky flex w-full px-6 py-2">
+        <h1 className="text-2xl">Version History</h1>
+      </div>
       <div className="max-w-200 mx-auto flex w-full flex-col gap-8 px-8">
-        <HeaderSpacer scrollable />
         {versionHistoryData.map((version, index) => {
           const isCurrent = index === versionHistoryData.length - 1;
           const hasMinorVersions =
@@ -65,16 +68,8 @@ export default function ClientPage({
             </div>
           );
         })}
-        {/* Bottom spacer to avoid fade cutoff */}
+        {/* Bottom div as a scroll reference, also adding bottom padding */}
         <div ref={bottomRef} />
-      </div>
-      <div className="sticky bottom-0 z-20">
-        <div className="from-background bottom-0 left-0 h-8 w-full bg-gradient-to-t to-transparent" />
-        <div className="bg-background flex justify-center pb-4">
-          <h1 className="font-display text-lion mt-2 px-8 text-center text-6xl md:mt-4 md:text-8xl">
-            Version History
-          </h1>
-        </div>
       </div>
     </div>
   );
