@@ -28,7 +28,7 @@ export default function ClientPage({
     <div className="flex min-h-screen flex-col gap-2">
       <HeaderSpacer />
       <div className="top-25 bg-background z-15 sticky flex w-full px-6 py-2">
-        <h1 className="text-2xl">Version History</h1>
+        <h1 className="text-2xl font-bold">Version History</h1>
       </div>
       <div className="max-w-200 mx-auto flex w-full flex-col gap-8 px-8">
         {versionHistoryData.map((version, index) => {
