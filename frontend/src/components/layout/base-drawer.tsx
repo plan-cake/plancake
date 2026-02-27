@@ -144,8 +144,13 @@ export function BaseDrawer({
     String(snap) === String(snapPoints[0]);
   const isPill = isLowestSnap && !isDragging;
 
+  const activeHeaderContent =
+    isPill && pillHeaderContent ? pillHeaderContent : headerContent;
+
+  const DrawerComponent = nested ? Drawer.NestedRoot : Drawer.Root;
+
   return (
-    <Drawer.Root
+    <DrawerComponent
       open={open}
       onOpenChange={onOpenChange}
       snapPoints={snapPoints}
@@ -252,6 +257,6 @@ export function BaseDrawer({
           </div>
         </Drawer.Content>
       </Drawer.Portal>
-    </Drawer.Root>
+    </DrawerComponent>
   );
 }
