@@ -24,6 +24,11 @@ export interface BaseDrawerProps {
    * Ideal for complex layouts that would otherwise cause invalid HTML.
    */
   headerContent?: React.ReactNode;
+  /**
+   * Optional alternative header content to display ONLY when the drawer is in its pill form.
+   * If not provided, it falls back to `headerContent` or `title`.
+   */
+  pillHeaderContent?: React.ReactNode;
   /** Description for accessibility (will be visually hidden) */
   description: string;
   /* Main content of the drawer */
@@ -69,6 +74,11 @@ export interface BaseDrawerProps {
    * @default false
    * */
   floatingAtLowestSnap?: boolean;
+  /**
+   * Whether this drawer is nested inside another drawer.
+   * @default false
+   */
+  nested?: boolean;
 }
 
 export function BaseDrawer({
@@ -77,6 +87,7 @@ export function BaseDrawer({
   trigger,
   title,
   headerContent,
+  pillHeaderContent,
   description = "Drawer contents",
   children,
   snapPoints,
@@ -90,6 +101,7 @@ export function BaseDrawer({
   // By default, show overlay unless it's not a modal
   showOverlay = modal,
   floatingAtLowestSnap = false,
+  nested = false,
 }: BaseDrawerProps) {
   const [snap, setSnap] = useState<number | string | null>(
     snapPoints?.[0] ?? null,
@@ -166,7 +178,6 @@ export function BaseDrawer({
           <div
             className={cn(
               "mx-auto flex w-full flex-col overflow-hidden",
-              "pb-[env(safe-area-inset-bottom)]",
               "transition-[max-width,border-radius,box-shadow] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
               isPill
                 ? "max-w-[calc(100%-2rem)] rounded-[40px] border border-white/10"
@@ -174,9 +185,7 @@ export function BaseDrawer({
               frostedGlass ? "" : "bg-panel",
             )}
             style={{
-              height: isPill
-                ? "calc(60px + env(safe-area-inset-bottom))"
-                : "100%",
+              height: isPill ? "" : "100%",
             }}
           >
             {frostedGlass && (
@@ -196,18 +205,19 @@ export function BaseDrawer({
               <div className={cn(showHandle && "mt-1")}>
                 {(title || headerAction || headerContent) && (
                   <div
-                    className={cn(
-                      "flex items-center gap-4",
+                    className={
+                      cn()
+                      // "flex w-full items-center gap-4",
                       // isPill && "justify-center",
-                    )}
+                    }
                   >
                     {!isPill && headerAction}
 
-                    {headerContent ? (
+                    {activeHeaderContent ? (
                       <>
                         <Drawer.Title className="sr-only">{title}</Drawer.Title>
-                        <div className={cn(isPill ? "flex-none" : "flex-1")}>
-                          {headerContent}
+                        <div className={cn(isPill ? "" : "flex-1")}>
+                          {activeHeaderContent}
                         </div>
                       </>
                     ) : (
