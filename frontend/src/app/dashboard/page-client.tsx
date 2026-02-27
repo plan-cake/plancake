@@ -49,6 +49,10 @@ export default function ClientPage({
             </Link>{" "}
             to sync your data across devices.
           </div>
+          <div className="opacity-60">
+            Currently, guest data cannot be transferred to an account. Keep an
+            eye out for updates!
+          </div>
         </Banner>
       )}
       <div className="bg-panel w-full rounded-3xl">
