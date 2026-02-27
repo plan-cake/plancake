@@ -98,6 +98,7 @@ export default function MobileResults({
           timeslots={timeslots}
         />
 
+        <ResultsDrawer />
       </div>
     </div>
   );

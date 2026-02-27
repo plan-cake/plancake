@@ -41,9 +41,10 @@ export default function EventInfoDrawer({
       <BaseDrawer
         open={open}
         onOpenChange={setOpen}
-        contentClassName="h-1/2"
+        // contentClassName="h-1/2"
         title="Event Details"
         description="View details about the event"
+        frostedGlass
       >
         <EventInfo eventRange={eventRange} timezone={timezone} noTitle />
       </BaseDrawer>

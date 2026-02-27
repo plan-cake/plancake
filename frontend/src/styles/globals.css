@@ -25,3 +25,7 @@ body {
   --time-picker-primary: var(--accent);
   --time-picker-primary-light: rgba(59, 130, 246, 0.1);
 }
+
+.vaul-resizing [data-vaul-drawer] {
+  transition: none !important;
+}
