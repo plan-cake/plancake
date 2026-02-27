@@ -59,8 +59,8 @@ export function BaseDrawer({
   showHandle = true,
   frostedGlass = false,
   modal = true,
-  // By default, show overlay unless frostedGlass is enabled or if it's not a modal
-  showOverlay = !frostedGlass && modal,
+  // By default, show overlay unless it's not a modal
+  showOverlay = modal,
 }: BaseDrawerProps) {
   return (
     <Drawer.Root
@@ -71,10 +71,15 @@ export function BaseDrawer({
     >
       {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
 
-      {showOverlay && (
-        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/30" />
-      )}
       <Drawer.Portal>
+        {showOverlay && (
+          <Drawer.Overlay
+            className={cn(
+              "fixed inset-0 z-40",
+              frostedGlass ? "bg-black/1" : "bg-black/30",
+            )}
+          />
+        )}
         <Drawer.Content
           className={cn(
             "rounded-t-4xl fixed bottom-0 left-0 right-0 z-50 flex flex-col focus:outline-none",
