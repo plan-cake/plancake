@@ -13,16 +13,33 @@ export interface BaseDrawerProps {
    * If not provided, the drawer should be controlled externally via the `open` prop.
    */
   trigger?: React.ReactNode;
-  /** Title to display in the drawer header */
-  title?: React.ReactNode;
+  /**
+   * Title for the drawer (string or inline nodes only).
+   * Required for accessibility (used in Drawer.Title).
+   * If `headerContent` is provided, this will be visually hidden.
+   */
+  title: React.ReactNode;
+  /**
+   * Custom header content rendered outside the Drawer.Title heading element.
+   * Ideal for complex layouts that would otherwise cause invalid HTML.
+   */
+  headerContent?: React.ReactNode;
   /** Description for accessibility (will be visually hidden) */
-  description?: string;
+  description: string;
   /* Main content of the drawer */
   children: React.ReactNode;
   /** Array of snap points (e.g., [0.5, 1]) */
   snapPoints?: number[];
   /** Class to apply to the content container (e.g., 'h-1/2' or 'h-[500px]') */
   contentClassName?: string;
+  /** Class to apply to the inner body container wrapping the children */
+  bodyClassName?: string;
+  /**
+   * Whether the drawer body should handle scrolling automatically.
+   * Set to false if you are managing scrolling inside the children.
+   * @default true
+   */
+  scrollableBody?: boolean;
   /** Optional button or element to render to the left of the title */
   headerAction?: React.ReactNode;
   /**
@@ -59,16 +76,19 @@ export function BaseDrawer({
   onOpenChange,
   trigger,
   title,
+  headerContent,
   description = "Drawer contents",
   children,
   snapPoints,
   contentClassName,
+  bodyClassName,
+  scrollableBody = true,
   headerAction,
   showHandle = true,
   frostedGlass = false,
   modal = true,
-  // By default, show overlay unless frostedGlass is enabled or if it's not a modal
-  showOverlay = !frostedGlass && modal,
+  // By default, show overlay unless it's not a modal
+  showOverlay = modal,
   floatingAtLowestSnap = false,
 }: BaseDrawerProps) {
   const [snap, setSnap] = useState<number | string | null>(
@@ -125,11 +145,15 @@ export function BaseDrawer({
     >
       {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
 
-      {showOverlay && (
-        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/30" />
-      )}
-
       <Drawer.Portal>
+        {showOverlay && (
+          <Drawer.Overlay
+            className={cn(
+              "fixed inset-0 z-40",
+              frostedGlass ? "bg-black/1" : "bg-black/30",
+            )}
+          />
+        )}
         <Drawer.Content
           onPointerDown={() => setIsDragging(true)}
           onPointerUp={() => setIsDragging(false)}
@@ -163,25 +187,58 @@ export function BaseDrawer({
                 )}
               />
             )}
-            <div className="shrink-0 px-8 pb-4">
+
+            <div className="mb-4 shrink-0 px-8">
               {showHandle && (
                 <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
               )}
-              {(title || headerAction) && (
-                <div className="flex items-center gap-4 pt-1">
-                  {headerAction}
-                  <Drawer.Title className="mb-0 flex-1 text-lg font-semibold">
-                    {title}
-                  </Drawer.Title>
-                </div>
-              )}
 
-              <Drawer.Description className="sr-only">
-                {description}
-              </Drawer.Description>
+              <div className={cn(showHandle && "mt-1")}>
+                {(title || headerAction || headerContent) && (
+                  <div
+                    className={cn(
+                      "flex items-center gap-4",
+                      // isPill && "justify-center",
+                    )}
+                  >
+                    {!isPill && headerAction}
+
+                    {headerContent ? (
+                      <>
+                        <Drawer.Title className="sr-only">{title}</Drawer.Title>
+                        <div className={cn(isPill ? "flex-none" : "flex-1")}>
+                          {headerContent}
+                        </div>
+                      </>
+                    ) : (
+                      <Drawer.Title
+                        className={cn(
+                          "mb-0 text-lg font-semibold",
+                          isPill ? "flex-none text-center" : "flex-1",
+                        )}
+                      >
+                        {title}
+                      </Drawer.Title>
+                    )}
+                  </div>
+                )}
+
+                <Drawer.Description className="sr-only">
+                  {description}
+                </Drawer.Description>
+              </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 pb-8">{children}</div>
+            <div
+              className={cn(
+                "px-8 pb-8",
+                scrollableBody && "overflow-y-auto",
+                bodyClassName,
+                isPill ? "hidden" : "flex-1",
+              )}
+            >
+              {children}
+            </div>
           </div>
         </Drawer.Content>
       </Drawer.Portal>

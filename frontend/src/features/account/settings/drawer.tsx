@@ -20,7 +20,7 @@ export default function AccountSettingsDrawer({
         frostedGlass
         contentClassName="h-7/8"
         description="View and edit your account settings"
-        title={"Account Settings"}
+        title="Account Settings"
       >
         <div className="flex flex-1 flex-col overflow-y-auto">{content}</div>
       </BaseDrawer>
