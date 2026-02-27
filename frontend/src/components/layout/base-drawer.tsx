@@ -87,8 +87,8 @@ export function BaseDrawer({
   showHandle = true,
   frostedGlass = false,
   modal = true,
-  // By default, show overlay unless frostedGlass is enabled or if it's not a modal
-  showOverlay = !frostedGlass && modal,
+  // By default, show overlay unless it's not a modal
+  showOverlay = modal,
   floatingAtLowestSnap = false,
 }: BaseDrawerProps) {
   const [snap, setSnap] = useState<number | string | null>(
@@ -145,10 +145,6 @@ export function BaseDrawer({
     >
       {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
 
-      {showOverlay && (
-        <Drawer.Overlay className="fixed inset-0 z-40 bg-black/30" />
-      )}
-
       <Drawer.Portal>
         {showOverlay && (
           <Drawer.Overlay
@@ -184,21 +180,28 @@ export function BaseDrawer({
             }}
           >
             {frostedGlass && (
-              <div className="frosted-glass absolute inset-0 -z-10" />
+              <div
+                className={cn(
+                  "rounded-t-4xl absolute -bottom-12 left-0 right-0 top-0 -z-10 border-t shadow-lg",
+                  "frosted-glass",
+                )}
+              />
             )}
 
-            <div className="shrink-0 px-8 pb-4">
+            <div className="mb-4 shrink-0 px-8">
               {showHandle && (
                 <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
               )}
-              {(title || headerAction) && (
-                <div className="flex items-center gap-4 pt-1">
-                  {headerAction}
-                  <Drawer.Title className="mb-0 flex-1 text-lg font-semibold">
-                    {title}
-                  </Drawer.Title>
-                </div>
-              )}
+
+              <div className={cn(showHandle && "mt-1")}>
+                {(title || headerAction || headerContent) && (
+                  <div
+                    className={cn(
+                      "flex items-center gap-4",
+                      // isPill && "justify-center",
+                    )}
+                  >
+                    {!isPill && headerAction}
 
                     {headerContent ? (
                       <>
