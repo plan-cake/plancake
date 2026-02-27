@@ -91,11 +91,10 @@ export function BaseDrawer({
             />
           )}
           <div className="mx-auto flex w-full max-w-md flex-1 flex-col overflow-hidden">
+            {showHandle && (
+              <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
+            )}
             <div className="shrink-0 px-8 pb-4 pt-4">
-              {showHandle && (
-                <Drawer.Handle className="!bg-foreground/50 mx-auto mb-4 !w-20" />
-              )}
-
               {(title || headerAction) && (
                 <div className="flex items-center gap-4">
                   {headerAction}
@@ -110,9 +109,7 @@ export function BaseDrawer({
               </Drawer.Description>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 pb-8" data-vaul-no-drag>
-              {children}
-            </div>
+            <div className="flex-1 overflow-y-auto px-8 pb-8">{children}</div>
           </div>
         </Drawer.Content>
       </Drawer.Portal>
