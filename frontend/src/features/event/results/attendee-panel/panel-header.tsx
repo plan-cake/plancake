@@ -12,12 +12,14 @@ type PanelHeaderProps = {
   isRemoving: boolean;
   toggleRemoving: () => void;
   promptRemove: (person: string) => void;
+  inDrawer?: boolean;
 };
 
 export default function PanelHeader({
   isRemoving,
   toggleRemoving,
   promptRemove,
+  inDrawer = false,
 }: PanelHeaderProps) {
   const {
     hoveredSlot,
@@ -41,7 +43,12 @@ export default function PanelHeader({
     !isCreator && currentUser && participants.includes(currentUser);
 
   return (
-    <div className="flex touch-none select-none justify-between px-6 pt-6">
+    <div
+      className={cn(
+        "flex touch-none select-none justify-between",
+        inDrawer ? "" : "px-6 pt-6",
+      )}
+    >
       <div className="flex flex-col">
         <h2 className="text-md font-semibold">
           {isRemoving ? "Removing a" : "A"}ttendees
