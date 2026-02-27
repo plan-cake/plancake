@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useContext, ReactNode } from "react";
 
 import { ResultsInformation } from "@/features/event/results/types";

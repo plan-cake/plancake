@@ -4,9 +4,11 @@ import { useResultsContext } from "@/features/event/results/context";
 export default function ParticipantList({
   isRemoving,
   promptRemove,
+  mobile = false,
 }: {
   isRemoving: boolean;
   promptRemove: (person: string) => void;
+  mobile?: boolean;
 }) {
   const {
     participants,
@@ -18,16 +20,20 @@ export default function ParticipantList({
     toggleParticipant: onParticipantToggle,
   } = useResultsContext();
 
+  const listClassNames = mobile
+    ? "flex flex-wrap gap-3 pt-1"
+    : "flex flex-wrap gap-2.5 overflow-y-auto px-6 pb-6 pt-1 max-h-none";
+
   if (participants.length === 0) {
     return (
-      <ul className="flex flex-wrap gap-3 overflow-y-auto px-6 pb-6 pt-1 md:max-h-none md:gap-2.5">
+      <ul className={listClassNames}>
         <li className="text-sm italic opacity-50">No attendees yet</li>
       </ul>
     );
   }
 
   return (
-    <ul className="flex flex-wrap gap-3 overflow-y-auto px-6 pb-6 pt-1 md:max-h-none md:gap-2.5">
+    <ul className={listClassNames}>
       {participants.map((person: string, index: number) => (
         <ParticipantChip
           key={person}

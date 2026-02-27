@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
