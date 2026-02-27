@@ -1,11 +1,11 @@
-import { AvailabilityDataResponse } from "@/features/event/availability/fetch-data";
+import { AllAvailability } from "@/lib/utils/api/types";
 import { formatDateTime } from "@/lib/utils/date-time-format";
 
 export function processAvailabilityData(
-  availabilityData: AvailabilityDataResponse,
+  availabilityData: AllAvailability,
   eventType: string,
   timezone: string,
-): AvailabilityDataResponse {
+): AllAvailability {
   const availabilities = availabilityData.availability || {};
 
   // convert all keys to ISO strings

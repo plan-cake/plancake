@@ -1,18 +1,18 @@
 import {
-  useState,
-  useOptimistic,
-  useMemo,
-  useCallback,
   startTransition,
+  useCallback,
+  useMemo,
+  useOptimistic,
+  useState,
 } from "react";
 
 import { ResultsAvailabilityMap } from "@/core/availability/types";
-import { AvailabilityDataResponse } from "@/features/event/availability/fetch-data";
 import { removePerson } from "@/features/event/results/remove-person";
 import { useToast } from "@/features/system-feedback/toast/context";
+import { AllAvailability } from "@/lib/utils/api/types";
 
 export function useEventResults(
-  initialData: AvailabilityDataResponse,
+  initialData: AllAvailability,
   eventCode: string,
   isCreator: boolean,
   userName: string | null,

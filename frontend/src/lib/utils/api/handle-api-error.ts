@@ -1,6 +1,6 @@
 import { notFound } from "next/dist/client/components/navigation";
 
-type ApiErrorResponse = {
+export type ApiErrorData = {
   error: {
     [key: string]: string[];
   };
@@ -15,7 +15,7 @@ function snakeToTitleCase(str: string): string {
 
 export default function handleErrorResponse(
   status: number,
-  errors: ApiErrorResponse,
+  errors: ApiErrorData,
 ): never {
   // handle 404 separately to trigger Next.js notFound page
   if (status === 404) {
@@ -65,7 +65,7 @@ export default function handleErrorResponse(
   });
 }
 
-export function formatApiError(errors: ApiErrorResponse): string {
+export function formatApiError(errors: ApiErrorData): string {
   let errorMessage = "";
   let generalMessage = "";
   const errorFields = errors.error;

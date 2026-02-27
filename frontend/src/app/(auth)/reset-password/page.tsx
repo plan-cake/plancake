@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { useRouter, useSearchParams, notFound } from "next/navigation";
+import { notFound, useRouter, useSearchParams } from "next/navigation";
 
 import AuthPageLayout from "@/components/layout/auth-page";
 import TextInputField from "@/components/text-input-field";
@@ -10,7 +10,9 @@ import PasswordValidation from "@/features/auth/components/password-validation";
 import ActionButton from "@/features/button/components/action";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
-import { formatApiError } from "@/lib/utils/api/handle-api-error";
+import { clientPost } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function Page() {
   const [newPassword, setNewPassword] = useState("");
@@ -30,8 +32,7 @@ export default function Page() {
   }
 
   // TOASTS AND ERROR STATES
-  const { errors, handleError, clearAllErrors, handleGenericError } =
-    useFormErrors();
+  const { errors, handleError, clearAllErrors } = useFormErrors();
 
   const handleConfirmPasswordChange = (value: string) => {
     handleError("confirmPassword", "");
@@ -61,37 +62,21 @@ export default function Page() {
     }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            reset_token: pwdResetToken,
-            new_password: newPassword,
-          }),
-        },
-      );
-      if (res.ok) {
-        router.push("/reset-password/success");
-        return true;
+      await clientPost(ROUTES.auth.resetPassword, {
+        reset_token: pwdResetToken,
+        new_password: newPassword,
+      });
+      router.push("/reset-password/success");
+      return true;
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      if (error.status === 404) {
+        handleError("api", MESSAGES.ERROR_RESET_TOKEN_INVALID);
+      } else if (error.data.error?.["new_password"]) {
+        handleError("password", MESSAGES.ERROR_PASSWORD_REUSE);
       } else {
-        const body = await res.json();
-        const errorMessage = formatApiError(body);
-
-        if (res.status === 404) {
-          handleError("api", MESSAGES.ERROR_RESET_TOKEN_INVALID);
-        } else if (body.error?.["new_password"]) {
-          handleError("password", MESSAGES.ERROR_PASSWORD_REUSE);
-        } else {
-          handleError("api", errorMessage);
-        }
-        return false;
+        handleError("api", error.formattedMessage);
       }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      handleGenericError();
       return false;
     }
   };

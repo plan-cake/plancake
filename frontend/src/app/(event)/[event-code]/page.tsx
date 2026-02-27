@@ -2,21 +2,22 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import ClientPage from "@/app/(event)/[event-code]/page-client";
-import { fetchAvailabilityData } from "@/features/event/availability/fetch-data";
 import { EventCodePageProps } from "@/features/event/code-page-props";
 import { getCachedEventDetails } from "@/features/event/editor/fetch-data";
-import { getAuthCookieString } from "@/lib/utils/api/cookie-utils";
-import { processAvailabilityData } from "@/lib/utils/api/process-availability-data";
-import { processEventData } from "@/lib/utils/api/process-event-data";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
+import handleErrorResponse from "@/lib/utils/api/handle-api-error";
+import { processAvailabilityData } from "@/lib/utils/api/processors/process-availability-data";
+import { processEventData } from "@/lib/utils/api/processors/process-event-data";
+import { serverGet } from "@/lib/utils/api/server-fetch";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
 
 export async function generateMetadata({
   params,
 }: EventCodePageProps): Promise<Metadata> {
   const { "event-code": eventCode } = await params;
-  const authCookies = await getAuthCookieString();
 
-  const initialEventData = await getCachedEventDetails(eventCode, authCookies);
+  const initialEventData = await getCachedEventDetails(eventCode);
 
   if (!initialEventData) {
     return constructMetadata(
@@ -35,15 +36,23 @@ export async function generateMetadata({
 
 export default async function Page({ params }: EventCodePageProps) {
   const { "event-code": eventCode } = await params;
-  const authCookies = await getAuthCookieString();
 
   if (!eventCode) {
     notFound();
   }
 
   const [initialEventData, initialAvailabilityData] = await Promise.all([
-    getCachedEventDetails(eventCode, authCookies),
-    fetchAvailabilityData(eventCode, authCookies),
+    getCachedEventDetails(eventCode),
+    serverGet(
+      ROUTES.availability.getAll,
+      {
+        event_code: eventCode,
+      },
+      { cache: "no-store" },
+    ).catch((e) => {
+      const error = e as ApiErrorResponse;
+      handleErrorResponse(error.status, error.data);
+    }),
   ]);
 
   const { eventName, eventRange, timeslots, isCreator } =

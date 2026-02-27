@@ -2,36 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 
-import { MESSAGES } from "@/lib/messages";
-import { getAuthCookieString } from "@/lib/utils/api/cookie-utils";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
+import { serverPost } from "@/lib/utils/api/server-fetch";
 
 export async function deleteEvent(eventCode: string) {
-  const authCookies = await getAuthCookieString();
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
   try {
-    const response = await fetch(`${baseUrl}/event/delete/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: authCookies,
-      },
-      cache: "no-store",
-      body: JSON.stringify({ event_code: eventCode }),
-    });
-
-    if (!response.ok) {
-      return {
-        success: false,
-        error: response.statusText,
-      };
-    }
-
+    await serverPost(ROUTES.event.delete, { event_code: eventCode }, { cache: "no-store" });
     revalidatePath(`/dashboard`);
-
     return { success: true };
-  } catch (error) {
-    console.error("Error deleting event:", error);
-    return { success: false, error: MESSAGES.ERROR_GENERIC };
+  } catch (e) {
+    const error = e as ApiErrorResponse;
+    return { success: false, error: error.formattedMessage };
   }
 }

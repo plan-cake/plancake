@@ -1,7 +1,9 @@
 import { EventRange } from "@/core/event/types";
 import { EventEditorType } from "@/features/event/editor/types";
-import { MESSAGES } from "@/lib/messages";
-import { formatApiError } from "@/lib/utils/api/handle-api-error";
+import { clientPost } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
+import { EventCode } from "@/lib/utils/api/types";
 import { timeslotToISOString } from "@/lib/utils/date-time-format";
 
 export type EventSubmitData = {
@@ -27,14 +29,14 @@ export default async function submitEvent(
   onSuccess: (code: string) => void,
   handleError: (field: string, message: string) => void,
 ): Promise<boolean> {
-  let apiRoute = `${process.env.NEXT_PUBLIC_API_URL}/event`;
+  let apiRoute;
 
   if (eventType === "specific") {
-    apiRoute +=
-      type === "new" ? "/date-create/" : "/date-edit/";
+    apiRoute =
+      type === "new" ? ROUTES.event.dateCreate : ROUTES.event.dateEdit;
   } else {
-    apiRoute +=
-      type === "new" ? "/week-create/" : "/week-edit/";
+    apiRoute =
+      type === "new" ? ROUTES.event.weekCreate : ROUTES.event.weekEdit;
   }
 
   if (data.timeslots.length === 0) {
@@ -62,37 +64,22 @@ export default async function submitEvent(
   }
 
   try {
-    const res = await fetch(apiRoute, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(jsonBody),
-    });
-    if (res.ok) {
-      const code = (await res.json()).event_code;
-      if (type === "new") {
-        onSuccess(code);
-        return true;
-      } else {
-        // endpoint does not return code on edit
-        onSuccess(data.code);
-        return true;
-      }
+    const resData = await clientPost(apiRoute, jsonBody);
+    if (type === "new") {
+      const code = (resData as EventCode).event_code;
+      onSuccess(code);
+      return true;
     } else {
-      const body = await res.json();
-      const errorMessage = formatApiError(body);
-
-      if (res.status === 429) {
-        handleError("rate_limit", errorMessage);
-      } else {
-        handleError("toast", formatApiError(body));
-      }
-
-      return false;
+      onSuccess(data.code);
+      return true;
     }
-  } catch (err) {
-    console.error("Fetch error:", err);
-    handleError("toast", MESSAGES.ERROR_GENERIC);
+  } catch (e) {
+    const error = e as ApiErrorResponse;
+    if (error.rateLimited) {
+      handleError("rate_limit", error.formattedMessage);
+    } else {
+      handleError("toast", error.formattedMessage);
+    }
     return false;
   }
 }

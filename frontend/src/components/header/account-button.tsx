@@ -8,6 +8,8 @@ import { useAccount } from "@/features/account/context";
 import AccountSettings from "@/features/account/settings/selector";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
+import { clientGet } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
 
 export default function AccountButton() {
   const { loginState, login, logout } = useAccount();
@@ -27,27 +29,14 @@ export default function AccountButton() {
       setAccountSettingsOpen(false);
 
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/check-account-auth/`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-          },
-        );
-        if (res.ok) {
-          const data = await res.json();
-          login({
-            email: data.email,
-            defaultName: data.default_display_name,
-          });
-        } else {
-          logout();
-          setAccountSettingsOpen(false);
-        }
-      } catch (err) {
-        console.error("Fetch error:", err);
+        const data = await clientGet(ROUTES.auth.checkAccountAuth);
+        login({
+          email: data.email,
+          defaultName: data.default_display_name,
+        });
+      } catch {
         logout();
+        setAccountSettingsOpen(false);
       }
     };
     checkLogin();

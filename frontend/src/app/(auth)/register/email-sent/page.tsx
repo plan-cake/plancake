@@ -9,7 +9,9 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
-import { formatApiError } from "@/lib/utils/api/handle-api-error";
+import { clientPost } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function Page() {
   const router = useRouter();
@@ -50,27 +52,13 @@ export default function Page() {
     }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/resend-register-email/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ email }),
-        },
-      );
-
-      if (res.ok) {
-        addToast("success", MESSAGES.SUCCESS_EMAIL_SENT);
-        lastEmailResend.current = Date.now();
-        return true;
-      } else {
-        addToast("error", formatApiError(await res.json()));
-        return false;
-      }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      addToast("error", MESSAGES.ERROR_GENERIC);
+      await clientPost(ROUTES.auth.resendRegisterEmail, { email });
+      addToast("success", MESSAGES.SUCCESS_EMAIL_SENT);
+      lastEmailResend.current = Date.now();
+      return true;
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      addToast("error", error.formattedMessage);
       return false;
     }
   };

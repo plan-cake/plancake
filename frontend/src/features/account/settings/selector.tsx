@@ -12,7 +12,9 @@ import ActionButton from "@/features/button/components/action";
 import { useToast } from "@/features/system-feedback";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { MESSAGES } from "@/lib/messages";
-import { formatApiError } from "@/lib/utils/api/handle-api-error";
+import { clientPost } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { cn } from "@/lib/utils/classname";
 
 export default function AccountSettings({
@@ -67,43 +69,28 @@ function SettingsContent() {
     setDefaultNameError("");
     try {
       if (defaultName) {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/account/set-default-name/`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ display_name: defaultName }),
-          },
-        );
-
-        if (res.ok) {
+        try {
+          await clientPost(ROUTES.account.setDefaultName, {
+            display_name: defaultName,
+          });
           login({ ...accountDetails!, defaultName: defaultName });
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_SAVED);
           return true;
-        } else {
-          const errorData = await res.json();
-          addToast("error", formatApiError(errorData));
+        } catch (e) {
+          const error = e as ApiErrorResponse;
+          addToast("error", error.formattedMessage);
           return false;
         }
       } else {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/account/remove-default-name/`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-          },
-        );
-
-        if (res.ok) {
+        try {
+          await clientPost(ROUTES.account.removeDefaultName);
           login({ ...accountDetails!, defaultName: "" });
           setDefaultName("");
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_REMOVED);
           return true;
-        } else {
-          const errorData = await res.json();
-          addToast("error", formatApiError(errorData));
+        } catch (e) {
+          const error = e as ApiErrorResponse;
+          addToast("error", error.formattedMessage);
           return false;
         }
       }
@@ -128,26 +115,14 @@ function SettingsContent() {
 
   const signOut = async () => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        },
-      );
-      if (res.ok) {
-        logout();
-        addToast("success", MESSAGES.SUCCESS_LOGOUT);
-        router.push("/login");
-        return true;
-      } else {
-        addToast("error", formatApiError(await res.json()));
-        return false;
-      }
+      await clientPost(ROUTES.auth.logout);
+      logout();
+      addToast("success", MESSAGES.SUCCESS_LOGOUT);
+      router.push("/login");
+      return true;
     } catch (e) {
-      console.error("Fetch error:", e);
-      addToast("error", MESSAGES.ERROR_GENERIC);
+      const error = e as ApiErrorResponse;
+      addToast("error", error.formattedMessage);
       return false;
     }
   };
