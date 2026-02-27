@@ -13,7 +13,7 @@ export default function NewEventButton() {
     return null;
   }
 
-  let style: ButtonStyle = "secondary";
+  let style: ButtonStyle = "frosted glass inset";
 
   if (pathname === "/dashboard" || pathname === "/") {
     style = "primary";
