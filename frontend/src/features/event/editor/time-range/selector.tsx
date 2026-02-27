@@ -64,7 +64,7 @@ function TimeCollapsible({
           <div
             className={cn(
               "inline-flex items-center rounded-full text-start",
-              "bg-accent/15 hover:bg-accent/25 active:bg-accent/40 text-accent px-3 py-1",
+              "bg-accent/15 hover:bg-accent/25 active:bg-accent/40 text-accent-text px-3 py-1",
               "hover:cursor-pointer focus:outline-none",
               open && "ring-accent ring-1",
             )}

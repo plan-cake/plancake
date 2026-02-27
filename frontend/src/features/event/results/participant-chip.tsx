@@ -64,7 +64,11 @@ export default function ParticipantChip({
 
         // Wiggle/Remove Styling
         isRemoving &&
-          "animate-wiggle hover:bg-red scale-102 group hover:cursor-pointer hover:text-white hover:opacity-100 active:bg-red-400 md:scale-100",
+          cn(
+            "animate-wiggle scale-102 group hover:cursor-pointer md:scale-100",
+            "hover:bg-error hover:text-white hover:opacity-100",
+            "active:bg-[color-mix(in_oklab,var(--color-error)_100%,black_10%)]",
+          ),
       )}
     >
       <span

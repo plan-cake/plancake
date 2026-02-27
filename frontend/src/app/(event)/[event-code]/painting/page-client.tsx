@@ -284,13 +284,11 @@ export default function ClientPage({
 
           <div className="bg-panel rounded-3xl p-6 text-sm">
             Displaying event in
-            <span className="text-accent ml-1 font-bold">
-              <TimeZoneSelector
-                id="timezone-select"
-                value={timeZone}
-                onChange={setTimeZone}
-              />
-            </span>
+            <TimeZoneSelector
+              id="timezone-select"
+              value={timeZone}
+              onChange={setTimeZone}
+            />
           </div>
         </div>
 
