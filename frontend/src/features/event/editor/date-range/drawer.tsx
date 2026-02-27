@@ -39,6 +39,7 @@ export default function DateRangeDrawer({
       open={open}
       onOpenChange={setOpen}
       contentClassName="h-2/3"
+      title="Select Date Range"
       description="Select a date range using the calendar below"
       trigger={
         <div onClick={() => setOpen(!open)}>
@@ -49,7 +50,7 @@ export default function DateRangeDrawer({
           />
         </div>
       }
-      title={
+      headerContent={
         <div className="flex flex-col text-lg font-semibold">
           Select Specific Date Range
           {errors.dateRange ? (

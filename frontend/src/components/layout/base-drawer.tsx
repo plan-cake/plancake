@@ -11,10 +11,19 @@ export interface BaseDrawerProps {
    * If not provided, the drawer should be controlled externally via the `open` prop.
    */
   trigger?: React.ReactNode;
-  /** Title to display in the drawer header */
-  title?: React.ReactNode;
+  /**
+   * Title for the drawer (string or inline nodes only).
+   * Required for accessibility (used in Drawer.Title).
+   * If `headerContent` is provided, this will be visually hidden.
+   */
+  title: React.ReactNode;
+  /**
+   * Custom header content rendered outside the Drawer.Title heading element.
+   * Ideal for complex layouts that would otherwise cause invalid HTML.
+   */
+  headerContent?: React.ReactNode;
   /** Description for accessibility (will be visually hidden) */
-  description?: string;
+  description: string;
   /* Main content of the drawer */
   children: React.ReactNode;
   /** Array of snap points (e.g., [0.5, 1]) */
@@ -51,6 +60,7 @@ export function BaseDrawer({
   onOpenChange,
   trigger,
   title,
+  headerContent,
   description = "Drawer contents",
   children,
   snapPoints,
@@ -100,12 +110,20 @@ export function BaseDrawer({
               <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
             )}
             <div className="shrink-0 px-8 pb-4 pt-4">
-              {(title || headerAction) && (
+              {(title || headerAction || headerContent) && (
                 <div className="flex items-center gap-4">
                   {headerAction}
-                  <Drawer.Title className="mb-0 flex-1 text-lg font-semibold">
-                    {title}
-                  </Drawer.Title>
+
+                  {headerContent ? (
+                    <>
+                      <Drawer.Title className="sr-only">{title}</Drawer.Title>
+                      <div className="flex-1">{headerContent}</div>
+                    </>
+                  ) : (
+                    <Drawer.Title className="mb-0 flex-1 text-lg font-semibold">
+                      {title}
+                    </Drawer.Title>
+                  )}
                 </div>
               )}
 
