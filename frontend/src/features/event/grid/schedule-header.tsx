@@ -1,9 +1,10 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 
+import ActionButton from "@/features/button/components/action";
 import {
-  TIME_LABEL_WIDTH,
   SIDE_WIDTH,
+  TIME_LABEL_WIDTH,
 } from "@/features/event/grid/lib/constants";
 import { cn } from "@/lib/utils/classname";
 
@@ -54,16 +55,18 @@ export default function ScheduleHeader({
       }}
     >
       {currentPage > 0 ? (
-        <button
-          onClick={onPrevPage}
-          aria-label="Previous Page"
-          className={cn(
-            "ml-3 flex h-9 w-9 cursor-pointer items-center justify-center",
-            "bg-accent/15 hover:bg-accent/25 active:bg-accent/40 rounded-full text-xl",
-          )}
-        >
-          <ChevronLeftIcon className="h-5 w-5" />
-        </button>
+        <div>
+          <ActionButton
+            buttonStyle="semi-transparent"
+            icon={<ChevronLeftIcon />}
+            onClick={() => {
+              onPrevPage();
+              return true;
+            }}
+            className="ml-3 p-1.5"
+            aria-label="Previous Page"
+          />
+        </div>
       ) : (
         <div style={{ width: `${SIDE_WIDTH}px` }} />
       )}
@@ -106,16 +109,18 @@ export default function ScheduleHeader({
       </div>
 
       {currentPage < totalPages - 1 ? (
-        <button
-          onClick={onNextPage}
-          aria-label="Next Page"
-          className={cn(
-            "flex h-9 w-9 cursor-pointer items-center justify-center",
-            "bg-accent/15 hover:bg-accent/25 active:bg-accent/40 rounded-full text-xl",
-          )}
-        >
-          <ChevronRightIcon className="h-5 w-5" />
-        </button>
+        <div>
+          <ActionButton
+            buttonStyle="semi-transparent"
+            icon={<ChevronRightIcon />}
+            onClick={() => {
+              onNextPage();
+              return true;
+            }}
+            className="p-1.5"
+            aria-label="Next Page"
+          />
+        </div>
       ) : (
         <div style={{ width: `${SIDE_WIDTH}px` }} />
       )}

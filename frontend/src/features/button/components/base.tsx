@@ -33,6 +33,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       href,
       onClick,
       loadOnSuccess = false,
+      className,
       ...props // for forwardRef
     },
     ref, // for forwardRef
@@ -100,7 +101,15 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       });
 
     const buttonContent = (
-      <div className={cn(baseClasses, cursorClass, styleClasses, focusClasses)}>
+      <div
+        className={cn(
+          baseClasses,
+          cursorClass,
+          styleClasses,
+          focusClasses,
+          className,
+        )}
+      >
         {icon && iconComponent}
         {label && (
           <span className={cn(labelClass, loadingHideClass)}>{label}</span>
@@ -231,6 +240,22 @@ function getStyleClasses(
           break;
       }
       spinnerClasses = "border-foreground";
+      break;
+    case "semi-transparent":
+      switch (state) {
+        case "rest":
+          styleClasses =
+            "text-accent font-bold bg-accent/15 hover:bg-accent/25 active:bg-accent/40";
+          break;
+        case "loading":
+          styleClasses = "font-bold bg-accent/20";
+          break;
+        case "disabled":
+          styleClasses =
+            "font-bold text-[#ffffff] dark:text-gray-400 bg-gray-200 dark:bg-gray-400/25";
+          break;
+      }
+      spinnerClasses = "border-accent";
       break;
     case "transparent":
       switch (state) {
