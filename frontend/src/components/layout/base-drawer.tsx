@@ -30,6 +30,14 @@ export interface BaseDrawerProps {
   snapPoints?: number[];
   /** Class to apply to the content container (e.g., 'h-1/2' or 'h-[500px]') */
   contentClassName?: string;
+  /** Class to apply to the inner body container wrapping the children */
+  bodyClassName?: string;
+  /**
+   * Whether the drawer body should handle scrolling automatically.
+   * Set to false if you are managing scrolling inside the children.
+   * @default true
+   */
+  scrollableBody?: boolean;
   /** Optional button or element to render to the left of the title */
   headerAction?: React.ReactNode;
   /**
@@ -65,6 +73,8 @@ export function BaseDrawer({
   children,
   snapPoints,
   contentClassName,
+  bodyClassName,
+  scrollableBody = true,
   headerAction,
   showHandle = true,
   frostedGlass = false,
@@ -132,7 +142,15 @@ export function BaseDrawer({
               </Drawer.Description>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 pb-8">{children}</div>
+            <div
+              className={cn(
+                "flex-1 px-8 pb-8",
+                scrollableBody && "overflow-y-auto",
+                bodyClassName,
+              )}
+            >
+              {children}
+            </div>
           </div>
         </Drawer.Content>
       </Drawer.Portal>
