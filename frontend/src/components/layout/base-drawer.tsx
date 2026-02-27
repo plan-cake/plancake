@@ -109,9 +109,7 @@ export function BaseDrawer({
               </Drawer.Description>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 pb-8" data-vaul-no-drag>
-              {children}
-            </div>
+            <div className="flex-1 overflow-y-auto px-8 pb-8">{children}</div>
           </div>
         </Drawer.Content>
       </Drawer.Portal>
