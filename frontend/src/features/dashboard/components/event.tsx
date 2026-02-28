@@ -75,7 +75,8 @@ export default function DashboardEvent({
       const width = entry.contentRect.width;
       // Each icon is 24px wide with a -4px overlap, except for the first
       // We also subtract an extra 16 px just for padding in case the "+N" is big
-      setNumIcons(Math.floor((width - 4 - 16) / 20));
+      const calculated = Math.floor((width - 4 - 16) / 20);
+      setNumIcons(Math.min(1, calculated)); // always show at least 1 icon
     });
 
     observer.observe(participantRowRef.current);
