@@ -13,18 +13,17 @@ export default function ParticipantRow({
     <div className="flex text-sm">
       {participants.length > 0 ? (
         participants.map((participant, index) => {
-          if (index >= maxDisplay) {
-            if (index === maxDisplay) {
-              return (
-                <ParticipantIcon
-                  key="more-participants"
-                  iconText={`+${participants.length - maxDisplay}`}
-                  isFirst={false}
-                  label={`and ${participants.length - maxDisplay} more participant${participants.length - maxDisplay === 1 ? "" : "s"}`}
-                />
-              );
-            }
+          if (index > maxDisplay) {
             return null;
+          } else if (index === maxDisplay) {
+            return (
+              <ParticipantIcon
+                key="more-participants"
+                iconText={`+${participants.length - maxDisplay}`}
+                isFirst={false}
+                label={`and ${participants.length - maxDisplay} more participant${participants.length - maxDisplay === 1 ? "" : "s"}`}
+              />
+            );
           }
           return (
             <ParticipantIcon
