@@ -1,4 +1,4 @@
-import { MouseEvent, useMemo } from "react";
+import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { ClockIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import Link from "next/link";
@@ -63,6 +63,26 @@ export default function DashboardEvent({
     [dateTimeProps.endTime, dateTimeProps.endDate, timezone, type],
   );
 
+  // Dynamic participant icon count based on event width
+  const participantRowRef = useRef<HTMLDivElement>(null);
+  const [numIcons, setNumIcons] = useState(8);
+  useEffect(() => {
+    if (!participantRowRef.current) return;
+
+    const observer = new ResizeObserver((entries) => {
+      if (entries.length === 0) return;
+      const entry = entries[0];
+      const width = entry.contentRect.width;
+      // Each icon is 24px wide with a -4px overlap, except for the first
+      // We also subtract an extra 16 px just for padding in case the "+N" is big
+      setNumIcons(Math.floor((width - 4 - 16) / 20));
+    });
+
+    observer.observe(participantRowRef.current);
+
+    return () => observer.disconnect();
+  });
+
   return (
     <Link
       href={`/${code}`}
@@ -85,8 +105,8 @@ export default function DashboardEvent({
         <ClockIcon className="h-5 w-5" />
         {formatTimeRange(start.time, end.time)}
       </div>
-      <div className="mt-1.5">
-        <ParticipantRow participants={participants} numIcons={8} />
+      <div className="mt-1.5" ref={participantRowRef}>
+        <ParticipantRow participants={participants} numIcons={numIcons} />
       </div>
       <div className="mt-2.5 flex items-center gap-2">
         <DashboardCopyButton code={code} />
