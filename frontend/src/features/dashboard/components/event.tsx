@@ -82,7 +82,7 @@ export default function DashboardEvent({
           {formatTimeRange(start.time, end.time)}
         </div>
         <div className="mt-1.5">
-          <ParticipantRow participants={participants} maxDisplay={7} />
+          <ParticipantRow participants={participants} numIcons={8} />
         </div>
         <div className="mt-2.5 flex items-center gap-2">
           <DashboardCopyButton code={code} />
