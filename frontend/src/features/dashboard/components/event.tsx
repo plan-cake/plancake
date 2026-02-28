@@ -81,7 +81,7 @@ export default function DashboardEvent({
     observer.observe(participantRowRef.current);
 
     return () => observer.disconnect();
-  });
+  }, []);
 
   return (
     <Link
