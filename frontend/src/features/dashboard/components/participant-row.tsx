@@ -15,7 +15,10 @@ export default function ParticipantRow({
         participants.map((participant, index) => {
           if (index > maxDisplay) {
             return null;
-          } else if (index === maxDisplay) {
+          } else if (
+            index === maxDisplay &&
+            participants.length > maxDisplay + 1
+          ) {
             return (
               <ParticipantIcon
                 key="more-participants"
