@@ -21,7 +21,8 @@ export default function ParticipantRow({
               <ParticipantIcon
                 key="more-participants"
                 iconText={`+${remaining}`}
-                isFirst={false}
+                // juuuuuust in case (the UI would be very messed up at this point)
+                isFirst={index === 0}
                 label={`and ${remaining} more participant${remaining === 1 ? "" : "s"}`}
               />
             );
