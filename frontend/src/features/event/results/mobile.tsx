@@ -61,12 +61,19 @@ export default function MobileResults({
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6">
       <HeaderSpacer />
-      <div className="flex flex-col justify-between gap-2 md:flex-row">
+      <div className="flex flex-col justify-between gap-4 md:flex-row">
         <div className="flex flex-1 justify-between">
           <h1 className="text-2xl">{eventName}</h1>
-          <EventInfoDrawer eventRange={eventRange} timezone={timezone} />
+          {/* <EventInfoDrawer eventRange={eventRange} timezone={timezone} /> */}
+          <LinkButton
+            buttonStyle="primary"
+            icon={<Pencil2Icon />}
+            label={(currentUser ? "Edit" : "Add") + " Availability"}
+            href={`/${eventCode}/painting`}
+          />
         </div>
-        <div className="flex flex-wrap items-start justify-end gap-2">
+        {banners}
+        {/* <div className="flex flex-wrap items-start justify-end gap-2">
           {isCreator && (
             <LinkButton
               buttonStyle="secondary"
@@ -83,7 +90,7 @@ export default function MobileResults({
             label={(currentUser ? "Edit" : "Add") + " Availability"}
             href={`/${eventCode}/painting`}
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="h-fit md:flex md:flex-row md:gap-4">
@@ -98,7 +105,11 @@ export default function MobileResults({
           timeslots={timeslots}
         />
 
-        <ResultsDrawer />
+        <ResultsDrawer
+          eventRange={eventRange}
+          timezone={timezone}
+          onTimezoneChange={handleTZChange}
+        />
       </div>
     </div>
   );
