@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
 
+import { BaseDrawer } from "@/components/layout/base-drawer";
 import ActionButton from "@/features/button/components/action";
 import { DIALOG_CONFIG } from "@/features/system-feedback/confirmation/config";
 import { ConfirmationDialogType } from "@/features/system-feedback/type";
@@ -16,6 +17,7 @@ type ConfirmationDialogProps = {
   disabled?: boolean;
   showIcon?: boolean;
   autoClose?: boolean;
+  asNestedDrawer?: boolean;
 
   // controlled props
   // (for when the dialog needs to be controlled by the parent component)
@@ -32,6 +34,7 @@ export default function ConfirmationDialog({
   disabled = false,
   showIcon = false,
   autoClose = false,
+  asNestedDrawer = false,
   open: controlledOpen,
   onOpenChange,
 }: ConfirmationDialogProps) {
@@ -91,6 +94,44 @@ export default function ConfirmationDialog({
       </div>
     );
   };
+
+  if (asNestedDrawer) {
+    return (
+      <BaseDrawer
+        open={open}
+        onOpenChange={handleOpenChange}
+        nested={true}
+        title={title}
+        trigger={triggerElement}
+        // BaseDrawer expects a string for accessibility
+        description={
+          typeof description === "string" ? description : "Confirm action"
+        }
+        contentClassName="h-1/2"
+        forcePill
+        showHandle={false}
+      >
+        <div className="flex flex-col items-center">
+          {showIcon && renderIcon()}
+          <p className="text-lg font-bold">{title}</p>
+          <div className="text-foreground mt-2 text-center">{description}</div>
+          <div className="mt-8 flex w-full justify-center gap-4">
+            <ActionButton
+              buttonStyle="transparent"
+              label="Cancel"
+              onClick={handleClose}
+            />
+            <ActionButton
+              buttonStyle={config.btnStyle}
+              label="Confirm"
+              onClick={handleConfirm}
+              loadOnSuccess={!autoClose}
+            />
+          </div>
+        </div>
+      </BaseDrawer>
+    );
+  }
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>

@@ -47,7 +47,7 @@ export interface BaseDrawerProps {
    * @default true
    */
   scrollableBody?: boolean;
-  /** Optional button or element to render to the left of the title */
+  /** Optional button or element to render to the right of the title */
   headerAction?: React.ReactNode;
   /**
    * Whether to show the Vaul top drag handle.
@@ -83,6 +83,8 @@ export interface BaseDrawerProps {
   nested?: boolean;
   activeSnapPoint?: number | string | null;
   setActiveSnapPoint?: (snap: number | string | null) => void;
+  /** Forces the drawer to always display as a floating pill */
+  forcePill?: boolean;
 }
 
 export function BaseDrawer({
@@ -109,6 +111,7 @@ export function BaseDrawer({
   nested = false,
   activeSnapPoint,
   setActiveSnapPoint,
+  forcePill = false,
 }: BaseDrawerProps) {
   const [internalSnap, setInternalSnap] = useState<number | string | null>(
     snapPoints?.[0] ?? null,
@@ -152,7 +155,8 @@ export function BaseDrawer({
     floatingAtLowestSnap &&
     snapPoints &&
     String(snap) === String(snapPoints[0]);
-  const isPill = isLowestSnap && !isDragging;
+  const isCollapsedPill = isLowestSnap && !isDragging;
+  const isPill = forcePill || isCollapsedPill;
 
   const activeHeaderContent =
     isPill && pillHeaderContent ? pillHeaderContent : headerContent;
@@ -162,7 +166,12 @@ export function BaseDrawer({
   // Calculate the exact exposed viewport height based on the current snap point
   const snapValue = typeof snap === "number" ? snap : parseFloat(String(snap));
   const isFraction = !isNaN(snapValue) && snapValue > 0 && snapValue <= 1;
-  const visibleHeight = isFraction ? `${snapValue * 100}svh` : snap || "auto";
+  // const visibleHeight = isFraction ? `${snapValue * 100}svh` : snap || "auto";
+  const visibleHeight = isFraction
+    ? `calc(${snapValue * 100}svh + 8px)`
+    : forcePill
+      ? `${0.5 * 100}svh`
+      : snap || "auto";
 
   return (
     <DrawerComponent
@@ -174,6 +183,7 @@ export function BaseDrawer({
       setActiveSnapPoint={setSnap}
       onDrag={() => setIsDragging(true)}
       onRelease={() => setIsDragging(false)}
+      dismissible={!modal}
     >
       {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
 
@@ -181,7 +191,8 @@ export function BaseDrawer({
         {showOverlay && (
           <Drawer.Overlay
             className={cn(
-              "fixed inset-0 z-40",
+              "fixed inset-0",
+              nested ? "z-[99]" : "z-40",
               frostedGlass ? "bg-black/1" : "bg-black/30",
             )}
           />
@@ -205,7 +216,8 @@ export function BaseDrawer({
 
         <Drawer.Content
           className={cn(
-            "fixed bottom-0 left-0 right-0 z-50 flex h-[100svh] flex-col bg-transparent outline-none",
+            "fixed bottom-0 left-0 right-0 flex h-[100svh] flex-col bg-transparent outline-none",
+            nested ? "z-[100]" : "z-50",
             contentClassName,
           )}
         >
@@ -257,10 +269,8 @@ export function BaseDrawer({
 
                   <div className={cn(showHandle && "mt-1")}>
                     {(title || headerAction || headerContent) && (
-                      <div className={cn()}>
-                        {!isPill && headerAction}
-
-                        {activeHeaderContent ? (
+                      <div>
+                        {activeHeaderContent || forcePill ? (
                           <>
                             <Drawer.Title className="sr-only">
                               {title}
@@ -279,6 +289,7 @@ export function BaseDrawer({
                             {title}
                           </Drawer.Title>
                         )}
+                        {!isCollapsedPill && headerAction}
                       </div>
                     )}
 
@@ -292,16 +303,17 @@ export function BaseDrawer({
                   className={cn(
                     "px-8",
                     footerContent && !isPill ? "pb-28" : "pb-4",
+                    forcePill && "pt-4",
                     scrollableBody && "overflow-y-auto",
                     bodyClassName,
-                    isPill ? "hidden" : "flex-1",
+                    isCollapsedPill ? "hidden" : "flex-1",
                   )}
                 >
                   {children}
                 </div>
               </div>
 
-              {footerContent && isPill && (
+              {footerContent && isCollapsedPill && (
                 <div
                   className={cn(
                     "mt-auto shrink-0",

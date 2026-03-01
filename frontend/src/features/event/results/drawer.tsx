@@ -153,38 +153,37 @@ export default function ResultsDrawer({
         }
       >
         {tabContent[tab].content || <div>Content for {tab}</div>}
-      </BaseDrawer>
-
-      <ConfirmationDialog
-        type="delete"
-        autoClose={true}
-        title={
-          personToRemove === currentUser
-            ? "Remove Yourself"
-            : "Remove Participant"
-        }
-        description={
-          personToRemove == currentUser ? (
-            "Are you sure you want to remove yourself from this event?"
-          ) : (
-            <span>
-              Are you sure you want to remove{" "}
-              <span className="font-bold">{personToRemove}</span>?
-            </span>
-          )
-        }
-        // Controlled Props
-        open={isConfirmationOpen}
-        onOpenChange={setIsConfirmationOpen}
-        onConfirm={async () => {
-          if (!personToRemove) return false;
-          const success = await onRemoveParticipant(personToRemove);
-          if (success) {
-            if (participants.length === 1) setIsRemoving(false);
+        <ConfirmationDialog
+          asNestedDrawer // <-- Triggers the Drawer layout instead of Dialog
+          type="delete"
+          autoClose={true}
+          title={
+            personToRemove === currentUser
+              ? "Remove Yourself"
+              : "Remove Participant"
           }
-          return success;
-        }}
-      />
+          description={
+            personToRemove == currentUser ? (
+              "Are you sure you want to remove yourself from this event?"
+            ) : (
+              <span>
+                Are you sure you want to remove{" "}
+                <span className="font-bold">{personToRemove}</span>?
+              </span>
+            )
+          }
+          open={isConfirmationOpen}
+          onOpenChange={setIsConfirmationOpen}
+          onConfirm={async () => {
+            if (!personToRemove) return false;
+            const success = await onRemoveParticipant(personToRemove);
+            if (success) {
+              if (participants.length === 1) setIsRemoving(false);
+            }
+            return success;
+          }}
+        />
+      </BaseDrawer>
     </>
   );
 }
