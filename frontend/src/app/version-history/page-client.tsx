@@ -153,8 +153,15 @@ function MajorVersion({
         isLast={isLast}
         extend={extendLine}
       />
-      <div className="px-4">
-        <span className="text-foreground/50 italic">{releaseDateString}</span>
+      <div className="w-full px-4">
+        <div className="flex items-center gap-4">
+          <span className="text-foreground/50 shrink-0 italic">
+            {releaseDateString}
+          </span>
+          {!isCurrent && (
+            <div className="border-foreground/50 w-full rounded-full border-t" />
+          )}
+        </div>
         <ul>
           {versionData.changes.map((change) => (
             <li key={change}>- {change}</li>
