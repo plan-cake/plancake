@@ -159,6 +159,11 @@ export function BaseDrawer({
 
   const DrawerComponent = nested ? Drawer.NestedRoot : Drawer.Root;
 
+  // Calculate the exact exposed viewport height based on the current snap point
+  const snapValue = typeof snap === "number" ? snap : parseFloat(String(snap));
+  const isFraction = !isNaN(snapValue) && snapValue > 0 && snapValue <= 1;
+  const visibleHeight = isFraction ? `${snapValue * 100}svh` : snap || "auto";
+
   return (
     <DrawerComponent
       open={open}
@@ -200,98 +205,113 @@ export function BaseDrawer({
 
         <Drawer.Content
           className={cn(
-            "fixed bottom-0 left-0 right-0 z-50 flex h-[100dvh] flex-col bg-transparent outline-none",
+            "fixed bottom-0 left-0 right-0 z-50 flex h-[100svh] flex-col bg-transparent outline-none",
             contentClassName,
           )}
         >
           <div
-            className={cn(
-              "mx-auto flex w-full flex-col overflow-hidden",
-              "transition-[max-width,border-radius,box-shadow] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-              isPill
-                ? "max-w-[calc(100%-2rem)] rounded-[40px] border border-white/10"
-                : "max-w-full rounded-t-[32px] border-transparent shadow-none",
-              frostedGlass ? "" : "bg-panel",
-            )}
-            style={{
-              height: isPill ? "" : "100%",
-              maxHeight: isPill ? "none" : "100%",
-            }}
+            className="flex w-full flex-col transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            style={{ height: isPill ? visibleHeight : "100%" }}
           >
-            {frostedGlass && (
-              <div
-                className={cn(
-                  "rounded-t-4xl absolute -bottom-12 left-0 right-0 top-0 -z-10 border-t shadow-lg",
-                  "frosted-glass",
-                )}
-              />
-            )}
+            <div
+              className="pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+              style={{
+                flexGrow: isPill ? 1 : 0,
+                flexBasis: isPill ? "auto" : "0px",
+                minHeight: 0,
+              }}
+            />
 
             <div
-              onPointerDown={() => setIsDragging(true)}
-              onPointerUp={() => setIsDragging(false)}
-              onPointerCancel={() => setIsDragging(false)}
+              className={cn(
+                "mx-auto flex w-full flex-col overflow-hidden",
+                "transition-[max-width,border-radius,box-shadow,margin] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                isPill
+                  ? "mb-4 max-w-[calc(100%-2rem)] rounded-[40px] border border-white/10"
+                  : "max-w-full rounded-t-[32px] border-transparent shadow-none",
+                frostedGlass ? "" : "bg-panel",
+              )}
+              style={{
+                height: isPill ? "auto" : "100%",
+                maxHeight: isPill ? "none" : "100%",
+              }}
             >
-              <div className="shrink-0 px-8">
-                {showHandle && (
-                  <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
-                )}
+              {frostedGlass && (
+                <div
+                  className={cn(
+                    "rounded-t-4xl absolute -bottom-12 left-0 right-0 top-0 -z-10 border-t shadow-lg",
+                    "frosted-glass",
+                  )}
+                />
+              )}
 
-                <div className={cn(showHandle && "mt-1")}>
-                  {(title || headerAction || headerContent) && (
-                    <div className={cn()}>
-                      {!isPill && headerAction}
-
-                      {activeHeaderContent ? (
-                        <>
-                          <Drawer.Title className="sr-only">
-                            {title}
-                          </Drawer.Title>
-                          <div className={cn(isPill ? "" : "flex-1")}>
-                            {activeHeaderContent}
-                          </div>
-                        </>
-                      ) : (
-                        <Drawer.Title
-                          className={cn(
-                            "mb-0 text-lg font-semibold",
-                            isPill ? "flex-none text-center" : "flex-1",
-                          )}
-                        >
-                          {title}
-                        </Drawer.Title>
-                      )}
-                    </div>
+              <div
+                onPointerDown={() => setIsDragging(true)}
+                onPointerUp={() => setIsDragging(false)}
+                onPointerCancel={() => setIsDragging(false)}
+              >
+                <div className="shrink-0 px-8">
+                  {showHandle && (
+                    <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
                   )}
 
-                  <Drawer.Description className="sr-only">
-                    {description}
-                  </Drawer.Description>
+                  <div className={cn(showHandle && "mt-1")}>
+                    {(title || headerAction || headerContent) && (
+                      <div className={cn()}>
+                        {!isPill && headerAction}
+
+                        {activeHeaderContent ? (
+                          <>
+                            <Drawer.Title className="sr-only">
+                              {title}
+                            </Drawer.Title>
+                            <div className={cn(isPill ? "" : "flex-1")}>
+                              {activeHeaderContent}
+                            </div>
+                          </>
+                        ) : (
+                          <Drawer.Title
+                            className={cn(
+                              "mb-0 text-lg font-semibold",
+                              isPill ? "flex-none text-center" : "flex-1",
+                            )}
+                          >
+                            {title}
+                          </Drawer.Title>
+                        )}
+                      </div>
+                    )}
+
+                    <Drawer.Description className="sr-only">
+                      {description}
+                    </Drawer.Description>
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    "px-8",
+                    footerContent && !isPill ? "pb-28" : "pb-4",
+                    scrollableBody && "overflow-y-auto",
+                    bodyClassName,
+                    isPill ? "hidden" : "flex-1",
+                  )}
+                >
+                  {children}
                 </div>
               </div>
 
-              <div
-                className={cn(
-                  "px-8",
-                  // When expanded, pad the bottom of the body so you can scroll
-                  // the content up past the fixed footer without it getting hidden.
-                  footerContent && !isPill ? "pb-28" : "pb-4",
-                  scrollableBody && "overflow-y-auto",
-                  bodyClassName,
-                  isPill ? "hidden" : "flex-1",
-                )}
-              >
-                {children}
-              </div>
+              {footerContent && isPill && (
+                <div
+                  className={cn(
+                    "mt-auto shrink-0",
+                    !frostedGlass && "bg-panel",
+                  )}
+                >
+                  {footerContent}
+                </div>
+              )}
             </div>
-
-            {footerContent && isPill && (
-              <div
-                className={cn("mt-auto shrink-0", !frostedGlass && "bg-panel")}
-              >
-                {footerContent}
-              </div>
-            )}
           </div>
         </Drawer.Content>
       </Drawer.Portal>
