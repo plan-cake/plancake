@@ -16,7 +16,7 @@ import { getResultBanners } from "@/features/event/results/banners";
 import { useResultsContext } from "@/features/event/results/context";
 import { cn } from "@/lib/utils/classname";
 
-export default function MobileResults({
+export default function DesktopResults({
   eventData,
 }: {
   eventData: EventInformation;
