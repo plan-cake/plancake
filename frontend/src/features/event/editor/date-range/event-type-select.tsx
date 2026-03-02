@@ -1,7 +1,6 @@
 import { useEventContext } from "@/core/event/context";
+import { EventType } from "@/core/event/types";
 import Dropdown from "@/features/selector/components/dropdown";
-
-type EventType = "specific" | "weekday";
 
 type EventTypeSelectProps = {
   id: string;
