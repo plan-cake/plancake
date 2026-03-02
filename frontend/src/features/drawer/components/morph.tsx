@@ -29,11 +29,16 @@ export function MorphingDrawer({
   modal = true,
   showOverlay = modal,
   nested = false,
+  activeSnapPoint,
+  setActiveSnapPoint,
 }: MorphingDrawerProps) {
   useDrawerResize();
-  const [snap, setSnap] = useState<number | string | null>(
+  const [internalSnap, setInternalSnap] = useState<number | string | null>(
     snapPoints?.[0] ?? null,
   );
+
+  const snap = activeSnapPoint !== undefined ? activeSnapPoint : internalSnap;
+  const setSnap = setActiveSnapPoint ?? setInternalSnap;
   const [isDragging, setIsDragging] = useState(false);
 
   // Morphing logic

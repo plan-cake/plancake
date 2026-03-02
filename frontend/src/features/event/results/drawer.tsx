@@ -2,9 +2,10 @@ import { useState, useMemo, useEffect } from "react";
 
 import { PersonIcon, GearIcon, InfoCircledIcon } from "@radix-ui/react-icons";
 
-import { BaseDrawer } from "@/components/layout/base-drawer";
+// import { BaseDrawer } from "@÷/components/layout/base-drawer";
 import SegmentedControl from "@/components/segmented-control";
 import { EventRange } from "@/core/event/types";
+import { MorphingDrawer } from "@/features/drawer/components/morph";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { EventInfo } from "@/features/event/info-drawer";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
@@ -88,7 +89,7 @@ export default function ResultsDrawer({
         ),
       },
       "event-info": {
-        header: <h2 className="text-md font-semibold">Event Info</h2>,
+        header: <h2 className="text-lg font-semibold">Event Info</h2>,
         content: <EventInfo eventRange={eventRange} timezone={timezone} />,
       },
     }),
@@ -97,7 +98,7 @@ export default function ResultsDrawer({
 
   return (
     <>
-      <BaseDrawer
+      <MorphingDrawer
         open
         onOpenChange={() => {}}
         contentClassName="h-full md:hidden"
@@ -183,7 +184,7 @@ export default function ResultsDrawer({
             return success;
           }}
         />
-      </BaseDrawer>
+      </MorphingDrawer>
     </>
   );
 }
