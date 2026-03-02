@@ -1,6 +1,7 @@
 import { ResultsAvailabilityMap } from "@/core/availability/types";
 import { hasMutualAvailability } from "@/features/event/results/utils";
 import { Banner } from "@/features/system-feedback/banner/base";
+import { MESSAGES } from "@/lib/messages";
 
 export function getResultBanners(
   availabilities: ResultsAvailabilityMap,
@@ -15,11 +16,7 @@ export function getResultBanners(
     timeslots[timeslots.length - 1] < new Date()
   ) {
     return (
-      <Banner
-        type="info"
-        subtitle="All the dates in this event have passed."
-        showPing
-      />
+      <Banner type="info" subtitle={MESSAGES.INFO_EVENT_PASSED} showPing />
     );
   } else if (participants.length === 0) {
     return (
@@ -28,25 +25,25 @@ export function getResultBanners(
         subtitle="No one has submitted availability!"
         showPing
       >
-        <p>Add your availability by clicking the button above.</p>
+        <p>{MESSAGES.INFO_ADD_AVAILABILITY}</p>
       </Banner>
     );
   } else if (participated && participants.length === 1) {
     return (
       <Banner type="info" subtitle="Waiting for others..." showPing>
-        <p>Copy and share the link so others can join!</p>
+        <p>{MESSAGES.INFO_COPY_SHARE_LINK}</p>
       </Banner>
     );
   } else if (!participated) {
     return (
       <Banner type="info" subtitle="Don't be a stranger!" showPing>
-        <p>Add your availability by clicking the button above.</p>
+        <p>{MESSAGES.INFO_ADD_AVAILABILITY}</p>
       </Banner>
     );
   } else if (!hasMutualAvailability(availabilities, participants)) {
     return (
       <Banner type="info" subtitle="Oh dear :(" showPing>
-        <p>There is not a time where everyone is available.</p>
+        <p>{MESSAGES.INFO_NO_MUTUAL_AVAILABILITY}</p>
       </Banner>
     );
   }
