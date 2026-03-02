@@ -1,5 +1,7 @@
 // app/_types/schedule.ts
 
+export type EventType = "specific" | "weekday";
+
 export type EventInformation = {
   title: string;
   customCode: string;
@@ -7,6 +9,16 @@ export type EventInformation = {
   originalEventRange?: EventRange; // only used for editing, to compare against changes
   timeslots: Date[];
 };
+
+type BaseEventRange = {
+  type: EventType;
+  duration: number;
+  timezone: string;
+  timeRange: {
+    from: string;
+    to: string;
+  }
+}
 
 // discriminated union for event ranges - this is your single source of truth
 export type EventRange = SpecificDateRange | WeekdayRange;
@@ -25,29 +37,17 @@ export const ALL_WEEKDAYS: Weekday[] = [
 
 /* EVENT RANGE MODELS */
 
-export type SpecificDateRange = {
+export type SpecificDateRange = BaseEventRange & {
   type: "specific";
-  duration: number;
-  timezone: string;
   dateRange: {
-    from: string;
-    to: string;
-  };
-  timeRange: {
     from: string;
     to: string;
   };
 };
 
-export type WeekdayRange = {
+export type WeekdayRange = BaseEventRange & {
   type: "weekday";
-  duration: number;
-  timezone: string;
   weekdays: Weekday[];
-  timeRange: {
-    from: string;
-    to: string;
-  };
 };
 
 /* SLOTS TYPES FOR UI */
