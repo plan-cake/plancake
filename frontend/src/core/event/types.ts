@@ -1,5 +1,3 @@
-// app/_types/schedule.ts
-
 export type EventType = "specific" | "weekday";
 
 export type EventInformation = {
