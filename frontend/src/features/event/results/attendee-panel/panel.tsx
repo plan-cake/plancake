@@ -6,6 +6,7 @@ import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
 import { useResultsContext } from "@/features/event/results/context";
 import { ConfirmationDialog } from "@/features/system-feedback";
+import { cn } from "@/lib/utils/classname";
 
 export default function AttendeesPanel() {
   const {
@@ -39,7 +40,12 @@ export default function AttendeesPanel() {
   };
 
   return (
-    <div className="max-h-53 bg-panel flex flex-col gap-2 overflow-hidden rounded-3xl shadow-md md:shadow-none">
+    <div
+      className={cn(
+        "bg-panel h-full rounded-3xl",
+        "flex flex-1 flex-col gap-2 overflow-hidden",
+      )}
+    >
       <PanelHeader
         isRemoving={isRemoving}
         toggleRemoving={toggleRemoving}

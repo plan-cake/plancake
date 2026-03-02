@@ -128,26 +128,28 @@ export default function DesktopResults({
           ref={sidebarRef}
           className={cn(
             "fixed bottom-1 left-0 z-10 w-full shrink-0 px-6",
-            "md:top-25 md:sticky md:h-full md:w-80 md:space-y-4 md:px-0",
+            "relative bottom-auto left-auto w-80 space-y-4 px-0",
           )}
         >
-          <div className="hidden md:block">{banners}</div>
+          {banners}
 
-          <AttendeesPanel />
-
-          <div className="bg-panel hidden rounded-3xl p-6 md:block">
-            <EventInfo eventRange={eventRange} timezone={timezone} />
-          </div>
-
-          <div className="bg-panel hidden rounded-3xl p-6 text-sm md:block">
-            Displaying event in
-            <span className="text-accent ml-1 font-bold">
-              <TimeZoneSelector
-                id="timezone-select"
-                value={timezone}
-                onChange={handleTZChange}
-              />
-            </span>
+          <div className="sticky top-24 flex h-[calc(100vh-8rem)] flex-col gap-y-4">
+            <div className="flex min-h-0 flex-1">
+              <AttendeesPanel />
+            </div>
+            <div className="bg-panel hidden shrink-0 rounded-3xl p-6 md:block">
+              <EventInfo eventRange={eventRange} timezone={timezone} />
+            </div>
+            <div className="bg-panel hidden shrink-0 rounded-3xl p-6 text-sm md:block">
+              Displaying event in
+              <span className="text-accent ml-1 font-bold">
+                <TimeZoneSelector
+                  id="timezone-select"
+                  value={timezone}
+                  onChange={handleTZChange}
+                />
+              </span>
+            </div>
           </div>
         </div>
       </div>

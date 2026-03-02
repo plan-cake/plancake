@@ -22,7 +22,7 @@ export default function ParticipantList({
 
   const listClassNames = mobile
     ? "flex flex-wrap gap-3 pt-1"
-    : "flex flex-wrap gap-2.5 overflow-y-auto px-6 pb-6 pt-1 max-h-none";
+    : "flex flex-wrap content-start flex-1 gap-2.5 overflow-y-auto px-6 pb-6 pt-1";
 
   if (participants.length === 0) {
     return (
