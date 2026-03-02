@@ -4,7 +4,7 @@ import { SharedDrawerProps } from "@/features/drawer/props";
 import { useDrawerResize } from "@/features/drawer/useDrawerResize";
 import { cn } from "@/lib/utils/classname";
 
-export function PillDrawer({
+export function FloatingDrawer({
   open,
   onOpenChange,
   trigger,
@@ -60,18 +60,8 @@ export function PillDrawer({
                 <div className={cn(showHandle && "mt-1")}>
                   {(title || headerContent) && (
                     <div className="text-center">
-                      {headerContent ? (
-                        <>
-                          <Drawer.Title className="sr-only">
-                            {title}
-                          </Drawer.Title>
-                          {headerContent}
-                        </>
-                      ) : (
-                        <Drawer.Title className="mb-0 text-lg font-semibold">
-                          {title}
-                        </Drawer.Title>
-                      )}
+                      <Drawer.Title className="sr-only">{title}</Drawer.Title>
+                      {headerContent}
                     </div>
                   )}
                   <Drawer.Description className="sr-only">

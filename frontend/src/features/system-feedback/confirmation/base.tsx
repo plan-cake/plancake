@@ -2,8 +2,8 @@ import React, { useState } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
 
-import { BaseDrawer } from "@/components/layout/base-drawer";
 import ActionButton from "@/features/button/components/action";
+import { FloatingDrawer } from "@/features/drawer/components/floating";
 import { DIALOG_CONFIG } from "@/features/system-feedback/confirmation/config";
 import { ConfirmationDialogType } from "@/features/system-feedback/type";
 import { cn } from "@/lib/utils/classname";
@@ -97,18 +97,15 @@ export default function ConfirmationDialog({
 
   if (asNestedDrawer) {
     return (
-      <BaseDrawer
+      <FloatingDrawer
         open={open}
         onOpenChange={handleOpenChange}
-        nested={true}
         title={title}
         trigger={triggerElement}
-        // BaseDrawer expects a string for accessibility
         description={
           typeof description === "string" ? description : "Confirm action"
         }
-        contentClassName="h-1/2"
-        forcePill
+        contentClassName="h-fit"
         showHandle={false}
       >
         <div className="flex flex-col items-center">
@@ -129,7 +126,7 @@ export default function ConfirmationDialog({
             />
           </div>
         </div>
-      </BaseDrawer>
+      </FloatingDrawer>
     );
   }
 
