@@ -337,7 +337,10 @@ export default function ClientPage({
         />
       </div>
 
-      <MobileFooterTray buttons={[cancelButton, submitButton]} />
+      {/* This z-index is necessary to avoid the time column overlapping */}
+      <div className="z-10">
+        <MobileFooterTray buttons={[cancelButton, submitButton]} />
+      </div>
     </div>
   );
 }

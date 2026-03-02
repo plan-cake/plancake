@@ -16,6 +16,7 @@ const ActionButton = forwardRef<Ref, ActionButtonProps>(
       disabled = false,
       onClick,
       loadOnSuccess = false,
+      className,
       ...props
     },
     ref,
@@ -31,6 +32,7 @@ const ActionButton = forwardRef<Ref, ActionButtonProps>(
         isLink={false}
         onClick={onClick}
         loadOnSuccess={loadOnSuccess}
+        className={className}
         ref={ref}
         {...props}
       />

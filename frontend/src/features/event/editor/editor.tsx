@@ -199,11 +199,14 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       </div>
       <div className="h-16 md:hidden" />
 
-      <MobileFooterTray
-        buttons={
-          type === "edit" ? [cancelButton, submitButton] : [submitButton]
-        }
-      />
+      {/* This z-index is necessary to avoid the time column overlapping */}
+      <div className="z-10">
+        <MobileFooterTray
+          buttons={
+            type === "edit" ? [cancelButton, submitButton] : [submitButton]
+          }
+        />
+      </div>
     </div>
   );
 }

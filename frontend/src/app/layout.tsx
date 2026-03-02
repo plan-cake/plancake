@@ -45,6 +45,10 @@ export function generateMetadata(): Metadata {
       "mobile friendly scheduler",
     ],
 
+    appleWebApp: {
+      title: "Plancake",
+    },
+
     // for link previews on social media
     openGraph: {
       title: "Plancake - Stacking up perfect plans",

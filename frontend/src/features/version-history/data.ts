@@ -78,7 +78,19 @@ export function getVersionHistoryData(): VersionHistoryData {
         "Fixed the event title text wrapping on the results page",
         "Fixed the error messages on internal server errors",
       ],
-      minorVersions: [],
+      minorVersions: [
+        {
+          version: "v0.3.1",
+          releaseDate: { year: 2026, month: 1, day: 26 },
+          changes: [
+            "Added an icon for iOS home screen bookmarks",
+            "Updated the date picker for more intuitive date range selection",
+            "Changed event participant name conflicts to be case-insensitive",
+            "Increased toast lifetime for easier reading",
+            "Fixed an issue with layering order on the painting page",
+          ],
+        }
+      ],
     },
   ];
 }

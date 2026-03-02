@@ -5,6 +5,7 @@ export type ButtonStyle =
   | "secondary"
   | "frosted glass"
   | "frosted glass inset"
+  | "semi-transparent"
   | "transparent"
   | "danger";
 
@@ -12,13 +13,14 @@ export type BaseButtonProps = {
   /** The HTML button type. Defaults to "button". */
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   /**
-   * The style of the button. There are four styles:
+   * The style of the button.
    * - `primary`: An important button, filled with the main accent color.
    * - `secondary`: A less important button, outlined with the main accent color.
-   * - `frosted glass`: A button with a frosted glass appearance, used only in the header.
+   * - `frosted glass`: A button with a frosted glass appearance.
+   * - `frosted glass inset`: A button with the style of a frosted glass inset element.
+   * - `semi-transparent`: A button with a semi-transparent background.
    * - `transparent`: A button with no background until hovered.
-   *
-   * `transparent` buttons cannot have icons.
+   * - `danger`: A button style used for destructive actions, filled with a red color.
    */
   buttonStyle: ButtonStyle;
   /**
@@ -42,7 +44,7 @@ export type BaseButtonProps = {
   shrinkOnMobile?: boolean;
   /**
    * If `true`, the button will show a loading spinner and be unclickable.
-   * 
+   *
    * Typically, the loading state is managed internally by the button when `onClick` is
    * provided. However, this can be helpful if a button shouldn't be accessible until
    * something else has loaded.
@@ -77,11 +79,15 @@ export type BaseButtonProps = {
    * If specified, the button will stay in a loading state after a successful action. This
    * behavior should be used for buttons that trigger navigation, to avoid multiple clicks
    * before the new page loads.
-   * 
+   *
    * Otherwise, the button will return to a normal state no matter the result of
    * `onClick`.
    */
   loadOnSuccess?: boolean;
+  /**
+   * Additional className to apply to the button, for further customization.
+   */
+  className?: string;
 };
 
 type CommonButtonProps = {
@@ -99,6 +105,8 @@ type CommonButtonProps = {
   loading?: boolean;
   /** @inheritdoc BaseButtonProps */
   disabled?: boolean;
+  /** @inheritdoc BaseButtonProps */
+  className?: string;
 };
 
 export type ActionButtonProps = CommonButtonProps & {

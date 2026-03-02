@@ -22,6 +22,7 @@ from api.event.utils import (
     event_lookup,
     generate_code,
     js_weekday,
+    touch_url_code,
     validate_date_timeslots,
     validate_weekday_timeslots,
 )
@@ -414,6 +415,7 @@ def get_event_details(request):
 
     try:
         event = event_lookup(event_code)
+        touch_url_code(event_code)
         data = format_event_info(event)
         match event.date_type:
             case UserEvent.EventType.SPECIFIC:

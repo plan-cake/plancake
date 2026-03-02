@@ -46,6 +46,7 @@ export default async function Page({ params }: EventCodePageProps) {
         title: eventName,
         customCode: eventCode,
         eventRange,
+        originalEventRange: eventRange,
         timeslots,
       }}
     />

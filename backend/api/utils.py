@@ -167,7 +167,10 @@ def check_auth(func):
                 response = func(request, *args, **kwargs)
                 # Intercept the response to refresh the session token cookie
                 set_session_cookie(
-                    response, ACCOUNT_COOKIE_NAME, acct_token, session.is_extended
+                    response,
+                    ACCOUNT_COOKIE_NAME,
+                    session.session_token,
+                    session.is_extended,
                 )
                 return response
             except UserSession.DoesNotExist:
@@ -196,7 +199,9 @@ def check_auth(func):
                 request.user = session.user_account
                 # Run the function
                 response = func(request, *args, **kwargs)
-                set_session_cookie(response, GUEST_COOKIE_NAME, guest_token, True)
+                set_session_cookie(
+                    response, GUEST_COOKIE_NAME, session.session_token, True
+                )
             except UserSession.DoesNotExist:
                 logger.info("Guest session expired.")
                 # Do NOT create a new guest account
@@ -262,7 +267,10 @@ def require_auth(func):
                 response = func(request, *args, **kwargs)
                 # Intercept the response to refresh the session token cookie
                 set_session_cookie(
-                    response, ACCOUNT_COOKIE_NAME, acct_token, session.is_extended
+                    response,
+                    ACCOUNT_COOKIE_NAME,
+                    session.session_token,
+                    session.is_extended,
                 )
                 return response
             except UserSession.DoesNotExist:
@@ -291,7 +299,9 @@ def require_auth(func):
                 request.user = session.user_account
                 # Run the function
                 response = func(request, *args, **kwargs)
-                set_session_cookie(response, GUEST_COOKIE_NAME, guest_token, True)
+                set_session_cookie(
+                    response, GUEST_COOKIE_NAME, session.session_token, True
+                )
             except UserSession.DoesNotExist:
                 logger.info("Guest session expired. Creating a new guest account...")
                 # Check guest creation rate limit
@@ -436,7 +446,10 @@ def require_account_auth(func):
                 response = func(request, *args, **kwargs)
                 # Intercept the response to refresh the session token cookie
                 set_session_cookie(
-                    response, ACCOUNT_COOKIE_NAME, acct_token, session.is_extended
+                    response,
+                    ACCOUNT_COOKIE_NAME,
+                    session.session_token,
+                    session.is_extended,
                 )
                 return response
             except UserSession.DoesNotExist:

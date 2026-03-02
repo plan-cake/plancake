@@ -1,3 +1,4 @@
+import logging
 import random
 import re
 import string
@@ -8,6 +9,8 @@ from django.db.models import Prefetch
 
 from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
 from api.settings import MAX_EVENT_DAYS, RAND_URL_CODE_ATTEMPTS, RAND_URL_CODE_LENGTH
+
+logger = logging.getLogger("api")
 
 
 def check_code_available(code):
@@ -150,3 +153,13 @@ def js_weekday(weekday: int) -> int:
     Converts a Python weekday (0 = Monday) to a JavaScript weekday (0 = Sunday).
     """
     return (weekday + 1) % 7
+
+
+def touch_url_code(url_code: str):
+    """
+    Updates the last_used timestamp for a URL code.
+    """
+    try:
+        UrlCode.objects.get(url_code=url_code).save()
+    except UrlCode.DoesNotExist:
+        logger.error(f"URL code {url_code} not found when attempting to touch.")

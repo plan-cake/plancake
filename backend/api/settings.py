@@ -73,7 +73,7 @@ DATABASES = {
         "PASSWORD": env("DB_PASSWORD"),
         "HOST": env("DB_HOST"),
         "PORT": env("DB_PORT"),
-        "CONN_MAX_AGE": 600,
+        "CONN_MAX_AGE": 0 if DEBUG else 600,  # Don't persist connections in development
     }
 }
 

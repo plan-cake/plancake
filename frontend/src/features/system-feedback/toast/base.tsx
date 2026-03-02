@@ -27,7 +27,7 @@ export default function BaseToast({
   icon,
   backgroundColor,
   textColor,
-  duration = 3000,
+  duration = 5000,
   isPersistent = false,
   isPaused,
 }: BaseToastProps) {

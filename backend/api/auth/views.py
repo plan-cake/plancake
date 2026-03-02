@@ -268,7 +268,10 @@ def login(request):
             )
             # Refresh the session token cookie
             set_session_cookie(
-                response, ACCOUNT_COOKIE_NAME, acct_token, session.is_extended
+                response,
+                ACCOUNT_COOKIE_NAME,
+                session.session_token,
+                session.is_extended,
             )
             return response
         except UserSession.DoesNotExist:

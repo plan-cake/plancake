@@ -16,7 +16,7 @@ export default function DateRangeSelection({
   editing = false,
 }: DateRangeProps) {
   const { state, setWeekdayRange, setEventType, errors } = useEventContext();
-  const { eventRange } = state;
+  const { eventRange, originalEventRange } = state;
 
   const rangeType = eventRange?.type ?? "specific";
 
@@ -52,7 +52,11 @@ export default function DateRangeSelection({
         </FormSelectorField>
 
         {eventRange?.type === "specific" ? (
-          <SpecificDateRangeDisplay eventRange={eventRange} />
+          <SpecificDateRangeDisplay
+            eventRange={eventRange}
+            editing={editing}
+            originalEventRange={originalEventRange as SpecificDateRange}
+          />
         ) : (
           <WeekdayCalendar
             selectedDays={eventRange?.weekdays}
@@ -66,12 +70,18 @@ export default function DateRangeSelection({
 
 function SpecificDateRangeDisplay({
   eventRange,
+  editing = false,
+  originalEventRange,
 }: {
   eventRange: SpecificDateRange;
+  editing?: boolean;
+  originalEventRange?: SpecificDateRange;
 }) {
   const isMobile = useCheckMobile();
 
-  const earliestDate = parseISO(eventRange.dateRange.from);
+  const earliestDate = editing
+    ? parseISO(originalEventRange?.dateRange.from || eventRange.dateRange.from)
+    : parseISO(eventRange.dateRange.from);
   const startDate = parseISO(eventRange.dateRange.from);
   const endDate = parseISO(eventRange.dateRange.to);
 

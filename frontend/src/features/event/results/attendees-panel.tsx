@@ -8,6 +8,7 @@ import {
 } from "@radix-ui/react-icons";
 
 import { ResultsAvailabilityMap } from "@/core/availability/types";
+import ActionButton from "@/features/button/components/action";
 import ParticipantChip from "@/features/event/results/participant-chip";
 import { ConfirmationDialog } from "@/features/system-feedback";
 import { cn } from "@/lib/utils/classname";
@@ -96,45 +97,51 @@ export default function AttendeesPanel({
         {participants.length > 0 && (
           // Don't render buttons if there are no participants to avoid taking up space
           <div className="space-x-2">
-            <button
-              tabIndex={hasSelection ? 0 : -1}
+            <ActionButton
+              buttonStyle="semi-transparent"
+              icon={<ResetIcon />}
+              onClick={() => {
+                clearSelectedParticipants();
+                return true;
+              }}
+              disabled={!hasSelection}
               className={cn(
-                "bg-accent/15 text-accent rounded-full p-2 text-sm font-semibold transition-[shadow,opacity] duration-200",
-                "hover:bg-accent/25 active:bg-accent/40 cursor-pointer",
-                hasSelection ? "opacity-100" : "pointer-events-none opacity-0",
+                "transition-opacity duration-200",
+                !hasSelection && "pointer-events-none opacity-0",
               )}
-              onClick={clearSelectedParticipants}
-            >
-              <ResetIcon className="h-6 w-6" />
-            </button>
+              aria-label="Clear Selection"
+            />
 
             {isCreator && (
-              <button
-                className={cn(
-                  "text-red bg-red/15 rounded-full p-2 text-sm font-semibold",
-                  "hover:bg-red/25 active:bg-red/40 cursor-pointer",
-                )}
+              <ActionButton
+                buttonStyle="semi-transparent"
+                icon={isRemoving ? <CheckIcon /> : <EraserIcon />}
                 onClick={() => {
                   setIsRemoving(!isRemoving);
                   clearSelectedParticipants();
+                  return true;
                 }}
-              >
-                {isRemoving ? (
-                  <CheckIcon className="h-6 w-6" />
-                ) : (
-                  <EraserIcon className="h-6 w-6" />
+                aria-label={
+                  isRemoving ? "Stop Removing" : "Remove Participants"
+                }
+                className={cn(
+                  !isRemoving &&
+                    "hover:bg-error/25 hover:text-error active:bg-error/40",
                 )}
-              </button>
+              />
             )}
 
             {showSelfRemove && (
-              <button
-                className="text-red bg-red/15 hover:bg-red/25 active:bg-red/40 cursor-pointer rounded-full p-2 text-sm font-semibold"
-                aria-label="Remove self"
-                onClick={() => promptRemove(currentUser)}
-              >
-                <ExitIcon className="h-6 w-6" />
-              </button>
+              <ActionButton
+                buttonStyle="semi-transparent"
+                icon={<ExitIcon />}
+                onClick={() => {
+                  promptRemove(currentUser);
+                  return true;
+                }}
+                aria-label="Remove Self from Event"
+                className="hover:bg-error/25 hover:text-error active:bg-error/40"
+              />
             )}
           </div>
         )}
