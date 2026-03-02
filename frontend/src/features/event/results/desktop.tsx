@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 
 import { Pencil1Icon, Pencil2Icon } from "@radix-ui/react-icons";
 
+import Checkbox from "@/components/checkbox";
 import CopyToastButton from "@/components/copy-toast-button";
 import HeaderSpacer from "@/components/header-spacer";
 import { EventInformation } from "@/core/event/types";
@@ -30,6 +31,8 @@ export default function DesktopResults({
     setHoveredSlot,
     currentUser,
     isCreator,
+    showOnlyBestTimes,
+    setShowOnlyBestTimes,
   } = useResultsContext();
 
   const {
@@ -141,14 +144,21 @@ export default function DesktopResults({
               <EventInfo eventRange={eventRange} timezone={timezone} />
             </div>
             <div className="bg-panel hidden shrink-0 rounded-3xl p-6 text-sm md:block">
-              Displaying event in
-              <span className="text-accent ml-1 font-bold">
-                <TimeZoneSelector
-                  id="timezone-select"
-                  value={timezone}
-                  onChange={handleTZChange}
-                />
-              </span>
+              <Checkbox
+                label="Only show best times"
+                checked={showOnlyBestTimes}
+                onChange={setShowOnlyBestTimes}
+              />
+              <div className="mt-3">
+                Displaying event in
+                <span className="text-accent font-bold">
+                  <TimeZoneSelector
+                    id="timezone-select"
+                    value={timezone}
+                    onChange={handleTZChange}
+                  />
+                </span>
+              </div>
             </div>
           </div>
         </div>

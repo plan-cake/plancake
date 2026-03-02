@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 
 import { PersonIcon, GearIcon, InfoCircledIcon } from "@radix-ui/react-icons";
 
-// import { BaseDrawer } from "@÷/components/layout/base-drawer";
+import Checkbox from "@/components/checkbox";
 import SegmentedControl from "@/components/segmented-control";
 import { EventRange } from "@/core/event/types";
 import { MorphingDrawer } from "@/features/drawer/components/morph";
@@ -28,6 +28,8 @@ export default function ResultsDrawer({
     participants,
     currentUser,
     handleRemoveParticipant: onRemoveParticipant,
+    showOnlyBestTimes,
+    setShowOnlyBestTimes,
   } = useResultsContext();
 
   const promptRemove = (person: string) => {
@@ -76,15 +78,23 @@ export default function ResultsDrawer({
       "view-details": {
         header: <h2 className="text-md font-semibold">View Details</h2>,
         content: (
-          <div>
-            Displaying event in
-            <span className="text-accent ml-1 font-bold">
-              <TimeZoneSelector
-                id="timezone-select"
-                value={timezone} // Captured from state
-                onChange={onTimezoneChange} // Passed down from parent
-              />
-            </span>
+          <div className="pt-4">
+            <Checkbox
+              label="Only show best times"
+              checked={showOnlyBestTimes}
+              onChange={setShowOnlyBestTimes}
+              textSize="md"
+            />
+            <div className="mt-3">
+              Displaying event in
+              <span className="text-accent font-bold">
+                <TimeZoneSelector
+                  id="timezone-select"
+                  value={timezone}
+                  onChange={onTimezoneChange}
+                />
+              </span>
+            </div>
           </div>
         ),
       },
@@ -93,7 +103,14 @@ export default function ResultsDrawer({
         content: <EventInfo eventRange={eventRange} timezone={timezone} />,
       },
     }),
-    [isRemoving, timezone, eventRange, onTimezoneChange],
+    [
+      isRemoving,
+      timezone,
+      eventRange,
+      onTimezoneChange,
+      showOnlyBestTimes,
+      setShowOnlyBestTimes,
+    ],
   );
 
   return (
@@ -110,7 +127,7 @@ export default function ResultsDrawer({
         modal={false}
         floatingAtLowestSnap
         scrollableBody
-        headerContent={tab == "attendees" ? tabContent.attendees.header : " "}
+        headerContent={tabContent[tab].header}
         footerContent={
           <SegmentedControl
             value={tab}

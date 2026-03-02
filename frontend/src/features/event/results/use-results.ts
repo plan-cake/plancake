@@ -4,12 +4,15 @@ import {
   useMemo,
   useCallback,
   startTransition,
+  useEffect,
 } from "react";
 
 import { ResultsAvailabilityMap } from "@/core/availability/types";
 import { removePerson } from "@/features/event/results/remove-person";
 import { ResultsInformation } from "@/features/event/results/types";
+import { findConsensusAndConflicts } from "@/features/event/results/utils";
 import { useToast } from "@/features/system-feedback/toast/context";
+import { MESSAGES } from "@/lib/messages";
 
 export function useEventResults(initialData: ResultsInformation) {
   const { addToast } = useToast();
@@ -25,7 +28,9 @@ export function useEventResults(initialData: ResultsInformation) {
     null,
   );
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
+  const [showOnlyBestTimes, setShowOnlyBestTimes] = useState<boolean>(false);
 
+  /* OPTIMISTIC STATES */
   const [optimisticParticipants, removeOptimisticParticipant] = useOptimistic(
     participants || [],
     (state, personToRemove: string) => {
@@ -89,41 +94,70 @@ export function useEventResults(initialData: ResultsInformation) {
   };
 
   /* DERIVED LOGIC */
-  const { filteredAvailabilities, gridNumParticipants } = useMemo(() => {
-    let activeParticipants: string[] = [];
+  const { filteredAvailabilities, gridNumParticipants, hasNoConsensus } =
+    useMemo(() => {
+      if (showOnlyBestTimes) {
+        const { allAvailableSlots } = findConsensusAndConflicts(
+          optimisticAvailabilities,
+          optimisticParticipants,
+        );
 
-    if (selectedParticipants.length > 0) {
-      activeParticipants = selectedParticipants;
-    } else if (hoveredParticipant) {
-      activeParticipants = [hoveredParticipant];
-    } else {
-      return {
-        filteredAvailabilities: optimisticAvailabilities,
-        gridNumParticipants: optimisticParticipants.length,
-      };
-    }
+        const noConsensus = allAvailableSlots.length === 0;
 
-    const filtered: ResultsAvailabilityMap = {};
-    for (const slot in optimisticAvailabilities) {
-      const availablePeople = optimisticAvailabilities[slot];
-      const intersection = availablePeople.filter((p) =>
-        activeParticipants.includes(p),
-      );
-      if (intersection.length > 0) {
-        filtered[slot] = intersection;
+        const filtered: ResultsAvailabilityMap = {};
+        for (const slot of allAvailableSlots) {
+          filtered[slot] = optimisticAvailabilities[slot];
+        }
+
+        return {
+          filteredAvailabilities: filtered,
+          gridNumParticipants: optimisticParticipants.length,
+          hasNoConsensus: noConsensus,
+        };
       }
-    }
 
-    return {
-      filteredAvailabilities: filtered,
-      gridNumParticipants: activeParticipants.length,
-    };
-  }, [
-    optimisticAvailabilities,
-    optimisticParticipants.length,
-    selectedParticipants,
-    hoveredParticipant,
-  ]);
+      let activeParticipants: string[] = [];
+
+      if (selectedParticipants.length > 0) {
+        activeParticipants = selectedParticipants;
+      } else if (hoveredParticipant) {
+        activeParticipants = [hoveredParticipant];
+      } else {
+        return {
+          filteredAvailabilities: optimisticAvailabilities,
+          gridNumParticipants: optimisticParticipants.length,
+        };
+      }
+
+      const filtered: ResultsAvailabilityMap = {};
+      for (const slot in optimisticAvailabilities) {
+        const availablePeople = optimisticAvailabilities[slot];
+        const intersection = availablePeople.filter((p) =>
+          activeParticipants.includes(p),
+        );
+        if (intersection.length > 0) {
+          filtered[slot] = intersection;
+        }
+      }
+
+      return {
+        filteredAvailabilities: filtered,
+        gridNumParticipants: activeParticipants.length,
+        hasNoConsensus: false,
+      };
+    }, [
+      showOnlyBestTimes,
+      optimisticAvailabilities,
+      optimisticParticipants,
+      selectedParticipants,
+      hoveredParticipant,
+    ]);
+
+  useEffect(() => {
+    if (showOnlyBestTimes && hasNoConsensus) {
+      addToast("info", MESSAGES.INFO_NO_MUTUAL_AVAILABILITY);
+    }
+  }, [hasNoConsensus, showOnlyBestTimes, addToast]);
 
   return {
     // Data
@@ -140,6 +174,7 @@ export function useEventResults(initialData: ResultsInformation) {
     hoveredSlot,
     hoveredParticipant,
     selectedParticipants,
+    showOnlyBestTimes,
 
     // Actions
     clearSelectedParticipants: () => setSelectedParticipants([]),
@@ -147,5 +182,6 @@ export function useEventResults(initialData: ResultsInformation) {
     setHoveredParticipant: handleSetHoveredParticipant,
     toggleParticipant,
     handleRemoveParticipant,
+    setShowOnlyBestTimes,
   };
 }
