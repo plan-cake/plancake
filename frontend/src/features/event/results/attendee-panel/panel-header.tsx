@@ -45,11 +45,11 @@ export default function PanelHeader({
   return (
     <div
       className={cn(
-        "flex w-full touch-none select-none justify-between",
+        "flex touch-none select-none justify-between",
         inDrawer ? "" : "px-6 pt-6",
       )}
     >
-      <div className="flex flex-col items-start">
+      <div className="flex flex-col">
         <h2 className="text-md font-semibold">
           {isRemoving ? "Removing a" : "A"}ttendees
         </h2>
