@@ -52,7 +52,7 @@ export default function SelectorDrawer<TValue extends string | number>({
         </button>
       }
     >
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-2">
         {options.map((option) => {
           const isSelected = option.value === value;
           return (
@@ -71,7 +71,7 @@ export default function SelectorDrawer<TValue extends string | number>({
                 }
               }}
               className={cn(
-                "mb-2 shrink-0 cursor-pointer rounded-full px-4 py-1.5 text-center",
+                "shrink-0 cursor-pointer rounded-full px-4 py-1.5 text-center",
                 "bg-background active:bg-accent/20",
                 isSelected && "bg-accent text-white",
                 textStart && "text-start",
