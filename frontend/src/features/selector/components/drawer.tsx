@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import { BaseDrawer } from "@/components/layout/base-drawer";
+import { BaseDrawer } from "@/features/drawer/components/base";
 import { SelectorProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 

@@ -1,4 +1,4 @@
-import { BaseDrawer } from "@/components/layout/base-drawer";
+import { BaseDrawer } from "@/features/drawer/components/base";
 
 export default function AccountSettingsDrawer({
   children: trigger,

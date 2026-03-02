@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from "react";
 
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
-import { BaseDrawer } from "@/components/layout/base-drawer";
 import { useEventContext } from "@/core/event/context";
+import { BaseDrawer } from "@/features/drawer/components/base";
 import {
   Calendar,
   CalendarHandle,

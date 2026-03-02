@@ -6,10 +6,10 @@ import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { addDays } from "date-fns";
 import { format } from "date-fns-tz/format";
 
-import { BaseDrawer } from "@/components/layout/base-drawer";
 import { EventRange, ALL_WEEKDAYS } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import WeekdayRow from "@/features/dashboard/components/weekday-row";
+import { BaseDrawer } from "@/features/drawer/components/base";
 import {
   formatDateRange,
   formatTimeRange,
