@@ -21,7 +21,8 @@ The project contains a database model that determines the structure of the conne
 - Make sure to also run this command whenever you pull changes from another branch
 
 ### Running the Server
-After the above steps, run the server with `python manage.py runserver`
+After the above steps, run the server with `python manage.py runserver 0.0.0.0:8000`
+- The `0.0.0.0:8000` ensures that the backend is accessible via LAN for easier testing
 
 ### *(Optional for Development)* Automated Tasks
 This project uses Celery and Redis to automate tasks like cleaning up old sessions.
