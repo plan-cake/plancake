@@ -47,7 +47,11 @@ export default function ClientPage({
             >
               Create an account
             </Link>{" "}
-            to sync your data across devices.
+            to sync data across devices.
+          </div>
+          <div className="opacity-60">
+            Currently, guest data cannot be transferred to an account. Keep an
+            eye out for updates!
           </div>
         </Banner>
       )}
