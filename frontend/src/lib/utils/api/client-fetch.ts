@@ -2,7 +2,7 @@ import { InferReq, InferRes } from "@/lib/utils/api/endpoints";
 import { fetchJson } from "@/lib/utils/api/fetch-wrapper";
 
 const baseUrl =
-  process.env.NEXT_PUBLIC_DEBUG
+  process.env.NEXT_PUBLIC_DEBUG === "true"
     ? "/api"
     : process.env.NEXT_PUBLIC_API_URL;
 
