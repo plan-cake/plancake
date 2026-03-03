@@ -165,13 +165,18 @@ export default function Page() {
           loadOnSuccess
         />
       </div>
-
-      {/* Login Link */}
-      <div className="mt-2 w-full text-right text-xs">
-        Already have an account?{" "}
-        <Link href="/login">
-          <LinkText>Login!</LinkText>
+      <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
+        {/* Forgot Password */}
+        <Link href="/forgot-password">
+          <LinkText>Forgot password?</LinkText>
         </Link>
+        {/* Login Link */}
+        <div>
+          Already have an account?{" "}
+          <Link href="/login">
+            <LinkText>Login!</LinkText>
+          </Link>
+        </div>
       </div>
     </AuthPageLayout>
   );

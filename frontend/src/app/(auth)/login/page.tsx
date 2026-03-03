@@ -122,7 +122,7 @@ export default function Page() {
         />,
       ]}
     >
-      <div className="flex w-full items-start justify-between">
+      <div className="flex w-full items-center justify-between">
         <div className="m-0 flex flex-col gap-2">
           {/* Remember Me Checkbox */}
           <Checkbox
@@ -130,10 +130,6 @@ export default function Page() {
             checked={rememberMe}
             onChange={() => setRememberMe(!rememberMe)}
           />
-          {/* Forgot Password */}
-          <Link href="/forgot-password" className="text-xs">
-            <LinkText>Forgot password?</LinkText>
-          </Link>
         </div>
 
         {/* Login Button */}
@@ -145,12 +141,18 @@ export default function Page() {
         />
       </div>
 
-      {/* Register Link */}
-      <div className="mt-2 w-full text-right text-xs">
-        No account?{" "}
-        <Link href="/register">
-          <LinkText>Register!</LinkText>
+      <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
+        {/* Forgot Password */}
+        <Link href="/forgot-password">
+          <LinkText>Forgot password?</LinkText>
         </Link>
+        {/* Register Link */}
+        <div>
+          No account?{" "}
+          <Link href="/register">
+            <LinkText>Register!</LinkText>
+          </Link>
+        </div>
       </div>
     </AuthPageLayout>
   );

@@ -102,12 +102,7 @@ export default function Page() {
           ]}
           rateLimitError={errors.rate_limit}
         >
-          <div className="flex w-full items-center justify-between">
-            {/* Forgot Password */}
-            <Link href="/login" className="mb-8 text-xs">
-              <LinkText>Remembered password?</LinkText>
-            </Link>
-
+          <div className="flex justify-end">
             {/* Email Button */}
             <ActionButton
               buttonStyle="primary"
@@ -115,6 +110,18 @@ export default function Page() {
               onClick={handleSubmit}
               loadOnSuccess
             />
+          </div>
+          <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
+            {/* Forgot Password */}
+            <Link href="/login" className="mb-8 text-xs">
+              <LinkText>Remembered password?</LinkText>
+            </Link>
+            <div>
+              No account?{" "}
+              <Link href="/register">
+                <LinkText>Register!</LinkText>
+              </Link>
+            </div>
           </div>
         </AuthPageLayout>
       )}
