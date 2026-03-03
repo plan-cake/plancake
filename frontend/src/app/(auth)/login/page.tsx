@@ -124,7 +124,6 @@ export default function Page() {
     >
       <div className="flex w-full items-center justify-between">
         <div className="m-0 flex flex-col gap-2">
-          {/* Remember Me Checkbox */}
           <Checkbox
             label="Remember me"
             checked={rememberMe}
@@ -132,7 +131,6 @@ export default function Page() {
           />
         </div>
 
-        {/* Login Button */}
         <ActionButton
           buttonStyle="primary"
           label="Login"
@@ -142,11 +140,9 @@ export default function Page() {
       </div>
 
       <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
-        {/* Forgot Password */}
         <Link href="/forgot-password">
           <LinkText>Forgot password?</LinkText>
         </Link>
-        {/* Register Link */}
         <div>
           No account?{" "}
           <Link href="/register">

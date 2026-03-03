@@ -156,7 +156,6 @@ export default function Page() {
         />,
       ]}
     >
-      {/* Register Button */}
       <div className="flex w-full justify-end">
         <ActionButton
           buttonStyle="primary"
@@ -166,11 +165,9 @@ export default function Page() {
         />
       </div>
       <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
-        {/* Forgot Password */}
         <Link href="/forgot-password">
           <LinkText>Forgot password?</LinkText>
         </Link>
-        {/* Login Link */}
         <div>
           Already have an account?{" "}
           <Link href="/login">
