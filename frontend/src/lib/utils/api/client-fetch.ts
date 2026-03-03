@@ -1,9 +1,10 @@
 import { InferReq, InferRes } from "@/lib/utils/api/endpoints";
 import { fetchJson } from "@/lib/utils/api/fetch-wrapper";
 
-const baseUrl = process.env.NEXT_PUBLIC_DEBUG && process.env.NEXT_PUBLIC_TEST_ENVIRONMENT === "Local"
-  ? `${window.location.protocol}//${window.location.hostname}:8000`
-  : process.env.NEXT_PUBLIC_API_URL;
+const baseUrl =
+  process.env.NEXT_PUBLIC_DEBUG
+    ? "/api"
+    : process.env.NEXT_PUBLIC_API_URL;
 
 /**
  * Performs a GET request to the specified API endpoint from the client.
