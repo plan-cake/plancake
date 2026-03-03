@@ -1,11 +1,20 @@
 import { ReactNode } from "react";
 
-export default function LinkText({ children }: { children: ReactNode }) {
+import { cn } from "@/lib/utils/classname";
+
+export default function LinkText({
+  unbolded = false,
+  children,
+}: {
+  unbolded?: boolean;
+  children: ReactNode;
+}) {
   return (
     <span
-      className={
-        "hover:text-accent cursor-pointer font-extrabold hover:underline"
-      }
+      className={cn(
+        "hover:text-accent cursor-pointer hover:underline",
+        unbolded ? "font-normal" : "font-extrabold",
+      )}
     >
       {children}
     </span>
