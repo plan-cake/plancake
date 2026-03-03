@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  if (process.env.DEBUG !== "true") {
+  if (process.env.NEXT_PUBLIC_DEBUG !== "true") {
     const cookieNames = ["account_sess_token", "guest_sess_token"];
     const hasLegacyCookies = cookieNames.some((name) =>
       request.cookies.has(name)
