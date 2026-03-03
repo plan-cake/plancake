@@ -113,7 +113,7 @@ export default function Page() {
           </div>
           <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
             {/* Forgot Password */}
-            <Link href="/login" className="mb-8 text-xs">
+            <Link href="/login">
               <LinkText>Remembered password?</LinkText>
             </Link>
             <div>
