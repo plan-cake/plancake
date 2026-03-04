@@ -115,7 +115,7 @@ export default function ConfirmationDialog({
         <Dialog.Content
           onEscapeKeyDown={(event) => event.stopPropagation()}
           className={cn(
-            "dialog-content fixed left-1/2 top-1/2 z-40 -translate-x-1/2 -translate-y-1/2",
+            "dialog-content fixed inset-0 z-40 m-auto",
             "bg-panel rounded-3xl p-6 shadow-md focus:outline-none",
             "h-fit w-3/4 md:w-fit md:max-w-3xl",
           )}
