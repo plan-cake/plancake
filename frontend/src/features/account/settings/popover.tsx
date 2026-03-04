@@ -15,7 +15,7 @@ export default function AccountSettingsPopover({
 }) {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Anchor asChild>{children}</Popover.Anchor>
+      <Popover.Trigger asChild>{children}</Popover.Trigger>
 
       <Popover.Portal>
         <Popover.Content
