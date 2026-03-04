@@ -170,7 +170,6 @@ export default function ClientPage({
         if (!userConfirmed) {
           return false;
         }
-        return false;
       }
 
       // Save the default name if checkbox checked
@@ -380,9 +379,14 @@ export default function ClientPage({
         open={confirmationOpen}
         onOpenChange={(open) => {
           setConfirmationOpen(open);
-          if (!open && dialogResolver.current) {
-            dialogResolver.current(false);
-            dialogResolver.current = null;
+          if (!open) {
+            // Delay close trigger to allow onConfirm to execute first if confirm was clicked
+            setTimeout(() => {
+              if (dialogResolver.current) {
+                dialogResolver.current(false);
+                dialogResolver.current = null;
+              }
+            }, 0);
           }
         }}
         onConfirm={async () => {
