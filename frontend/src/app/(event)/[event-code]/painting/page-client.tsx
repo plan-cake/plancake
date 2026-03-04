@@ -19,7 +19,11 @@ import { validateAvailabilityData } from "@/features/event/availability/validate
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
 import EventInfoDrawer, { EventInfo } from "@/features/event/info-drawer";
-import { RateLimitBanner, useToast } from "@/features/system-feedback";
+import {
+  ConfirmationDialog,
+  RateLimitBanner,
+  useToast,
+} from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { formatApiError } from "@/lib/utils/api/handle-api-error";
 import { timeslotToISOString } from "@/lib/utils/date-time-format";
@@ -49,6 +53,10 @@ export default function ClientPage({
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // VISITED LAST PAGE STATE
+  const [visitedLastPage, setVisitedLastPage] = useState(false);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
 
   // useEffect(() => {
   //   /**
@@ -136,7 +144,7 @@ export default function ClientPage({
   }, [loginState, accountDetails, setDisplayName, addToast, handleNameChange]);
 
   // SUBMIT AVAILABILITY
-  const handleSubmitAvailability = async () => {
+  const handleSubmitAvailability = async (bypassPageVisitCheck = false) => {
     setErrors({}); // reset errors
 
     try {
@@ -146,6 +154,13 @@ export default function ClientPage({
         Object.values(validationErrors).forEach((error) =>
           addToast("error", error),
         );
+        return false;
+      }
+
+      // Check if the user visited all pages
+      // Only check if they are NOT editing
+      if (!initialData && !visitedLastPage && !bypassPageVisitCheck) {
+        setConfirmationOpen(true);
         return false;
       }
 
@@ -334,6 +349,11 @@ export default function ClientPage({
           onToggleSlot={toggleSlot}
           userAvailability={userAvailability}
           timeslots={timeslots}
+          onPaginate={(index, pages) => {
+            if (index === pages - 1) {
+              setVisitedLastPage(true);
+            }
+          }}
         />
       </div>
 
@@ -341,6 +361,18 @@ export default function ClientPage({
       <div className="z-10">
         <MobileFooterTray buttons={[cancelButton, submitButton]} />
       </div>
+
+      <ConfirmationDialog
+        type="info"
+        autoClose={true}
+        title="Heads up!"
+        description="You haven't viewed all the grid pages. Are you sure you want to submit?"
+        open={confirmationOpen}
+        onOpenChange={setConfirmationOpen}
+        onConfirm={async () => {
+          return await handleSubmitAvailability(true);
+        }}
+      />
     </div>
   );
 }
