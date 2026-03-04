@@ -55,7 +55,11 @@ export default function AccountButton() {
         open={accountSettingsOpen}
         setOpenChange={setAccountSettingsOpen}
       >
-        <EmptyButton buttonStyle="frosted glass inset" icon={<PersonIcon />} />
+        <EmptyButton
+          buttonStyle="frosted glass inset"
+          icon={<PersonIcon />}
+          aria-label="Account settings"
+        />
       </AccountSettings>
     );
   }
