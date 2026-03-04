@@ -32,6 +32,9 @@ interface ScheduleGridProps {
   // for "paint" mode
   userAvailability?: AvailabilitySet;
   onToggleSlot?: (slotIso: string, togglingOn: boolean) => void;
+
+  // for pagination
+  onPaginate?: (index: number, pages: number) => void;
 }
 
 const variants = {
@@ -62,6 +65,7 @@ export default function ScheduleGrid({
   setHoveredSlot = () => {},
   userAvailability = createEmptyUserAvailability(),
   onToggleSlot = () => {},
+  onPaginate = () => {},
 }: ScheduleGridProps) {
   const isMobile = useCheckMobile();
 
@@ -73,7 +77,7 @@ export default function ScheduleGrid({
     direction,
     paginate,
     error,
-  } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7);
+  } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPaginate);
 
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < totalPages - 1;
