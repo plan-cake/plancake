@@ -66,13 +66,11 @@ export type BaseButtonProps = {
    */
   disabled?: boolean;
   /**
-   * The URL to navigate to when the button is clicked. Required for link buttons, and
-   * must not be provided for non-link buttons.
+   * The URL to navigate to when the button is clicked. Required for Link buttons.
    */
   href?: string;
   /**
-   * The function to call when the button is clicked. Required for non-link buttons, and
-   * must not be provided for link buttons.
+   * The function to call when the button is clicked. Required for Action buttons.
    *
    * The function must return a boolean or a Promise that resolves to a boolean,
    * indicating whether the action was successful.
