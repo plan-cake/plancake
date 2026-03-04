@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -78,6 +80,16 @@ export default function ScheduleGrid({
     paginate,
     error,
   } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPaginate);
+
+  // Initial onPaginate callback to report pagination info to parent
+  // Also triggers if the user changes between mobile and desktop layouts
+  const reportedTotalPages = useRef<number | null>(null);
+  useEffect(() => {
+    if (reportedTotalPages.current !== totalPages) {
+      onPaginate(currentPage, totalPages);
+      reportedTotalPages.current = totalPages;
+    }
+  }, [onPaginate, currentPage, totalPages]);
 
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < totalPages - 1;
