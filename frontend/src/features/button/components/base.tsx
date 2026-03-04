@@ -53,10 +53,10 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       setIsLoading(loading);
     }, [loading]);
 
-    const onClickHandler = async () => {
+    const onClickHandler = async (e?: React.MouseEvent<HTMLButtonElement>) => {
       if (isLoading) return;
       setIsLoading(true);
-      const success = await onClick!();
+      const success = await onClick!(e);
       if (loadOnSuccess) {
         if (!success) {
           setIsLoading(false);
