@@ -36,7 +36,7 @@ interface ScheduleGridProps {
   onToggleSlot?: (slotIso: string, togglingOn: boolean) => void;
 
   // for pagination
-  onPaginate?: (index: number, pages: number) => void;
+  onPageUpdate?: (index: number, pages: number) => void;
 }
 
 const variants = {
@@ -67,7 +67,7 @@ export default function ScheduleGrid({
   setHoveredSlot = () => {},
   userAvailability = createEmptyUserAvailability(),
   onToggleSlot = () => {},
-  onPaginate = () => {},
+  onPageUpdate = () => {},
 }: ScheduleGridProps) {
   const isMobile = useCheckMobile();
 
@@ -79,17 +79,17 @@ export default function ScheduleGrid({
     direction,
     paginate,
     error,
-  } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPaginate);
+  } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPageUpdate);
 
-  // Initial onPaginate callback to report pagination info to parent
+  // Initial onPageUpdate callback to report pagination info to parent
   // Also triggers if the user changes between mobile and desktop layouts
   const reportedTotalPages = useRef<number | null>(null);
   useEffect(() => {
     if (reportedTotalPages.current !== totalPages) {
-      onPaginate(currentPage, totalPages);
+      onPageUpdate(currentPage, totalPages);
       reportedTotalPages.current = totalPages;
     }
-  }, [onPaginate, currentPage, totalPages]);
+  }, [onPageUpdate, currentPage, totalPages]);
 
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < totalPages - 1;

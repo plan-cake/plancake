@@ -358,7 +358,7 @@ export default function ClientPage({
           onToggleSlot={toggleSlot}
           userAvailability={userAvailability}
           timeslots={timeslots}
-          onPaginate={(index, pages) => {
+          onPageUpdate={(index, pages) => {
             setNumPages(pages);
             if (index > maxVisitedPage) {
               setMaxVisitedPage(index);
