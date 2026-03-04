@@ -17,7 +17,7 @@ export type BaseButtonProps = {
    * 
    * This is only used internally.
    */
-  _buttontype?: ButtonType;
+  _buttontype: ButtonType;
   /** The HTML button type. Defaults to "button". */
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   /**
