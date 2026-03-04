@@ -21,13 +21,13 @@ const EmptyButton = forwardRef<Ref, EmptyButtonProps>(
   ) => {
     return (
       <BaseButton
+        _buttontype="empty"
         buttonStyle={buttonStyle}
         icon={icon}
         label={label}
         shrinkOnMobile={shrinkOnMobile}
         loading={loading}
         disabled={disabled}
-        isLink={false}
         className={className}
         ref={ref}
         {...props}

@@ -9,7 +9,15 @@ export type ButtonStyle =
   | "transparent"
   | "danger";
 
+type ButtonType = "action" | "link" | "empty";
+
 export type BaseButtonProps = {
+  /**
+   * The type of the button, determining its behavior and required props.
+   * 
+   * This is only used internally.
+   */
+  _buttontype?: ButtonType;
   /** The HTML button type. Defaults to "button". */
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   /**
@@ -57,11 +65,6 @@ export type BaseButtonProps = {
    * @default false
    */
   disabled?: boolean;
-  /**
-   * If specified, the button will be a link. A link button uses the Next.js `Link`
-   * component, and must have an `href` prop.
-   */
-  isLink?: boolean;
   /**
    * The URL to navigate to when the button is clicked. Required for link buttons, and
    * must not be provided for non-link buttons.

@@ -23,13 +23,13 @@ const ActionButton = forwardRef<Ref, ActionButtonProps>(
   ) => {
     return (
       <BaseButton
+        _buttontype="action"
         buttonStyle={buttonStyle}
         icon={icon}
         label={label}
         shrinkOnMobile={shrinkOnMobile}
         loading={loading}
         disabled={disabled}
-        isLink={false}
         onClick={onClick}
         loadOnSuccess={loadOnSuccess}
         className={className}

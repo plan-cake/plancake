@@ -22,6 +22,7 @@ type Ref = HTMLButtonElement | HTMLAnchorElement;
 const BaseButton = forwardRef<Ref, BaseButtonProps>(
   (
     {
+      _buttontype,
       type,
       buttonStyle,
       icon,
@@ -29,7 +30,6 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       shrinkOnMobile = false,
       loading = false,
       disabled = false,
-      isLink = false,
       href,
       onClick,
       loadOnSuccess = false,
@@ -44,9 +44,10 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       throw new Error(
         "Button cannot shrink on mobile without both an icon and a label",
       );
-    if (isLink && !href) throw new Error("Link Button must specify href");
-    if (!isLink && !onClick)
-      throw new Error("Non-Link Button must specify onClick");
+    if (_buttontype === "link" && !href)
+      throw new Error("Link Button must specify href");
+    if (_buttontype === "action" && !onClick)
+      throw new Error("Action Button must specify onClick");
 
     const [isLoading, setIsLoading] = useState(loading);
     useEffect(() => {
@@ -131,7 +132,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
           {buttonContent}
         </button>
       );
-    } else if (isLink) {
+    } else if (_buttontype === "link") {
       return (
         <Link
           ref={ref as React.Ref<HTMLAnchorElement>}
