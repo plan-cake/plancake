@@ -55,7 +55,9 @@ export default function ClientPage({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // VISITED LAST PAGE STATE
-  const [visitedLastPage, setVisitedLastPage] = useState(false);
+  const [maxVisitedPage, setMaxVisitedPage] = useState(0);
+  const [numPages, setNumPages] = useState(1);
+  const visitedLastPage = maxVisitedPage >= numPages - 1;
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const dialogResolver = useRef<((confirmed: boolean) => void) | null>(null);
 
@@ -357,8 +359,9 @@ export default function ClientPage({
           userAvailability={userAvailability}
           timeslots={timeslots}
           onPaginate={(index, pages) => {
-            if (index === pages - 1) {
-              setVisitedLastPage(true);
+            setNumPages(pages);
+            if (index > maxVisitedPage) {
+              setMaxVisitedPage(index);
             }
           }}
         />
