@@ -120,3 +120,5 @@ export type LinkButtonProps = CommonButtonProps & {
   /** @inheritdoc BaseButtonProps */
   href: string;
 };
+
+export type EmptyButtonProps = CommonButtonProps;
