@@ -57,6 +57,7 @@ export default function ClientPage({
   // VISITED LAST PAGE STATE
   const [visitedLastPage, setVisitedLastPage] = useState(false);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const dialogResolver = useRef<((confirmed: boolean) => void) | null>(null);
 
   // useEffect(() => {
   //   /**
@@ -144,7 +145,7 @@ export default function ClientPage({
   }, [loginState, accountDetails, setDisplayName, addToast, handleNameChange]);
 
   // SUBMIT AVAILABILITY
-  const handleSubmitAvailability = async (bypassPageVisitCheck = false) => {
+  const handleSubmitAvailability = async () => {
     setErrors({}); // reset errors
 
     try {
@@ -159,8 +160,14 @@ export default function ClientPage({
 
       // Check if the user visited all pages
       // Only check if they are NOT editing
-      if (!initialData && !visitedLastPage && !bypassPageVisitCheck) {
+      if (!initialData && !visitedLastPage) {
         setConfirmationOpen(true);
+        const userConfirmed = await new Promise<boolean>((resolve) => {
+          dialogResolver.current = resolve;
+        });
+        if (!userConfirmed) {
+          return false;
+        }
         return false;
       }
 
@@ -368,9 +375,19 @@ export default function ClientPage({
         title="Heads up!"
         description="You haven't viewed all the grid pages. Are you sure you want to submit?"
         open={confirmationOpen}
-        onOpenChange={setConfirmationOpen}
+        onOpenChange={(open) => {
+          setConfirmationOpen(open);
+          if (!open && dialogResolver.current) {
+            dialogResolver.current(false);
+            dialogResolver.current = null;
+          }
+        }}
         onConfirm={async () => {
-          return await handleSubmitAvailability(true);
+          if (dialogResolver.current) {
+            dialogResolver.current(true);
+            dialogResolver.current = null;
+          }
+          return true;
         }}
       />
     </div>
