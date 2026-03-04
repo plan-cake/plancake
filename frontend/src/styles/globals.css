@@ -16,11 +16,3 @@ body {
   color: var(--foreground);
   font-family: var(--font-nunito);
 }
-
-:root {
-  --time-picker-bg: var(--background);
-  --time-picker-text: var(--foreground);
-  --time-picker-text-secondary: #9ca3af;
-  --time-picker-primary: var(--accent);
-  --time-picker-primary-light: rgba(59, 130, 246, 0.1);
-}
