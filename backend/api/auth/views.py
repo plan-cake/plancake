@@ -31,10 +31,8 @@ from api.settings import (
     BASE_URL,
     EMAIL_CODE_EXP_SECONDS,
     GENERIC_ERR_RESPONSE,
-    LONG_SESS_EXP_SECONDS,
     PWD_RESET_EXP_SECONDS,
     SEND_EMAILS,
-    SESS_EXP_SECONDS,
 )
 from api.utils import (
     MessageOutputSerializer,
