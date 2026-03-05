@@ -26,7 +26,7 @@ export default function LogoArea() {
         <Logo />
       </Link>
       <Link href="/version-history" className="text-xs">
-        <LinkText>{getCurrentVersion()}</LinkText>
+        <LinkText unbolded>{getCurrentVersion()}</LinkText>
       </Link>
     </div>
   );

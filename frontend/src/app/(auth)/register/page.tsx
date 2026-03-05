@@ -156,7 +156,6 @@ export default function Page() {
         />,
       ]}
     >
-      {/* Register Button */}
       <div className="flex w-full justify-end">
         <ActionButton
           buttonStyle="primary"
@@ -165,13 +164,16 @@ export default function Page() {
           loadOnSuccess
         />
       </div>
-
-      {/* Login Link */}
-      <div className="mt-2 w-full text-right text-xs">
-        Already have an account?{" "}
-        <Link href="/login">
-          <LinkText>Login!</LinkText>
+      <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
+        <Link href="/forgot-password">
+          <LinkText>Forgot password?</LinkText>
         </Link>
+        <div>
+          Already have an account?{" "}
+          <Link href="/login">
+            <LinkText>Login!</LinkText>
+          </Link>
+        </div>
       </div>
     </AuthPageLayout>
   );

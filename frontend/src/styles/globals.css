@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "react-day-picker/style.css";
-@import "@poursha98/react-ios-time-picker/styles.css";
 
 @import "./tailwind.css";
 @import "./text.css";
@@ -16,12 +15,4 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-nunito);
-}
-
-:root {
-  --time-picker-bg: var(--background);
-  --time-picker-text: var(--foreground);
-  --time-picker-text-secondary: #9ca3af;
-  --time-picker-primary: var(--accent);
-  --time-picker-primary-light: rgba(59, 130, 246, 0.1);
 }
