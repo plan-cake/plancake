@@ -1,4 +1,4 @@
-import { MouseEvent, useMemo } from "react";
+import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { ClockIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import DashboardCopyButton from "@/features/dashboard/components/copy-button";
 import DateRangeRow from "@/features/dashboard/components/date-range-row";
 import ParticipantRow from "@/features/dashboard/components/participant-row";
 import WeekdayRow from "@/features/dashboard/components/weekday-row";
+import { cn } from "@/lib/utils/classname";
 import {
   formatTimeRange,
   getTimezoneDetails,
@@ -62,42 +63,65 @@ export default function DashboardEvent({
     [dateTimeProps.endTime, dateTimeProps.endDate, timezone, type],
   );
 
+  // Dynamic participant icon count based on event width
+  const participantRowRef = useRef<HTMLDivElement>(null);
+  const [numIcons, setNumIcons] = useState(8);
+  useEffect(() => {
+    if (!participantRowRef.current) return;
+
+    const observer = new ResizeObserver((entries) => {
+      if (entries.length === 0) return;
+      const entry = entries[0];
+      const width = entry.contentRect.width;
+      // Each icon is 24px wide with a -4px overlap, except for the first
+      // We also subtract an extra 16 px just for padding in case the "+N" is big
+      const calculated = Math.floor((width - 4 - 16) / 20);
+      setNumIcons(Math.max(1, calculated)); // always show at least 1 icon
+    });
+
+    observer.observe(participantRowRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <Link href={`/${code}`}>
-      <div className="bg-background flex w-full flex-col rounded-lg p-4 transition-shadow hover:shadow-lg hover:shadow-black/25">
-        <div className="bg-background rounded text-lg font-bold leading-tight">
-          {title}
-        </div>
-        <div className="text-sm opacity-50">{code}</div>
-        <div className="mb-2 mt-1">
-          {type === "specific" && (
-            <DateRangeRow startDate={start.date} endDate={end.date} />
-          )}
-          {type === "weekday" && (
-            <WeekdayRow startWeekday={start.weekday} endWeekday={end.weekday} />
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <ClockIcon className="h-5 w-5" />
-          {formatTimeRange(start.time, end.time)}
-        </div>
-        <div className="mt-1.5">
-          <ParticipantRow participants={participants} maxDisplay={7} />
-        </div>
-        <div className="mt-2.5 flex items-center gap-2">
-          <DashboardCopyButton code={code} />
-          {myEvent && (
-            <button className="cursor-pointer" onClick={navigateToEdit}>
-              <div
-                className={
-                  "border-foreground hover:bg-foreground/25 w-fit rounded-full border p-1.5"
-                }
-              >
-                <Pencil1Icon className="h-4 w-4" />
-              </div>
-            </button>
-          )}
-        </div>
+    <Link
+      href={`/${code}`}
+      className={cn(
+        "bg-background flex h-fit w-full flex-col rounded-lg p-4",
+        "transition-shadow hover:shadow-lg hover:shadow-black/25",
+      )}
+    >
+      <div className="text-lg font-bold leading-tight">{title}</div>
+      <div className="text-sm opacity-50">{code}</div>
+      <div className="mb-2 mt-1">
+        {type === "specific" && (
+          <DateRangeRow startDate={start.date} endDate={end.date} />
+        )}
+        {type === "weekday" && (
+          <WeekdayRow startWeekday={start.weekday} endWeekday={end.weekday} />
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <ClockIcon className="h-5 w-5" />
+        {formatTimeRange(start.time, end.time)}
+      </div>
+      <div className="mt-1.5" ref={participantRowRef}>
+        <ParticipantRow participants={participants} numIcons={numIcons} />
+      </div>
+      <div className="mt-2.5 flex items-center gap-2">
+        <DashboardCopyButton code={code} />
+        {myEvent && (
+          <button className="cursor-pointer" onClick={navigateToEdit}>
+            <div
+              className={
+                "border-foreground hover:bg-foreground/25 w-fit rounded-full border p-1.5"
+              }
+            >
+              <Pencil1Icon className="h-4 w-4" />
+            </div>
+          </button>
+        )}
       </div>
     </Link>
   );
