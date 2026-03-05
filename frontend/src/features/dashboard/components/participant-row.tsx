@@ -2,29 +2,30 @@ import { cn } from "@/lib/utils/classname";
 
 type ParticipantRowProps = {
   participants: string[];
-  maxDisplay: number;
+  numIcons: number;
 };
 
 export default function ParticipantRow({
   participants,
-  maxDisplay,
+  numIcons,
 }: ParticipantRowProps) {
   return (
     <div className="flex text-sm">
       {participants.length > 0 ? (
         participants.map((participant, index) => {
-          if (index >= maxDisplay) {
-            if (index === maxDisplay) {
-              return (
-                <ParticipantIcon
-                  key="more-participants"
-                  iconText={`+${participants.length - maxDisplay}`}
-                  isFirst={false}
-                  label={`and ${participants.length - maxDisplay} more participant${participants.length - maxDisplay === 1 ? "" : "s"}`}
-                />
-              );
-            }
+          if (index >= numIcons) {
             return null;
+          } else if (index === numIcons - 1 && participants.length > numIcons) {
+            const remaining = participants.length - numIcons + 1;
+            return (
+              <ParticipantIcon
+                key="more-participants"
+                iconText={`+${remaining}`}
+                // juuuuuust in case (the UI would be very messed up at this point)
+                isFirst={index === 0}
+                label={`and ${remaining} more participant${remaining === 1 ? "" : "s"}`}
+              />
+            );
           }
           return (
             <ParticipantIcon

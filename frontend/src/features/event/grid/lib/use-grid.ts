@@ -30,6 +30,7 @@ export default function useGridInfo(
   timeslots: Date[],
   timezone: string,
   daysPerPage: number,
+  onPaginate: (index: number, pages: number) => void,
 ) {
   const [[currentPage, direction], setCurrentPage] = useState([0, 0]);
 
@@ -49,6 +50,7 @@ export default function useGridInfo(
       (newDirection === 1 && currentPage < view.totalPages - 1)
     ) {
       setCurrentPage([currentPage + newDirection, newDirection]);
+      onPaginate(currentPage + newDirection, view.totalPages);
     }
   };
 

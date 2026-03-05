@@ -144,7 +144,7 @@ export function BaseDrawer({
 
             <div
               className={cn(
-                "flex-1 px-8 pb-8",
+                "flex-1 px-8 pb-4",
                 scrollableBody && "overflow-y-auto",
                 bodyClassName,
               )}
