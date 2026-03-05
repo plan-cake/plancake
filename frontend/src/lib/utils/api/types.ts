@@ -55,13 +55,15 @@ export type EventEditData = {
   event_code: string;
 }
 
+type ApiEventType = "Date" | "Week";
+
 export type EventDetails = {
   title: string;
   duration: number | null;
   timeslots: string[];
   time_zone: string;
   is_creator: boolean;
-  event_type: "Date" | "Week";
+  event_type: ApiEventType;
   start_date: string;
   end_date: string;
   start_time: string;
@@ -96,7 +98,7 @@ export type AllAvailability = {
 
 export type DashboardEvent = {
   title: string;
-  event_type: "Date" | "Week";
+  event_type: ApiEventType;
   duration: number | null;
   start_date: string;
   end_date: string;

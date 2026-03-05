@@ -1,4 +1,4 @@
-import { EventRange } from "@/core/event/types";
+import { EventRange, EventType } from "@/core/event/types";
 import { EventEditorType } from "@/features/event/editor/types";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -25,7 +25,7 @@ type EventSubmitJsonBody = {
 export default async function submitEvent(
   data: EventSubmitData,
   type: EventEditorType,
-  eventType: "specific" | "weekday",
+  eventType: EventType,
   onSuccess: (code: string) => void,
   handleError: (field: string, message: string) => void,
 ): Promise<boolean> {

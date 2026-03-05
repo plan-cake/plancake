@@ -1,9 +1,10 @@
+import { EventType } from "@/core/event/types";
 import { AllAvailability } from "@/lib/utils/api/types";
 import { formatDateTime } from "@/lib/utils/date-time-format";
 
 export function processAvailabilityData(
   availabilityData: AllAvailability,
-  eventType: string,
+  eventType: EventType,
   timezone: string,
 ): AllAvailability {
   const availabilities = availabilityData.availability || {};

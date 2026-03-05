@@ -4,6 +4,7 @@ import { ClockIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { EventType } from "@/core/event/types";
 import DashboardCopyButton from "@/features/dashboard/components/copy-button";
 import DateRangeRow from "@/features/dashboard/components/date-range-row";
 import ParticipantRow from "@/features/dashboard/components/participant-row";
@@ -18,7 +19,7 @@ export type DashboardEventProps = {
   myEvent: boolean;
   code: string;
   title: string;
-  type: "specific" | "weekday";
+  type: EventType;
   participants: string[];
   startTime: string;
   endTime: string;

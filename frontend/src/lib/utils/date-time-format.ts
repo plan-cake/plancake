@@ -1,6 +1,8 @@
 import { format, parse, parseISO } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
+import { EventType } from "@/core/event/types";
+
 /* TIMEZONE UTILS */
 
 // expects a timezone value (e.g., "America/New_York") and returns
@@ -61,7 +63,7 @@ export function getTimezoneDetails({
 export function timeslotToISOString(
   timeslot: Date,
   timezone: string,
-  eventType: string,
+  eventType: EventType,
 ): string {
   if (eventType === "specific") {
     return timeslot.toISOString();
@@ -85,7 +87,7 @@ export function timeslotToISOString(
 export function parseIsoDateTime(
   slotIso: string,
   timezone: string,
-  eventType: string,
+  eventType: EventType,
 ): Date {
   if (eventType === "specific") {
     return parseISO(slotIso + "Z");
@@ -99,7 +101,7 @@ export function parseIsoDateTime(
 export function formatDateTime(
   timeslot: string,
   timezone: string,
-  eventType: string,
+  eventType: EventType,
 ): string {
   return parseIsoDateTime(timeslot, timezone, eventType).toISOString();
 }
