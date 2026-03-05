@@ -1,5 +1,4 @@
 import logging
-from zoneinfo import ZoneInfo
 
 from django.db import DatabaseError
 from django.db.models import Prefetch, Q

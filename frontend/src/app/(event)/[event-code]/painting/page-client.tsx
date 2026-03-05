@@ -19,7 +19,11 @@ import { validateAvailabilityData } from "@/features/event/availability/validate
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
 import EventInfoDrawer, { EventInfo } from "@/features/event/info-drawer";
-import { RateLimitBanner, useToast } from "@/features/system-feedback";
+import {
+  ConfirmationDialog,
+  RateLimitBanner,
+  useToast,
+} from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { formatApiError } from "@/lib/utils/api/handle-api-error";
 import { timeslotToISOString } from "@/lib/utils/date-time-format";
@@ -49,6 +53,13 @@ export default function ClientPage({
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // VISITED LAST PAGE STATE
+  const [maxVisitedPage, setMaxVisitedPage] = useState(0);
+  const [numPages, setNumPages] = useState(1);
+  const visitedLastPage = maxVisitedPage >= numPages - 1;
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const dialogResolver = useRef<((confirmed: boolean) => void) | null>(null);
 
   // useEffect(() => {
   //   /**
@@ -124,7 +135,10 @@ export default function ClientPage({
   useEffect(() => {
     if (nameInitialized.current) return;
     if (loginState !== "logged_in") return;
-    if (!accountDetails || !accountDetails.defaultName) return;
+    if (!accountDetails || !accountDetails.defaultName) {
+      nameInitialized.current = true; // don't try again after setting the name
+      return;
+    }
 
     const newName = accountDetails.defaultName;
     setDisplayName(newName);
@@ -147,6 +161,18 @@ export default function ClientPage({
           addToast("error", error),
         );
         return false;
+      }
+
+      // Check if the user visited all pages
+      // Only check if they are NOT editing
+      if (!initialData && !visitedLastPage) {
+        setConfirmationOpen(true);
+        const userConfirmed = await new Promise<boolean>((resolve) => {
+          dialogResolver.current = resolve;
+        });
+        if (!userConfirmed) {
+          return false;
+        }
       }
 
       // Save the default name if checkbox checked
@@ -259,7 +285,7 @@ export default function ClientPage({
       {/* Header and Button Row */}
       <div className="flex w-full flex-wrap justify-between md:flex-row">
         <div className="flex flex-1 justify-between">
-          <h1 className="text-2xl">{eventName}</h1>
+          <h1 className="text-2xl font-bold">{eventName}</h1>
           <EventInfoDrawer eventRange={eventRange} timezone={timeZone} />
         </div>
         <div className="hidden items-center gap-2 md:flex">
@@ -334,6 +360,12 @@ export default function ClientPage({
           onToggleSlot={toggleSlot}
           userAvailability={userAvailability}
           timeslots={timeslots}
+          onPageUpdate={(index, pages) => {
+            setNumPages(pages);
+            if (index > maxVisitedPage) {
+              setMaxVisitedPage(index);
+            }
+          }}
         />
       </div>
 
@@ -341,6 +373,33 @@ export default function ClientPage({
       <div className="z-10">
         <MobileFooterTray buttons={[cancelButton, submitButton]} />
       </div>
+
+      <ConfirmationDialog
+        type="info"
+        autoClose={true}
+        title="Heads up!"
+        description="You haven't viewed all the grid pages. Are you sure you want to submit?"
+        open={confirmationOpen}
+        onOpenChange={(open) => {
+          setConfirmationOpen(open);
+          if (!open) {
+            // Delay close trigger to allow onConfirm to execute first if confirm was clicked
+            setTimeout(() => {
+              if (dialogResolver.current) {
+                dialogResolver.current(false);
+                dialogResolver.current = null;
+              }
+            }, 0);
+          }
+        }}
+        onConfirm={async () => {
+          if (dialogResolver.current) {
+            dialogResolver.current(true);
+            dialogResolver.current = null;
+          }
+          return true;
+        }}
+      />
     </div>
   );
 }
