@@ -1,6 +1,11 @@
 import { InferReq, InferRes } from "@/lib/utils/api/endpoints";
 import { fetchJson } from "@/lib/utils/api/fetch-wrapper";
 
+const baseUrl =
+  process.env.NEXT_PUBLIC_DEBUG === "true"
+    ? "/api"
+    : process.env.NEXT_PUBLIC_API_URL;
+
 /**
  * Performs a GET request to the specified API endpoint from the client.
  * @param endpoint The endpoint to send the request to from the `ROUTES` object.
@@ -13,8 +18,6 @@ export async function clientGet<T extends { url: string }>(
   params?: InferReq<T>,
   options?: RequestInit
 ): Promise<InferRes<T>> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
   let queryString = "";
   if (params && Object.keys(params).length > 0) {
     queryString = `?${new URLSearchParams(params).toString()}`;
@@ -46,7 +49,6 @@ export async function clientPost<T extends { url: string }>(
   body?: InferReq<T>,
   options?: RequestInit
 ): Promise<InferRes<T>> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const url = `${baseUrl}${endpoint.url}`;
 
   const requestOptions: RequestInit = {
