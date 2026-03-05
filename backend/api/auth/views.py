@@ -10,7 +10,6 @@ from rest_framework.throttling import AnonRateThrottle
 
 from api.auth.serializers import (
     AccountDetailsSerializer,
-    CheckPasswordSerializer,
     EmailSerializer,
     EmailVerifySerializer,
     LoginSerializer,
@@ -318,21 +317,6 @@ def login(request):
     )
     set_session_cookie(response, ACCOUNT_COOKIE_NAME, session_token, remember_me)
     return response
-
-
-@api_endpoint("POST")
-@validate_json_input(PasswordSerializer)
-@validate_output(CheckPasswordSerializer)
-def check_password(request):
-    """
-    Checks if the provided password meets the security criteria.
-
-    Returns a list of password criteria with whether they are met or not.
-    """
-    password = request.validated_data.get("password")
-
-    is_strong, criteria = validate_password(password)
-    return Response({"is_strong": is_strong, "criteria": criteria}, status=200)
 
 
 @api_endpoint("GET")
