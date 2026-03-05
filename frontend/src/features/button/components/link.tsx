@@ -22,13 +22,13 @@ const LinkButton = forwardRef<Ref, LinkButtonProps>(
   ) => {
     return (
       <BaseButton
+        _buttontype="link"
         buttonStyle={buttonStyle}
         icon={icon}
         label={label}
         shrinkOnMobile={shrinkOnMobile}
         loading={loading}
         disabled={disabled}
-        isLink={true}
         href={href}
         className={className}
         ref={ref}

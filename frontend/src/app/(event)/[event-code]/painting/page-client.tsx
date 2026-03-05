@@ -124,7 +124,10 @@ export default function ClientPage({
   useEffect(() => {
     if (nameInitialized.current) return;
     if (loginState !== "logged_in") return;
-    if (!accountDetails || !accountDetails.defaultName) return;
+    if (!accountDetails || !accountDetails.defaultName) {
+      nameInitialized.current = true; // don't try again after setting the name
+      return;
+    }
 
     const newName = accountDetails.defaultName;
     setDisplayName(newName);

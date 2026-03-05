@@ -13,7 +13,6 @@ export default function AccountSettingsDrawer({
 }) {
   return (
     <div>
-      {trigger}
       <BaseDrawer
         open={open}
         onOpenChange={setOpen}
@@ -21,6 +20,7 @@ export default function AccountSettingsDrawer({
         contentClassName="h-7/8"
         description="View and edit your account settings"
         title="Account Settings"
+        trigger={trigger}
       >
         <div className="flex flex-1 flex-col overflow-y-auto">{content}</div>
       </BaseDrawer>
