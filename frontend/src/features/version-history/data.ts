@@ -35,7 +35,7 @@ export function getVersionHistoryData(): VersionHistoryData {
         "Added a version history page",
         "Updated error handling across the site",
         "Updated certain parts of the event editor",
-        'Improved readability of "Frosted Glass"-styled components',
+        'Improved readability of transparent components',
         "Temporarily disabled weekday events for fixes",
       ],
       bugFixes: ["Fixed the theme transition on the landing page"],
