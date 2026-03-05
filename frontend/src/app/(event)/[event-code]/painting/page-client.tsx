@@ -359,7 +359,9 @@ export default function ClientPage({
           timeslots={timeslots}
           onPageUpdate={(index, pages) => {
             setNumPages(pages);
-            setMaxVisitedPage((prev) => Math.max(prev, index));
+            if (index > maxVisitedPage) {
+              setMaxVisitedPage(index);
+            }
           }}
         />
       </div>

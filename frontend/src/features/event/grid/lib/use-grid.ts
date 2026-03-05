@@ -49,11 +49,8 @@ export default function useGridInfo(
       (newDirection === -1 && currentPage > 0) ||
       (newDirection === 1 && currentPage < view.totalPages - 1)
     ) {
-      setCurrentPage(() => {
-        const newPage = currentPage + newDirection;
-        onPaginate(newPage, view.totalPages);
-        return [newPage, newDirection];
-      });
+      setCurrentPage([currentPage + newDirection, newDirection]);
+      onPaginate(currentPage + newDirection, view.totalPages);
     }
   };
 
