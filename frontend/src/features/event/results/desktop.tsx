@@ -136,10 +136,9 @@ export default function DesktopResults({
         >
           {banners}
 
-          <div className="sticky top-24 flex h-[calc(100vh-8rem)] flex-col gap-y-4">
-            <div className="flex min-h-0 flex-1">
-              <AttendeesPanel />
-            </div>
+          <div className="sticky top-24 flex max-h-[calc(100vh-8rem)] flex-col gap-y-4">
+            <AttendeesPanel />
+
             <div className="bg-panel hidden shrink-0 rounded-3xl p-6 md:block">
               <EventInfo eventRange={eventRange} timezone={timezone} />
             </div>

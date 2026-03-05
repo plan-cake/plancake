@@ -42,8 +42,8 @@ export default function AttendeesPanel() {
   return (
     <div
       className={cn(
-        "bg-panel h-full rounded-3xl",
-        "flex flex-1 flex-col gap-2 overflow-hidden",
+        "bg-panel rounded-3xl",
+        "flex min-h-0 w-full shrink flex-col gap-2 overflow-hidden",
       )}
     >
       <PanelHeader
