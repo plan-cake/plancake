@@ -8,7 +8,7 @@ export default function HeaderSpacer({
   return (
     <div
       className={cn(
-        "md:h-25 bg-background z-20 h-20 w-full",
+        "h-25 bg-background z-20 w-full",
         scrollable ? "" : "sticky top-0",
       )}
     />
