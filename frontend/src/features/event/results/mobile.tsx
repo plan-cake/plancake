@@ -46,6 +46,19 @@ export default function MobileResults({
     setTimezone(newTZ.toString());
   };
 
+  /* DRAWER SPACING */
+  const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);
+  const getSpacerHeight = () => {
+    const defaultHeight = "25svh";
+    if (!drawerSnap) return defaultHeight;
+
+    if (typeof drawerSnap === "number") {
+      return `calc(${drawerSnap * 100}svh + 20px)`;
+    }
+
+    return drawerSnap;
+  };
+
   /* BANNERS */
   const banners = getResultBanners(
     availabilities,
@@ -82,7 +95,7 @@ export default function MobileResults({
     <div className="flex flex-col space-y-4 pl-6 pr-6">
       <HeaderSpacer />
       <div className="flex flex-col justify-between gap-2 md:flex-row">
-        <h1 className="text-2xl">{eventTitle}</h1>
+        <h1 className="text-2xl font-bold">{eventTitle}</h1>
         <div className="flex w-full items-center justify-end gap-2">
           {paintingButton}
           <KebabMenu
@@ -103,7 +116,13 @@ export default function MobileResults({
           timeslots={timeslots}
         />
 
-        <ResultsDrawer timezone={timezone} onTimezoneChange={handleTZChange} />
+        <div style={{ height: `${getSpacerHeight()}` }} className="w-full" />
+
+        <ResultsDrawer
+          timezone={timezone}
+          onTimezoneChange={handleTZChange}
+          onSnapChange={setDrawerSnap}
+        />
       </div>
     </div>
   );
