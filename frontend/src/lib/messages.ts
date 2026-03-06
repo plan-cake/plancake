@@ -38,6 +38,7 @@ export const MESSAGES = {
   SUCCESS_LOGOUT: "You have been logged out.",
   SUCCESS_DEFAULT_NAME_SAVED: "Nickname saved successfully.",
   SUCCESS_DEFAULT_NAME_REMOVED: "Nickname removed successfully.",
+  SUCCESS_EVENT_DELETE: "Event deleted successfully.",
 
   // copy link messages
   COPY_LINK_SUCCESS: "Link copied to clipboard!",

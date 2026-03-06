@@ -186,7 +186,7 @@ export default function ScheduleGrid({
 
 const GridError = ({ message }: { message: string }) => (
   <div className="flex h-full w-full items-center justify-center text-sm">
-    <ExclamationTriangleIcon className="text-red mr-2 h-5 w-5" />
+    <ExclamationTriangleIcon className="text-error mr-2 h-5 w-5" />
     {message}
   </div>
 );

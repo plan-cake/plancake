@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { EventCodePageProps } from "@/features/event/code-page-props";
 import EventEditor from "@/features/event/editor/editor";
 import { getCachedEventDetails } from "@/features/event/editor/fetch-data";
-import { processEventData } from "@/lib/utils/api/process-event-data";
+import { processEventData } from "@/lib/utils/api/processors/process-event-data";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
 
 export async function generateMetadata({

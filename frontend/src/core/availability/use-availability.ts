@@ -5,12 +5,13 @@ import {
   AvailabilityState,
 } from "@/core/availability/reducers/reducer";
 import { createUserAvailability } from "@/core/availability/utils";
-import { SelfAvailabilityResponse } from "@/features/event/availability/fetch-data";
+import { EventType } from "@/core/event/types";
+import { SelfAvailability } from "@/lib/utils/api/types";
 import { formatDateTime } from "@/lib/utils/date-time-format";
 
 export function useAvailability(
-  initialData: SelfAvailabilityResponse | null,
-  eventType: string,
+  initialData: SelfAvailability | null,
+  eventType: EventType,
 ) {
   const initialTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const isoStrings = [];

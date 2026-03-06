@@ -276,18 +276,20 @@ function getStyleClasses(
       switch (state) {
         case "rest":
           styleClasses = cn(
-            "bg-error text-white font-semibold",
-            "active:bg-[color-mix(in_oklab,var(--color-error)_100%,black_10%)]",
-            "hover:bg-[color-mix(in_oklab,var(--color-error)_100%,white_10%)]",
+            "bg-panel text-error font-bold border-2 border-error",
+            "active:border-[color-mix(in_oklab,var(--color-error)_100%,black_10%)]",
+            "active:bg-[color-mix(in_oklab,var(--color-error)_100%,black_10%)] active:text-white",
+            "hover:bg-error hover:text-white",
           );
+          paddingShrink = 0.5;
           break;
         case "loading":
           styleClasses =
-            "bg-[color-mix(in_oklab,var(--color-error)_100%,black_20%)]";
+            "bg-[color-mix(in_oklab,var(--color-error)_100%,black_20%)] font-bold";
           break;
         case "disabled":
           styleClasses =
-            "bg-gray-200 text-[#ffffff] dark:bg-gray-300/25 dark:text-gray-300";
+            "bg-gray-200 text-[#ffffff] dark:bg-gray-300/25 dark:text-gray-300 font-bold";
           break;
       }
       break;

@@ -400,6 +400,45 @@ def edit_week_event(request):
     return Response({"message": ["Event updated successfully."]}, status=200)
 
 
+@api_endpoint("POST")
+@check_auth
+@validate_json_input(EventCodeSerializer)
+@validate_output(MessageOutputSerializer)
+def delete_event(request):
+    """
+    Deletes an event, identified by its URL code.
+
+    The event must be originally created by the current user.
+    """
+    user = request.user
+    event_code = request.validated_data.get("event_code")
+
+    NOT_CREATOR_ERROR = Response(
+        {"error": {"general": ["User must be event creator."]}}, status=403
+    )
+
+    if not user:
+        return NOT_CREATOR_ERROR
+
+    try:
+        event = UserEvent.objects.get(url_code=event_code)
+        if event.user_account != user:
+            return NOT_CREATOR_ERROR
+        # This should remove everything with foreign key cascades
+        event.delete()
+
+    except UserEvent.DoesNotExist:
+        return EVENT_NOT_FOUND_ERROR
+    except DatabaseError as e:
+        logger.db_error(e)
+        return GENERIC_ERR_RESPONSE
+    except Exception as e:
+        logger.error(e)
+        return GENERIC_ERR_RESPONSE
+
+    return Response({"message": ["Event deleted successfully."]}, status=200)
+
+
 @api_endpoint("GET")
 @check_auth
 @validate_query_param_input(EventCodeSerializer)

@@ -14,7 +14,6 @@ import { EventRange } from "@/core/event/types";
 import { useAccount } from "@/features/account/context";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
-import { SelfAvailabilityResponse } from "@/features/event/availability/fetch-data";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
@@ -25,7 +24,10 @@ import {
   useToast,
 } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
-import { formatApiError } from "@/lib/utils/api/handle-api-error";
+import { clientPost } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
+import { SelfAvailability } from "@/lib/utils/api/types";
 import { timeslotToISOString } from "@/lib/utils/date-time-format";
 
 export default function ClientPage({
@@ -39,7 +41,7 @@ export default function ClientPage({
   eventName: string;
   eventRange: EventRange;
   timeslots: Date[];
-  initialData: SelfAvailabilityResponse | null;
+  initialData: SelfAvailability | null;
 }) {
   const router = useRouter();
 
@@ -96,30 +98,21 @@ export default function ClientPage({
     }
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/availability/check-display-name/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            event_code: eventCode,
-            display_name: displayName,
-          }),
-        },
-      );
-
-      if (!response.ok) {
+      await clientPost(ROUTES.availability.checkDisplayName, {
+        event_code: eventCode,
+        display_name: displayName,
+      });
+      setErrors((prev) => ({ ...prev, displayName: "" }));
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      if (error.badRequest) {
         setErrors((prev) => ({
           ...prev,
           displayName: MESSAGES.ERROR_NAME_TAKEN,
         }));
       } else {
-        setErrors((prev) => ({ ...prev, displayName: "" }));
+        addToast("error", error.formattedMessage);
       }
-    } catch (error) {
-      console.error("Error checking name availability:", error);
-      addToast("error", MESSAGES.ERROR_GENERIC);
     }
   }, 300);
 
@@ -153,101 +146,76 @@ export default function ClientPage({
   const handleSubmitAvailability = async () => {
     setErrors({}); // reset errors
 
-    try {
-      const validationErrors = await validateAvailabilityData(state);
-      if (Object.keys(validationErrors).length > 0) {
-        setErrors(validationErrors);
-        Object.values(validationErrors).forEach((error) =>
-          addToast("error", error),
-        );
+    const validationErrors = await validateAvailabilityData(state);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      Object.values(validationErrors).forEach((error) =>
+        addToast("error", error),
+      );
+      return false;
+    }
+
+    // Check if the user visited all pages
+    // Only check if they are NOT editing
+    if (!initialData && !visitedLastPage) {
+      setConfirmationOpen(true);
+      const userConfirmed = await new Promise<boolean>((resolve) => {
+        dialogResolver.current = resolve;
+      });
+      if (!userConfirmed) {
         return false;
       }
+    }
 
-      // Check if the user visited all pages
-      // Only check if they are NOT editing
-      if (!initialData && !visitedLastPage) {
-        setConfirmationOpen(true);
-        const userConfirmed = await new Promise<boolean>((resolve) => {
-          dialogResolver.current = resolve;
-        });
-        if (!userConfirmed) {
-          return false;
-        }
-      }
-
-      // Save the default name if checkbox checked
-      if (saveDefaultName) {
-        let defaultNameSaved = false;
-        if (accountDetails) {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/account/set-default-name/`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ display_name: displayName }),
-            },
-          );
-          if (response.ok) {
-            defaultNameSaved = true;
-          }
-        }
-        if (defaultNameSaved) {
-          // Update account context
+    // Save the default name if checkbox checked
+    if (saveDefaultName) {
+      if (accountDetails) {
+        try {
+          await clientPost(ROUTES.account.setDefaultName, {
+            display_name: displayName,
+          });
           login({
-            ...accountDetails!,
+            ...accountDetails,
             defaultName: displayName,
           });
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_SAVED);
-        } else {
-          console.error("Failed to save default name");
-          addToast("error", MESSAGES.ERROR_GENERIC);
+        } catch (e) {
+          const error = e as ApiErrorResponse;
+          addToast("error", error.formattedMessage);
           return false;
         }
-      }
-
-      const payload_availability = Array.from(userAvailability).map((iso) => {
-        const date = parseISO(iso);
-        return timeslotToISOString(date, timeZone, eventRange.type);
-      });
-
-      const payload = {
-        event_code: eventCode,
-        display_name: displayName,
-        availability: payload_availability,
-        time_zone: timeZone,
-      };
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/availability/add/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(payload),
-        },
-      );
-
-      if (response.ok) {
-        router.push(`/${eventCode}`);
-        return true;
       } else {
-        const body = await response.json();
-        const message = formatApiError(body);
-
-        if (response.status === 429) {
-          setErrors((prev) => ({
-            ...prev,
-            rate_limit: message || MESSAGES.ERROR_RATE_LIMIT,
-          }));
-        } else {
-          addToast("error", message);
-        }
+        addToast("error", MESSAGES.ERROR_GENERIC);
         return false;
       }
-    } catch (error) {
-      console.error("Error submitting availability:", error);
-      addToast("error", MESSAGES.ERROR_GENERIC);
+    }
+
+    const payload_availability = Array.from(userAvailability).map((iso) => {
+      const date = parseISO(iso);
+      return timeslotToISOString(date, timeZone, eventRange.type);
+    });
+
+    const payload = {
+      event_code: eventCode,
+      display_name: displayName,
+      availability: payload_availability,
+      time_zone: timeZone,
+    };
+
+    try {
+      await clientPost(ROUTES.availability.add, payload);
+      router.push(`/${eventCode}`);
+      return true;
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      if (error.rateLimited) {
+        setErrors((prev) => ({
+          ...prev,
+          rate_limit: error.formattedMessage || MESSAGES.ERROR_RATE_LIMIT,
+        }));
+      } else {
+        addToast("error", error.formattedMessage);
+      }
       return false;
     }
   };
@@ -342,13 +310,11 @@ export default function ClientPage({
 
           <div className="bg-panel rounded-3xl p-6 text-sm">
             Displaying event in
-            <span className="text-accent ml-1 font-bold">
-              <TimeZoneSelector
-                id="timezone-select"
-                value={timeZone}
-                onChange={setTimeZone}
-              />
-            </span>
+            <TimeZoneSelector
+              id="timezone-select"
+              value={timeZone}
+              onChange={setTimeZone}
+            />
           </div>
         </div>
 

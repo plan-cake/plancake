@@ -1,12 +1,12 @@
 import { EventRange } from "@/core/event/types";
 import { createWeekdayArray } from "@/core/event/weekday-utils";
-import { EventDetailsResponse } from "@/features/event/editor/fetch-data";
+import { EventDetails } from "@/lib/utils/api/types";
 import {
   getTimezoneDetails,
   parseIsoDateTime,
 } from "@/lib/utils/date-time-format";
 
-export function processEventData(eventData: EventDetailsResponse): {
+export function processEventData(eventData: EventDetails): {
   eventName: string;
   eventRange: EventRange;
   timeslots: Date[];

@@ -5,7 +5,7 @@
   --color-white: oklch(0.9702 0 0);
   --color-violet: oklch(0.368 0.0393 288.29);
   --color-bone: oklch(0.904 0.0293 82.59);
-  --color-red: oklch(0.6909 0.1987 23.91);
+  --color-red: oklch(60.3% 0.1584 15.03);
   --color-blue: oklch(0.54 0.0951 247.39);
   --color-lion: oklch(0.8045 0.0779 73.42);
 
@@ -25,13 +25,13 @@
   --color-bone-600: oklch(0.2869 0.0137 81.69);
   --color-bone-700: oklch(0.1785 0.0086 84.57);
 
-  --color-red-100: oklch(0.9193 0.0413 17.93);
-  --color-red-200: oklch(0.8034 0.1122 19.82);
-  --color-red-300: oklch(0.6909 0.1987 23.91);
-  --color-red-400: oklch(0.5732 0.2352 29.23);
-  --color-red-500: oklch(0.4432 0.181862 29.2339);
-  --color-red-600: oklch(0.3138 0.128763 29.2339);
-  --color-red-700: oklch(0.1866 0.0766 29.23);
+  --color-red-100: oklch(90.4% 0.0429 15.03);
+  --color-red-200: oklch(78.5% 0.1315 15.03);
+  --color-red-300: oklch(60.3% 0.1584 15.03);
+  --color-red-400: oklch(44.9% 0.0958 15.03);
+  --color-red-500: oklch(33.2% 0.0828 15.03);
+  --color-red-600: oklch(25.2% 0.05 15.03);
+  --color-red-700: oklch(20.5% 0.0142 15.03);
 
   --color-blue-100: oklch(0.911 0.033 256.76);
   --color-blue-200: oklch(0.7858 0.0852 252.63);
@@ -82,7 +82,7 @@
 
 @theme {
   /* HELPER COLORS */
-  --color-error: oklch(0.6993 0.1534 12.87);
+  --color-error: oklch(60.1% 0.2133 29.08);
 
   /* DYNAMIC COLORS */
   --color-background: var(--background);

@@ -32,7 +32,7 @@ if DEBUG and (TEST_ENVIRONMENT not in ["Local", "Codespaces"]):
 
 BASE_URL = env("BASE_URL")
 API_URL = env("API_URL")
-COOKIE_DOMAIN = env("COOKIE_DOMAIN")
+COOKIE_DOMAIN = None if DEBUG else env("COOKIE_DOMAIN")
 
 # Application definition
 
@@ -55,7 +55,7 @@ CORS_ALLOWED_ORIGINS = [BASE_URL, "http://localhost"]
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [BASE_URL, "http://localhost"]
 CSRF_COOKIE_DOMAIN = COOKIE_DOMAIN
-ALLOWED_HOSTS = [urlparse(API_URL).hostname, "localhost"]
+ALLOWED_HOSTS = ["*"] if DEBUG else [urlparse(API_URL).hostname, "localhost"]
 
 ROOT_URLCONF = "api.urls"
 
