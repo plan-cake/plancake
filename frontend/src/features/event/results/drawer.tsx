@@ -50,7 +50,7 @@ export default function ResultsDrawer({
 
   useEffect(() => {
     if (tab === "view-settings") {
-      setActiveSnap(0.3);
+      setActiveSnap(0.37);
     }
   }, [tab]);
 
@@ -80,7 +80,7 @@ export default function ResultsDrawer({
       "view-settings": {
         header: <h2 className="text-md font-semibold">View Settings</h2>,
         content: (
-          <div className="pt-2">
+          <>
             <Checkbox
               label="Only show best times"
               checked={showOnlyBestTimes}
@@ -97,7 +97,7 @@ export default function ResultsDrawer({
                 />
               </span>
             </div>
-          </div>
+          </>
         ),
       },
     }),
@@ -120,7 +120,7 @@ export default function ResultsDrawer({
       setActiveSnapPoint={setActiveSnap}
       title="Attendees List"
       description="View attendees for this event"
-      snapPoints={[0.22, 0.3, 0.4]}
+      snapPoints={[0.22, 0.37]}
       modal={false}
       floatingAtLowestSnap
       scrollableBody

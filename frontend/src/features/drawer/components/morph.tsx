@@ -129,9 +129,9 @@ export function MorphingDrawer({
                 onPointerDown={() => setIsDragging(true)}
                 onPointerUp={() => setIsDragging(false)}
                 onPointerCancel={() => setIsDragging(false)}
-                className="flex h-full w-full flex-col"
+                className="flex h-full min-h-0 w-full flex-col"
               >
-                <div className="shrink-0 px-8">
+                <div className="shrink-0 px-8 pb-2">
                   {showHandle && (
                     <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
                   )}
@@ -171,13 +171,27 @@ export function MorphingDrawer({
 
                 <div
                   className={cn(
-                    "flex-1 px-8 pb-4",
+                    "min-h-0 flex-1 px-8 pb-4",
                     scrollableBody && "overflow-y-auto",
                     bodyClassName,
                     isPill && "hidden",
                   )}
+                  data-vaul-no-drag
                 >
                   {children}
+
+                  {/**
+                   * This takes up the space of the drawer that Vaul shifted off
+                   * the bottom of the screen
+                   */}
+                  {!isPill && scrollableBody && (
+                    <div
+                      className="shrink-0"
+                      style={{
+                        height: "calc(var(--snap-point-height, 0px) + 50px)",
+                      }}
+                    />
+                  )}
                 </div>
               </div>
 

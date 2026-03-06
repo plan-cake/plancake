@@ -21,7 +21,7 @@ export default function ParticipantList({
   } = useResultsContext();
 
   const listClassNames = mobile
-    ? "flex flex-wrap gap-3 pt-1 overflow-y-auto max-h-[200px]"
+    ? "flex flex-wrap gap-3 pt-1"
     : "flex min-h-0 shrink flex-wrap content-start gap-2.5 overflow-y-auto px-6 pb-6 pt-1";
 
   if (participants.length === 0) {
