@@ -124,9 +124,10 @@ export default function DashboardEvent({
           <>
             <button className="cursor-pointer" onClick={navigateToEdit}>
               <div
-                className={
-                  "border-foreground hover:bg-foreground/25 w-fit rounded-full border p-1.5"
-                }
+                className={cn(
+                  "border-foreground w-fit rounded-full border p-1.5",
+                  "hover:bg-foreground/20 active:bg-foreground/10",
+                )}
               >
                 <Pencil1Icon className="h-4 w-4" />
               </div>
@@ -139,7 +140,8 @@ export default function DashboardEvent({
               <div
                 className={cn(
                   "border-foreground w-fit rounded-full border p-1.5",
-                  "hover:bg-error/25 hover:text-error hover:border-error",
+                  "hover:bg-error/20 hover:text-error hover:border-error",
+                  "active:bg-error/40",
                 )}
               >
                 <TrashIcon className="h-4 w-4" />
