@@ -48,7 +48,7 @@ export function FloatingDrawer({
           {/* Notice the simplified container specifically for the pill shape */}
           <div
             className={cn(
-              "border-foreground/10 mx-auto mb-4 flex w-full max-w-[calc(100%-2rem)] flex-col overflow-hidden rounded-[40px] border",
+              "border-foreground/10 rounded-4xl mx-auto mb-4 flex w-full max-w-[calc(100%-2rem)] flex-col overflow-hidden border",
               frostedGlass ? "frosted-glass" : "bg-panel",
             )}
           >

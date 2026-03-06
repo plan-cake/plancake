@@ -119,7 +119,7 @@ export function MorphingDrawer({
               className={cn(
                 "mx-auto flex w-full flex-col overflow-hidden transition-[max-width,border-radius,margin] duration-300",
                 isPill
-                  ? "border-foreground/10 mb-4 max-w-[calc(100%-2rem)] rounded-[40px] border"
+                  ? "border-foreground/10 rounded-4xl mb-4 max-w-[calc(100%-2rem)] border"
                   : "border-foreground/10 max-w-full rounded-t-[32px] border",
                 frostedGlass ? "frosted-glass" : "bg-panel",
                 !isPill && "min-h-0 flex-1",
@@ -184,7 +184,7 @@ export function MorphingDrawer({
               {footerContent && isPill && (
                 <div
                   className={cn(
-                    "mt-auto shrink-0",
+                    "m-2 mt-auto shrink-0",
                     !frostedGlass && "bg-panel",
                   )}
                 >

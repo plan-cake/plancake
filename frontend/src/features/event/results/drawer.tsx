@@ -11,7 +11,7 @@ import ParticipantList from "@/features/event/results/attendee-panel/participant
 import { useResultsContext } from "@/features/event/results/context";
 import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
 
-type ResultsTab = "attendees" | "view-details";
+type ResultsTab = "attendees" | "view-settings";
 
 export default function ResultsDrawer({
   timezone,
@@ -49,10 +49,12 @@ export default function ResultsDrawer({
   }, [activeSnap, onSnapChange]);
 
   useEffect(() => {
-    if (tab === "view-details") {
+    if (tab === "view-settings") {
       setActiveSnap(0.3);
     }
   }, [tab]);
+
+  const isCollapsed = activeSnap === 0.22;
 
   /* TABS - Wrapped in useMemo */
   const tabContent = useMemo(
@@ -64,6 +66,7 @@ export default function ResultsDrawer({
             toggleRemoving={() => setIsRemoving((prev) => !prev)}
             promptRemove={promptRemove}
             inDrawer
+            isCollapsed={isCollapsed}
           />
         ),
         content: (
@@ -74,10 +77,10 @@ export default function ResultsDrawer({
           />
         ),
       },
-      "view-details": {
-        header: <h2 className="text-md font-semibold">View Details</h2>,
+      "view-settings": {
+        header: <h2 className="text-md font-semibold">View Settings</h2>,
         content: (
-          <div className="pt-4">
+          <div className="pt-2">
             <Checkbox
               label="Only show best times"
               checked={showOnlyBestTimes}
@@ -104,6 +107,7 @@ export default function ResultsDrawer({
       onTimezoneChange,
       showOnlyBestTimes,
       setShowOnlyBestTimes,
+      isCollapsed, // Added to dependencies so it morphs instantly
     ],
   );
 
@@ -128,25 +132,21 @@ export default function ResultsDrawer({
           options={[
             {
               label: (
-                <div className="flex flex-col items-center gap-1 text-xs">
+                <div className="flex items-center gap-2 text-xs">
                   <PersonIcon className="h-5 w-5" />
-                  {activeSnap === 0.22 && (
-                    <span className="text-xs">Attendees</span>
-                  )}
+                  <span className="text-xs">Attendees</span>
                 </div>
               ),
               value: "attendees",
             },
             {
               label: (
-                <div className="flex flex-col items-center gap-1 text-xs">
+                <div className="flex items-center gap-2 text-xs">
                   <GearIcon className="h-5 w-5" />
-                  {activeSnap === 0.22 && (
-                    <span className="text-xs">View Settings</span>
-                  )}
+                  <span className="text-xs">View Settings</span>
                 </div>
               ),
-              value: "view-details",
+              value: "view-settings",
             },
           ]}
         />
@@ -154,7 +154,7 @@ export default function ResultsDrawer({
     >
       {tabContent[tab].content || <div>Content for {tab}</div>}
       <ConfirmationDialog
-        asNestedDrawer // <-- Triggers the Drawer layout instead of Dialog
+        asNestedDrawer
         type="delete"
         autoClose={true}
         title={
