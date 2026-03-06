@@ -1,26 +1,22 @@
 import { useState, useMemo, useEffect } from "react";
 
-import { PersonIcon, GearIcon, InfoCircledIcon } from "@radix-ui/react-icons";
+import { PersonIcon, GearIcon } from "@radix-ui/react-icons";
 
 import Checkbox from "@/components/checkbox";
 import SegmentedControl from "@/components/segmented-control";
-import { EventRange } from "@/core/event/types";
 import { MorphingDrawer } from "@/features/drawer/components/morph";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
-import { EventInfo } from "@/features/event/info-drawer";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
 import { useResultsContext } from "@/features/event/results/context";
 import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
 
-type ResultsTab = "attendees" | "view-details" | "event-info";
+type ResultsTab = "attendees" | "view-details";
 
 export default function ResultsDrawer({
-  eventRange,
   timezone,
   onTimezoneChange,
 }: {
-  eventRange: EventRange;
   timezone: string;
   onTimezoneChange: (newTZ: string) => void;
 }) {
@@ -48,10 +44,7 @@ export default function ResultsDrawer({
 
   useEffect(() => {
     if (tab === "view-details") {
-      // 0.25 is the second index in your snapPoints array
       setActiveSnap(0.3);
-    } else if (tab === "event-info") {
-      setActiveSnap(0.4);
     }
   }, [tab]);
 
@@ -98,15 +91,10 @@ export default function ResultsDrawer({
           </div>
         ),
       },
-      "event-info": {
-        header: <h2 className="text-lg font-semibold">Event Info</h2>,
-        content: <EventInfo eventRange={eventRange} timezone={timezone} />,
-      },
     }),
     [
       isRemoving,
       timezone,
-      eventRange,
       onTimezoneChange,
       showOnlyBestTimes,
       setShowOnlyBestTimes,
@@ -154,17 +142,6 @@ export default function ResultsDrawer({
                   </div>
                 ),
                 value: "view-details",
-              },
-              {
-                label: (
-                  <div className="flex flex-col items-center gap-1 text-xs">
-                    <InfoCircledIcon className="h-5 w-5" />
-                    {activeSnap === 0.22 && (
-                      <span className="text-xs">Event Info</span>
-                    )}
-                  </div>
-                ),
-                value: "event-info",
               },
             ]}
           />

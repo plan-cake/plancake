@@ -103,11 +103,7 @@ export default function MobileResults({
           timeslots={timeslots}
         />
 
-        <ResultsDrawer
-          eventRange={eventRange}
-          timezone={timezone}
-          onTimezoneChange={handleTZChange}
-        />
+        <ResultsDrawer timezone={timezone} onTimezoneChange={handleTZChange} />
       </div>
     </div>
   );

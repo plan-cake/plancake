@@ -11,7 +11,6 @@ import { EventInformation } from "@/core/event/types";
 import LinkButton from "@/features/button/components/link";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
-import EventInfoDrawer, { EventInfo } from "@/features/event/info-drawer";
 import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
 import { getResultBanners } from "@/features/event/results/banners";
 import { useResultsContext } from "@/features/event/results/context";
@@ -85,7 +84,6 @@ export default function DesktopResults({
       <div className="flex flex-col justify-between gap-2 md:flex-row">
         <div className="flex flex-1 justify-between">
           <h1 className="text-2xl">{eventName}</h1>
-          <EventInfoDrawer eventRange={eventRange} timezone={timezone} />
         </div>
         <div className="flex flex-wrap items-start justify-end gap-2">
           {isCreator && (
@@ -139,9 +137,6 @@ export default function DesktopResults({
           <div className="sticky top-24 flex max-h-[calc(100vh-8rem)] flex-col gap-y-4">
             <AttendeesPanel />
 
-            <div className="bg-panel hidden shrink-0 rounded-3xl p-6 md:block">
-              <EventInfo eventRange={eventRange} timezone={timezone} />
-            </div>
             <div className="bg-panel hidden shrink-0 rounded-3xl p-6 text-sm md:block">
               <Checkbox
                 label="Only show best times"
