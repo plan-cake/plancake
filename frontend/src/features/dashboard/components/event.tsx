@@ -98,7 +98,7 @@ export default function DashboardEvent({
       className={cn(
         "bg-background flex h-fit w-full flex-col rounded-lg p-4",
         "hover:bg-[color-mix(in_oklab,var(--color-background)_95%,var(--color-foreground))]",
-        "active:bg-[color-mix(in_oklab,var(--color-background)_95%,var(--color-black))]",
+        "[&:not(:has([data-actions]:active))]:active:bg-[color-mix(in_oklab,var(--color-background)_95%,var(--color-black))]",
       )}
     >
       <div className="text-lg font-bold leading-tight">{title}</div>
@@ -118,7 +118,7 @@ export default function DashboardEvent({
       <div className="mt-1.5" ref={participantRowRef}>
         <ParticipantRow participants={participants} numIcons={numIcons} />
       </div>
-      <div className="mt-2.5 flex items-center gap-2">
+      <div data-actions className="mt-2.5 flex items-center gap-2">
         <DashboardCopyButton code={code} />
         {myEvent && (
           <>
