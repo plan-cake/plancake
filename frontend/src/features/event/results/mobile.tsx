@@ -30,7 +30,12 @@ export default function MobileResults({
     isCreator,
   } = useResultsContext();
 
-  const { customCode: eventCode, eventRange, timeslots } = eventData;
+  const {
+    customCode: eventCode,
+    title: eventTitle,
+    eventRange,
+    timeslots,
+  } = eventData;
 
   /* FORM ERROR & TIMEZONE HANDLING */
   const [timezone, setTimezone] = useState(
@@ -77,9 +82,7 @@ export default function MobileResults({
     <div className="flex flex-col space-y-4 pl-6 pr-6">
       <HeaderSpacer />
       <div className="flex flex-col justify-between gap-2 md:flex-row">
-        <h1 className="text-2xl">
-          REALLLY REALLY LONG EVENT TITLE REALLLY REALLY LON
-        </h1>
+        <h1 className="text-2xl">{eventTitle}</h1>
         <div className="flex w-full items-center justify-end gap-2">
           {paintingButton}
           <KebabMenu
