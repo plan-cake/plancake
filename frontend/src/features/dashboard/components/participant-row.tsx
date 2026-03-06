@@ -59,6 +59,11 @@ function ParticipantIcon({
       className={cn(
         "bg-lion text-violet flex h-6 items-center justify-center rounded-full font-bold",
         !isFirst && "outline-background -ml-1 outline-2",
+        // I know this is ugly but it gets the job done without using JavaScript
+        !isFirst &&
+          "group-hover:outline-[color-mix(in_oklab,var(--color-background)_95%,var(--color-foreground))]",
+        !isFirst &&
+          "group-[&:not(:has([data-actions]:active))]:group-active:outline-[color-mix(in_oklab,var(--color-background)_95%,var(--color-black))]",
         // The "leading-[13px]" is to vertically center the text
         // By setting the line height to 1 pixel less than the font size, it should cut
         // off the descender space and properly center the numbers
