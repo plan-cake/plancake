@@ -5,6 +5,7 @@ import { motion, AnimatePresence, Transition } from "framer-motion";
 
 import { ButtonArray } from "@/features/button/button-array";
 import EmptyButton from "@/features/button/components/empty";
+import { cn } from "@/lib/utils/classname";
 
 const morphTransition: Transition = {
   type: "spring",
@@ -50,7 +51,11 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
               key="content"
               layoutId={`popover-morph`}
               transition={morphTransition}
-              className="frosted-glass rounded-4xl absolute right-0 top-0 z-50 flex min-w-[200px] origin-top-right flex-col gap-2 overflow-hidden p-4 shadow-lg"
+              className={cn(
+                "absolute right-0 top-0 z-50",
+                "flex min-w-[200px] origin-top-right flex-col gap-2",
+                "frosted-glass rounded-4xl overflow-hidden p-4 shadow-lg",
+              )}
             >
               {buttons.map((button, index) => (
                 <Fragment key={index}>{button}</Fragment>
