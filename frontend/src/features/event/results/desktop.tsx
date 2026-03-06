@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 
 import { Pencil1Icon, Pencil2Icon } from "@radix-ui/react-icons";
 
@@ -50,25 +50,6 @@ export default function DesktopResults({
     setTimezone(newTZ.toString());
   };
 
-  /* SIDEBAR SPACING HANDLING */
-  const DEFAULT_SPACER_HEIGHT = 200;
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const [spacerHeight, setSpacerHeight] = useState(DEFAULT_SPACER_HEIGHT);
-
-  useEffect(() => {
-    if (!sidebarRef.current) return;
-
-    const observer = new ResizeObserver((entries) => {
-      if (entries.length === 0) return;
-      const entry = entries[0];
-      setSpacerHeight(entry.contentRect.height);
-    });
-
-    observer.observe(sidebarRef.current);
-
-    return () => observer.disconnect();
-  }, []);
-
   /* BANNERS */
   const banners = getResultBanners(
     availabilities,
@@ -81,11 +62,9 @@ export default function DesktopResults({
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6">
       <HeaderSpacer />
-      <div className="flex flex-col justify-between gap-2 md:flex-row">
-        <div className="flex flex-1 justify-between">
-          <h1 className="text-2xl">{eventName}</h1>
-        </div>
-        <div className="flex flex-wrap items-start justify-end gap-2">
+      <div className="flex flex-wrap justify-between gap-2">
+        <h1 className="text-2xl font-bold">{eventName}</h1>
+        <div className="ml-auto flex flex-wrap justify-end gap-2">
           {isCreator && (
             <LinkButton
               buttonStyle="secondary"
@@ -105,9 +84,7 @@ export default function DesktopResults({
         </div>
       </div>
 
-      <div className="md:hidden">{banners}</div>
-
-      <div className="h-fit md:flex md:flex-row md:gap-4">
+      <div className="flex h-fit flex-row gap-4">
         <ScheduleGrid
           mode="view"
           isWeekdayEvent={eventRange.type === "weekday"}
@@ -119,14 +96,8 @@ export default function DesktopResults({
           timeslots={timeslots}
         />
 
-        <div
-          style={{ height: `${spacerHeight}px` }}
-          className="w-full md:hidden"
-        />
-
         {/* Sidebar for attendees */}
         <div
-          ref={sidebarRef}
           className={cn(
             "fixed bottom-1 left-0 z-10 w-full shrink-0 px-6",
             "relative bottom-auto left-auto w-80 space-y-4 px-0",
@@ -134,10 +105,10 @@ export default function DesktopResults({
         >
           {banners}
 
-          <div className="sticky top-24 flex max-h-[calc(100vh-8rem)] flex-col gap-y-4">
+          <div className="top-25 sticky flex max-h-[calc(100vh-8rem)] flex-col gap-y-4">
             <AttendeesPanel />
 
-            <div className="bg-panel hidden shrink-0 rounded-3xl p-6 text-sm md:block">
+            <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
               <Checkbox
                 label="Only show best times"
                 checked={showOnlyBestTimes}
