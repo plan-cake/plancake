@@ -1,9 +1,9 @@
-import { AvailabilityDataResponse } from "@/features/event/availability/fetch-data";
+import { AllAvailability } from "@/lib/utils/api/types";
 
 export type ResultsInformation = {
   eventCode: string;
   isCreator: boolean;
-  participants: AvailabilityDataResponse["participants"];
-  availability: AvailabilityDataResponse["availability"];
-  currentUser: AvailabilityDataResponse["user_display_name"] | null;
+  participants: AllAvailability["participants"];
+  availability: AllAvailability["availability"];
+  currentUser: AllAvailability["user_display_name"] | null;
 };
