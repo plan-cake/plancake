@@ -97,7 +97,8 @@ export default function DashboardEvent({
       href={`/${code}`}
       className={cn(
         "bg-background flex h-fit w-full flex-col rounded-lg p-4",
-        "transition-shadow hover:shadow-lg hover:shadow-black/25",
+        "hover:bg-[color-mix(in_oklab,var(--color-background)_95%,var(--color-foreground))]",
+        "active:bg-[color-mix(in_oklab,var(--color-background)_95%,var(--color-black))]",
       )}
     >
       <div className="text-lg font-bold leading-tight">{title}</div>
