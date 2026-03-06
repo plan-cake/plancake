@@ -6,7 +6,7 @@ import { PersonIcon } from "@radix-ui/react-icons";
 
 import { useAccount } from "@/features/account/context";
 import AccountSettings from "@/features/account/settings/selector";
-import ActionButton from "@/features/button/components/action";
+import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import { clientGet } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -15,10 +15,6 @@ export default function AccountButton() {
   const { loginState, login, logout } = useAccount();
 
   const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
-  const handleOpenChange = () => {
-    setAccountSettingsOpen((prev) => !prev);
-    return true;
-  };
 
   // 1. Check Login Status
   useEffect(() => {
@@ -48,10 +44,10 @@ export default function AccountButton() {
         open={accountSettingsOpen}
         setOpenChange={setAccountSettingsOpen}
       >
-        <ActionButton
+        <EmptyButton
           buttonStyle="frosted glass inset"
           icon={<PersonIcon />}
-          onClick={handleOpenChange}
+          aria-label="Account settings"
         />
       </AccountSettings>
     );

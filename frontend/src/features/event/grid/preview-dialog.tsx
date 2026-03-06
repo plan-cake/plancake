@@ -6,6 +6,7 @@ import { EnterFullScreenIcon, Cross2Icon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
 
 import { EventRange } from "@/core/event/types";
+import ActionButton from "@/features/button/components/action";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import ScheduleGrid from "@/features/event/grid/grid";
 import { cn } from "@/lib/utils/classname";
@@ -62,7 +63,7 @@ export default function GridPreviewDialog({
       <motion.div
         layout
         className={cn(
-          "bg-panel flex flex-col space-y-4 overflow-hidden rounded-3xl border border-transparent",
+          "bg-panel flex flex-col overflow-hidden rounded-3xl border border-transparent",
           isOpen
             ? "fixed inset-0 z-50 m-auto h-[85vh] w-[85vw] p-8"
             : "absolute inset-0 h-full w-full pb-4 pl-2 pr-4 pt-4",
@@ -70,31 +71,49 @@ export default function GridPreviewDialog({
       >
         <motion.div
           layout
-          className="mr-4 flex items-center justify-end space-x-2"
+          className="flex shrink-0 items-center justify-end space-x-2 px-4"
         >
-          <p className="text-sm font-medium">Grid Preview</p>
+          <p>Grid Preview</p>
           {isOpen ? (
-            <Cross2Icon
-              className="hover:text-accent hover:bg-accent/25 active:bg-accent/40 h-6 w-6 cursor-pointer rounded-full p-1"
-              onClick={() => closeDialog()}
-            />
+            <div>
+              <ActionButton
+                buttonStyle="transparent"
+                icon={<Cross2Icon />}
+                onClick={() => {
+                  closeDialog();
+                  return true;
+                }}
+                className="bg-transparent p-1.5"
+                aria-label="Close Preview"
+              />
+            </div>
           ) : (
-            <EnterFullScreenIcon
-              className="hover:text-accent hover:bg-accent/25 active:bg-accent/40 h-6 w-6 cursor-pointer rounded-full p-1"
-              onClick={() => setIsOpen(!isOpen)}
-            />
+            <div>
+              <ActionButton
+                buttonStyle="transparent"
+                icon={<EnterFullScreenIcon />}
+                onClick={() => {
+                  setIsOpen(!isOpen);
+                  return true;
+                }}
+                className="bg-transparent p-1.5"
+                aria-label="Open Preview"
+              />
+            </div>
           )}
         </motion.div>
         {isOpen ? (
-          <motion.div className="flex h-[85%] grow flex-col space-y-4">
-            <ScheduleGrid
-              mode="preview"
-              isWeekdayEvent={eventRange.type === "weekday"}
-              disableSelect
-              timezone={timezone}
-              timeslots={timeslots}
-            />
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <motion.div className="flex min-h-0 flex-1 flex-col gap-4">
+            <div className="min-h-0 w-full flex-1">
+              <ScheduleGrid
+                mode="preview"
+                disableSelect
+                isWeekdayEvent={eventRange.type === "weekday"}
+                timezone={timezone}
+                timeslots={timeslots}
+              />
+            </div>
+            <div className="flex shrink-0 flex-col pt-2 md:flex-row md:items-center md:justify-between">
               <label
                 htmlFor="timezone-select"
                 className="flex items-center gap-1 text-sm md:ml-[50px]"
@@ -115,10 +134,10 @@ export default function GridPreviewDialog({
             </div>
           </motion.div>
         ) : (
-          <motion.div className="h-full grow space-y-4">
+          <motion.div className="min-h-0 flex-1 grow space-y-4">
             <ScheduleGrid
               mode="preview"
-              disableSelect={true}
+              disableSelect
               isWeekdayEvent={eventRange.type === "weekday"}
               timezone={eventRange.timezone}
               timeslots={timeslots}

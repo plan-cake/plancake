@@ -121,7 +121,6 @@ export default function Page() {
       ]}
       rateLimitError={errors.rate_limit}
     >
-      {/* Change Password Button */}
       <div className="flex w-full justify-end">
         <ActionButton
           buttonStyle="primary"

@@ -94,7 +94,7 @@ export default function ClientPage({
       <HeaderSpacer />
       <div className="flex flex-col justify-between gap-2 md:flex-row">
         <div className="flex flex-1 justify-between">
-          <h1 className="text-2xl">{eventName}</h1>
+          <h1 className="text-2xl font-bold">{eventName}</h1>
           <EventInfoDrawer eventRange={eventRange} timezone={timezone} />
         </div>
         <div className="flex flex-wrap items-start justify-end gap-2">

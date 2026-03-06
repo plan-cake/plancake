@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from "react";
 
-import * as Dialog from "@radix-ui/react-dialog";
-import { InfoCircledIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { addDays } from "date-fns";
 import { format } from "date-fns-tz/format";
 
+import { BaseDrawer } from "@/components/layout/base-drawer";
 import { EventRange, ALL_WEEKDAYS } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import WeekdayRow from "@/features/dashboard/components/weekday-row";
@@ -26,59 +26,28 @@ export default function EventInfoDrawer({
   timezone,
 }: EventInfoProps) {
   const [open, setOpen] = useState(false);
-  const handleClose = () => {
-    setOpen(false);
-    return true;
-  };
-
   const handleOpen = () => {
     setOpen(true);
     return true;
   };
 
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
-      <div className="md:hidden">
-        <ActionButton
-          buttonStyle="frosted glass"
-          icon={<InfoCircledIcon />}
-          onClick={handleOpen}
-        />
-      </div>
-
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-gray-700/40" />
-        <Dialog.Content
-          className="animate-slideUp data-[state=closed]:animate-slideDown fixed bottom-0 left-0 right-0 z-50 flex h-[500px] w-full flex-col focus:outline-none"
-          aria-label="Event Info"
-        >
-          <div className="rounded-t-4xl bg-background flex flex-1 flex-col overflow-y-auto p-8 shadow-lg">
-            <div
-              onPointerDown={handleClose}
-              className="bg-background sticky top-0 z-10 flex items-center gap-4 pb-8"
-            >
-              <ActionButton
-                buttonStyle="frosted glass"
-                icon={<Cross1Icon />}
-                label="Close Drawer"
-                shrinkOnMobile
-                onClick={handleClose}
-              />
-
-              <Dialog.Title className="mb-0 flex flex-row items-center justify-between text-lg font-semibold">
-                Event Details
-              </Dialog.Title>
-
-              <Dialog.Description className="sr-only">
-                View details about the event
-              </Dialog.Description>
-            </div>
-
-            <EventInfo eventRange={eventRange} timezone={timezone} noTitle />
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <div className="md:hidden">
+      <ActionButton
+        buttonStyle="frosted glass"
+        icon={<InfoCircledIcon />}
+        onClick={handleOpen}
+      />
+      <BaseDrawer
+        open={open}
+        onOpenChange={setOpen}
+        contentClassName="h-1/2"
+        title="Event Details"
+        description="View details about the event"
+      >
+        <EventInfo eventRange={eventRange} timezone={timezone} noTitle />
+      </BaseDrawer>
+    </div>
   );
 }
 

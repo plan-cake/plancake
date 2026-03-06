@@ -41,9 +41,7 @@ function TimeSlot({
       onContextMenu={(e) => e.preventDefault()}
       className={cn(
         "bg-background relative",
-        disableSelect
-          ? "bg-panel pointer-events-none cursor-not-allowed"
-          : "cursor-cell",
+        disableSelect ? "bg-panel cursor-not-allowed" : "cursor-cell",
         cellClasses,
         "select-none",
         isHovered &&

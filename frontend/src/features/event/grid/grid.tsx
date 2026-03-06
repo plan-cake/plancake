@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -32,6 +34,9 @@ interface ScheduleGridProps {
   // for "paint" mode
   userAvailability?: AvailabilitySet;
   onToggleSlot?: (slotIso: string, togglingOn: boolean) => void;
+
+  // for pagination
+  onPageUpdate?: (index: number, pages: number) => void;
 }
 
 const variants = {
@@ -62,6 +67,7 @@ export default function ScheduleGrid({
   setHoveredSlot = () => {},
   userAvailability = createEmptyUserAvailability(),
   onToggleSlot = () => {},
+  onPageUpdate = () => {},
 }: ScheduleGridProps) {
   const isMobile = useCheckMobile();
 
@@ -73,7 +79,17 @@ export default function ScheduleGrid({
     direction,
     paginate,
     error,
-  } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7);
+  } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPageUpdate);
+
+  // Initial onPageUpdate callback to report pagination info to parent
+  // Also triggers if the user changes between mobile and desktop layouts
+  const reportedTotalPages = useRef<number | null>(null);
+  useEffect(() => {
+    if (reportedTotalPages.current !== totalPages) {
+      onPageUpdate(currentPage, totalPages);
+      reportedTotalPages.current = totalPages;
+    }
+  }, [onPageUpdate, currentPage, totalPages]);
 
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < totalPages - 1;
@@ -82,8 +98,10 @@ export default function ScheduleGrid({
 
   return (
     <div
-      className="relative mb-8 grid w-full grid-cols-[1fr] grid-rows-[auto_1fr]"
-      style={{ maxHeight: "90%" }}
+      className={cn(
+        "relative mb-8 grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]",
+        mode === "preview" && "mb-0",
+      )}
     >
       <ScheduleHeader
         preview={mode === "preview"}
