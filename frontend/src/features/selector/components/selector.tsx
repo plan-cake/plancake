@@ -4,46 +4,32 @@ import { SelectorProps } from "@/features/selector/types";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
-export default function Selector<TValue extends string | number>({
-  id,
-  onChange,
-  value,
-  options,
-  dialogTitle,
-  dialogDescription,
-  className,
-  textStart = false,
-}: SelectorProps<TValue>) {
+export default function Selector<TValue extends string | number>(
+  props: SelectorProps<TValue>,
+) {
   const isMobile = useCheckMobile();
 
   // converts the value to the format needed by CustomSelect (string or number)
   const handleValueChange = (selectedValue: string | number) => {
-    onChange(selectedValue as TValue);
+    props.onChange(selectedValue as TValue);
   };
 
+  // dekstop uses dropdown selector
   if (!isMobile) {
     return (
-      <div className={className}>
+      <div className={props.className}>
         <Dropdown
-          id={id}
-          value={String(value)}
-          options={options}
+          id={props.id}
+          value={props.value}
+          options={props.options}
           onChange={handleValueChange}
-          className={cn("w-full", !className && "h-fit w-fit")}
+          disabled={props.disabled}
+          className={cn("w-full", !props.className && "h-fit w-fit")}
         />
       </div>
     );
-  } else {
-    return (
-      <SelectorDrawer
-        id={id}
-        value={value}
-        options={options}
-        onChange={onChange}
-        dialogTitle={dialogTitle}
-        dialogDescription={dialogDescription}
-        textStart={textStart}
-      />
-    );
   }
+
+  // mobile uses drawer selector
+  return <SelectorDrawer {...props} onChange={handleValueChange} />;
 }

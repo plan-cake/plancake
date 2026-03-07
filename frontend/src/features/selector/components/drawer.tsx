@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import { BaseDrawer } from "@/components/layout/base-drawer";
-import { SelectorProps } from "@/features/selector/types";
+import { DrawerProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
 export default function SelectorDrawer<TValue extends string | number>({
@@ -12,10 +12,24 @@ export default function SelectorDrawer<TValue extends string | number>({
   dialogTitle,
   dialogDescription,
   textStart = false,
-}: SelectorProps<TValue>) {
-  const [open, setOpen] = useState(false);
-  const selectedItemRef = useRef<HTMLButtonElement>(null);
+  open: controlledOpen,
+  onOpenChange,
+}: DrawerProps<TValue>) {
+  const [internalOpen, setInternalOpen] = useState(false);
 
+  // use controlled state if provided, otherwise local state
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!isControlled) {
+      setInternalOpen(newOpen);
+    }
+    onOpenChange?.(newOpen);
+  };
+
+  /* SELECTED ITEM SCROLLING LOGIC */
+  const selectedItemRef = useRef<HTMLButtonElement>(null);
   const selectLabel = options.find((opt) => opt.value === value)?.label || "";
 
   useEffect(() => {
@@ -34,7 +48,7 @@ export default function SelectorDrawer<TValue extends string | number>({
   return (
     <BaseDrawer
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={handleOpenChange}
       title={dialogTitle}
       description={dialogDescription || "Select an option from the list below"}
       contentClassName="h-1/2"
@@ -61,13 +75,13 @@ export default function SelectorDrawer<TValue extends string | number>({
               key={String(option.value)}
               onClick={() => {
                 onChange(option.value);
-                setOpen(false);
+                handleOpenChange(false);
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   onChange(option.value);
-                  setOpen(false);
+                  handleOpenChange(false);
                 }
               }}
               className={cn(

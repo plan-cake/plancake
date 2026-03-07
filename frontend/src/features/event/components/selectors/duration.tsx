@@ -1,4 +1,5 @@
 import Selector from "@/features/selector/components/selector";
+import { BaseSelectorWrapperProps } from "@/features/selector/types";
 
 const durationOptions = [
   { label: "None", value: 0 },
@@ -7,22 +8,12 @@ const durationOptions = [
   { label: "1 hour", value: 60 },
 ];
 
-type DurationSelectorProps = {
-  id: string;
-  onChange: (duration: string | number) => void;
-  value: number;
-};
-
-export default function DurationSelector({
-  id,
-  onChange,
-  value,
-}: DurationSelectorProps) {
+export default function DurationSelector(
+  props: BaseSelectorWrapperProps<number>,
+) {
   return (
     <Selector
-      id={id}
-      onChange={onChange}
-      value={value}
+      {...props}
       options={durationOptions}
       dialogTitle="Select Duration"
       dialogDescription="Select a duration from the list"
