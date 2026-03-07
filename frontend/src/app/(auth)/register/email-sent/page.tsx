@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -15,7 +15,6 @@ const EMAIL_RESEND_COOLDOWN_MS = 30_000;
 
 export default function Page() {
   const router = useRouter();
-  const lastEmailResend = useRef<number | null>(null);
   const [email, setEmail] = useState("");
   const [cooldown, setCooldown] = useState(EMAIL_RESEND_COOLDOWN_MS / 1000);
 
@@ -61,7 +60,6 @@ export default function Page() {
 
       if (res.ok) {
         addToast("success", MESSAGES.SUCCESS_EMAIL_SENT);
-        lastEmailResend.current = Date.now();
         setCooldown(EMAIL_RESEND_COOLDOWN_MS / 1000);
         return true;
       } else {
