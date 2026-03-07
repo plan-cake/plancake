@@ -8,6 +8,7 @@ import LogoArea from "@/components/header/logo-area";
 import NewEventButton from "@/components/header/new-event-button";
 import ThemeToggle from "@/components/header/theme-toggle";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { cn } from "@/lib/utils/classname";
 
 const SCROLL_THRESHOLD = 50;
 
@@ -64,7 +65,10 @@ export default function Header() {
   return (
     <header className="h-25 fixed top-0 z-40 w-full pt-4">
       <nav
-        className="flex w-full max-w-[1440px] justify-between px-4"
+        className={cn(
+          "flex w-full max-w-[1440px] justify-between px-4",
+          isShrunk ? "cursor-pointer" : "",
+        )}
         onClickCapture={(e) => {
           if (!isShrunk) return;
           e.preventDefault();
