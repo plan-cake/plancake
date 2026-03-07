@@ -245,7 +245,7 @@ function getStyleClasses(
       switch (state) {
         case "rest":
           styleClasses =
-            "text-accent font-bold bg-accent/15 hover:bg-accent/25 active:bg-accent/40";
+            "text-accent-text font-bold bg-accent/15 hover:bg-accent/25 active:bg-accent/40";
           break;
         case "loading":
           styleClasses = "font-bold bg-accent/20";
@@ -255,7 +255,7 @@ function getStyleClasses(
             "font-bold text-[#ffffff] dark:text-gray-400 bg-gray-200 dark:bg-gray-400/25";
           break;
       }
-      spinnerClasses = "border-accent";
+      spinnerClasses = "border-accent-text";
       break;
     case "transparent":
       switch (state) {
