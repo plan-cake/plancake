@@ -1,19 +1,61 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import AccountButton from "@/components/header/account-button";
 import DashboardButton from "@/components/header/dashboard-button";
 import LogoArea from "@/components/header/logo-area";
 import NewEventButton from "@/components/header/new-event-button";
 import ThemeToggle from "@/components/header/theme-toggle";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
+
+const SCROLL_THRESHOLD = 50;
 
 export default function Header() {
   const [mounted, setMounted] = useState(false);
+  const isMobile = useCheckMobile();
+  const [isShrunk, setIsShrunk] = useState(false);
+  const lastScrollPoint = useRef(0);
+  const scrollCheckpoint = useRef(0);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+
+    if (!isMobile) {
+      setIsShrunk(false);
+      return;
+    }
+
+    const handleScroll = () => {
+      const scrollingDown = window.scrollY > lastScrollPoint.current;
+      lastScrollPoint.current = window.scrollY;
+
+      if (isShrunk) {
+        if (scrollingDown) {
+          scrollCheckpoint.current = window.scrollY;
+        } else if (
+          window.scrollY <
+          scrollCheckpoint.current - SCROLL_THRESHOLD
+        ) {
+          setIsShrunk(false);
+        }
+      } else {
+        if (!scrollingDown) {
+          scrollCheckpoint.current = window.scrollY;
+        } else if (
+          window.scrollY >
+          scrollCheckpoint.current + SCROLL_THRESHOLD
+        ) {
+          setIsShrunk(true);
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isMobile, isShrunk]);
 
   if (!mounted) {
     return null;
