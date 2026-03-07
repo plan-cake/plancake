@@ -7,8 +7,9 @@ import Link from "next/link";
 import LinkText from "@/components/link-text";
 import Logo from "@/components/logo";
 import { getCurrentVersion } from "@/features/version-history/data";
+import { cn } from "@/lib/utils/classname";
 
-export default function LogoArea() {
+export default function LogoArea({ isShrunk = false }: { isShrunk?: boolean }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -23,9 +24,15 @@ export default function LogoArea() {
     <div>
       {/* Text Container */}
       <Link href="/">
-        <Logo />
+        <Logo oneLine={isShrunk} />
       </Link>
-      <Link href="/version-history" className="text-xs">
+      <Link
+        href="/version-history"
+        className={cn(
+          "duration-250 text-xs transition-opacity ease-out",
+          isShrunk ? "opacity-0" : "opacity-100",
+        )}
+      >
         <LinkText unbolded>{getCurrentVersion()}</LinkText>
       </Link>
     </div>

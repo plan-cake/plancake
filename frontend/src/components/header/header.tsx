@@ -64,7 +64,7 @@ export default function Header() {
   return (
     <header className="h-25 fixed top-0 z-40 w-full pt-4">
       <nav className="flex w-full max-w-[1440px] justify-between px-4">
-        <LogoArea />
+        <LogoArea isShrunk={isShrunk} />
 
         <div className="frosted-glass flex h-fit items-center gap-2 rounded-full p-2">
           <NewEventButton />
