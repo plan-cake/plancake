@@ -98,6 +98,7 @@ export default function ConfirmationDialog({
   if (asNestedDrawer) {
     return (
       <FloatingDrawer
+        nested
         open={open}
         onOpenChange={handleOpenChange}
         title={title}

@@ -1,8 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 
 import { BaseDrawer } from "@/features/drawer/components/base";
+import { FloatingDrawer } from "@/features/drawer/components/floating";
 import { SelectorProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
+
+type ExtendedSelectorProps<TValue extends string | number> =
+  SelectorProps<TValue> & {
+    asNestedDrawer?: boolean;
+  };
 
 export default function SelectorDrawer<TValue extends string | number>({
   id,
@@ -12,7 +18,8 @@ export default function SelectorDrawer<TValue extends string | number>({
   dialogTitle,
   dialogDescription,
   textStart = false,
-}: SelectorProps<TValue>) {
+  asNestedDrawer = true,
+}: ExtendedSelectorProps<TValue>) {
   const [open, setOpen] = useState(false);
   const selectedItemRef = useRef<HTMLButtonElement>(null);
 
@@ -31,8 +38,11 @@ export default function SelectorDrawer<TValue extends string | number>({
     }
   }, [open]);
 
+  const DrawerComponent = asNestedDrawer ? FloatingDrawer : BaseDrawer;
+
   return (
-    <BaseDrawer
+    <DrawerComponent
+      nested={asNestedDrawer}
       open={open}
       onOpenChange={setOpen}
       title={dialogTitle}
@@ -82,6 +92,6 @@ export default function SelectorDrawer<TValue extends string | number>({
           );
         })}
       </div>
-    </BaseDrawer>
+    </DrawerComponent>
   );
 }
