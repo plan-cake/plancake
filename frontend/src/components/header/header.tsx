@@ -27,6 +27,10 @@ export default function Header() {
       return;
     }
 
+    if (window.scrollY < SCROLL_THRESHOLD) {
+      setIsShrunk(false);
+    }
+
     const handleScroll = () => {
       const scrollingDown = window.scrollY > lastScrollPoint.current;
       lastScrollPoint.current = window.scrollY;
