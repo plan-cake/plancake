@@ -4,16 +4,15 @@ import { useState } from "react";
 
 import { Pencil1Icon, Pencil2Icon } from "@radix-ui/react-icons";
 
-import Checkbox from "@/components/checkbox";
 import CopyToastButton from "@/components/copy-toast-button";
 import HeaderSpacer from "@/components/header-spacer";
 import { EventInformation } from "@/core/event/types";
 import LinkButton from "@/features/button/components/link";
-import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
 import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
 import { getResultBanners } from "@/features/event/results/banners";
 import { useResultsContext } from "@/features/event/results/context";
+import ViewSettings from "@/features/event/results/view-settings";
 import { cn } from "@/lib/utils/classname";
 
 export default function DesktopResults({
@@ -30,8 +29,6 @@ export default function DesktopResults({
     setHoveredSlot,
     currentUser,
     isCreator,
-    showOnlyBestTimes,
-    setShowOnlyBestTimes,
   } = useResultsContext();
 
   const {
@@ -109,21 +106,10 @@ export default function DesktopResults({
             <AttendeesPanel />
 
             <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
-              <Checkbox
-                label="Only show best times"
-                checked={showOnlyBestTimes}
-                onChange={setShowOnlyBestTimes}
+              <ViewSettings
+                timezone={timezone}
+                onTimezoneChange={handleTZChange}
               />
-              <div className="mt-3">
-                Displaying event in
-                <span className="text-accent font-bold">
-                  <TimeZoneSelector
-                    id="timezone-select"
-                    value={timezone}
-                    onChange={handleTZChange}
-                  />
-                </span>
-              </div>
             </div>
           </div>
         </div>

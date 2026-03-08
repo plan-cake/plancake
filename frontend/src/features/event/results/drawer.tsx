@@ -2,13 +2,12 @@ import { useState, useMemo, useEffect } from "react";
 
 import { PersonIcon, GearIcon } from "@radix-ui/react-icons";
 
-import Checkbox from "@/components/checkbox";
 import SegmentedControl from "@/components/segmented-control";
 import { MorphingDrawer } from "@/features/drawer/components/morph";
-import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
 import { useResultsContext } from "@/features/event/results/context";
+import ViewSettings from "@/features/event/results/view-settings";
 import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
 
 type ResultsTab = "attendees" | "view-settings";
@@ -34,6 +33,8 @@ export default function ResultsDrawer({
     setPersonToRemove(person);
     setIsConfirmationOpen(true);
   };
+
+  const [isTimezoneOpen, setTimezoneOpen] = useState(false);
 
   /* REMOVING STATES */
   const [isRemoving, setIsRemoving] = useState(false);
@@ -65,8 +66,8 @@ export default function ResultsDrawer({
             isRemoving={isRemoving}
             toggleRemoving={() => setIsRemoving((prev) => !prev)}
             promptRemove={promptRemove}
-            inDrawer
             isCollapsed={isCollapsed}
+            inDrawer
           />
         ),
         content: (
@@ -80,24 +81,13 @@ export default function ResultsDrawer({
       "view-settings": {
         header: <h2 className="text-md font-semibold">View Settings</h2>,
         content: (
-          <>
-            <Checkbox
-              label="Only show best times"
-              checked={showOnlyBestTimes}
-              onChange={setShowOnlyBestTimes}
-              textSize="md"
-            />
-            <div className="mt-3">
-              Displaying event in
-              <span className="text-accent font-bold">
-                <TimeZoneSelector
-                  id="timezone-select"
-                  value={timezone}
-                  onChange={onTimezoneChange}
-                />
-              </span>
-            </div>
-          </>
+          <ViewSettings
+            timezone={timezone}
+            onTimezoneChange={onTimezoneChange}
+            inDrawer
+            open={isTimezoneOpen}
+            setOpen={setTimezoneOpen}
+          />
         ),
       },
     }),
@@ -105,9 +95,9 @@ export default function ResultsDrawer({
       isRemoving,
       timezone,
       onTimezoneChange,
-      showOnlyBestTimes,
-      setShowOnlyBestTimes,
-      isCollapsed, // Added to dependencies so it morphs instantly
+      isCollapsed,
+      isTimezoneOpen,
+      setTimezoneOpen,
     ],
   );
 
@@ -153,6 +143,7 @@ export default function ResultsDrawer({
       }
     >
       {tabContent[tab].content || <div>Content for {tab}</div>}
+
       <ConfirmationDialog
         asNestedDrawer
         type="delete"
