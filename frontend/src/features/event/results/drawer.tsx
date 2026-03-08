@@ -25,8 +25,6 @@ export default function ResultsDrawer({
     participants,
     currentUser,
     handleRemoveParticipant: onRemoveParticipant,
-    showOnlyBestTimes,
-    setShowOnlyBestTimes,
   } = useResultsContext();
 
   const promptRemove = (person: string) => {
