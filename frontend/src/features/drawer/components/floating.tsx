@@ -32,7 +32,7 @@ export function FloatingDrawer({
           <Drawer.Overlay
             className={cn(
               "fixed inset-0",
-              nested ? "z-[99]" : "z-40",
+              nested ? "z-[99]" : "z-60",
               frostedGlass ? "bg-black/1" : "bg-black/30",
             )}
           />
@@ -41,7 +41,7 @@ export function FloatingDrawer({
         <Drawer.Content
           className={cn(
             "fixed bottom-0 left-0 right-0 flex outline-none",
-            nested ? "z-[100]" : "z-50",
+            nested ? "z-[100]" : "z-70",
             contentClassName,
           )}
         >

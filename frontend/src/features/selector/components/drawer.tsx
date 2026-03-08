@@ -51,7 +51,6 @@ export default function SelectorDrawer<TValue extends string | number>({
 
   return (
     <DrawerComponent
-      nested={asNestedDrawer}
       open={open}
       onOpenChange={handleOpenChange}
       title={dialogTitle}
