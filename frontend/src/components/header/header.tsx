@@ -27,15 +27,17 @@ export default function Header() {
       return;
     }
 
-    if (window.scrollY < SCROLL_THRESHOLD) {
-      setIsShrunk(false);
-    }
-
     const handleScroll = () => {
       const scrollingDown = window.scrollY > lastScrollPoint.current;
       lastScrollPoint.current = window.scrollY;
 
       if (isShrunk) {
+        if (
+          window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - SCROLL_THRESHOLD
+        ) {
+          return;
+        }
         if (scrollingDown) {
           scrollCheckpoint.current = window.scrollY;
         } else if (
@@ -45,6 +47,9 @@ export default function Header() {
           setIsShrunk(false);
         }
       } else {
+        if (window.scrollY < SCROLL_THRESHOLD) {
+          return;
+        }
         if (!scrollingDown) {
           scrollCheckpoint.current = window.scrollY;
         } else if (
