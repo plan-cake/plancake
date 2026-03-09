@@ -5,6 +5,7 @@ import * as Collapsible from "@radix-ui/react-collapsible";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
 
 import HeaderSpacer from "@/features/header/components/header-spacer";
+import { useHeaderSize } from "@/features/header/context";
 import {
   MajorVersionData,
   MinorVersionData,
@@ -19,6 +20,8 @@ export default function ClientPage({
 }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  const { topMarginClass } = useHeaderSize();
+
   // On load, scroll to the bottom
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "instant" });
@@ -27,7 +30,12 @@ export default function ClientPage({
   return (
     <div className="flex min-h-screen flex-col gap-2">
       <HeaderSpacer />
-      <div className="top-25 bg-background z-15 sticky flex w-full px-6 py-2">
+      <div
+        className={cn(
+          topMarginClass,
+          "bg-background z-15 sticky flex w-full px-6 py-2",
+        )}
+      >
         <h1 className="text-2xl font-bold">Version History</h1>
       </div>
       <div className="mx-auto flex w-full flex-col gap-8 px-8">
