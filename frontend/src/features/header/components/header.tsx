@@ -7,6 +7,7 @@ import DashboardButton from "@/features/header/components/dashboard-button";
 import LogoArea from "@/features/header/components/logo-area";
 import NewEventButton from "@/features/header/components/new-event-button";
 import ThemeToggle from "@/features/header/components/theme-toggle";
+import { useHeaderSize } from "@/features/header/context";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
@@ -15,15 +16,16 @@ const SCROLL_THRESHOLD = 50;
 export default function Header() {
   const [mounted, setMounted] = useState(false);
   const isMobile = useCheckMobile();
-  const [isShrunk, setIsShrunk] = useState(false);
   const lastScrollPoint = useRef(0);
   const scrollCheckpoint = useRef(0);
+
+  const { isShrunk, shrink, expand } = useHeaderSize();
 
   useEffect(() => {
     setMounted(true);
 
     if (!isMobile) {
-      setIsShrunk(false);
+      expand();
       return;
     }
 
@@ -42,7 +44,7 @@ export default function Header() {
           currentScrollPoint <
           scrollCheckpoint.current - SCROLL_THRESHOLD
         ) {
-          setIsShrunk(false);
+          expand();
         }
       } else {
         if (!scrollingDown) {
@@ -51,7 +53,7 @@ export default function Header() {
           currentScrollPoint >
           scrollCheckpoint.current + SCROLL_THRESHOLD
         ) {
-          setIsShrunk(true);
+          shrink();
         }
       }
     };
@@ -60,7 +62,7 @@ export default function Header() {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [isMobile, isShrunk]);
+  }, [isMobile, isShrunk, shrink, expand]);
 
   if (!mounted) {
     return null;
@@ -77,7 +79,7 @@ export default function Header() {
           if (!isShrunk) return;
           e.preventDefault();
           e.stopPropagation();
-          setIsShrunk(false);
+          expand();
         }}
       >
         <LogoArea isShrunk={isShrunk} />
@@ -89,10 +91,10 @@ export default function Header() {
             isShrunk ? "gap-1 p-1" : "gap-2 p-2",
           )}
         >
-          <NewEventButton isShrunk={isShrunk} />
-          <ThemeToggle isShrunk={isShrunk} />
-          <DashboardButton isShrunk={isShrunk} />
-          <AccountButton isShrunk={isShrunk} />
+          <NewEventButton />
+          <ThemeToggle />
+          <DashboardButton />
+          <AccountButton />
         </div>
       </nav>
     </header>

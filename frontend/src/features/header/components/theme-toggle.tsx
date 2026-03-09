@@ -6,11 +6,7 @@ import { FiMoon, FiSun } from "react-icons/fi";
 import ActionButton from "@/features/button/components/action";
 import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
 
-export default function FixedThemeToggle({
-  isShrunk = false,
-}: {
-  isShrunk?: boolean;
-}) {
+export default function FixedThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
 
   const toggleTheme = () => {
@@ -22,7 +18,6 @@ export default function FixedThemeToggle({
     <ShrinkingHeaderButton
       buttonStyle="frosted glass inset"
       icon={resolvedTheme === "dark" ? <FiMoon /> : <FiSun />}
-      isShrunk={isShrunk}
     >
       <ActionButton
         buttonStyle="frosted glass inset"

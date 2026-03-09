@@ -10,11 +10,7 @@ import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
 
-export default function AccountButton({
-  isShrunk = false,
-}: {
-  isShrunk?: boolean;
-}) {
+export default function AccountButton() {
   const { loginState, login, logout } = useAccount();
 
   const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
@@ -59,7 +55,6 @@ export default function AccountButton({
       <ShrinkingHeaderButton
         buttonStyle="frosted glass inset"
         icon={<PersonIcon />}
-        isShrunk={isShrunk}
       >
         <AccountSettings
           open={accountSettingsOpen}
@@ -76,17 +71,12 @@ export default function AccountButton({
   }
 
   return (
-    <ShrinkingHeaderButton
-      buttonStyle="frosted glass inset"
-      label="Log In"
-      isShrunk={isShrunk}
-    >
+    <ShrinkingHeaderButton buttonStyle="frosted glass inset" label="Log In">
       <LinkButton
         buttonStyle="frosted glass inset"
         label="Log In"
         href="/login"
         loading={loginState === "loading"}
-        className={isShrunk ? "hidden" : ""}
       />
     </ShrinkingHeaderButton>
   );

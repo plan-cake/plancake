@@ -2,6 +2,7 @@
 
 import { cloneElement, ReactElement, useEffect, useRef, useState } from "react";
 
+import { useHeaderSize } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
 type HeaderButtonStyle = "frosted glass inset" | "primary";
@@ -10,17 +11,17 @@ export default function ShrinkingHeaderButton({
   buttonStyle,
   icon,
   label,
-  isShrunk,
   children,
 }: {
   buttonStyle: HeaderButtonStyle;
   icon?: React.ReactNode;
   label?: string;
-  isShrunk: boolean;
   children: React.ReactNode;
 }) {
   const [showButton, setShowButton] = useState(false);
   const buttonShowTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const { isShrunk } = useHeaderSize();
 
   useEffect(() => {
     if (buttonShowTimeout.current) {

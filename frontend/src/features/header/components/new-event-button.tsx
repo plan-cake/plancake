@@ -7,11 +7,7 @@ import LinkButton from "@/features/button/components/link";
 import { ButtonStyle } from "@/features/button/props";
 import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
 
-export default function NewEventButton({
-  isShrunk = false,
-}: {
-  isShrunk?: boolean;
-}) {
+export default function NewEventButton() {
   const pathname = usePathname();
 
   if (pathname === "/new-event") {
@@ -25,11 +21,7 @@ export default function NewEventButton({
   }
 
   return (
-    <ShrinkingHeaderButton
-      buttonStyle={style}
-      icon={<PlusIcon />}
-      isShrunk={isShrunk}
-    >
+    <ShrinkingHeaderButton buttonStyle={style} icon={<PlusIcon />}>
       <LinkButton
         buttonStyle={style}
         icon={<PlusIcon />}
