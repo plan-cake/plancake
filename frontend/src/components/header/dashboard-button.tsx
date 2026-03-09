@@ -1,13 +1,24 @@
 import { DashboardIcon } from "@radix-ui/react-icons";
 
+import ShrinkingHeaderButton from "@/components/header/shrinking-header-button";
 import LinkButton from "@/features/button/components/link";
 
-export default function DashboardButton() {
+export default function DashboardButton({
+  isShrunk = false,
+}: {
+  isShrunk?: boolean;
+}) {
   return (
-    <LinkButton
+    <ShrinkingHeaderButton
       buttonStyle="frosted glass inset"
-      icon={<DashboardIcon className="h-5 w-5" />}
-      href="/dashboard"
-    />
+      icon={<DashboardIcon />}
+      isShrunk={isShrunk}
+    >
+      <LinkButton
+        buttonStyle="frosted glass inset"
+        icon={<DashboardIcon className="h-5 w-5" />}
+        href="/dashboard"
+      />
+    </ShrinkingHeaderButton>
   );
 }

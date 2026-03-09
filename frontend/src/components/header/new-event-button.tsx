@@ -3,10 +3,15 @@
 import { PlusIcon } from "@radix-ui/react-icons";
 import { usePathname } from "next/navigation";
 
+import ShrinkingHeaderButton from "@/components/header/shrinking-header-button";
 import LinkButton from "@/features/button/components/link";
 import { ButtonStyle } from "@/features/button/props";
 
-export default function NewEventButton() {
+export default function NewEventButton({
+  isShrunk = false,
+}: {
+  isShrunk?: boolean;
+}) {
   const pathname = usePathname();
 
   if (pathname === "/new-event") {
@@ -20,12 +25,18 @@ export default function NewEventButton() {
   }
 
   return (
-    <LinkButton
+    <ShrinkingHeaderButton
       buttonStyle={style}
       icon={<PlusIcon />}
-      label="New Event"
-      shrinkOnMobile
-      href="/new-event"
-    />
+      isShrunk={isShrunk}
+    >
+      <LinkButton
+        buttonStyle={style}
+        icon={<PlusIcon />}
+        label="New Event"
+        shrinkOnMobile
+        href="/new-event"
+      />
+    </ShrinkingHeaderButton>
   );
 }

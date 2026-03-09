@@ -4,12 +4,17 @@ import { useEffect, useState } from "react";
 
 import { PersonIcon } from "@radix-ui/react-icons";
 
+import ShrinkingHeaderButton from "@/components/header/shrinking-header-button";
 import { useAccount } from "@/features/account/context";
 import AccountSettings from "@/features/account/settings/selector";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 
-export default function AccountButton() {
+export default function AccountButton({
+  isShrunk = false,
+}: {
+  isShrunk?: boolean;
+}) {
   const { loginState, login, logout } = useAccount();
 
   const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
@@ -51,25 +56,38 @@ export default function AccountButton() {
 
   if (loginState === "logged_in") {
     return (
-      <AccountSettings
-        open={accountSettingsOpen}
-        setOpenChange={setAccountSettingsOpen}
+      <ShrinkingHeaderButton
+        buttonStyle="frosted glass inset"
+        icon={<PersonIcon />}
+        isShrunk={isShrunk}
       >
-        <EmptyButton
-          buttonStyle="frosted glass inset"
-          icon={<PersonIcon />}
-          aria-label="Account settings"
-        />
-      </AccountSettings>
+        <AccountSettings
+          open={accountSettingsOpen}
+          setOpenChange={setAccountSettingsOpen}
+        >
+          <EmptyButton
+            buttonStyle="frosted glass inset"
+            icon={<PersonIcon />}
+            aria-label="Account settings"
+          />
+        </AccountSettings>
+      </ShrinkingHeaderButton>
     );
   }
 
   return (
-    <LinkButton
+    <ShrinkingHeaderButton
       buttonStyle="frosted glass inset"
       label="Log In"
-      href="/login"
-      loading={loginState === "loading"}
-    />
+      isShrunk={isShrunk}
+    >
+      <LinkButton
+        buttonStyle="frosted glass inset"
+        label="Log In"
+        href="/login"
+        loading={loginState === "loading"}
+        className={isShrunk ? "hidden" : ""}
+      />
+    </ShrinkingHeaderButton>
   );
 }
