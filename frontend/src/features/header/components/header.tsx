@@ -19,7 +19,7 @@ export default function Header() {
   const lastScrollPoint = useRef(0);
   const scrollCheckpoint = useRef(0);
 
-  const { isShrunk, shrink, expand } = useHeaderSize();
+  const { isShrunk, heightClass, shrink, expand } = useHeaderSize();
 
   useEffect(() => {
     setMounted(true);
@@ -69,7 +69,7 @@ export default function Header() {
   }
 
   return (
-    <header className="h-25 fixed top-0 z-40 w-full pt-4">
+    <header className={cn(heightClass, "fixed top-0 z-40 w-full pt-4")}>
       <nav
         className={cn(
           "flex w-full max-w-[1440px] justify-between px-4",
