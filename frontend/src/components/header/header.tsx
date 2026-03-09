@@ -82,11 +82,17 @@ export default function Header() {
       >
         <LogoArea isShrunk={isShrunk} />
 
-        <div className="frosted-glass flex h-fit items-center gap-2 rounded-full p-2">
-          <NewEventButton />
-          <ThemeToggle />
-          <DashboardButton />
-          <AccountButton />
+        <div
+          className={cn(
+            "frosted-glass flex h-fit items-center rounded-full",
+            "header-transition-[gap,padding]",
+            isShrunk ? "gap-1 p-1" : "gap-2 p-2",
+          )}
+        >
+          <NewEventButton isShrunk={isShrunk} />
+          <ThemeToggle isShrunk={isShrunk} />
+          <DashboardButton isShrunk={isShrunk} />
+          <AccountButton isShrunk={isShrunk} />
         </div>
       </nav>
     </header>
