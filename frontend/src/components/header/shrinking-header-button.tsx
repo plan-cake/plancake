@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils/classname";
 
 type HeaderButtonStyle = "frosted glass inset" | "primary";
 
-export default function SmallHeaderButton({
+export default function ShrinkingHeaderButton({
   buttonStyle,
   icon,
   label,
@@ -35,9 +35,11 @@ export default function SmallHeaderButton({
   }, [isShrunk]);
 
   if (icon && label) {
-    throw new Error("SmallHeaderButton cannot have both icon and label");
+    throw new Error("ShrinkingHeaderButton cannot have both icon and label");
   } else if (!icon && !label) {
-    throw new Error("SmallHeaderButton must have either an icon or a label");
+    throw new Error(
+      "ShrinkingHeaderButton must have either an icon or a label",
+    );
   }
 
   const styleClass =
