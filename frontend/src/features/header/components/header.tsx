@@ -37,6 +37,11 @@ export default function Header() {
       const scrollingDown = currentScrollPoint > lastScrollPoint.current;
       lastScrollPoint.current = currentScrollPoint;
 
+      if (currentScrollPoint <= 0) {
+        expand();
+        return;
+      }
+
       if (isShrunk) {
         if (scrollingDown) {
           scrollCheckpoint.current = currentScrollPoint;
