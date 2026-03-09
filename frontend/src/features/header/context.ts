@@ -12,8 +12,8 @@ export const HeaderSizeContext = createContext<{
   expand: () => void;
 }>({
   isShrunk: false,
-  heightClass: "h-25",
-  topMarginClass: "top-25",
+  heightClass: "header-transition-[height] h-23",
+  topMarginClass: "header-transition-[top] top-23",
   shrink: () => { },
   expand: () => { },
 });

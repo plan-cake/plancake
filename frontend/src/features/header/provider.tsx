@@ -20,8 +20,12 @@ export default function HeaderSizeProvider({
     setIsShrunk(false);
   }, []);
 
-  const heightClass: HeaderHeightClass = isShrunk ? "h-12" : "h-25";
-  const topMarginClass: HeaderMarginClass = isShrunk ? "top-12" : "top-25";
+  const heightClass: HeaderHeightClass = isShrunk
+    ? "header-transition-[height] h-14"
+    : "header-transition-[height] h-23";
+  const topMarginClass: HeaderMarginClass = isShrunk
+    ? "header-transition-[top] top-14"
+    : "header-transition-[top] top-23";
 
   return (
     <HeaderSizeContext.Provider

@@ -1,2 +1,2 @@
-export type HeaderHeightClass = "h-12" | "h-25";
-export type HeaderMarginClass = "top-12" | "top-25";
+export type HeaderHeightClass = `header-transition-[height] ${"h-14" | "h-23"}`;
+export type HeaderMarginClass = `header-transition-[top] ${"top-14" | "top-23"}`;
