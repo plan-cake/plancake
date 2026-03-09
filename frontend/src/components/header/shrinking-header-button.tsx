@@ -51,7 +51,7 @@ export default function ShrinkingHeaderButton({
     icon &&
     cloneElement(icon as ReactElement<{ className: string }>, {
       className: cn(
-        "transition-[height,width,padding,opacity] duration-250 ease-out",
+        "header-transition-[height,width,padding,opacity]",
         isShrunk ? "h-0 w-0 p-0 opacity-0" : "h-6 w-6 p-0.5",
       ),
     });
@@ -61,7 +61,7 @@ export default function ShrinkingHeaderButton({
   const textComponent = label && (
     <div
       className={cn(
-        "duration-250 transition-[height,padding,opacity,font-size] ease-out",
+        "header-transition-[height,padding,opacity,font-size]",
         isShrunk ? "h-0 px-1 text-[0px] opacity-0" : "h-6 px-2 opacity-100",
       )}
     >
@@ -74,7 +74,7 @@ export default function ShrinkingHeaderButton({
       <div
         className={cn(
           "rounded-full",
-          "duration-250 transition-[padding] ease-out",
+          "header-transition-[padding]",
           isShrunk ? "p-1.5" : "p-2",
           showButton ? "absolute opacity-0" : "",
           styleClass,
