@@ -28,32 +28,27 @@ export default function Header() {
     }
 
     const handleScroll = () => {
-      const scrollingDown = window.scrollY > lastScrollPoint.current;
-      lastScrollPoint.current = window.scrollY;
+      const currentScrollPoint = Math.min(
+        Math.max(window.scrollY, 0),
+        document.documentElement.scrollHeight - window.innerHeight,
+      );
+      const scrollingDown = currentScrollPoint > lastScrollPoint.current;
+      lastScrollPoint.current = currentScrollPoint;
 
       if (isShrunk) {
-        if (
-          window.innerHeight + window.scrollY >=
-          document.documentElement.scrollHeight - SCROLL_THRESHOLD
-        ) {
-          return;
-        }
         if (scrollingDown) {
-          scrollCheckpoint.current = window.scrollY;
+          scrollCheckpoint.current = currentScrollPoint;
         } else if (
-          window.scrollY <
+          currentScrollPoint <
           scrollCheckpoint.current - SCROLL_THRESHOLD
         ) {
           setIsShrunk(false);
         }
       } else {
-        if (window.scrollY < SCROLL_THRESHOLD) {
-          return;
-        }
         if (!scrollingDown) {
-          scrollCheckpoint.current = window.scrollY;
+          scrollCheckpoint.current = currentScrollPoint;
         } else if (
-          window.scrollY >
+          currentScrollPoint >
           scrollCheckpoint.current + SCROLL_THRESHOLD
         ) {
           setIsShrunk(true);
