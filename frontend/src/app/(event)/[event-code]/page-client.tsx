@@ -15,6 +15,8 @@ import AttendeesPanel from "@/features/event/results/attendees-panel";
 import { getResultBanners } from "@/features/event/results/banners";
 import { useEventResults } from "@/features/event/results/use-results";
 import HeaderSpacer from "@/features/header/components/header-spacer";
+import { useHeaderSize } from "@/features/header/context";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -32,6 +34,10 @@ export default function ClientPage({
   initialAvailabilityData: AvailabilityDataResponse;
   isCreator: boolean;
 }) {
+  /* CONTEXTS */
+  const { topMarginClass } = useHeaderSize();
+  const isMobile = useCheckMobile();
+
   /* PARTICIPANT INFO */
   const participated: boolean =
     initialAvailabilityData.user_display_name != null;
@@ -141,7 +147,8 @@ export default function ClientPage({
           ref={sidebarRef}
           className={cn(
             "fixed bottom-1 left-0 z-10 w-full shrink-0 px-6",
-            "md:top-25 md:sticky md:h-full md:w-80 md:space-y-4 md:px-0",
+            isMobile ?? topMarginClass,
+            "md:sticky md:h-full md:w-80 md:space-y-4 md:px-0",
           )}
         >
           <div className="hidden md:block">{banners}</div>

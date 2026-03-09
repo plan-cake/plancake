@@ -19,6 +19,7 @@ import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
 import EventInfoDrawer, { EventInfo } from "@/features/event/info-drawer";
 import HeaderSpacer from "@/features/header/components/header-spacer";
+import { useHeaderSize } from "@/features/header/context";
 import {
   ConfirmationDialog,
   RateLimitBanner,
@@ -26,6 +27,7 @@ import {
 } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { formatApiError } from "@/lib/utils/api/handle-api-error";
+import { cn } from "@/lib/utils/classname";
 import { timeslotToISOString } from "@/lib/utils/date-time-format";
 
 export default function ClientPage({
@@ -42,6 +44,9 @@ export default function ClientPage({
   initialData: SelfAvailabilityResponse | null;
 }) {
   const router = useRouter();
+
+  // HEADER SIZE CONTEXT
+  const { topMarginClass } = useHeaderSize();
 
   // AVAILABILITY STATE
   const { state, setDisplayName, setTimeZone, toggleSlot } = useAvailability(
@@ -297,7 +302,12 @@ export default function ClientPage({
       {/* Main Content */}
       <div className="mb-12 flex h-fit flex-col gap-4 md:mb-0 md:flex-row">
         {/* Left Panel */}
-        <div className="md:top-25 h-fit w-full shrink-0 space-y-4 overflow-y-auto md:sticky md:w-80">
+        <div
+          className={cn(
+            topMarginClass,
+            "h-fit w-full shrink-0 space-y-4 overflow-y-auto md:sticky md:w-80",
+          )}
+        >
           <div className="space-y-2">
             <div className="w-fit">
               <p
