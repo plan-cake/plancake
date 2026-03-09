@@ -3,9 +3,9 @@
 import { PlusIcon } from "@radix-ui/react-icons";
 import { usePathname } from "next/navigation";
 
-import ShrinkingHeaderButton from "@/components/header/shrinking-header-button";
 import LinkButton from "@/features/button/components/link";
 import { ButtonStyle } from "@/features/button/props";
+import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
 
 export default function NewEventButton({
   isShrunk = false,

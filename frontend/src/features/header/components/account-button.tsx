@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 
 import { PersonIcon } from "@radix-ui/react-icons";
 
-import ShrinkingHeaderButton from "@/components/header/shrinking-header-button";
 import { useAccount } from "@/features/account/context";
 import AccountSettings from "@/features/account/settings/selector";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
+import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
 
 export default function AccountButton({
   isShrunk = false,

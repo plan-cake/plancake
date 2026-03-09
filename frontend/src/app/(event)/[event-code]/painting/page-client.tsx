@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
 import Checkbox from "@/components/checkbox";
-import HeaderSpacer from "@/components/header-spacer";
 import MobileFooterTray from "@/components/mobile-footer-tray";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
@@ -19,6 +18,7 @@ import { validateAvailabilityData } from "@/features/event/availability/validate
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
 import EventInfoDrawer, { EventInfo } from "@/features/event/info-drawer";
+import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,
   RateLimitBanner,

@@ -1,7 +1,7 @@
 import { DashboardIcon } from "@radix-ui/react-icons";
 
-import ShrinkingHeaderButton from "@/components/header/shrinking-header-button";
 import LinkButton from "@/features/button/components/link";
+import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
 
 export default function DashboardButton({
   isShrunk = false,

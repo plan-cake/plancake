@@ -3,8 +3,8 @@
 import { useTheme } from "next-themes";
 import { FiMoon, FiSun } from "react-icons/fi";
 
-import ShrinkingHeaderButton from "@/components/header/shrinking-header-button";
 import ActionButton from "@/features/button/components/action";
+import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
 
 export default function FixedThemeToggle({
   isShrunk = false,

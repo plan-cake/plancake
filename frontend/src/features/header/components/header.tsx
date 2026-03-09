@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import AccountButton from "@/components/header/account-button";
-import DashboardButton from "@/components/header/dashboard-button";
-import LogoArea from "@/components/header/logo-area";
-import NewEventButton from "@/components/header/new-event-button";
-import ThemeToggle from "@/components/header/theme-toggle";
+import AccountButton from "@/features/header/components/account-button";
+import DashboardButton from "@/features/header/components/dashboard-button";
+import LogoArea from "@/features/header/components/logo-area";
+import NewEventButton from "@/features/header/components/new-event-button";
+import ThemeToggle from "@/features/header/components/theme-toggle";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 

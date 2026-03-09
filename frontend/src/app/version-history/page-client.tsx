@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
 
-import HeaderSpacer from "@/components/header-spacer";
+import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   MajorVersionData,
   MinorVersionData,

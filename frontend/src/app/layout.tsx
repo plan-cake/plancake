@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Modak, Nunito } from "next/font/google";
 
-import Header from "@/components/header/header";
+import Header from "@/features/header/components/header";
 import { Providers } from "@/lib/providers";
 import "@/styles/globals.css";
 

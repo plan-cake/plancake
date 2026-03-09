@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Pencil1Icon, Pencil2Icon } from "@radix-ui/react-icons";
 
 import CopyToastButton from "@/components/copy-toast-button";
-import HeaderSpacer from "@/components/header-spacer";
 import { EventRange } from "@/core/event/types";
 import LinkButton from "@/features/button/components/link";
 import { AvailabilityDataResponse } from "@/features/event/availability/fetch-data";
@@ -15,6 +14,7 @@ import EventInfoDrawer, { EventInfo } from "@/features/event/info-drawer";
 import AttendeesPanel from "@/features/event/results/attendees-panel";
 import { getResultBanners } from "@/features/event/results/banners";
 import { useEventResults } from "@/features/event/results/use-results";
+import HeaderSpacer from "@/features/header/components/header-spacer";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
