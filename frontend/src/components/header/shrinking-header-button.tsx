@@ -17,7 +17,6 @@ export default function ShrinkingHeaderButton({
   icon?: React.ReactNode;
   label?: string;
   isShrunk: boolean;
-  showButton: boolean;
   children: React.ReactNode;
 }) {
   const [showButton, setShowButton] = useState(false);
