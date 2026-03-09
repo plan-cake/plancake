@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useContext } from "react";
 
 import { HeaderHeightClass, HeaderMarginClass } from "@/features/header/type";
