@@ -1,21 +1,45 @@
-import { cloneElement, ReactElement } from "react";
+"use client";
+
+import { cloneElement, ReactElement, useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils/classname";
 
 type HeaderButtonStyle = "frosted glass inset" | "primary";
-type HeaderButtonType = "icon" | "text";
 
 export default function SmallHeaderButton({
   buttonStyle,
-  buttonType,
+  icon,
+  label,
   isShrunk,
   children,
 }: {
   buttonStyle: HeaderButtonStyle;
-  buttonType: HeaderButtonType;
+  icon?: React.ReactNode;
+  label?: string;
   isShrunk: boolean;
+  showButton: boolean;
   children: React.ReactNode;
 }) {
+  const [showButton, setShowButton] = useState(false);
+  const buttonShowTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (buttonShowTimeout.current) {
+      clearTimeout(buttonShowTimeout.current);
+    }
+    if (isShrunk) {
+      setShowButton(false);
+    } else {
+      buttonShowTimeout.current = setTimeout(() => setShowButton(true), 250);
+    }
+  }, [isShrunk]);
+
+  if (icon && label) {
+    throw new Error("SmallHeaderButton cannot have both icon and label");
+  } else if (!icon && !label) {
+    throw new Error("SmallHeaderButton must have either an icon or a label");
+  }
+
   const styleClass =
     buttonStyle === "primary"
       ? "bg-accent text-white"
@@ -23,8 +47,8 @@ export default function SmallHeaderButton({
 
   // Same as the button component, setting the icon size here
   const iconComponent =
-    buttonType === "icon" &&
-    cloneElement(children as ReactElement<{ className: string }>, {
+    icon &&
+    cloneElement(icon as ReactElement<{ className: string }>, {
       className: cn(
         "transition-[height,width,padding,opacity] duration-250 ease-out",
         isShrunk ? "h-0 w-0 p-0 opacity-0" : "h-6 w-6 p-0.5",
@@ -33,27 +57,31 @@ export default function SmallHeaderButton({
 
   // This is honestly pretty tailored to the "Log In" button size, but no other text
   // buttons exist in the header on mobile and probably never will
-  const textComponent = buttonType === "text" && (
+  const textComponent = label && (
     <div
       className={cn(
         "duration-250 transition-[height,padding,opacity,font-size] ease-out",
         isShrunk ? "h-0 px-1 text-[0px] opacity-0" : "h-6 px-2 opacity-100",
       )}
     >
-      {children}
+      {label}
     </div>
   );
 
   return (
-    <div
-      className={cn(
-        "rounded-full",
-        "duration-250 transition-[padding] ease-out",
-        isShrunk ? "p-1.5" : "p-2",
-        styleClass,
-      )}
-    >
-      {buttonType === "icon" ? iconComponent : textComponent}
+    <div>
+      <div
+        className={cn(
+          "rounded-full",
+          "duration-250 transition-[padding] ease-out",
+          isShrunk ? "p-1.5" : "p-2",
+          showButton ? "absolute opacity-0" : "",
+          styleClass,
+        )}
+      >
+        {icon ? iconComponent : textComponent}
+      </div>
+      <div className={showButton ? "" : "hidden"}>{children}</div>
     </div>
   );
 }
