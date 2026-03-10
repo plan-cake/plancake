@@ -32,6 +32,12 @@ export default function ShrinkingHeaderButton({
     } else {
       buttonShowTimeout.current = setTimeout(() => setShowButton(true), 250);
     }
+
+    return () => {
+      if (buttonShowTimeout.current) {
+        clearTimeout(buttonShowTimeout.current);
+      }
+    };
   }, [isShrunk]);
 
   if (icon && label) {
