@@ -21,7 +21,7 @@ export const HeaderSizeContext = createContext<{
 export function useHeaderSize() {
   const context = useContext(HeaderSizeContext);
   if (!context) {
-    throw new Error("useHeaderSize must be used within an HeaderSizeProvider");
+    throw new Error("useHeaderSize must be used within a HeaderSizeProvider");
   }
   return context;
 }
