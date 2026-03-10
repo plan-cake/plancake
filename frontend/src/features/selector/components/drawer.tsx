@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import { BaseDrawer } from "@/components/layout/base-drawer";
+import { BaseDrawer } from "@/features/drawer/components/base";
 import { FloatingDrawer } from "@/features/drawer/components/floating";
 import { DrawerProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
@@ -68,6 +68,9 @@ export default function SelectorDrawer<TValue extends string | number>({
         >
           <span className="text-wrap">{selectLabel}</span>
         </button>
+      }
+      headerContent={
+        <h1 className="mb-2 flex-1 text-lg font-semibold">{dialogTitle}</h1>
       }
     >
       <div className="flex flex-col gap-2">
