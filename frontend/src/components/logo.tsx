@@ -7,7 +7,7 @@ export default function Logo({ oneLine = false }: { oneLine?: boolean }) {
         <span>plan</span>
         <span
           className={cn(
-            "duration-250 transition-opacity ease-out",
+            "header-transition-[opacity]",
             oneLine ? "opacity-100" : "absolute opacity-0",
           )}
         >
@@ -16,7 +16,7 @@ export default function Logo({ oneLine = false }: { oneLine?: boolean }) {
       </div>
       <div
         className={cn(
-          "duration-250 transition-opacity ease-out",
+          "header-transition-[opacity]",
           oneLine ? "opacity-0" : "opacity-100",
         )}
       >

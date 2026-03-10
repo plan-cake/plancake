@@ -29,7 +29,7 @@ export default function LogoArea({ isShrunk = false }: { isShrunk?: boolean }) {
       <Link
         href="/version-history"
         className={cn(
-          "duration-250 text-xs transition-opacity ease-out",
+          "header-transition-[opacity] text-xs",
           isShrunk ? "opacity-0" : "opacity-100",
         )}
       >
