@@ -32,7 +32,7 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
             key="trigger"
             layoutId={`popover-morph`}
             transition={morphTransition}
-            className="absolute right-0 top-0 z-50 inline-block rounded-full"
+            className="absolute right-0 top-0 z-10 inline-block rounded-full"
             onClick={() => setIsOpen(true)}
           >
             <EmptyButton
@@ -43,7 +43,7 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
         ) : (
           <>
             <div
-              className="fixed inset-0 z-40"
+              className="fixed inset-0 z-10"
               onClick={() => setIsOpen(false)}
             />
 
@@ -52,7 +52,7 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
               layoutId={`popover-morph`}
               transition={morphTransition}
               className={cn(
-                "absolute right-0 top-0 z-50",
+                "absolute right-0 top-0 z-10",
                 "flex min-w-[200px] origin-top-right flex-col gap-2",
                 "frosted-glass rounded-4xl overflow-hidden p-4 shadow-lg",
               )}
