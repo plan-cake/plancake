@@ -81,7 +81,7 @@ export function MorphingDrawer({
         {!isPill && footerContent && (
           <div
             className={cn(
-              "fixed bottom-0 left-0 right-0 z-[60] w-full shrink-0 p-4 pt-2",
+              "fixed bottom-0 left-0 right-0 z-[60] w-full shrink-0 px-4 pt-2",
               !frostedGlass && "bg-panel",
               "transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
               open ? "translate-y-0" : "translate-y-full",
