@@ -53,22 +53,16 @@ export default function PanelHeader({
       )}
     >
       <div className="flex flex-col items-start">
-        {!isCollapsed && (
-          <h2 className="text-md font-semibold">
-            {isRemoving ? "Removing a" : "A"}ttendees
-          </h2>
-        )}
+        <h2 className="text-md font-semibold">
+          {isRemoving ? "Removing a" : "A"}ttendees
+        </h2>
         {gridNumParticipants > 0 && (
-          <span
-            className={cn(
-              isCollapsed ? "text-md opacity-100" : "text-sm opacity-75",
-            )}
-          >
+          <span className="text-sm opacity-75">
             {isRemoving
               ? `Select to remove`
               : activeCount === null
                 ? "Hover grid for availability"
-                : `${activeCount}/${gridNumParticipants} ${isCollapsed ? "people are" : ""} available`}
+                : `${activeCount}/${gridNumParticipants} available`}
           </span>
         )}
       </div>

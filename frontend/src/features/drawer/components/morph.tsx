@@ -78,16 +78,14 @@ export function MorphingDrawer({
           />
         )}
 
-        {footerContent && (
+        {!isPill && footerContent && (
           <div
             className={cn(
-              "fixed bottom-0 left-0 right-0 z-[60] w-full shrink-0 px-4",
+              "fixed bottom-0 left-0 right-0 z-[60] w-full shrink-0 p-4 pt-2",
               !frostedGlass && "bg-panel",
               "transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
               open ? "translate-y-0" : "translate-y-full",
-              isPill
-                ? "hidden max-w-[calc(100%-2rem)] rounded-[40px] border border-white/10"
-                : "max-w-full rounded-t-[32px] border-transparent shadow-none",
+              "border-transparent shadow-none",
             )}
           >
             {footerContent}
@@ -131,7 +129,7 @@ export function MorphingDrawer({
                 onPointerCancel={() => setIsDragging(false)}
                 className="flex h-full min-h-0 w-full flex-col"
               >
-                <div className="shrink-0 px-8 pb-2">
+                <div className="shrink-0 px-6 pb-2">
                   {showHandle && (
                     <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
                   )}
@@ -171,7 +169,7 @@ export function MorphingDrawer({
 
                 <div
                   className={cn(
-                    "min-h-0 flex-1 px-8 pb-4",
+                    "min-h-0 flex-1 px-7 pb-4",
                     scrollableBody && "overflow-y-auto",
                     bodyClassName,
                     isPill && "hidden",
@@ -198,7 +196,7 @@ export function MorphingDrawer({
               {footerContent && isPill && (
                 <div
                   className={cn(
-                    "m-2 mt-auto shrink-0",
+                    "m-4 mt-auto shrink-0",
                     !frostedGlass && "bg-panel",
                   )}
                 >

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Pencil1Icon, Pencil2Icon } from "@radix-ui/react-icons";
+import { Pencil1Icon } from "@radix-ui/react-icons";
 
 import CopyToastButton from "@/components/copy-toast-button";
 import HeaderSpacer from "@/components/header-spacer";
@@ -69,15 +69,6 @@ export default function MobileResults({
   );
 
   /* BUTTONS */
-  const paintingButton = (
-    <LinkButton
-      buttonStyle="primary"
-      icon={<Pencil2Icon />}
-      label={(currentUser ? "Edit" : "Add") + " Availability"}
-      href={`/${eventCode}/painting`}
-    />
-  );
-
   const editButton = (
     <LinkButton
       buttonStyle="frosted glass inset"
@@ -95,9 +86,8 @@ export default function MobileResults({
     <div className="flex flex-col space-y-4 pl-6 pr-6">
       <HeaderSpacer />
       <div className="flex flex-col justify-between gap-2 md:flex-row">
-        <h1 className="text-2xl font-bold">{eventTitle}</h1>
-        <div className="flex w-full items-center justify-end gap-2">
-          {paintingButton}
+        <div className="flex justify-between">
+          <h1 className="text-2xl font-bold">{eventTitle}</h1>
           <KebabMenu
             buttons={isCreator ? [editButton, copyButton] : [copyButton]}
           />
@@ -122,6 +112,7 @@ export default function MobileResults({
           timezone={timezone}
           onTimezoneChange={handleTZChange}
           onSnapChange={setDrawerSnap}
+          eventCode={eventCode}
         />
       </div>
     </div>

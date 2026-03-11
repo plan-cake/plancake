@@ -1,8 +1,10 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 
-import { PersonIcon, GearIcon } from "@radix-ui/react-icons";
+import { GearIcon, Pencil2Icon } from "@radix-ui/react-icons";
 
-import SegmentedControl from "@/components/segmented-control";
+import EmptyButton from "@/features/button/components/empty";
+import LinkButton from "@/features/button/components/link";
+import { FloatingDrawer } from "@/features/drawer/components/floating";
 import { MorphingDrawer } from "@/features/drawer/components/morph";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
@@ -10,16 +12,16 @@ import { useResultsContext } from "@/features/event/results/context";
 import ViewSettings from "@/features/event/results/view-settings";
 import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
 
-type ResultsTab = "attendees" | "view-settings";
-
 export default function ResultsDrawer({
   timezone,
   onTimezoneChange,
   onSnapChange,
+  eventCode,
 }: {
   timezone: string;
   onTimezoneChange: (newTZ: string) => void;
   onSnapChange: (snap: number | string | null) => void;
+  eventCode: string;
 }) {
   const {
     participants,
@@ -40,63 +42,27 @@ export default function ResultsDrawer({
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
   /* TABS */
-  const [tab, setTab] = useState<ResultsTab>("attendees");
+  const [openSettings, setSettings] = useState(false);
   const [activeSnap, setActiveSnap] = useState<number | string | null>(0.22);
 
   useEffect(() => {
     onSnapChange(activeSnap);
   }, [activeSnap, onSnapChange]);
 
-  useEffect(() => {
-    if (tab === "view-settings") {
-      setActiveSnap(0.37);
-    }
-  }, [tab]);
-
   const isCollapsed = activeSnap === 0.22;
 
-  /* TABS - Wrapped in useMemo */
-  const tabContent = useMemo(
-    () => ({
-      attendees: {
-        header: (
-          <PanelHeader
-            isRemoving={isRemoving}
-            toggleRemoving={() => setIsRemoving((prev) => !prev)}
-            promptRemove={promptRemove}
-            isCollapsed={isCollapsed}
-            inDrawer
-          />
-        ),
-        content: (
-          <ParticipantList
-            isRemoving={isRemoving}
-            promptRemove={promptRemove}
-            mobile
-          />
-        ),
-      },
-      "view-settings": {
-        header: <h2 className="text-md font-semibold">View Settings</h2>,
-        content: (
-          <ViewSettings
-            timezone={timezone}
-            onTimezoneChange={onTimezoneChange}
-            inDrawer
-            open={isTimezoneOpen}
-            setOpen={setTimezoneOpen}
-          />
-        ),
-      },
-    }),
-    [
-      isRemoving,
-      timezone,
-      onTimezoneChange,
-      isCollapsed,
-      isTimezoneOpen,
-      setTimezoneOpen,
-    ],
+  /* BUTTONS */
+  const paintingButton = (
+    <LinkButton
+      buttonStyle="primary"
+      icon={<Pencil2Icon />}
+      label={(currentUser ? "Edit" : "Add") + " Availability"}
+      href={`/${eventCode}/painting`}
+    />
+  );
+
+  const settingsButton = (
+    <EmptyButton buttonStyle="semi-transparent" icon={<GearIcon />} />
   );
 
   return (
@@ -112,35 +78,44 @@ export default function ResultsDrawer({
       modal={false}
       floatingAtLowestSnap
       scrollableBody
-      headerContent={tabContent[tab].header}
-      footerContent={
-        <SegmentedControl
-          value={tab}
-          onChange={setTab}
-          options={[
-            {
-              label: (
-                <div className="flex items-center gap-2 text-xs">
-                  <PersonIcon className="h-5 w-5" />
-                  <span className="text-xs">Attendees</span>
-                </div>
-              ),
-              value: "attendees",
-            },
-            {
-              label: (
-                <div className="flex items-center gap-2 text-xs">
-                  <GearIcon className="h-5 w-5" />
-                  <span className="text-xs">View Settings</span>
-                </div>
-              ),
-              value: "view-settings",
-            },
-          ]}
+      headerContent={
+        <PanelHeader
+          isRemoving={isRemoving}
+          toggleRemoving={() => setIsRemoving((prev) => !prev)}
+          promptRemove={promptRemove}
+          isCollapsed={isCollapsed}
+          inDrawer
         />
       }
+      footerContent={
+        <div className="mx-1 flex grow justify-between gap-2">
+          <FloatingDrawer
+            open={openSettings}
+            onOpenChange={setSettings}
+            trigger={settingsButton}
+            title="View Settings"
+            description="View Settings"
+            headerContent={
+              <h1 className="flex-1 text-lg font-semibold">View Settings</h1>
+            }
+          >
+            <ViewSettings
+              timezone={timezone}
+              onTimezoneChange={onTimezoneChange}
+              inDrawer
+              open={isTimezoneOpen}
+              setOpen={setTimezoneOpen}
+            />
+          </FloatingDrawer>
+          {paintingButton}
+        </div>
+      }
     >
-      {tabContent[tab].content || <div>Content for {tab}</div>}
+      <ParticipantList
+        isRemoving={isRemoving}
+        promptRemove={promptRemove}
+        mobile
+      />
 
       <ConfirmationDialog
         asNestedDrawer
