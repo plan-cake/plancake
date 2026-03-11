@@ -8,9 +8,9 @@ import {
 } from "react";
 
 import { ResultsAvailabilityMap } from "@/core/availability/types";
-import { removePerson } from "@/features/event/results/remove-person";
-import { ResultsInformation } from "@/features/event/results/types";
-import { findConsensusAndConflicts } from "@/features/event/results/utils";
+import { removePerson } from "@/features/event/results/lib/remove-person";
+import { ResultsInformation } from "@/features/event/results/lib/types";
+import { findConsensusAndConflicts } from "@/features/event/results/lib/utils";
 import { useToast } from "@/features/system-feedback/toast/context";
 import { MESSAGES } from "@/lib/messages";
 

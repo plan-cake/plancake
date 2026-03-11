@@ -2,8 +2,8 @@
 
 import { createContext, useContext, ReactNode } from "react";
 
-import { ResultsInformation } from "@/features/event/results/types";
-import { useEventResults } from "@/features/event/results/use-results";
+import { ResultsInformation } from "@/features/event/results/lib/types";
+import { useEventResults } from "@/features/event/results/lib/use-results";
 
 type ResultsContextType = ReturnType<typeof useEventResults>;
 

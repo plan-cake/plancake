@@ -1,5 +1,5 @@
 import { ResultsAvailabilityMap } from "@/core/availability/types";
-import { hasMutualAvailability } from "@/features/event/results/utils";
+import { hasMutualAvailability } from "@/features/event/results/lib/utils";
 import { Banner } from "@/features/system-feedback/banner/base";
 import { MESSAGES } from "@/lib/messages";
 

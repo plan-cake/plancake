@@ -17,7 +17,7 @@ import {
   useResultsContext,
 } from "@/features/event/results/context";
 import ResultsDrawer from "@/features/event/results/drawer";
-import { ResultsInformation } from "@/features/event/results/types";
+import { ResultsInformation } from "@/features/event/results/lib/types";
 import ViewSettings from "@/features/event/results/view-settings";
 import { cn } from "@/lib/utils/classname";
 
