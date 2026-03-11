@@ -26,7 +26,7 @@ export default function Checkbox(props: CheckboxProps) {
       </div>
       <label
         htmlFor="confirm"
-        className={cn("text-sm", checked && "text-accent")}
+        className={cn("select-none text-sm", checked && "text-accent")}
       >
         {label}
       </label>
