@@ -28,18 +28,20 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
 
       <AnimatePresence>
         {!isOpen ? (
-          <motion.div
+          <motion.button
             key="trigger"
             layoutId={`popover-morph`}
             transition={morphTransition}
             className="absolute right-0 top-0 z-10 inline-block rounded-full"
+            aria-haspopup="menu"
+            aria-expanded={isOpen}
             onClick={() => setIsOpen(true)}
           >
             <EmptyButton
               buttonStyle="semi-transparent"
               icon={<DotsVerticalIcon />}
             />
-          </motion.div>
+          </motion.button>
         ) : (
           <>
             <div
