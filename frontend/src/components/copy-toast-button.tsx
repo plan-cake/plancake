@@ -34,7 +34,7 @@ export default function CopyToastButton({
     <ActionButton
       buttonStyle={buttonStyle}
       icon={<CopyIcon />}
-      // label="Copy Link"
+      label="Copy Link"
       onClick={copyToClipboard}
     />
   );
