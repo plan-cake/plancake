@@ -1,39 +1,28 @@
 import { useTimezoneSelect, allTimezones } from "react-timezone-select";
 
 import Selector from "@/features/selector/components/selector";
+import { BaseSelectorWrapperProps } from "@/features/selector/types";
 
 const labelStyle = "original";
 const timezones = allTimezones;
 
-type TimeZoneSelectorProps = {
-  id: string;
-  onChange: (tz: string) => void;
-  value: string;
-  className?: string;
-};
-
-export default function TimeZoneSelector({
-  id,
-  onChange,
-  value,
-  className,
-}: TimeZoneSelectorProps) {
+export default function TimeZoneSelector(
+  props: BaseSelectorWrapperProps<string>,
+) {
   const { options, parseTimezone } = useTimezoneSelect({
     labelStyle,
     timezones,
   });
 
-  const parsedValue = parseTimezone(value)?.value || "";
+  const parsedValue = parseTimezone(props.value)?.value || "";
 
   return (
-    <Selector<string>
-      id={id}
-      onChange={onChange}
+    <Selector
+      {...props}
       value={parsedValue}
       options={options}
       dialogTitle="Select Timezone"
       dialogDescription="Select a timezone from the list"
-      className={className}
       textStart
     />
   );

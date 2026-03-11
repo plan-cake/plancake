@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import { BaseDrawer } from "@/components/layout/base-drawer";
-import { SelectorProps } from "@/features/selector/types";
+import { DrawerProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
 export default function SelectorDrawer<TValue extends string | number>({
@@ -12,10 +12,26 @@ export default function SelectorDrawer<TValue extends string | number>({
   dialogTitle,
   dialogDescription,
   textStart = false,
-}: SelectorProps<TValue>) {
-  const [open, setOpen] = useState(false);
-  const selectedItemRef = useRef<HTMLButtonElement>(null);
+  open: controlledOpen,
+  onOpenChange,
+  disabled = false,
+}: DrawerProps<TValue>) {
+  const [internalOpen, setInternalOpen] = useState(false);
 
+  // use controlled state if provided, otherwise local state
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (disabled) return;
+    if (!isControlled) {
+      setInternalOpen(newOpen);
+    }
+    onOpenChange?.(newOpen);
+  };
+
+  /* SELECTED ITEM SCROLLING LOGIC */
+  const selectedItemRef = useRef<HTMLButtonElement>(null);
   const selectLabel = options.find((opt) => opt.value === value)?.label || "";
 
   useEffect(() => {
@@ -34,18 +50,26 @@ export default function SelectorDrawer<TValue extends string | number>({
   return (
     <BaseDrawer
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={handleOpenChange}
       title={dialogTitle}
       description={dialogDescription || "Select an option from the list below"}
       contentClassName="h-1/2"
       trigger={
         <button
           id={id}
+          disabled={disabled}
           aria-label={`Select ${dialogTitle}`}
+          aria-disabled={disabled}
           className={cn(
-            "relative flex items-center rounded-2xl text-start hover:cursor-pointer focus:outline-none",
-            "bg-accent/15 hover:bg-accent/25 active:bg-accent/40 text-accent px-3 py-1",
-            open && "ring-accent ring-1",
+            "relative flex items-center rounded-2xl text-start focus:outline-none",
+            "bg-accent/15 text-accent px-3 py-1",
+            open && !disabled && "ring-accent ring-1",
+            // Interactive states only when enabled
+            !disabled &&
+              "hover:bg-accent/25 active:bg-accent/40 hover:cursor-pointer",
+            // Visual styles for disabled state
+            disabled &&
+              "bg-foreground/20 text-foreground hover:bg-foreground/20 active:bg-foreground/20 cursor-not-allowed opacity-50 hover:cursor-not-allowed",
           )}
         >
           <span className="text-wrap">{selectLabel}</span>
@@ -61,13 +85,13 @@ export default function SelectorDrawer<TValue extends string | number>({
               key={String(option.value)}
               onClick={() => {
                 onChange(option.value);
-                setOpen(false);
+                handleOpenChange(false);
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   onChange(option.value);
-                  setOpen(false);
+                  handleOpenChange(false);
                 }
               }}
               className={cn(

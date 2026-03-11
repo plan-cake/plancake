@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 import { CheckIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 import * as Select from "@radix-ui/react-select";
 
-import { SelectorProps } from "@/features/selector/types";
+import { DropdownProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
 export default function Dropdown<TValue extends string | number>({
@@ -13,7 +13,7 @@ export default function Dropdown<TValue extends string | number>({
   options,
   disabled,
   className,
-}: SelectorProps<TValue>) {
+}: DropdownProps<TValue>) {
   return (
     <Select.Root
       value={value?.toString()}
