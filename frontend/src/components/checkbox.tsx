@@ -21,7 +21,11 @@ export default function Checkbox(props: CheckboxProps) {
           onChange={(e) => onChange(e.target.checked)}
         />
         {checked && (
-          <CheckIcon className="centered-absolute pointer-events-none h-4 w-4" />
+          <CheckIcon
+            className="centered-absolute pointer-events-none h-4 w-4"
+            aria-hidden
+            focusable={false}
+          />
         )}
       </div>
       <label
