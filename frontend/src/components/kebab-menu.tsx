@@ -29,7 +29,7 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
 
       <AnimatePresence>
         {!isOpen ? (
-          <motion.button
+          <motion.div
             key="trigger"
             layoutId={"popover-morph-" + id}
             transition={morphTransition}
@@ -42,7 +42,7 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
               buttonStyle="semi-transparent"
               icon={<DotsVerticalIcon />}
             />
-          </motion.button>
+          </motion.div>
         ) : (
           <>
             <div
