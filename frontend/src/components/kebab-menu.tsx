@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useId } from "react";
 
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import { motion, AnimatePresence, Transition } from "framer-motion";
@@ -16,6 +16,7 @@ const morphTransition: Transition = {
 
 export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
   const [isOpen, setIsOpen] = useState(false);
+  const id = useId();
   return (
     <div className="relative">
       {/* Placeholder */}
@@ -30,7 +31,7 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
         {!isOpen ? (
           <motion.button
             key="trigger"
-            layoutId={`popover-morph`}
+            layoutId={"popover-morph-" + id}
             transition={morphTransition}
             className="absolute right-0 top-0 z-10 inline-block rounded-full"
             aria-haspopup="menu"
@@ -51,7 +52,7 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
 
             <motion.div
               key="content"
-              layoutId={`popover-morph`}
+              layoutId={"popover-morph-" + id}
               transition={morphTransition}
               className={cn(
                 "absolute right-0 top-0 z-10",

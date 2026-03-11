@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 import { cn } from "@/lib/utils/classname";
 
 type CheckboxProps = {
@@ -9,11 +11,12 @@ type CheckboxProps = {
 
 export default function Checkbox(props: CheckboxProps) {
   const { label, checked, onChange, textSize = "md" } = props;
+  const id = useId();
   return (
     <div className="flex items-center gap-2">
       <input
         type="checkbox"
-        id="confirm"
+        id={"checkbox-" + id}
         className={cn(
           "h-4 w-4 appearance-none rounded-sm border border-gray-300",
           "checked:border-accent checked:bg-accent peer",
@@ -23,7 +26,7 @@ export default function Checkbox(props: CheckboxProps) {
         onChange={(e) => onChange(e.target.checked)}
       />
       <label
-        htmlFor="confirm"
+        htmlFor={"checkbox-" + id}
         className={`peer-checked:text-accent ${textSize === "sm" ? "text-sm" : "text-md"}`}
       >
         {label}
