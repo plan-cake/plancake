@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 import { CheckIcon } from "@radix-ui/react-icons";
 
 import { cn } from "@/lib/utils/classname";
@@ -15,7 +17,7 @@ export default function Checkbox(props: CheckboxProps) {
       <div className="relative flex">
         <input
           type="checkbox"
-          id="confirm"
+          id={useId()}
           className="checked:border-accent checked:bg-accent h-4 w-4 appearance-none rounded-sm border border-gray-300"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
