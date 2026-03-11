@@ -76,7 +76,7 @@ export type DrawerProps<TValue extends string | number> =
      *
      * @default false
      */
-    nestingLevel?: boolean | number;
+    drawerNesting?: boolean | number;
     /**
      * Controlled open state for the drawer.
      */
