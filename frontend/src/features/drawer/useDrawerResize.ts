@@ -1,34 +1,47 @@
 import { useEffect } from "react";
 
-/**
- * This overrides vaul's natural handling of the resize event for snapPoints because
- * vaul's animations run on every resize event, which causes a visual jitter when
- * the user is actively sizing the window or when mobile Safari's dynamic bottom
- * bar is resizing. This was added mostly to offset problems caused by the latter.
- */
+// Module-level variables to track state across all instances of the hook
+let listenerCount = 0;
+let resizeTimeout: NodeJS.Timeout | null = null;
+
+const handleResize = () => {
+  document.body.classList.add("vaul-resizing");
+
+  if (resizeTimeout) {
+    clearTimeout(resizeTimeout);
+  }
+
+  resizeTimeout = setTimeout(() => {
+    document.body.classList.remove("vaul-resizing");
+    resizeTimeout = null;
+  }, 300);
+};
+
 export function useDrawerResize() {
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    const onResize = () => {
-      document.body.classList.add("vaul-resizing");
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        document.body.classList.remove("vaul-resizing");
-      }, 300);
-    };
+    const target =
+      typeof window !== "undefined" && window.visualViewport
+        ? window.visualViewport
+        : window;
 
-    const hasVisualViewport =
-      typeof window !== "undefined" && !!window.visualViewport;
-    if (hasVisualViewport) {
-      window.visualViewport!.addEventListener("resize", onResize);
-    } else {
-      window.addEventListener("resize", onResize);
+    // Only attach the listener if this is the FIRST drawer being mounted
+    if (listenerCount === 0 && typeof window !== "undefined") {
+      target.addEventListener("resize", handleResize);
     }
+
+    listenerCount++;
+
     return () => {
-      if (hasVisualViewport) {
-        window.visualViewport!.removeEventListener("resize", onResize);
-      } else {
-        window.removeEventListener("resize", onResize);
+      listenerCount--;
+
+      if (listenerCount === 0 && typeof window !== "undefined") {
+        target.removeEventListener("resize", handleResize);
+
+        if (resizeTimeout) {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = null;
+        }
+        document.body.classList.remove("vaul-resizing");
       }
     };
   }, []);
