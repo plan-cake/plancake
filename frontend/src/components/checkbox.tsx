@@ -12,12 +12,13 @@ type CheckboxProps = {
 
 export default function Checkbox(props: CheckboxProps) {
   const { label, checked, onChange } = props;
+  const id = useId();
   return (
     <div className="flex items-center gap-2">
       <div className="relative flex">
         <input
           type="checkbox"
-          id={useId()}
+          id={id}
           className="checked:border-accent checked:bg-accent h-4 w-4 appearance-none rounded-sm border border-gray-300"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
@@ -31,7 +32,7 @@ export default function Checkbox(props: CheckboxProps) {
         )}
       </div>
       <label
-        htmlFor="confirm"
+        htmlFor={id}
         className={cn("select-none text-sm", checked && "text-accent")}
       >
         {label}
