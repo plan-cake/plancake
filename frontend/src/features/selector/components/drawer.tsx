@@ -15,6 +15,7 @@ export default function SelectorDrawer<TValue extends string | number>({
   open: controlledOpen,
   onOpenChange,
   drawerNesting = false,
+  disabled = false,
 }: DrawerProps<TValue>) {
   const [internalOpen, setInternalOpen] = useState(false);
 
@@ -23,6 +24,7 @@ export default function SelectorDrawer<TValue extends string | number>({
   const open = isControlled ? controlledOpen : internalOpen;
 
   const handleOpenChange = (newOpen: boolean) => {
+    if (disabled) return;
     if (!isControlled) {
       setInternalOpen(newOpen);
     }
@@ -59,11 +61,19 @@ export default function SelectorDrawer<TValue extends string | number>({
       trigger={
         <button
           id={id}
+          disabled={disabled}
           aria-label={`Select ${dialogTitle}`}
+          aria-disabled={disabled}
           className={cn(
-            "relative flex items-center rounded-2xl text-start hover:cursor-pointer focus:outline-none",
-            "bg-accent/15 hover:bg-accent/25 active:bg-accent/40 text-accent px-3 py-1",
-            open && "ring-accent ring-1",
+            "relative flex items-center rounded-2xl text-start focus:outline-none",
+            "bg-accent/15 text-accent px-3 py-1",
+            open && !disabled && "ring-accent ring-1",
+            // Interactive states only when enabled
+            !disabled &&
+              "hover:bg-accent/25 active:bg-accent/40 hover:cursor-pointer",
+            // Visual styles for disabled state
+            disabled &&
+              "bg-foreground/20 text-foreground hover:bg-foreground/20 active:bg-foreground/20 cursor-not-allowed opacity-50 hover:cursor-not-allowed",
           )}
         >
           <span className="text-wrap">{selectLabel}</span>

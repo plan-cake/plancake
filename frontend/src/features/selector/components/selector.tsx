@@ -14,7 +14,7 @@ export default function Selector<TValue extends string | number>(
     props.onChange(selectedValue as TValue);
   };
 
-  // dekstop uses dropdown selector
+  // desktop uses dropdown selector
   if (!isMobile) {
     return (
       <div className={props.className}>
