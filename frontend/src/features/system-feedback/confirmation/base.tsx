@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 
 import ActionButton from "@/features/button/components/action";
-import { FloatingDrawer } from "@/features/drawer/components/floating";
+import { FloatingDrawer } from "@/features/drawer";
 import { DIALOG_CONFIG } from "@/features/system-feedback/confirmation/config";
 import { ConfirmationDialogType } from "@/features/system-feedback/type";
 import { cn } from "@/lib/utils/classname";
@@ -108,6 +108,7 @@ export default function ConfirmationDialog({
         }
         contentClassName="h-fit"
         showHandle={false}
+        headerContent={<div className="h-2" />}
       >
         <div className="flex flex-col items-center">
           {showIcon && renderIcon()}

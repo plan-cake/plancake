@@ -1,4 +1,4 @@
-import { BaseDrawer } from "@/features/drawer/components/base";
+import { StandardDrawer } from "@/features/drawer";
 
 export default function AccountSettingsDrawer({
   children: trigger,
@@ -13,7 +13,7 @@ export default function AccountSettingsDrawer({
 }) {
   return (
     <div>
-      <BaseDrawer
+      <StandardDrawer
         open={open}
         onOpenChange={setOpen}
         frostedGlass
@@ -23,7 +23,7 @@ export default function AccountSettingsDrawer({
         trigger={trigger}
       >
         <div className="flex flex-1 flex-col overflow-y-auto">{content}</div>
-      </BaseDrawer>
+      </StandardDrawer>
     </div>
   );
 }

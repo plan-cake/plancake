@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
 import { useEventContext } from "@/core/event/context";
-import { BaseDrawer } from "@/features/drawer/components/base";
+import { StandardDrawer } from "@/features/drawer";
 import {
   Calendar,
   CalendarHandle,
@@ -35,7 +35,7 @@ export default function DateRangeDrawer({
   }, [open]);
 
   return (
-    <BaseDrawer
+    <StandardDrawer
       open={open}
       onOpenChange={setOpen}
       contentClassName="h-2/3"
@@ -77,6 +77,6 @@ export default function DateRangeDrawer({
         setDateRange={setDateRange}
         dateRangeError={errors.dateRange}
       />
-    </BaseDrawer>
+    </StandardDrawer>
   );
 }

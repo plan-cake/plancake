@@ -1,67 +1,132 @@
+import { useState } from "react";
+
 import { Drawer } from "vaul";
 
-import { SharedDrawerProps } from "@/features/drawer/props";
+import { DrawerProps } from "@/features/drawer/props";
 import { useDrawerResize } from "@/features/drawer/useDrawerResize";
 import { cn } from "@/lib/utils/classname";
 
-export interface StandardDrawerProps extends SharedDrawerProps {
-  snapPoints?: (number | string)[];
-  activeSnapPoint?: number | string | null;
-  setActiveSnapPoint?: (snap: number | string | null) => void;
-}
-
-export function BaseDrawer({
+export default function BaseDrawer({
+  _type = "standard",
   open,
   onOpenChange,
   trigger,
   title,
   headerContent,
-  footerContent,
   description = "Drawer contents",
   children,
-  snapPoints,
   contentClassName,
   bodyClassName,
   scrollableBody = true,
   showHandle = true,
   frostedGlass = false,
   modal = true,
-  showOverlay = modal,
+  showOverlay = !frostedGlass && modal,
   nested = false,
-  activeSnapPoint,
-  setActiveSnapPoint,
-}: StandardDrawerProps) {
+  ...rest
+}: DrawerProps) {
   useDrawerResize();
-  const DrawerComponent = nested ? Drawer.NestedRoot : Drawer.Root;
+
+  /**
+   * CONDITIONAL PROPS BASED ON VARIANT
+   *
+   * Since BaseDrawer is used for all variants, we need to conditionally handle
+   * props that only apply to certain types of drawers.
+   */
+  const snapPoints = "snapPoints" in rest ? rest.snapPoints : undefined;
+  const activeSnapPoint =
+    "activeSnapPoint" in rest ? rest.activeSnapPoint : undefined;
+  const setActiveSnapPoint =
+    "setActiveSnapPoint" in rest ? rest.setActiveSnapPoint : undefined;
+  const footerContent =
+    "footerContent" in rest ? rest.footerContent : undefined;
+  const pillHeaderContent =
+    "pillHeaderContent" in rest ? rest.pillHeaderContent : undefined;
+  const floatingAtLowestSnap =
+    "floatingAtLowestSnap" in rest ? rest.floatingAtLowestSnap : false;
+
+  /**
+   * SNAP POINT MANAGEMENT
+   *
+   * For standard and morphing drawers, we manage snap points to allow the drawer to
+   * be draggable between defined heights. Since morphing drawers can transition
+   * between a pill and a full drawer, we also track the lowest snap point.
+   */
+  const [internalSnap, setInternalSnap] = useState<number | string | null>(
+    snapPoints?.[0] ?? null,
+  );
+
+  const snap = activeSnapPoint !== undefined ? activeSnapPoint : internalSnap;
+  const setSnap = setActiveSnapPoint ?? setInternalSnap;
+  const [isDragging, setIsDragging] = useState(false);
+
+  const isLowestSnap = snapPoints && String(snap) === String(snapPoints[0]);
+
+  // It's a pill if it's explicitly 'floating', OR if it's 'morphing',
+  // at the lowest snap, not being dragged, AND floatingAtLowestSnap is true.
+  const isPill =
+    _type === "floating" ||
+    (_type === "morphing" &&
+      floatingAtLowestSnap &&
+      !!isLowestSnap &&
+      !isDragging);
+
+  const activeHeaderContent =
+    isPill && pillHeaderContent ? pillHeaderContent : headerContent;
+
+  const snapValue = typeof snap === "number" ? snap : parseFloat(String(snap));
+  const isFraction = !isNaN(snapValue) && snapValue > 0 && snapValue <= 1;
+  const visibleHeight = isFraction
+    ? `calc(${snapValue * 100}svh + 8px)`
+    : snap || "auto";
+
+  /**
+   * Z-INDEX CALCULATION FOR NESTED DRAWERS
+   *
+   * To ensure that nested drawers stack correctly, we calculate z-index values
+   * based on the nesting level. Each level of nesting increases the z-index to
+   * ensure proper stacking order.
+   */
+  const nestingLevel = typeof nested === "number" ? nested : nested ? 1 : 0;
+  const overlayZIndex = 40 + nestingLevel * 100;
+  const contentZIndex = 50 + nestingLevel * 100;
+  const footerZIndex = 60 + nestingLevel * 100;
 
   return (
-    <DrawerComponent
+    <Drawer.Root
       open={open}
       onOpenChange={onOpenChange}
       snapPoints={snapPoints}
       modal={modal}
-      activeSnapPoint={activeSnapPoint}
-      setActiveSnapPoint={setActiveSnapPoint}
+      activeSnapPoint={snap}
+      setActiveSnapPoint={setSnap}
+      onDrag={() => setIsDragging(true)}
+      onRelease={() => setIsDragging(false)}
     >
       {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
+
       <Drawer.Portal>
         {showOverlay && (
           <Drawer.Overlay
             className={cn(
               "fixed inset-0",
-              nested ? "z-[99]" : "z-40",
               frostedGlass ? "bg-black/1" : "bg-black/30",
             )}
+            style={{ zIndex: overlayZIndex }}
           />
         )}
 
-        {footerContent && (
+        {/* Fixed Footer (Visible when NOT a pill) */}
+        {!isPill && footerContent && (
           <div
             className={cn(
-              "fixed bottom-0 left-0 right-0 z-[60] w-full shrink-0 px-4 transition-transform duration-300",
+              "fixed bottom-0 left-0 right-0 w-full shrink-0 px-4 pt-2",
               !frostedGlass && "bg-panel",
+              "transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
               open ? "translate-y-0" : "translate-y-full",
+              "border-transparent shadow-none",
             )}
+            style={{ zIndex: footerZIndex }}
           >
             {footerContent}
           </div>
@@ -69,60 +134,122 @@ export function BaseDrawer({
 
         <Drawer.Content
           className={cn(
-            "fixed bottom-0 left-0 right-0 flex h-[100svh] flex-col bg-transparent outline-none transition-all duration-300",
-            nested ? "z-[100]" : "z-50",
+            "fixed bottom-0 left-0 right-0 flex outline-none",
+            _type !== "floating" && "h-[100svh]",
             contentClassName,
           )}
+          style={{ zIndex: contentZIndex }}
         >
           <div
-            className={cn(
-              "border-foreground/10 mx-auto flex h-full w-full max-w-full flex-col overflow-hidden rounded-t-[32px] border shadow-none",
-              frostedGlass ? "frosted-glass" : "bg-panel",
-            )}
+            className="flex w-full flex-col transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            style={{
+              height: isPill && _type === "morphing" ? visibleHeight : "100%",
+            }}
           >
-            {/* The flex-col fix is applied here */}
-            <div className="flex h-full w-full flex-col">
-              <div className="shrink-0 px-6">
-                {showHandle && (
-                  <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
-                )}
-                <div className={cn(showHandle && "mt-1")}>
-                  {(title || headerContent) && (
-                    <div className="flex items-center">
-                      {headerContent ? (
-                        <>
-                          <Drawer.Title className="sr-only">
+            {/* Invisible spacer that pushes the morphing pill down */}
+            {_type === "morphing" && (
+              <div
+                className="pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                style={{
+                  flexGrow: isPill ? 1 : 0,
+                  flexBasis: isPill ? "auto" : "0px",
+                  minHeight: 0,
+                }}
+              />
+            )}
+
+            <div
+              className={cn(
+                "mx-auto flex w-full flex-col overflow-hidden transition-[max-width,border-radius,margin] duration-300",
+                isPill
+                  ? "border-foreground/10 rounded-4xl mb-4 max-w-[calc(100%-2rem)] border"
+                  : "border-foreground/10 max-w-full rounded-t-[32px] border",
+                frostedGlass ? "frosted-glass" : "bg-panel",
+                !isPill && "min-h-0 flex-1",
+              )}
+            >
+              <div
+                onPointerDown={() => setIsDragging(true)}
+                onPointerUp={() => setIsDragging(false)}
+                onPointerCancel={() => setIsDragging(false)}
+                className="flex h-full min-h-0 w-full flex-col"
+              >
+                <div className="shrink-0 px-6 pb-2">
+                  {showHandle && (
+                    <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
+                  )}
+                  <div className={cn(showHandle && "mt-1")}>
+                    {(title || headerContent) && (
+                      <div
+                        className={cn(
+                          isPill ? "text-center" : "flex items-center",
+                        )}
+                      >
+                        {activeHeaderContent ? (
+                          <>
+                            <Drawer.Title className="sr-only">
+                              {title}
+                            </Drawer.Title>
+                            <div className={cn(!isPill && "flex-1")}>
+                              {activeHeaderContent}
+                            </div>
+                          </>
+                        ) : (
+                          <Drawer.Title
+                            className={cn(
+                              "mb-0 text-lg font-semibold",
+                              !isPill && "flex-1",
+                            )}
+                          >
                             {title}
                           </Drawer.Title>
-                          <div className="flex-1">{headerContent}</div>
-                        </>
-                      ) : (
-                        <Drawer.Title className="mb-0 flex-1 text-lg font-semibold">
-                          {title}
-                        </Drawer.Title>
-                      )}
-                    </div>
+                        )}
+                      </div>
+                    )}
+                    <Drawer.Description className="sr-only">
+                      {description}
+                    </Drawer.Description>
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    "min-h-0 flex-1 px-7 pb-4",
+                    scrollableBody && "overflow-y-auto",
+                    bodyClassName,
+                    isPill && _type === "morphing" && "hidden",
                   )}
-                  <Drawer.Description className="sr-only">
-                    {description}
-                  </Drawer.Description>
+                  data-vaul-no-drag
+                >
+                  {children}
+
+                  {/** Spacer for standard/morphing drawers to account for Vaul's shift */}
+                  {!isPill && scrollableBody && (
+                    <div
+                      className="shrink-0"
+                      style={{
+                        height: "calc(var(--snap-point-height, 0px) + 50px)",
+                      }}
+                    />
+                  )}
                 </div>
               </div>
 
-              <div
-                className={cn(
-                  "flex-1 px-6",
-                  footerContent ? "pb-28" : "pb-4",
-                  scrollableBody && "overflow-y-auto",
-                  bodyClassName,
-                )}
-              >
-                {children}
-              </div>
+              {/* Inline Footer (Visible when it IS a pill) */}
+              {footerContent && isPill && (
+                <div
+                  className={cn(
+                    "m-4 mt-auto shrink-0",
+                    !frostedGlass && "bg-panel",
+                  )}
+                >
+                  {footerContent}
+                </div>
+              )}
             </div>
           </div>
         </Drawer.Content>
       </Drawer.Portal>
-    </DrawerComponent>
+    </Drawer.Root>
   );
 }

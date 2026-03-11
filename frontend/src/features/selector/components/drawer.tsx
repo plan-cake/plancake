@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import { BaseDrawer } from "@/features/drawer/components/base";
-import { FloatingDrawer } from "@/features/drawer/components/floating";
+import { StandardDrawer, FloatingDrawer } from "@/features/drawer";
 import { DrawerProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
@@ -47,10 +46,11 @@ export default function SelectorDrawer<TValue extends string | number>({
     }
   }, [open]);
 
-  const DrawerComponent = asNestedDrawer ? FloatingDrawer : BaseDrawer;
+  const DrawerComponent = asNestedDrawer ? FloatingDrawer : StandardDrawer;
 
   return (
     <DrawerComponent
+      // nested={2}
       open={open}
       onOpenChange={handleOpenChange}
       title={dialogTitle}

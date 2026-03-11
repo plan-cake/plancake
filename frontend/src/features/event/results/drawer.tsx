@@ -4,8 +4,7 @@ import { GearIcon, Pencil2Icon } from "@radix-ui/react-icons";
 
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
-import { FloatingDrawer } from "@/features/drawer/components/floating";
-import { MorphingDrawer } from "@/features/drawer/components/morph";
+import { FloatingDrawer, MorphingDrawer } from "@/features/drawer";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
 import { useResultsContext } from "@/features/event/results/context";
@@ -90,6 +89,7 @@ export default function ResultsDrawer({
       footerContent={
         <div className="mx-1 flex grow justify-between gap-2">
           <FloatingDrawer
+            nested
             open={openSettings}
             onOpenChange={setSettings}
             trigger={settingsButton}
