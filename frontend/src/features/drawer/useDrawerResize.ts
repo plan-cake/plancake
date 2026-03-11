@@ -17,11 +17,19 @@ export function useDrawerResize() {
       }, 300);
     };
 
-    window.visualViewport?.addEventListener("resize", onResize);
+    const hasVisualViewport =
+      typeof window !== "undefined" && !!window.visualViewport;
+    if (hasVisualViewport) {
+      window.visualViewport!.addEventListener("resize", onResize);
+    } else {
+      window.addEventListener("resize", onResize);
+    }
     return () => {
-      window.visualViewport?.removeEventListener("resize", onResize);
-      clearTimeout(timeout);
-      document.body.classList.remove("vaul-resizing");
+      if (hasVisualViewport) {
+        window.visualViewport!.removeEventListener("resize", onResize);
+      } else {
+        window.removeEventListener("resize", onResize);
+      }
     };
   }, []);
 }
