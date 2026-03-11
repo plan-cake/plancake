@@ -102,9 +102,9 @@ export default function ResultsDrawer({
             <ViewSettings
               timezone={timezone}
               onTimezoneChange={onTimezoneChange}
-              inDrawer
               open={isTimezoneOpen}
               setOpen={setTimezoneOpen}
+              drawerNesting={2}
             />
           </FloatingDrawer>
           {paintingButton}

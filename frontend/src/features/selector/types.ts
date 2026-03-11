@@ -69,9 +69,14 @@ export type DrawerProps<TValue extends string | number> =
      * If the drawer is nested, it will adjust styling to become a floating drawer
      * instead of a regular bottom sheet drawer.
      *
+     * The nesting level of the drawer.
+     * - `false` or `0`: Base level drawer.
+     * - `true`: First level nested drawer (Level 1).
+     * - `number`: Deeply nested drawers (Level 2, 3, etc.).
+     *
      * @default false
      */
-    asNestedDrawer?: boolean;
+    nestingLevel?: boolean | number;
     /**
      * Controlled open state for the drawer.
      */

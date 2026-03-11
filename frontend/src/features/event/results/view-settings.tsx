@@ -5,15 +5,15 @@ import { useResultsContext } from "@/features/event/results/context";
 export default function ViewSettings({
   timezone,
   onTimezoneChange,
-  inDrawer = false,
   open = false,
   setOpen,
+  drawerNesting = 0,
 }: {
   timezone: string;
   onTimezoneChange: (newTZ: string) => void;
-  inDrawer?: boolean;
   open?: boolean;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  drawerNesting?: number;
 }) {
   const { showOnlyBestTimes, setShowOnlyBestTimes } = useResultsContext();
 
@@ -31,7 +31,7 @@ export default function ViewSettings({
             id="timezone-select"
             value={timezone}
             onChange={onTimezoneChange}
-            asNestedDrawer={inDrawer}
+            drawerNesting={drawerNesting}
             open={open}
             onOpenChange={setOpen}
           />

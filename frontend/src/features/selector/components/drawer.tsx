@@ -14,7 +14,7 @@ export default function SelectorDrawer<TValue extends string | number>({
   textStart = false,
   open: controlledOpen,
   onOpenChange,
-  asNestedDrawer = false,
+  drawerNesting = false,
 }: DrawerProps<TValue>) {
   const [internalOpen, setInternalOpen] = useState(false);
 
@@ -46,11 +46,11 @@ export default function SelectorDrawer<TValue extends string | number>({
     }
   }, [open]);
 
-  const DrawerComponent = asNestedDrawer ? FloatingDrawer : StandardDrawer;
+  const DrawerComponent = drawerNesting ? FloatingDrawer : StandardDrawer;
 
   return (
     <DrawerComponent
-      // nested={2}
+      nested={drawerNesting}
       open={open}
       onOpenChange={handleOpenChange}
       title={dialogTitle}
