@@ -53,7 +53,7 @@ export function FloatingDrawer({
             )}
           >
             <div className="flex h-full w-full flex-col">
-              <div className="shrink-0 px-8">
+              <div className="shrink-0 px-6">
                 {showHandle && (
                   <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
                 )}
@@ -72,7 +72,7 @@ export function FloatingDrawer({
 
               <div
                 className={cn(
-                  "flex-1 px-8 pb-4 pt-4",
+                  "flex-1 px-6 pb-4 pt-4",
                   scrollableBody && "overflow-y-auto",
                   bodyClassName,
                 )}

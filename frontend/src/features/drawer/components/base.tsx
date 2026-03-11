@@ -82,7 +82,7 @@ export function BaseDrawer({
           >
             {/* The flex-col fix is applied here */}
             <div className="flex h-full w-full flex-col">
-              <div className="shrink-0 px-8">
+              <div className="shrink-0 px-6">
                 {showHandle && (
                   <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
                 )}
@@ -111,7 +111,7 @@ export function BaseDrawer({
 
               <div
                 className={cn(
-                  "flex-1 px-8",
+                  "flex-1 px-6",
                   footerContent ? "pb-28" : "pb-4",
                   scrollableBody && "overflow-y-auto",
                   bodyClassName,
