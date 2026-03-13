@@ -12,7 +12,7 @@ from api.availability.serializers import (
     EventCodeSerializer,
 )
 from api.availability.utils import check_name_available, get_timeslots, get_weekday_date
-from api.decorators import api_endpoint
+from api.decorators import api_endpoint, check_auth
 from api.models import (
     AvailabilityStatus,
     EventDateAvailability,
@@ -23,7 +23,6 @@ from api.models import (
 from api.settings import GENERIC_ERR_RESPONSE
 from api.utils import (
     MessageOutputSerializer,
-    check_auth,
     rate_limit,
     require_auth,
     validate_json_input,
