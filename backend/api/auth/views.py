@@ -18,7 +18,7 @@ from api.auth.serializers import (
     RegisterAccountSerializer,
 )
 from api.auth.utils import list_failed_criteria, validate_password
-from api.decorators import api_endpoint
+from api.decorators import api_endpoint, require_account_auth
 from api.models import (
     PasswordResetToken,
     UnverifiedUserAccount,
@@ -39,7 +39,6 @@ from api.utils import (
     delete_session_cookie,
     get_session,
     rate_limit,
-    require_account_auth,
     set_session_cookie,
     validate_json_input,
     validate_output,
