@@ -7,7 +7,6 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from django.db import DatabaseError, transaction
 from django.db.models import Q
 from rest_framework import serializers
-from rest_framework.decorators import api_view
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
@@ -53,29 +52,6 @@ def get_metadata(func):
     if not hasattr(func, "metadata"):
         func.metadata = APIMetadata()
     return func.metadata
-
-
-def api_endpoint(method):
-    """
-    Defines an API endpoint that uses a single method type.
-
-    **This must be the outer-most decorator for the view function to work properly.**
-    """
-
-    def decorator(func):
-        drf_view = api_view([method])(func)
-        metadata = get_metadata(func)
-        metadata.method = method
-        drf_view.metadata = metadata
-        # Check if the endpoint has an output serializer
-        if not metadata.output_serializer_class:
-            logger.warning(
-                "No output serializer defined for function: %s",
-                func.__name__,
-            )
-        return drf_view
-
-    return decorator
 
 
 def get_session(token):

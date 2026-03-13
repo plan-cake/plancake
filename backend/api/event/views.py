@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
 from api.availability.utils import get_weekday_date
+from api.decorators import api_endpoint
 from api.event.serializers import (
     CustomCodeSerializer,
     DateEventCreateSerializer,
@@ -30,7 +31,6 @@ from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEve
 from api.settings import GENERIC_ERR_RESPONSE
 from api.utils import (
     MessageOutputSerializer,
-    api_endpoint,
     check_auth,
     format_event_info,
     rate_limit,

@@ -4,10 +4,10 @@ from django.db import DatabaseError, transaction
 from rest_framework.response import Response
 
 from api.availability.serializers import DisplayNameSerializer
+from api.decorators import api_endpoint
 from api.settings import GENERIC_ERR_RESPONSE
 from api.utils import (
     MessageOutputSerializer,
-    api_endpoint,
     require_account_auth,
     validate_json_input,
     validate_output,
