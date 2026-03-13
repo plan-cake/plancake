@@ -90,7 +90,6 @@ export default function BaseDrawer({
   const nestingLevel = typeof nested === "number" ? nested : nested ? 1 : 0;
   const overlayZIndex = 40 + nestingLevel * 100;
   const contentZIndex = 50 + nestingLevel * 100;
-  const footerZIndex = 60 + nestingLevel * 100;
 
   return (
     <Drawer.Root
@@ -116,22 +115,6 @@ export default function BaseDrawer({
           />
         )}
 
-        {/* Fixed Footer (Visible when NOT a pill) */}
-        {!isPill && footerContent && (
-          <div
-            className={cn(
-              "fixed bottom-0 left-0 right-0 w-full shrink-0 px-4 pt-2",
-              !frostedGlass && "bg-panel",
-              "transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-              open ? "translate-y-0" : "translate-y-full",
-              "border-transparent shadow-none",
-            )}
-            style={{ zIndex: footerZIndex }}
-          >
-            {footerContent}
-          </div>
-        )}
-
         <Drawer.Content
           className={cn(
             "fixed bottom-0 left-0 right-0 flex outline-none",
@@ -143,7 +126,7 @@ export default function BaseDrawer({
           <div
             className="flex w-full flex-col transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
             style={{
-              height: isPill && _type === "morphing" ? visibleHeight : "100%",
+              height: isPill && _type === "morphing" ? visibleHeight : "100svh",
             }}
           >
             {/* Invisible spacer that pushes the morphing pill down */}
@@ -169,10 +152,10 @@ export default function BaseDrawer({
               )}
             >
               <div
-                onPointerDown={() => setIsDragging(true)}
-                onPointerUp={() => setIsDragging(false)}
-                onPointerCancel={() => setIsDragging(false)}
-                className="flex h-full min-h-0 w-full flex-col"
+                onClick={() => setSnap(snapPoints?.[1] ?? null)}
+                onTouchMove={() => setIsDragging(true)}
+                onTouchEnd={() => setIsDragging(false)}
+                className="flex h-full min-h-0 w-full flex-1 flex-col"
               >
                 <div className="shrink-0 px-6 pb-2">
                   {showHandle && (
@@ -214,38 +197,40 @@ export default function BaseDrawer({
 
                 <div
                   className={cn(
-                    "min-h-0 flex-1 px-7 pb-4",
+                    "min-h-0 flex-1 px-7 transition-opacity duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
                     scrollableBody && "overflow-y-auto",
                     bodyClassName,
-                    isPill && _type === "morphing" && "hidden",
+                    isPill && _type === "morphing"
+                      ? "pointer-events-none pb-0 opacity-0"
+                      : "pb-4 opacity-100",
                   )}
                   data-vaul-no-drag
                 >
-                  {children}
-
-                  {/** Spacer for standard/morphing drawers to account for Vaul's shift */}
-                  {!isPill && scrollableBody && (
-                    <div
-                      className="shrink-0"
-                      style={{
-                        height: "calc(var(--snap-point-height, 0px) + 50px)",
-                      }}
-                    />
-                  )}
+                  {(!isPill || _type !== "morphing") && children}
                 </div>
+
+                {footerContent && (
+                  <div
+                    className={cn(
+                      "shrink-0 px-4 pt-2",
+                      isPill && _type === "morphing" && "px-3 pb-3 pt-0",
+                      !frostedGlass && "bg-panel",
+                    )}
+                  >
+                    {footerContent}
+                  </div>
+                )}
+
+                {/** Spacer for standard/morphing drawers to account for Vaul's shift */}
+                {!isPill && scrollableBody && (
+                  <div
+                    className="shrink-0 bg-transparent"
+                    style={{
+                      height: "calc(var(--snap-point-height, 0px))",
+                    }}
+                  />
+                )}
               </div>
-
-              {/* Inline Footer (Visible when it IS a pill) */}
-              {footerContent && isPill && (
-                <div
-                  className={cn(
-                    "m-4 mt-auto shrink-0",
-                    !frostedGlass && "bg-panel",
-                  )}
-                >
-                  {footerContent}
-                </div>
-              )}
             </div>
           </div>
         </Drawer.Content>
