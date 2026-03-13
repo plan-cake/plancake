@@ -5,7 +5,6 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.db.models import Q
 from rest_framework import serializers
-from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 
 from api.availability.utils import get_weekday_date
@@ -106,104 +105,13 @@ def delete_session_cookie(response, key):
     response.delete_cookie(key, domain=COOKIE_DOMAIN)
 
 
-def fix_choice_field_errors(serializer):
-    errors = serializer.errors
-    # Check if there are any ChoiceFields with invalid choices
-    choice_field_errors = [
-        field_name
-        for field_name in errors
-        if isinstance(serializer.fields[field_name], serializers.ChoiceField)
-        and any("is not a valid choice" in err for err in serializer.errors[field_name])
-    ]
-    # Change the error message to say the valid values
-    for choice_field in choice_field_errors:
-        valid_values = serializer.fields[choice_field].choices
-        errors[choice_field] = [
-            f"Invalid value. Valid values are: {', '.join(valid_values)}"
-        ]
-    return errors
-
-
-def validate_json_input(serializer_class):
-    """
-    A decorator to validate JSON input data for a view function.
-
-    The `serializer_class` is used to validate the request data.
-    """
-
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(request, *args, **kwargs):
-            if request.content_type != "application/json":
-                return Response(
-                    {"error": {"general": ["Request body must be JSON."]}},
-                    status=415,
-                )
-            try:
-                serializer = serializer_class(data=request.data)
-            except ParseError:
-                return Response(
-                    {"error": {"general": ["Invalid JSON."]}},
-                    status=400,
-                )
-            if not serializer.is_valid():
-                errors = fix_choice_field_errors(serializer)
-                return Response({"error": errors}, status=400)
-            request.validated_data = serializer.validated_data
-            return func(request, *args, **kwargs)
-
-        metadata = get_metadata(wrapper)
-        metadata.input_type = "JSON Body"
-        metadata.input_serializer_class = serializer_class
-        return wrapper
-
-    return decorator
-
-
-def validate_query_param_input(serializer_class):
-    """
-    A decorator to validate query parameters for a view function.
-
-    The `serializer_class` is used to validate the query parameters.
-    """
-
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(request, *args, **kwargs):
-            # Parse the query parameters into a dictionary
-            # This allows for both single and multiple values for the same key
-            query_dict = {}
-            for key in request.query_params:
-                value = request.query_params.getlist(key)
-                if isinstance(value, list):
-                    if len(value) == 1:
-                        query_dict[key] = value[0]
-                    else:
-                        query_dict[key] = value
-                elif isinstance(value, str):
-                    query_dict[key] = value
-
-            serializer = serializer_class(data=query_dict)
-            if not serializer.is_valid():
-                errors = fix_choice_field_errors(serializer)
-                return Response({"error": errors}, status=400)
-            request.validated_data = serializer.validated_data
-            return func(request, *args, **kwargs)
-
-        metadata = get_metadata(wrapper)
-        metadata.input_type = "Query Parameters"
-        metadata.input_serializer_class = serializer_class
-        return wrapper
-
-    return decorator
-
-
 def validate_error_format(data, input_serializer_class):
     """
     A helper function to make sure that error messages are returned in whatever crazy
     format I decided to use for this project.
 
     Expected format:
+    ```
     {
         "error": {
             "general/[input serializer field name]": [
@@ -213,6 +121,7 @@ def validate_error_format(data, input_serializer_class):
             ...
         }
     }
+    ```
     """
 
     def log_error_msg_error(message):
