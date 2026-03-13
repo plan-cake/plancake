@@ -1,11 +1,9 @@
-import functools
 import logging
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.db.models import Q
 from rest_framework import serializers
-from rest_framework.response import Response
 
 from api.availability.utils import get_weekday_date
 from api.models import UserEvent, UserSession
@@ -13,7 +11,6 @@ from api.settings import (
     COOKIE_DOMAIN,
     DEBUG,
     LONG_SESS_EXP_SECONDS,
-    REST_FRAMEWORK,
     SESS_EXP_SECONDS,
     TEST_ENVIRONMENT,
 )
@@ -106,41 +103,6 @@ def delete_session_cookie(response, key):
 
 class MessageOutputSerializer(serializers.Serializer):
     message = serializers.ListField(child=serializers.CharField())
-
-
-def get_rate_limit(scope):
-    return REST_FRAMEWORK.get("DEFAULT_THROTTLE_RATES", {}).get(scope, None)
-
-
-def rate_limit(
-    throttle_class, error_message="Rate limit ({rate}) exceeded. Try again later."
-):
-    """
-    A decorator that takes a throttle class and limits the endpoint accordingly.
-
-    An optional message can be passed, which can include the `{rate}` placeholder to
-    dynamically insert the rate limit value.
-    """
-
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(request, *args, **kwargs):
-            throttle = throttle_class()
-            if not throttle.allow_request(request, None):
-                msg = error_message
-                if "{rate}" in msg:
-                    msg = msg.replace("{rate}", throttle.get_rate())
-                logger.warning(msg)
-                return Response(
-                    {"error": {"general": [msg]}},
-                    status=429,
-                )
-            return func(request, *args, **kwargs)
-
-        get_metadata(wrapper).rate_limit = get_rate_limit(throttle_class.scope)
-        return wrapper
-
-    return decorator
 
 
 class TimeZoneField(serializers.CharField):

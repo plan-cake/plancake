@@ -20,6 +20,7 @@ from api.auth.serializers import (
 from api.auth.utils import list_failed_criteria, validate_password
 from api.decorators import (
     api_endpoint,
+    rate_limit,
     require_account_auth,
     validate_json_input,
     validate_output,
@@ -43,7 +44,6 @@ from api.utils import (
     MessageOutputSerializer,
     delete_session_cookie,
     get_session,
-    rate_limit,
     set_session_cookie,
 )
 

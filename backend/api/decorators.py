@@ -11,7 +11,12 @@ from rest_framework.throttling import AnonRateThrottle
 
 from api.availability.utils import get_weekday_date
 from api.models import UserAccount, UserSession
-from api.settings import ACCOUNT_COOKIE_NAME, GENERIC_ERR_RESPONSE, GUEST_COOKIE_NAME
+from api.settings import (
+    ACCOUNT_COOKIE_NAME,
+    GENERIC_ERR_RESPONSE,
+    GUEST_COOKIE_NAME,
+    REST_FRAMEWORK,
+)
 from api.utils import (
     delete_session_cookie,
     get_metadata,
@@ -545,6 +550,41 @@ def validate_output(serializer_class):
                 return GENERIC_ERR_RESPONSE
 
         get_metadata(wrapper).output_serializer_class = serializer_class
+        return wrapper
+
+    return decorator
+
+
+def get_rate_limit(scope):
+    return REST_FRAMEWORK.get("DEFAULT_THROTTLE_RATES", {}).get(scope, None)
+
+
+def rate_limit(
+    throttle_class, error_message="Rate limit ({rate}) exceeded. Try again later."
+):
+    """
+    A decorator that takes a throttle class and limits the endpoint accordingly.
+
+    An optional message can be passed, which can include the `{rate}` placeholder to
+    dynamically insert the rate limit value.
+    """
+
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(request, *args, **kwargs):
+            throttle = throttle_class()
+            if not throttle.allow_request(request, None):
+                msg = error_message
+                if "{rate}" in msg:
+                    msg = msg.replace("{rate}", throttle.get_rate())
+                logger.warning(msg)
+                return Response(
+                    {"error": {"general": [msg]}},
+                    status=429,
+                )
+            return func(request, *args, **kwargs)
+
+        get_metadata(wrapper).rate_limit = get_rate_limit(throttle_class.scope)
         return wrapper
 
     return decorator

@@ -15,6 +15,7 @@ from api.availability.utils import check_name_available, get_timeslots, get_week
 from api.decorators import (
     api_endpoint,
     check_auth,
+    rate_limit,
     require_auth,
     validate_json_input,
     validate_output,
@@ -28,7 +29,7 @@ from api.models import (
     UserEvent,
 )
 from api.settings import GENERIC_ERR_RESPONSE
-from api.utils import MessageOutputSerializer, rate_limit
+from api.utils import MessageOutputSerializer
 
 logger = logging.getLogger("api")
 
