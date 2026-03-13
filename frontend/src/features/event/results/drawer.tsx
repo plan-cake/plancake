@@ -8,7 +8,7 @@ import { FloatingDrawer, MorphingDrawer } from "@/features/drawer";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
 import { useResultsContext } from "@/features/event/results/context";
-import ViewSettings from "@/features/event/results/view-settings";
+import DisplaySettings from "@/features/event/results/display-settings";
 import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
 
 export default function ResultsDrawer({
@@ -93,13 +93,13 @@ export default function ResultsDrawer({
             open={openSettings}
             onOpenChange={setSettings}
             trigger={settingsButton}
-            title="View Settings"
-            description="View Settings"
+            title="Display Settings"
+            description="Display Settings"
             headerContent={
-              <h1 className="flex-1 text-lg font-semibold">View Settings</h1>
+              <h1 className="flex-1 text-lg font-semibold">Display Settings</h1>
             }
           >
-            <ViewSettings
+            <DisplaySettings
               timezone={timezone}
               onTimezoneChange={onTimezoneChange}
               open={isTimezoneOpen}

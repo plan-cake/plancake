@@ -2,7 +2,7 @@
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 // import { useResultsContext } from "@/features/event/results/context";
 
-export default function ViewSettings({
+export default function DisplaySettings({
   timezone,
   onTimezoneChange,
   open = false,

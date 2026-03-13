@@ -16,9 +16,9 @@ import {
   ResultsProvider,
   useResultsContext,
 } from "@/features/event/results/context";
+import DisplaySettings from "@/features/event/results/display-settings";
 import ResultsDrawer from "@/features/event/results/drawer";
 import { ResultsInformation } from "@/features/event/results/lib/types";
-import ViewSettings from "@/features/event/results/view-settings";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -175,7 +175,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           <div className="top-25 sticky flex max-h-[calc(100vh-8rem)] flex-col gap-y-4">
             <AttendeesPanel />
             <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
-              <ViewSettings
+              <DisplaySettings
                 timezone={timezone}
                 onTimezoneChange={handleTZChange}
               />
