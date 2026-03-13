@@ -5,7 +5,7 @@ from django.db.models import Prefetch, Q
 from rest_framework import serializers
 from rest_framework.response import Response
 
-from api.decorators import api_endpoint, check_auth
+from api.decorators import api_endpoint, check_auth, validate_output
 from api.models import (
     EventDateTimeslot,
     EventParticipant,
@@ -13,7 +13,7 @@ from api.models import (
     UserEvent,
 )
 from api.settings import GENERIC_ERR_RESPONSE
-from api.utils import TimeZoneField, format_event_info, validate_output
+from api.utils import TimeZoneField, format_event_info
 
 logger = logging.getLogger("api")
 

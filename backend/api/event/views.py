@@ -13,6 +13,7 @@ from api.decorators import (
     check_auth,
     require_auth,
     validate_json_input,
+    validate_output,
     validate_query_param_input,
 )
 from api.event.serializers import (
@@ -35,12 +36,7 @@ from api.event.utils import (
 )
 from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
 from api.settings import GENERIC_ERR_RESPONSE
-from api.utils import (
-    MessageOutputSerializer,
-    format_event_info,
-    rate_limit,
-    validate_output,
-)
+from api.utils import MessageOutputSerializer, format_event_info, rate_limit
 
 logger = logging.getLogger("api")
 

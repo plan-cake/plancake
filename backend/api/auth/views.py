@@ -18,7 +18,12 @@ from api.auth.serializers import (
     RegisterAccountSerializer,
 )
 from api.auth.utils import list_failed_criteria, validate_password
-from api.decorators import api_endpoint, require_account_auth, validate_json_input
+from api.decorators import (
+    api_endpoint,
+    require_account_auth,
+    validate_json_input,
+    validate_output,
+)
 from api.models import (
     PasswordResetToken,
     UnverifiedUserAccount,
@@ -40,7 +45,6 @@ from api.utils import (
     get_session,
     rate_limit,
     set_session_cookie,
-    validate_output,
 )
 
 logger = logging.getLogger("api")

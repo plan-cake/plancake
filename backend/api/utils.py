@@ -12,7 +12,6 @@ from api.models import UserEvent, UserSession
 from api.settings import (
     COOKIE_DOMAIN,
     DEBUG,
-    GENERIC_ERR_RESPONSE,
     LONG_SESS_EXP_SECONDS,
     REST_FRAMEWORK,
     SESS_EXP_SECONDS,
@@ -105,88 +104,8 @@ def delete_session_cookie(response, key):
     response.delete_cookie(key, domain=COOKIE_DOMAIN)
 
 
-def validate_error_format(data, input_serializer_class):
-    """
-    A helper function to make sure that error messages are returned in whatever crazy
-    format I decided to use for this project.
-
-    Expected format:
-    ```
-    {
-        "error": {
-            "general/[input serializer field name]": [
-                "Error message",
-                ...
-            ],
-            ...
-        }
-    }
-    ```
-    """
-
-    def log_error_msg_error(message):
-        logger.error("Error message validation error: %s", message)
-
-    if not isinstance(data, dict):
-        log_error_msg_error("Response must be a dictionary.")
-
-    if "error" not in data or not isinstance(data["error"], dict):
-        log_error_msg_error("Response must contain an 'error' dictionary.")
-
-    if input_serializer_class:
-        for field_name, value in data["error"].items():
-            if field_name not in input_serializer_class().fields:
-                if field_name != "general":
-                    log_error_msg_error(
-                        f"{field_name} must be a field name from the input serializer."
-                    )
-            if not isinstance(value, list):
-                log_error_msg_error(f"{field_name} must be a list.")
-            if not all(isinstance(item, str) for item in value):
-                log_error_msg_error(f"All items in {field_name} must be strings.")
-    else:
-        for field_name, value in data["error"].items():
-            if field_name != "general":
-                log_error_msg_error(
-                    f"{field_name} must be named 'general' if no input serializer is provided."
-                )
-            if not isinstance(value, list):
-                log_error_msg_error(f"{field_name} must be a list.")
-
-
 class MessageOutputSerializer(serializers.Serializer):
     message = serializers.ListField(child=serializers.CharField())
-
-
-def validate_output(serializer_class):
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(request, *args, **kwargs):
-            response = func(request, *args, **kwargs)
-            if isinstance(response, Response):
-                if 200 <= response.status_code < 300:
-                    serializer = serializer_class(data=response.data)
-                    if serializer.is_valid():
-                        response.data = serializer.validated_data
-                        return response
-                    else:
-                        logger.error("Output validation failed: %s", serializer.errors)
-                        return GENERIC_ERR_RESPONSE
-                else:
-                    validate_error_format(
-                        response.data, get_metadata(wrapper).input_serializer_class
-                    )
-                    # If the format is bad, just print errors to the log and move on
-                    # We don't want errors causing errors to cause problems in prod
-                    return response
-            else:
-                logger.critical("Response is not a valid Response object.")
-                return GENERIC_ERR_RESPONSE
-
-        get_metadata(wrapper).output_serializer_class = serializer_class
-        return wrapper
-
-    return decorator
 
 
 def get_rate_limit(scope):

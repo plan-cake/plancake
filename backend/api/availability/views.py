@@ -17,6 +17,7 @@ from api.decorators import (
     check_auth,
     require_auth,
     validate_json_input,
+    validate_output,
     validate_query_param_input,
 )
 from api.models import (
@@ -27,7 +28,7 @@ from api.models import (
     UserEvent,
 )
 from api.settings import GENERIC_ERR_RESPONSE
-from api.utils import MessageOutputSerializer, rate_limit, validate_output
+from api.utils import MessageOutputSerializer, rate_limit
 
 logger = logging.getLogger("api")
 
