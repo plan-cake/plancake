@@ -128,7 +128,12 @@ export default function BaseDrawer({
           <div
             className="flex w-full flex-col transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
             style={{
-              height: isPill && _type === "morphing" ? visibleHeight : "100%",
+              height:
+                _type === "floating"
+                  ? "auto"
+                  : isPill && _type === "morphing"
+                    ? visibleHeight
+                    : "100%",
             }}
           >
             {/* Invisible spacer that pushes the morphing pill down */}
