@@ -94,9 +94,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     />
   );
 
-  const editButton = (
+  const editButton = (buttonStyle: "frosted glass inset" | "secondary") => (
     <LinkButton
-      buttonStyle="frosted glass inset"
+      buttonStyle={buttonStyle}
       icon={<Pencil1Icon />}
       label="Edit Event"
       href={`/${eventCode}/edit`}
@@ -119,14 +119,17 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           <KebabMenu
             buttons={
               isCreator
-                ? [editButton, copyButton("frosted glass inset")]
+                ? [
+                    editButton("frosted glass inset"),
+                    copyButton("frosted glass inset"),
+                  ]
                 : [copyButton("frosted glass inset")]
             }
           />
         </div>
 
         <div className="ml-auto hidden flex-wrap justify-end gap-2 md:flex">
-          {isCreator && editButton}
+          {isCreator && editButton("secondary")}
           {copyButton("secondary")}
           {paintingButton}
         </div>
