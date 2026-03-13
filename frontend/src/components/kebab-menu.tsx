@@ -10,8 +10,8 @@ import { cn } from "@/lib/utils/classname";
 const morphTransition: Transition = {
   type: "spring",
   damping: 25,
-  stiffness: 300,
-  mass: 1,
+  stiffness: 400,
+  mass: 0.8,
 };
 
 export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
@@ -30,6 +30,7 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
       <AnimatePresence>
         {!isOpen ? (
           <motion.div
+            layout
             key="trigger"
             layoutId={"popover-morph-" + id}
             transition={morphTransition}
@@ -52,6 +53,7 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
 
             <motion.div
               key="content"
+              layout
               layoutId={"popover-morph-" + id}
               transition={morphTransition}
               className={cn(
