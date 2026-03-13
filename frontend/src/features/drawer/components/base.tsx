@@ -97,6 +97,7 @@ export default function BaseDrawer({
       onOpenChange={onOpenChange}
       snapPoints={snapPoints}
       modal={modal}
+      dismissible={_type === "morphing" ? !isPill : true}
       activeSnapPoint={snap}
       setActiveSnapPoint={setSnap}
       onDrag={() => setIsDragging(true)}
@@ -107,6 +108,7 @@ export default function BaseDrawer({
       <Drawer.Portal>
         {showOverlay && (
           <Drawer.Overlay
+            onClick={() => onOpenChange?.(false)}
             className={cn(
               "fixed inset-0",
               frostedGlass ? "bg-black/1" : "bg-black/30",
@@ -153,8 +155,6 @@ export default function BaseDrawer({
             >
               <div
                 onClick={() => setSnap(snapPoints?.[1] ?? null)}
-                onTouchMove={() => setIsDragging(true)}
-                onTouchEnd={() => setIsDragging(false)}
                 className="flex h-full min-h-0 w-full flex-1 flex-col"
               >
                 <div className="shrink-0 px-6 pb-2">
@@ -211,6 +211,7 @@ export default function BaseDrawer({
 
                 {footerContent && (
                   <div
+                    onClick={(e) => e.stopPropagation()}
                     className={cn(
                       "shrink-0 px-4 pt-2",
                       isPill && _type === "morphing" && "px-3 pb-3 pt-0",
