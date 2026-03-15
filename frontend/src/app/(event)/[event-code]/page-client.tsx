@@ -92,7 +92,7 @@ export default function ClientPage({
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6">
       <HeaderSpacer />
-      <div className="top-25 bg-background z-15 sticky flex flex-col justify-between gap-2 md:flex-row py-2">
+      <div className="top-25 bg-background z-15 sticky flex flex-col justify-between gap-2 py-2 md:flex-row">
         <div className="flex flex-1 justify-between">
           <h1 className="text-2xl font-bold">{eventName}</h1>
           <EventInfoDrawer eventRange={eventRange} timezone={timezone} />
