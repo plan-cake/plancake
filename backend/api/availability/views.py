@@ -12,16 +12,7 @@ from api.availability.serializers import (
     EventCodeSerializer,
 )
 from api.availability.utils import check_name_available, get_timeslots, get_weekday_date
-from api.models import (
-    AvailabilityStatus,
-    EventDateAvailability,
-    EventParticipant,
-    EventWeekdayAvailability,
-    UserEvent,
-)
-from api.settings import GENERIC_ERR_RESPONSE
-from api.utils import (
-    MessageOutputSerializer,
+from api.decorators import (
     api_endpoint,
     check_auth,
     rate_limit,
@@ -30,6 +21,15 @@ from api.utils import (
     validate_output,
     validate_query_param_input,
 )
+from api.models import (
+    AvailabilityStatus,
+    EventDateAvailability,
+    EventParticipant,
+    EventWeekdayAvailability,
+    UserEvent,
+)
+from api.settings import GENERIC_ERR_RESPONSE
+from api.utils import MessageOutputSerializer
 
 logger = logging.getLogger("api")
 
