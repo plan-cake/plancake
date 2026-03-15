@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -11,10 +11,12 @@ import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { formatApiError } from "@/lib/utils/api/handle-api-error";
 
+const EMAIL_RESEND_COOLDOWN_MS = 30_000;
+
 export default function Page() {
   const router = useRouter();
-  const lastEmailResend = useRef(Date.now());
   const [email, setEmail] = useState("");
+  const [cooldown, setCooldown] = useState(EMAIL_RESEND_COOLDOWN_MS / 1000);
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -31,23 +33,19 @@ export default function Page() {
     }
   }, [router]); // empty dependency array to run once on initial mount
 
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+
   if (!email) {
     // don't render until there is an email
     return null;
   }
 
   const handleResendEmail = async () => {
-    const emailResendCooldown = 30000; // 30 seconds
-    let timeLeft =
-      (emailResendCooldown - (Date.now() - lastEmailResend.current)) / 1000;
-    timeLeft = Math.ceil(timeLeft);
-    if (timeLeft > 0) {
-      addToast(
-        "info",
-        `Slow down! ${timeLeft} seconds until you can send again.`,
-      );
-      return false;
-    }
+    if (cooldown > 0) return false;
 
     try {
       const res = await fetch(
@@ -62,7 +60,7 @@ export default function Page() {
 
       if (res.ok) {
         addToast("success", MESSAGES.SUCCESS_EMAIL_SENT);
-        lastEmailResend.current = Date.now();
+        setCooldown(EMAIL_RESEND_COOLDOWN_MS / 1000);
         return true;
       } else {
         addToast("error", formatApiError(await res.json()));
@@ -84,8 +82,11 @@ export default function Page() {
           <ActionButton
             key="0"
             buttonStyle="secondary"
-            label="Resend Email"
+            label={
+              cooldown > 0 ? `Resend Email (${cooldown}s)` : "Resend Email"
+            }
             onClick={handleResendEmail}
+            disabled={cooldown > 0}
           />,
           <LinkButton
             key="1"

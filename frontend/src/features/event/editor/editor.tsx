@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, memo } from "react";
+import { memo, useState } from "react";
 
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 
-import HeaderSpacer from "@/components/header-spacer";
 import MobileFooterTray from "@/components/mobile-footer-tray";
 import SegmentedControl from "@/components/segmented-control";
 import TextInputField from "@/components/text-input-field";
@@ -18,7 +17,8 @@ import AdvancedOptions from "@/features/event/editor/advanced-options";
 import DateRangeSelection from "@/features/event/editor/date-range/selector";
 import { EventEditorType } from "@/features/event/editor/types";
 import { validateEventData } from "@/features/event/editor/validate-data";
-import { ScheduleGrid, GridPreviewDialog } from "@/features/event/grid";
+import { GridPreviewDialog, ScheduleGrid } from "@/features/event/grid";
+import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { RateLimitBanner } from "@/features/system-feedback";
 import submitEvent from "@/lib/utils/api/submit-event";

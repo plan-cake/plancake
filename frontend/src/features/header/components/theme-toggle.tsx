@@ -4,8 +4,9 @@ import { useTheme } from "next-themes";
 import { FiMoon, FiSun } from "react-icons/fi";
 
 import ActionButton from "@/features/button/components/action";
+import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
 
-export default function FixedThemeToggle() {
+export default function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
 
   const toggleTheme = () => {
@@ -14,10 +15,15 @@ export default function FixedThemeToggle() {
   };
 
   return (
-    <ActionButton
+    <ShrinkingHeaderButton
       buttonStyle="frosted glass inset"
       icon={resolvedTheme === "dark" ? <FiMoon /> : <FiSun />}
-      onClick={toggleTheme}
-    />
+    >
+      <ActionButton
+        buttonStyle="frosted glass inset"
+        icon={resolvedTheme === "dark" ? <FiMoon /> : <FiSun />}
+        onClick={toggleTheme}
+      />
+    </ShrinkingHeaderButton>
   );
 }
