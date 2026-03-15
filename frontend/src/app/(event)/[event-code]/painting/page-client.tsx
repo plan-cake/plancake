@@ -283,7 +283,7 @@ export default function ClientPage({
       )}
 
       {/* Header and Button Row */}
-      <div className="flex w-full flex-wrap justify-between md:flex-row">
+      <div className="top-25 bg-background z-15 sticky flex w-full flex-wrap justify-between md:flex-row py-2">
         <div className="flex flex-1 justify-between">
           <h1 className="text-2xl font-bold">{eventName}</h1>
           <EventInfoDrawer eventRange={eventRange} timezone={timeZone} />
