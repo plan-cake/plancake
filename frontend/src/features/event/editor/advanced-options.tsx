@@ -60,15 +60,8 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
     setCustomCode,
     handleError,
   } = useEventContext();
-
-  const [localCode, setLocalCode] = useState(customCode);
-
   const checkCodeAvailability = useDebouncedCallback(async (code: string) => {
-    if (isEditing) return;
-    if (!code) {
-      setCustomCode("");
-      return;
-    }
+    if (isEditing || !code) return;
 
     try {
       await clientPost(ROUTES.event.checkCode, { custom_code: code });
@@ -80,13 +73,11 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
         handleError("api", MESSAGES.ERROR_GENERIC);
       }
     }
-
-    setCustomCode(code);
   }, 500);
 
   const handleCustomCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    setLocalCode(newValue);
+    setCustomCode(newValue);
     checkCodeAvailability(newValue);
   };
 
@@ -124,7 +115,7 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
       <input
         id="custom-code-input"
         type="text"
-        value={localCode}
+        value={customCode}
         onChange={handleCustomCodeChange}
         placeholder="optional"
         disabled={isEditing}
