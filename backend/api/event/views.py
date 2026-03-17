@@ -9,11 +9,11 @@ from rest_framework.throttling import AnonRateThrottle
 
 from api.availability.utils import get_weekday_date
 from api.event.serializers import (
-    CustomCodeSerializer,
     DateEventCreateSerializer,
     DateEventEditSerializer,
     EventCodeSerializer,
     EventDetailSerializer,
+    RequiredCustomCodeSerializer,
     WeekEventCreateSerializer,
     WeekEventEditSerializer,
 )
@@ -210,7 +210,7 @@ def create_week_event(request):
 
 
 @api_endpoint("POST")
-@validate_json_input(CustomCodeSerializer)
+@validate_json_input(RequiredCustomCodeSerializer)
 @validate_output(MessageOutputSerializer)
 def check_code(request):
     """
