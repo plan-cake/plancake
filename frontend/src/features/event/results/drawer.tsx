@@ -25,6 +25,7 @@ export default function ResultsDrawer({
   const {
     participants,
     currentUser,
+    clearSelectedParticipants,
     handleRemoveParticipant: onRemoveParticipant,
   } = useResultsContext();
 
@@ -49,6 +50,18 @@ export default function ResultsDrawer({
   }, [activeSnap, onSnapChange]);
 
   const isCollapsed = activeSnap === 0.22;
+
+  useEffect(() => {
+    if (isCollapsed && isRemoving) {
+      setIsRemoving(false);
+      clearSelectedParticipants();
+    }
+  }, [isCollapsed, isRemoving, clearSelectedParticipants]);
+
+  const toggleRemoving = () => {
+    setIsRemoving(!isRemoving);
+    clearSelectedParticipants();
+  };
 
   /* BUTTONS */
   const paintingButton = (
@@ -80,7 +93,7 @@ export default function ResultsDrawer({
       headerContent={
         <PanelHeader
           isRemoving={isRemoving}
-          toggleRemoving={() => setIsRemoving((prev) => !prev)}
+          toggleRemoving={toggleRemoving}
           promptRemove={promptRemove}
           isCollapsed={isCollapsed}
           inDrawer
