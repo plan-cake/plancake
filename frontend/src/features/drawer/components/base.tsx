@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { Drawer } from "vaul";
 
 import { DrawerProps } from "@/features/drawer/props";
 import { useDrawerResize } from "@/features/drawer/useDrawerResize";
+import { useVaulStickyFooter } from "@/features/drawer/useStickyFooter";
 import { cn } from "@/lib/utils/classname";
 
 export default function BaseDrawer({
@@ -26,6 +27,11 @@ export default function BaseDrawer({
   ...rest
 }: DrawerProps) {
   useDrawerResize();
+
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  useVaulStickyFooter(contentRef, isDragging);
 
   /**
    * CONDITIONAL PROPS BASED ON VARIANT
@@ -58,7 +64,6 @@ export default function BaseDrawer({
 
   const snap = activeSnapPoint !== undefined ? activeSnapPoint : internalSnap;
   const setSnap = setActiveSnapPoint ?? setInternalSnap;
-  const [isDragging, setIsDragging] = useState(false);
 
   const isLowestSnap = snapPoints && String(snap) === String(snapPoints[0]);
 
@@ -118,6 +123,7 @@ export default function BaseDrawer({
         )}
 
         <Drawer.Content
+          ref={contentRef}
           className={cn(
             "fixed bottom-0 left-0 right-0 flex outline-none",
             _type !== "floating" && "h-[100svh]",
@@ -230,9 +236,9 @@ export default function BaseDrawer({
                 {/** Spacer for standard/morphing drawers to account for Vaul's shift */}
                 {!isPill && scrollableBody && (
                   <div
-                    className="shrink-0 bg-transparent"
+                    className={cn("shrink-0 bg-amber-50")}
                     style={{
-                      height: "calc(var(--snap-point-height, 0px))",
+                      height: "var(--drag-translate-y, 0px)",
                     }}
                   />
                 )}
