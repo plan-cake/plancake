@@ -236,7 +236,7 @@ export default function BaseDrawer({
                 {/** Spacer for standard/morphing drawers to account for Vaul's shift */}
                 {!isPill && scrollableBody && (
                   <div
-                    className={cn("shrink-0 bg-amber-50")}
+                    className={cn("shrink-0 bg-transparent")}
                     style={{
                       height: "var(--drag-translate-y, 0px)",
                     }}
