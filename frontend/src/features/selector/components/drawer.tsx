@@ -66,7 +66,7 @@ export default function SelectorDrawer<TValue extends string | number>({
           aria-disabled={disabled}
           className={cn(
             "relative flex items-center rounded-2xl text-start focus:outline-none",
-            "bg-accent/15 text-accent px-3 py-1",
+            "bg-accent/15 text-accent-text px-3 py-1",
             open && !disabled && "ring-accent ring-1",
             // Interactive states only when enabled
             !disabled &&
