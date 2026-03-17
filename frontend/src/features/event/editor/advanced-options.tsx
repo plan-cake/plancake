@@ -64,7 +64,11 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
   const [localCode, setLocalCode] = useState(customCode);
 
   const checkCodeAvailability = useDebouncedCallback(async (code: string) => {
-    if (isEditing || !code) return;
+    if (isEditing) return;
+    if (!code) {
+      setCustomCode("");
+      return;
+    }
 
     try {
       await clientPost(ROUTES.event.checkCode, { custom_code: code });
