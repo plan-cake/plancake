@@ -31,6 +31,12 @@ export type PasswordResetData = {
   new_password: string;
 }
 
+export type PasswordChangeData = {
+  password: string;
+  new_password: string;
+  prune_sessions?: boolean;
+}
+
 export type EventCode = {
   event_code: string;
 }
