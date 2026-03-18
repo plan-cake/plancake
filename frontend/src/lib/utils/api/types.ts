@@ -37,6 +37,10 @@ export type PasswordChangeData = {
   prune_sessions?: boolean;
 }
 
+export type Password = {
+  password: string;
+}
+
 export type EventCode = {
   event_code: string;
 }

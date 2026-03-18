@@ -13,6 +13,7 @@ import {
   LoginData,
   MessageResponse,
   NewEventData,
+  Password,
   PasswordChangeData,
   PasswordResetData,
   RegisterData,
@@ -98,6 +99,13 @@ export const ROUTES = {
      * @method POST
      */
     logout: route<MessageResponse>("/auth/logout/"),
+    /**
+     * Deletes the current user account, including all created events and participation
+     * data.
+     * @method POST
+     * @throws 400 - If the password is incorrect.
+     */
+    deleteAccount: route<MessageResponse, Password>("/auth/delete-account/"),
   },
   event: {
     /**
