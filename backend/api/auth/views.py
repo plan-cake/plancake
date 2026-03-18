@@ -493,7 +493,7 @@ def change_password(request):
 
     # Check if the new password is actually new
     if password == new_password:
-        logger.info("Password change failed: New password was not new.", user.email)
+        logger.info("Password change failed: New password was not new.")
         return Response(
             {
                 "error": {
