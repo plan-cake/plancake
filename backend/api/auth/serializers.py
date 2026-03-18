@@ -9,6 +9,10 @@ class PasswordSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
 
 
+class NewPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True)
+
+
 class RegisterAccountSerializer(EmailSerializer, PasswordSerializer):
     pass
 
@@ -21,9 +25,12 @@ class LoginSerializer(RegisterAccountSerializer):
     remember_me = serializers.BooleanField(default=False, required=False)
 
 
-class PasswordResetSerializer(serializers.Serializer):
+class PasswordResetSerializer(NewPasswordSerializer):
     reset_token = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
+
+
+class PasswordChangeSerializer(PasswordSerializer, NewPasswordSerializer):
+    prune_sessions = serializers.BooleanField(default=False, required=False)
 
 
 class AccountDetailsSerializer(serializers.Serializer):
