@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-import { BaseDrawer } from "@/components/layout/base-drawer";
+import { StandardDrawer, FloatingDrawer } from "@/features/drawer";
 import { DrawerProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
@@ -14,6 +14,7 @@ export default function SelectorDrawer<TValue extends string | number>({
   textStart = false,
   open: controlledOpen,
   onOpenChange,
+  drawerNesting = false,
   disabled = false,
 }: DrawerProps<TValue>) {
   const [internalOpen, setInternalOpen] = useState(false);
@@ -47,8 +48,11 @@ export default function SelectorDrawer<TValue extends string | number>({
     }
   }, [open]);
 
+  const DrawerComponent = drawerNesting ? FloatingDrawer : StandardDrawer;
+
   return (
-    <BaseDrawer
+    <DrawerComponent
+      nested={drawerNesting}
       open={open}
       onOpenChange={handleOpenChange}
       title={dialogTitle}
@@ -62,7 +66,7 @@ export default function SelectorDrawer<TValue extends string | number>({
           aria-disabled={disabled}
           className={cn(
             "relative flex items-center rounded-2xl text-start focus:outline-none",
-            "bg-accent/15 text-accent px-3 py-1",
+            "bg-accent/15 text-accent-text px-3 py-1",
             open && !disabled && "ring-accent ring-1",
             // Interactive states only when enabled
             !disabled &&
@@ -74,6 +78,9 @@ export default function SelectorDrawer<TValue extends string | number>({
         >
           <span className="text-wrap">{selectLabel}</span>
         </button>
+      }
+      headerContent={
+        <h1 className="mb-2 flex-1 text-lg font-semibold">{dialogTitle}</h1>
       }
     >
       <div className="flex flex-col gap-2">
@@ -106,6 +113,6 @@ export default function SelectorDrawer<TValue extends string | number>({
           );
         })}
       </div>
-    </BaseDrawer>
+    </DrawerComponent>
   );
 }
