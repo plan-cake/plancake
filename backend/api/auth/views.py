@@ -489,9 +489,7 @@ def change_password(request):
         logger.info(
             "Password change failed for %s: Incorrect current password.", user.email
         )
-        return Response(
-            {"error": {"password": ["Incorrect current password."]}}, status=400
-        )
+        return Response({"error": {"password": ["Incorrect password."]}}, status=400)
 
     # Check if the new password is actually new
     if password == new_password:
