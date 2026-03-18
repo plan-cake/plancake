@@ -473,7 +473,7 @@ def reset_password(request):
 @validate_output(MessageOutputSerializer)
 def change_password(request):
     """
-    Changes the password for the currently-authenicated user account after verifying the
+    Changes the password for the currently-authenticated user account after verifying the
     current password.
 
     If `prune_sessions` is true, all active sessions for this account EXCEPT the current
