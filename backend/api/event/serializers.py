@@ -8,6 +8,10 @@ class CustomCodeSerializer(serializers.Serializer):
     custom_code = serializers.CharField(required=False, max_length=255)
 
 
+class RequiredCustomCodeSerializer(serializers.Serializer):
+    custom_code = serializers.CharField(required=True, max_length=255)
+
+
 class EventCodeSerializer(serializers.Serializer):
     event_code = serializers.CharField(required=True, max_length=255)
 
