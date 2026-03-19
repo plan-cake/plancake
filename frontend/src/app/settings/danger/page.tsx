@@ -4,7 +4,7 @@ import ActionButton from "@/features/button/components/action";
 
 export default function Page() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-6 duration-300">
+    <div className="flex flex-col gap-6">
       <div className="border-error/20 bg-error/10 flex flex-col gap-4 rounded-3xl border p-6 md:p-8">
         <div>
           <h2 className="text-error text-lg font-bold">Account Removal</h2>

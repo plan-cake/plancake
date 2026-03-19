@@ -4,7 +4,7 @@ import ChangePasswordDialog from "@/features/account/settings/change-password-di
 
 export default function Page() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-col gap-6 duration-300">
+    <div className="flex flex-col gap-6">
       <div className="bg-panel flex flex-col gap-4 rounded-3xl border-none p-6 md:p-8">
         <div>
           <h2 className="text-lg font-bold">Password</h2>

@@ -41,7 +41,7 @@ export default function SettingsLayout({
                   key={tab.href}
                   href={tab.href}
                   className={cn(
-                    "focus-visible:ring-primary/50 text-md relative flex items-center whitespace-nowrap rounded-full px-4 py-2.5 font-medium outline-none transition-all duration-200 focus-visible:ring-2",
+                    "focus-visible:ring-primary/50 text-md relative flex items-center whitespace-nowrap rounded-full px-4 py-2.5 font-medium outline-none focus-visible:ring-2",
                     isActive
                       ? "bg-foreground/10 text-foreground"
                       : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground",
