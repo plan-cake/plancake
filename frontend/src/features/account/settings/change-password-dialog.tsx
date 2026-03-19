@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import Link from "next/link";
 
+import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import ActionButton from "@/features/button/components/action";
@@ -13,6 +15,7 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { cn } from "@/lib/utils/classname";
+import { useAccount } from "@/features/account/context";
 
 export default function ChangePasswordDialog() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -46,6 +49,32 @@ export default function ChangePasswordDialog() {
     handleError("confirmPassword", "");
     handleError("api", "");
     setConfirmPassword(value);
+  };
+
+  const { accountDetails } = useAccount();
+
+  const handleForgotPassword = async () => {
+    if (!accountDetails?.email) {
+      addToast("error", "No email associated with this account.");
+      return;
+    }
+
+    try {
+      await clientPost(ROUTES.auth.startPasswordReset, {
+        email: accountDetails?.email,
+      });
+
+      handleOpenChange(false);
+      addToast("success", MESSAGES.SUCCESS_PASSWORD_RESET_EMAIL_SENT);
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      if (error.rateLimited) {
+        handleError("toast", error.formattedMessage);
+      } else {
+        handleError("toast", error.formattedMessage);
+      }
+      return false;
+    }
   };
 
   useEffect(() => {
@@ -203,7 +232,16 @@ export default function ChangePasswordDialog() {
               error={errors.confirmPassword || errors.api}
             />
           </div>
-          <div className="mt-4 flex w-full justify-center gap-4">
+          <div className="mt-4 flex justify-center text-sm">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="cursor-pointer border-none bg-transparent p-0"
+            >
+              <LinkText>Forgot password?</LinkText>
+            </button>
+          </div>
+          <div className="mt-4 flex justify-center gap-4">
             <Dialog.Close asChild>
               <EmptyButton buttonStyle="transparent" label="Cancel" />
             </Dialog.Close>
