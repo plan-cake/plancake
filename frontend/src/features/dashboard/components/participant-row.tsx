@@ -14,7 +14,7 @@ export default function ParticipantRow({
       className={cn(
         "flex bg-inherit text-sm",
         // Every icon after the first has padding meant to act as a border
-        participants.length > 1 && "-mb-0.5",
+        Math.min(numIcons, participants.length) > 1 && "-mb-0.5",
       )}
     >
       {participants.length > 0 ? (
