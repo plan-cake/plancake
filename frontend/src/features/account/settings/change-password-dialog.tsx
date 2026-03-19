@@ -146,8 +146,8 @@ export default function ChangePasswordDialog() {
               type="password"
               label="Current Password*"
               value={currentPassword}
-              onChange={() => {
-                setCurrentPassword(currentPassword);
+              onChange={(value) => {
+                setCurrentPassword(value);
               }}
               outlined
               error={errors.currentPassword || errors.api}
