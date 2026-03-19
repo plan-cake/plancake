@@ -3,10 +3,17 @@
 import { CopyIcon } from "@radix-ui/react-icons";
 
 import ActionButton from "@/features/button/components/action";
+import { ButtonStyle } from "@/features/button/props";
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 
-export default function CopyToastButton({ code }: { code: string }) {
+export default function CopyToastButton({
+  code,
+  buttonStyle = "secondary",
+}: {
+  code: string;
+  buttonStyle?: ButtonStyle;
+}) {
   const { addToast } = useToast();
   const currentURL =
     typeof window !== "undefined" ? `${window.location.origin}/${code}` : "";
@@ -25,7 +32,7 @@ export default function CopyToastButton({ code }: { code: string }) {
 
   return (
     <ActionButton
-      buttonStyle="secondary"
+      buttonStyle={buttonStyle}
       icon={<CopyIcon />}
       label="Copy Link"
       onClick={copyToClipboard}

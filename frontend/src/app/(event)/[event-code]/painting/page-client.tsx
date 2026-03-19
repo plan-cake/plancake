@@ -17,7 +17,6 @@ import LinkButton from "@/features/button/components/link";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
-import EventInfoDrawer, { EventInfo } from "@/features/event/info-drawer";
 import {
   ConfirmationDialog,
   RateLimitBanner,
@@ -252,10 +251,7 @@ export default function ClientPage({
 
       {/* Header and Button Row */}
       <div className="flex w-full flex-wrap justify-between md:flex-row">
-        <div className="flex flex-1 justify-between">
-          <h1 className="text-2xl font-bold">{eventName}</h1>
-          <EventInfoDrawer eventRange={eventRange} timezone={timeZone} />
-        </div>
+        <h1 className="text-2xl font-bold">{eventName}</h1>
         <div className="hidden items-center gap-2 md:flex">
           {cancelButton}
           {submitButton}
@@ -301,11 +297,6 @@ export default function ClientPage({
                 ></Checkbox>
               </div>
             )}
-          </div>
-
-          {/* Desktop-only Event Info */}
-          <div className="bg-panel hidden rounded-3xl p-6 md:block">
-            <EventInfo eventRange={eventRange} timezone={timeZone} />
           </div>
 
           <div className="bg-panel rounded-3xl p-6 text-sm">
