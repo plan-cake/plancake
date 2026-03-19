@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import Link from "next/link";
 
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
+import { useAccount } from "@/features/account/context";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
@@ -15,7 +15,6 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { cn } from "@/lib/utils/classname";
-import { useAccount } from "@/features/account/context";
 
 export default function ChangePasswordDialog() {
   const [currentPassword, setCurrentPassword] = useState("");
