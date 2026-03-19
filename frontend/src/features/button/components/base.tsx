@@ -276,7 +276,7 @@ function getStyleClasses(
       switch (state) {
         case "rest":
           styleClasses = cn(
-            "bg-panel text-error font-bold border-2 border-error",
+            "bg-transparent text-error font-bold border-2 border-error",
             "active:border-[color-mix(in_oklab,var(--color-error)_100%,black_10%)]",
             "active:bg-[color-mix(in_oklab,var(--color-error)_100%,black_10%)] active:text-white",
             "hover:bg-error hover:text-white",
