@@ -13,6 +13,8 @@ import {
   LoginData,
   MessageResponse,
   NewEventData,
+  Password,
+  PasswordChangeData,
   PasswordResetData,
   RegisterData,
   SelfAvailability,
@@ -84,10 +86,26 @@ export const ROUTES = {
      */
     resetPassword: route<MessageResponse, PasswordResetData>("/auth/reset-password/"),
     /**
+     * Changes the password for the current user account. If `prune_sessions` is true, all
+     * other sessions for the user will be removed.
+     * @method POST
+     * @throws 400 - If the current password is incorrect.
+     * @throws 400 - If the new password is not strong enough.
+     * @throws 400 - If the new password is the same as the old password.
+     */
+    changePassword: route<MessageResponse, PasswordChangeData>("/auth/change-password/"),
+    /**
      * Logs out the current user.
      * @method POST
      */
     logout: route<MessageResponse>("/auth/logout/"),
+    /**
+     * Deletes the current user account, including all created events and participation
+     * data.
+     * @method POST
+     * @throws 400 - If the password is incorrect.
+     */
+    deleteAccount: route<MessageResponse, Password>("/auth/delete-account/"),
   },
   event: {
     /**
