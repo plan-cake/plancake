@@ -10,7 +10,13 @@ export default function ParticipantRow({
   numIcons,
 }: ParticipantRowProps) {
   return (
-    <div className="flex bg-inherit text-sm">
+    <div
+      className={cn(
+        "flex bg-inherit text-sm",
+        // Every icon after the first has padding meant to act as a border
+        participants.length > 1 && "-mb-0.5",
+      )}
+    >
       {participants.length > 0 ? (
         participants.map((participant, index) => {
           if (index >= numIcons) {
