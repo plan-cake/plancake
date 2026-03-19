@@ -151,7 +151,13 @@ export default function ConfirmationDialog({
       )}
 
       <Dialog.Portal>
-        <Dialog.Overlay className="dialog-overlay fixed inset-0 z-40 bg-gray-700/40 transition-opacity" />
+        <Dialog.Overlay
+          className={cn(
+            "dialog-overlay fixed inset-0 z-40 bg-gray-700/40 transition-opacity",
+            type == "error" &&
+              "bg-[color-mix(in_oklab,var(--color-error)_15%,black_20%)]",
+          )}
+        />
         <Dialog.Content
           onEscapeKeyDown={(event) => event.stopPropagation()}
           className={cn(
