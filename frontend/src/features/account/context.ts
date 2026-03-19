@@ -7,11 +7,13 @@ export const AccountContext = createContext<{
   accountDetails: AccountDetails | null;
   login: (accountDetails: AccountDetails) => void;
   logout: () => void;
+  refreshAccount: () => Promise<void>;
 }>({
   loginState: "loading",
   accountDetails: null,
-  login: () => { },
-  logout: () => { },
+  login: () => {},
+  logout: () => {},
+  refreshAccount: async () => {},
 });
 
 export function useAccount() {

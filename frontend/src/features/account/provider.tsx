@@ -4,6 +4,8 @@ import { useCallback, useState } from "react";
 
 import AccountContext from "@/features/account/context";
 import { AccountDetails, LoginState } from "@/features/account/type";
+import { clientGet } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
 
 export default function AccountProvider({
   children,
@@ -27,9 +29,23 @@ export default function AccountProvider({
     setLoginState("logged_out");
   }, []);
 
+  const refreshAccount = useCallback(async () => {
+    try {
+      const data = await clientGet(ROUTES.auth.checkAccountAuth);
+      setAccountDetails({
+        email: data.email,
+        defaultName: data.default_display_name,
+      });
+      setLoginState("logged_in");
+    } catch {
+      setAccountDetails(null);
+      setLoginState("logged_out");
+    }
+  }, []);
+
   return (
     <AccountContext.Provider
-      value={{ loginState, accountDetails, login, logout }}
+      value={{ loginState, accountDetails, login, logout, refreshAccount }}
     >
       {children}
     </AccountContext.Provider>
