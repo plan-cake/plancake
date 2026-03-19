@@ -31,7 +31,7 @@ export default function AccountSettings({
   if (isMobile) {
     return (
       <AccountSettingsDrawer
-        content={<SettingsContent />}
+        content={<SettingsContent setOpenChange={setOpenChange} />}
         open={open}
         setOpen={setOpenChange}
       >
@@ -42,7 +42,7 @@ export default function AccountSettings({
 
   return (
     <AccountSettingsPopover
-      content={<SettingsContent />}
+      content={<SettingsContent setOpenChange={setOpenChange} />}
       open={open}
       setOpen={setOpenChange}
     >
@@ -51,7 +51,11 @@ export default function AccountSettings({
   );
 }
 
-function SettingsContent() {
+function SettingsContent({
+  setOpenChange,
+}: {
+  setOpenChange: (open: boolean) => void;
+}) {
   const { login, logout, accountDetails } = useAccount();
   const router = useRouter();
 
@@ -117,8 +121,9 @@ function SettingsContent() {
     try {
       await clientPost(ROUTES.auth.logout);
       logout();
-      addToast("success", MESSAGES.SUCCESS_LOGOUT);
       router.push("/login");
+      addToast("success", MESSAGES.SUCCESS_LOGOUT);
+      setOpenChange(false);
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;

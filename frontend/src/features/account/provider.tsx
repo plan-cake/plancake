@@ -7,12 +7,14 @@ import { AccountDetails, LoginState } from "@/features/account/type";
 
 export default function AccountProvider({
   children,
+  accountDetails: initialAccountDetails,
 }: {
   children: React.ReactNode;
+  accountDetails: AccountDetails | null;
 }) {
-  const [loginState, setLoginState] = useState<LoginState>("loading");
-  const [accountDetails, setAccountDetails] = useState<AccountDetails | null>(
-    null,
+  const [accountDetails, setAccountDetails] = useState(initialAccountDetails);
+  const [loginState, setLoginState] = useState<LoginState>(
+    initialAccountDetails ? "logged_in" : "logged_out",
   );
 
   const login = useCallback((accountDetails: AccountDetails) => {
