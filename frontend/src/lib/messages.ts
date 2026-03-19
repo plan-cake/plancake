@@ -12,6 +12,7 @@ export const MESSAGES = {
   // auth errors
   ERROR_EMAIL_MISSING: "Missing email.",
   ERROR_PASSWORD_MISSING: "Missing password.",
+  ERROR_PASSWORD_WRONG: "Incorrect password.",
   ERROR_PASSWORD_REUSE: "Cannot reuse old password.",
   ERROR_PASSWORD_WEAK: "Password is not strong enough.",
   ERROR_PASSWORD_MISMATCH: "Passwords do not match.",
@@ -34,6 +35,7 @@ export const MESSAGES = {
 
   // success messages
   SUCCESS_EMAIL_SENT: "Email resent. Please check your inbox.",
+  SUCESSS_PASSWORD_CHANGED: "Password changed successfully.",
   SUCCESS_PASSWORD_RESET: "Password has been reset successfully.",
   SUCCESS_LOGOUT: "You have been logged out.",
   SUCCESS_DEFAULT_NAME_SAVED: "Nickname saved successfully.",

@@ -6,6 +6,7 @@ import TextInputField from "@/components/text-input-field";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
+import { useToast } from "@/features/system-feedback/toast/context";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -20,11 +21,25 @@ export default function ChangePasswordDialog() {
   const [passwordCriteria, setPasswordCriteria] = useState({});
   const [showPasswordCriteria, setShowPasswordCriteria] = useState(false);
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setShowPasswordCriteria(false);
+      clearAllErrors();
+    }
+  };
+
   function passwordIsStrong() {
     return Object.values(passwordCriteria).every((value) => value === true);
   }
 
   // TOASTS AND ERROR STATES
+  const { addToast } = useToast();
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
   const handleConfirmPasswordChange = (value: string) => {
@@ -64,11 +79,15 @@ export default function ChangePasswordDialog() {
         password: currentPassword,
         new_password: newPassword,
       });
+      handleOpenChange(false);
+      addToast("success", MESSAGES.SUCESSS_PASSWORD_CHANGED);
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
       if (error.status === 404) {
         handleError("api", MESSAGES.ERROR_RESET_TOKEN_INVALID);
+      } else if (error.data.error?.["password"]) {
+        handleError("currentPassword", MESSAGES.ERROR_PASSWORD_WRONG);
       } else if (error.data.error?.["new_password"]) {
         handleError("newPassword", MESSAGES.ERROR_PASSWORD_REUSE);
       } else {
@@ -116,11 +135,10 @@ export default function ChangePasswordDialog() {
   // }
 
   return (
-    <Dialog.Root>
+    <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <Dialog.Trigger asChild>
         <EmptyButton buttonStyle="primary" label="Change Password" />
       </Dialog.Trigger>
-
       <Dialog.Portal>
         <Dialog.Overlay className="dialog-overlay fixed inset-0 z-40 bg-gray-700/40 transition-opacity" />
         <Dialog.Content
