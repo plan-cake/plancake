@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils/classname";
 const SETTINGS_TABS = [
   { href: "/settings", label: "General" },
   { href: "/settings/security", label: "Security" },
-  { href: "/settings/danger", label: "Danger Zone" },
+  { href: "/settings/remove", label: "Account Removal" },
 ] as const;
 
 export default function SettingsLayout({

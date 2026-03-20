@@ -1,9 +1,15 @@
 import DeleteAccountDialog from "@/features/account/settings/dialogs/delete-account";
+import { cn } from "@/lib/utils/classname";
 
 export default function Page() {
   return (
     <div className="flex flex-col gap-6">
-      <div className="border-error/20 bg-error/10 flex flex-col gap-4 rounded-3xl border p-6 md:p-8">
+      <div
+        className={cn(
+          "flex flex-col gap-4 rounded-3xl border p-6 md:p-8",
+          "border-error bg-[color-mix(in_oklab,var(--color-error)_20%,var(--color-foreground)_5%)]",
+        )}
+      >
         <div>
           <h2 className="text-error text-lg font-bold">Account Removal</h2>
           <p className="mt-1 text-sm opacity-80">
