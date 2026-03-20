@@ -14,7 +14,13 @@ const morphTransition: Transition = {
   mass: 0.8,
 };
 
-export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
+export default function KebabMenu({
+  buttons,
+  trigger,
+}: {
+  buttons: ButtonArray;
+  trigger?: React.ReactNode;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const id = useId();
   return (
@@ -39,10 +45,14 @@ export default function KebabMenu({ buttons }: { buttons: ButtonArray }) {
             aria-expanded={isOpen}
             onClick={() => setIsOpen(true)}
           >
-            <EmptyButton
-              buttonStyle="semi-transparent"
-              icon={<DotsVerticalIcon />}
-            />
+            {trigger ? (
+              trigger
+            ) : (
+              <EmptyButton
+                buttonStyle="semi-transparent"
+                icon={<DotsVerticalIcon />}
+              />
+            )}
           </motion.div>
         ) : (
           <>
