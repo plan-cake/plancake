@@ -249,7 +249,7 @@ function getStyleClasses(
           paddingShrink = 0.5;
           break;
         case "loading":
-          styleClasses = "font-bold bg-accent/20 border border-accent";
+          styleClasses = "font-bold bg-accent/20 border-2 border-accent";
           paddingShrink = 0.5;
           break;
         case "disabled":
