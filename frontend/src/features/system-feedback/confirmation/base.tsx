@@ -170,7 +170,7 @@ export default function ConfirmationDialog({
             {showIcon && renderIcon()}
             <p className="text-lg font-bold">{title}</p>
           </Dialog.Title>
-          <Dialog.Description className="mt-2 text-center">
+          <Dialog.Description asChild className="mt-2 text-center">
             {description}
           </Dialog.Description>
 

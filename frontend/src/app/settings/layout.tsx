@@ -30,7 +30,7 @@ export default function SettingsLayout({
         </p>
       </div>
 
-      <div className="flex flex-col gap-8 md:flex-row md:gap-12">
+      <div className="flex flex-col gap-4 md:flex-row md:gap-12">
         <aside className="w-full shrink-0 md:w-64">
           <nav className="flex flex-row gap-1 overflow-x-auto pb-2 md:flex-col md:overflow-visible md:pb-0">
             {SETTINGS_TABS.map((tab) => {
