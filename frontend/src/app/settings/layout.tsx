@@ -1,9 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+
+import Loading from "@/app/loading";
 import HeaderSpacer from "@/components/header-spacer";
+import { useAccount } from "@/features/account/context";
+import { useToast } from "@/features/system-feedback";
+import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
 const SETTINGS_TABS = [
@@ -18,6 +24,20 @@ export default function SettingsLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { loginState } = useAccount();
+  const { addToast } = useToast();
+
+  useEffect(() => {
+    if (loginState === "logged_out") {
+      router.replace("/login");
+      addToast("info", MESSAGES.INFO_NOT_LOGGED_IN);
+    }
+  }, [addToast, loginState, router]);
+
+  if (loginState === "loading" || loginState === "logged_out") {
+    return <Loading />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col px-6 pb-6">
