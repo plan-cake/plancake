@@ -27,6 +27,8 @@ export type BaseButtonProps = {
    * - `secondary`: A less important button, outlined with the main accent color.
    * - `frosted glass`: A button with a frosted glass appearance.
    * - `frosted glass inset`: A button with the style of a frosted glass inset element.
+   * - `bordered semi-transparent`: A button with a semi-transparent background and a
+   *   border.
    * - `semi-transparent`: A button with a semi-transparent background.
    * - `transparent`: A button with no background until hovered.
    * - `danger`: A button style used for destructive actions, filled with a red color.
