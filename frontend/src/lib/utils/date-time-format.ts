@@ -72,6 +72,16 @@ export function timeslotToISOString(
   }
 }
 
+// Checks if two timezones are equivalent even if they represent different locations
+// For example, "America/New_York" and "America/Detroit" are both Eastern Time
+export function tzEqual(tz1: string, tz2: string): boolean {
+  const now = new Date();
+  return (
+    formatInTimeZone(now, tz1, "yyyy-MM-dd'T'HH:mm:ssXXX") ===
+    formatInTimeZone(now, tz2, "yyyy-MM-dd'T'HH:mm:ssXXX")
+  );
+}
+
 /*
  * DATETIME CONVERSION UTILS
  * from python datetime string (ISO 8601) to Date object.
