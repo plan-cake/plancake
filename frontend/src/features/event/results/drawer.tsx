@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { GearIcon, Pencil2Icon } from "@radix-ui/react-icons";
+import { GlobeIcon, Pencil2Icon } from "@radix-ui/react-icons";
 
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
-import { FloatingDrawer, MorphingDrawer } from "@/features/drawer";
+import { MorphingDrawer } from "@/features/drawer";
+import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
 import { useResultsContext } from "@/features/event/results/context";
-import DisplaySettings from "@/features/event/results/display-settings";
 import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
 
 export default function ResultsDrawer({
@@ -34,15 +34,12 @@ export default function ResultsDrawer({
     setIsConfirmationOpen(true);
   };
 
-  const [isTimezoneOpen, setTimezoneOpen] = useState(false);
-
   /* REMOVING STATES */
   const [isRemoving, setIsRemoving] = useState(false);
   const [personToRemove, setPersonToRemove] = useState<string | null>(null);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
   /* TABS */
-  const [openSettings, setSettings] = useState(false);
   const [activeSnap, setActiveSnap] = useState<number | string | null>(0.22);
 
   useEffect(() => {
@@ -73,10 +70,6 @@ export default function ResultsDrawer({
     />
   );
 
-  const settingsButton = (
-    <EmptyButton buttonStyle="semi-transparent" icon={<GearIcon />} />
-  );
-
   return (
     <MorphingDrawer
       open
@@ -101,25 +94,18 @@ export default function ResultsDrawer({
       }
       footerContent={
         <div className="mx-1 flex grow justify-between gap-2">
-          <FloatingDrawer
-            nested
-            open={openSettings}
-            onOpenChange={setSettings}
-            trigger={settingsButton}
-            title="Display Settings"
-            description="Display Settings"
-            headerContent={
-              <h1 className="flex-1 text-lg font-semibold">Display Settings</h1>
+          <TimeZoneSelector
+            id="timezone-select"
+            value={timezone}
+            onChange={onTimezoneChange}
+            drawerNesting={1}
+            trigger={
+              <EmptyButton
+                buttonStyle="semi-transparent"
+                icon={<GlobeIcon />}
+              />
             }
-          >
-            <DisplaySettings
-              timezone={timezone}
-              onTimezoneChange={onTimezoneChange}
-              open={isTimezoneOpen}
-              setOpen={setTimezoneOpen}
-              drawerNesting={2}
-            />
-          </FloatingDrawer>
+          />
           {paintingButton}
         </div>
       }
