@@ -85,6 +85,12 @@ export type DrawerProps<TValue extends string | number> =
      * Callback function that is called when the open state of the drawer changes.
      */
     onOpenChange?: (open: boolean) => void;
+    /**
+     * Optional custom trigger element to open the drawer.
+     * 
+     * If not provided, the default will be used.
+     */
+    trigger?: React.ReactNode;
   };
 
 /**
