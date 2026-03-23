@@ -10,6 +10,7 @@ import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
 import { useResultsContext } from "@/features/event/results/context";
 import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
+import { tzEqual } from "@/lib/utils/date-time-format";
 
 export default function ResultsDrawer({
   timezone,
@@ -60,6 +61,12 @@ export default function ResultsDrawer({
     clearSelectedParticipants();
   };
 
+  /* TIMEZONE HANDLING */
+  const tzChanged = !tzEqual(
+    timezone,
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+  );
+
   /* BUTTONS */
   const paintingButton = (
     <LinkButton
@@ -101,7 +108,9 @@ export default function ResultsDrawer({
             drawerNesting={1}
             trigger={
               <EmptyButton
-                buttonStyle="semi-transparent"
+                buttonStyle={
+                  tzChanged ? "bordered semi-transparent" : "semi-transparent"
+                }
                 icon={<GlobeIcon />}
               />
             }
