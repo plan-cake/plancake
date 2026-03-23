@@ -90,7 +90,7 @@ export type DrawerProps<TValue extends string | number> =
      * 
      * If not provided, the default will be used.
      */
-    trigger?: React.ReactNode;
+    trigger?: React.ReactElement;
   };
 
 /**

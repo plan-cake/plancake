@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { cloneElement, useEffect, useRef, useState } from "react";
 
-import { StandardDrawer, FloatingDrawer } from "@/features/drawer";
+import { FloatingDrawer, StandardDrawer } from "@/features/drawer";
 import { DrawerProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
@@ -61,7 +61,15 @@ export default function SelectorDrawer<TValue extends string | number>({
       contentClassName="h-1/2"
       trigger={
         trigger ? (
-          trigger
+          // Apply accessibility attributes to the trigger element
+          cloneElement(trigger, {
+            id,
+            disabled,
+            "aria-label":
+              (trigger.props as { "aria-label"?: string })["aria-label"] ||
+              `Select ${dialogTitle}`,
+            "aria-disabled": disabled,
+          } as React.HTMLAttributes<HTMLElement>)
         ) : (
           <button
             id={id}
