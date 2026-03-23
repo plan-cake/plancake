@@ -112,6 +112,7 @@ export default function ResultsDrawer({
                   tzChanged ? "bordered semi-transparent" : "semi-transparent"
                 }
                 icon={<GlobeIcon />}
+                aria-label="Change Timezone"
               />
             }
           />
