@@ -72,14 +72,36 @@ export function timeslotToISOString(
   }
 }
 
-// Checks if two timezones are equivalent even if they represent different locations
-// For example, "America/New_York" and "America/Detroit" are both Eastern Time
+
+/**
+ * Checks if two timezones are equivalent even if they represent different locations.
+ * 
+ * For example, "America/New_York" and "America/Detroit" are equal because they are both
+ * in Eastern Time.
+ * 
+ * IMPORTANT: This function also checks if the timezones have the same DST rules by
+ * comparing offsets in January and July.
+ * 
+ * For example, "America/New_York" and "America/Caracas" are NOT equal because Caracas
+ * does not observe DST, despite both having the same offset during part of the year.
+ * 
+ * @param tz1 The first timezone to compare
+ * @param tz2 The second timezone to compare
+ * @returns `true` if the timezones are equivalent, `false` otherwise
+ */
 export function tzEqual(tz1: string, tz2: string): boolean {
-  const now = new Date();
-  return (
-    formatInTimeZone(now, tz1, "yyyy-MM-dd'T'HH:mm:ssXXX") ===
-    formatInTimeZone(now, tz2, "yyyy-MM-dd'T'HH:mm:ssXXX")
-  );
+  if (tz1 === tz2) return true;
+
+  const currentYear = new Date().getUTCFullYear();
+  const jan1 = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0));
+  const jul1 = new Date(Date.UTC(currentYear, 6, 1, 0, 0, 0));
+
+  const tz1OffsetJan = formatInTimeZone(jan1, tz1, "xxx");
+  const tz1OffsetJul = formatInTimeZone(jul1, tz1, "xxx");
+  const tz2OffsetJan = formatInTimeZone(jan1, tz2, "xxx");
+  const tz2OffsetJul = formatInTimeZone(jul1, tz2, "xxx");
+
+  return tz1OffsetJan === tz2OffsetJan && tz1OffsetJul === tz2OffsetJul;
 }
 
 /*
