@@ -20,7 +20,6 @@ from api.auth.serializers import (
 from api.auth.utils import list_failed_criteria, validate_password
 from api.decorators import (
     api_endpoint,
-    rate_limit,
     require_account_auth,
     validate_json_input,
     validate_output,
@@ -39,9 +38,11 @@ from api.settings import (
     GENERIC_ERR_RESPONSE,
     PWD_RESET_EXP_SECONDS,
     SEND_EMAILS,
+    ThrottleScopes,
 )
 from api.utils import (
     MessageOutputSerializer,
+    check_rate_limit,
     delete_session_cookie,
     get_session,
     set_session_cookie,
@@ -50,14 +51,7 @@ from api.utils import (
 logger = logging.getLogger("api")
 
 
-class RegisterAccountThrottle(AnonRateThrottle):
-    scope = "user_account_creation"
-
-
 @api_endpoint("POST")
-@rate_limit(
-    RegisterAccountThrottle, "Account creation limit reached ({rate}). Try again later."
-)
 @validate_json_input(RegisterAccountSerializer)
 @validate_output(MessageOutputSerializer)
 def register(request):
@@ -83,6 +77,8 @@ def register(request):
             {"error": {"password": list_failed_criteria(criteria)}}, status=400
         )
     pwd_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+    check_rate_limit(request, ThrottleScopes.USER_ACCOUNT_CREATION)
 
     try:
         # Check if the email already exists
@@ -130,14 +126,7 @@ def register(request):
         return GENERIC_ERR_RESPONSE
 
 
-class ResendEmailThrottle(AnonRateThrottle):
-    scope = "resend_email"
-
-
 @api_endpoint("POST")
-@rate_limit(
-    ResendEmailThrottle, "Resend email limit reached ({rate}). Try again later."
-)
 @validate_json_input(EmailSerializer)
 @validate_output(MessageOutputSerializer)
 def resend_register_email(request):
@@ -152,6 +141,8 @@ def resend_register_email(request):
     register again.
     """
     email = request.validated_data.get("email")
+
+    check_rate_limit(request, ThrottleScopes.RESEND_EMAIL)
 
     try:
         unverified_user = UnverifiedUserAccount.objects.get(
@@ -231,12 +222,7 @@ def verify_email(request):
     return Response({"message": ["Email verified successfully."]}, status=200)
 
 
-class LoginThrottle(AnonRateThrottle):
-    scope = "login"
-
-
 @api_endpoint("POST")
-@rate_limit(LoginThrottle, "Login limit reached ({rate}). Try again later.")
 @validate_json_input(LoginSerializer)
 @validate_output(AccountDetailsSerializer)
 def login(request):
@@ -249,6 +235,8 @@ def login(request):
     email = request.validated_data.get("email")
     password = request.validated_data.get("password")
     remember_me = request.validated_data.get("remember_me")
+
+    check_rate_limit(request, ThrottleScopes.LOGIN)
 
     # Check if the user is already logged in
     acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
@@ -345,10 +333,6 @@ class PasswordResetThrottle(AnonRateThrottle):
 
 
 @api_endpoint("POST")
-@rate_limit(
-    PasswordResetThrottle,
-    "Password reset limit reached ({rate}). Try again later.",
-)
 @validate_json_input(EmailSerializer)
 @validate_output(MessageOutputSerializer)
 def start_password_reset(request):
@@ -362,6 +346,8 @@ def start_password_reset(request):
     reset token will be generated and the old one invalidated.
     """
     email = request.validated_data.get("email")
+
+    check_rate_limit(request, ThrottleScopes.PASSWORD_RESET)
 
     try:
         user = UserAccount.objects.get(email=email)
