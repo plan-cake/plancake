@@ -154,10 +154,6 @@ def check_auth(func):
     return wrapper
 
 
-class GuestAccountCreationThrottle(AnonRateThrottle):
-    scope = "guest_account_creation"
-
-
 def require_auth(func):
     """
     A decorator to check if the user is authenticated (either with an account or as a
@@ -222,22 +218,7 @@ def require_auth(func):
                 )
             except UserSession.DoesNotExist:
                 logger.info("Guest session expired. Creating a new guest account...")
-                # Check guest creation rate limit
-                throttle = GuestAccountCreationThrottle()
-                if not throttle.allow_request(request, None):
-                    logger.warning(
-                        "Guest creation limit (%s) reached.", throttle.get_rate()
-                    )
-                    return Response(
-                        {
-                            "error": {
-                                "general": [
-                                    f"Guest creation limit ({throttle.get_rate()}) reached. Make sure cookies are enabled for this site, and try again later."
-                                ]
-                            }
-                        },
-                        status=429,
-                    )
+                check_rate_limit(request, ThrottleScopes.GUEST_ACCOUNT_CREATION)
                 # Create a new guest user
                 with transaction.atomic():
                     guest_account = UserAccount.objects.create(is_guest=True)
@@ -259,22 +240,7 @@ def require_auth(func):
                     True,
                 )
         else:
-            # Check guest creation rate limit
-            throttle = GuestAccountCreationThrottle()
-            if not throttle.allow_request(request, None):
-                logger.warning(
-                    "Guest creation limit (%s) reached.", throttle.get_rate()
-                )
-                return Response(
-                    {
-                        "error": {
-                            "general": [
-                                f"Guest creation limit ({throttle.get_rate()}) reached. Make sure cookies are enabled for this site, and try again later."
-                            ]
-                        }
-                    },
-                    status=429,
-                )
+            check_rate_limit(request, ThrottleScopes.GUEST_ACCOUNT_CREATION)
             # Create a guest user with an extended session
             with transaction.atomic():
                 guest_account = UserAccount.objects.create(is_guest=True)
