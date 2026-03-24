@@ -40,7 +40,8 @@ def api_endpoint(method):
         @functools.wraps(func)
         def wrapper(request, *args, **kwargs):
             try:
-                check_rate_limit(request, ThrottleScopes.GLOBAL)
+                # Currently disabled global rate limit until the auth logic is cleaned up
+                # check_rate_limit(request, ThrottleScopes.GLOBAL)
                 return func(request, *args, **kwargs)
             except RateLimitError as e:
                 return e.response
