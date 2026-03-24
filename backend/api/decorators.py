@@ -7,7 +7,6 @@ from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 
 from api.availability.utils import get_weekday_date
 from api.models import UserAccount, UserSession
@@ -15,7 +14,6 @@ from api.settings import (
     ACCOUNT_COOKIE_NAME,
     GENERIC_ERR_RESPONSE,
     GUEST_COOKIE_NAME,
-    REST_FRAMEWORK,
     ThrottleScopes,
 )
 from api.utils import (

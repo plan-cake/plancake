@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from django.db import DatabaseError, transaction
+from django.db import transaction
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
