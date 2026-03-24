@@ -2,7 +2,6 @@ import logging
 
 from django.db import transaction
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 
 from api.availability.serializers import (
     AvailabilityAddSerializer,
@@ -31,10 +30,6 @@ from api.settings import ThrottleScopes
 from api.utils import MessageOutputSerializer, check_rate_limit
 
 logger = logging.getLogger("api")
-
-
-class AvailabilityAddThrottle(AnonRateThrottle):
-    scope = "availability_add"
 
 
 class InvalidTimeslotError(Exception):

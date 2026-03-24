@@ -5,7 +5,6 @@ from zoneinfo import ZoneInfo
 from django.db import transaction
 from django.db.models import Q
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 
 from api.availability.utils import get_weekday_date
 from api.decorators import (
@@ -48,10 +47,6 @@ INVALID_TIMESLOT_TIME_ERROR = Response(
     {"error": {"timeslots": ["Timeslots must be on 15-minute intervals."]}},
     status=400,
 )
-
-
-class EventCreateThrottle(AnonRateThrottle):
-    scope = "event_creation"
 
 
 @api_endpoint("POST")

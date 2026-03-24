@@ -6,7 +6,6 @@ import bcrypt
 from django.core.mail import send_mail
 from django.db import transaction
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 
 from api.auth.serializers import (
     AccountDetailsSerializer,
@@ -293,10 +292,6 @@ def check_account_auth(request):
         },
         status=200,
     )
-
-
-class PasswordResetThrottle(AnonRateThrottle):
-    scope = "password_reset"
 
 
 @api_endpoint("POST")
