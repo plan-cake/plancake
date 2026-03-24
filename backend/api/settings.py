@@ -117,13 +117,13 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [],
     "DEFAULT_THROTTLE_RATES": {
         ThrottleScopes.GLOBAL.key: "300/min",
-        ThrottleScopes.USER_ACCOUNT_CREATION.key: "3/hour",
-        ThrottleScopes.RESEND_EMAIL.key: "3/hour",
-        ThrottleScopes.GUEST_ACCOUNT_CREATION.key: "1/min",
-        ThrottleScopes.LOGIN.key: "6/hour",
-        ThrottleScopes.PASSWORD_RESET.key: "3/hour",
-        ThrottleScopes.EVENT_CREATION.key: "6/hour",
-        ThrottleScopes.AVAILABILITY_ADD.key: "12/hour",
+        ThrottleScopes.USER_ACCOUNT_CREATION.key: "10/hour",
+        ThrottleScopes.RESEND_EMAIL.key: "20/hour",
+        ThrottleScopes.GUEST_ACCOUNT_CREATION.key: "10/min",
+        ThrottleScopes.LOGIN.key: "30/hour",
+        ThrottleScopes.PASSWORD_RESET.key: "10/hour",
+        ThrottleScopes.EVENT_CREATION.key: "25/hour",
+        ThrottleScopes.AVAILABILITY_ADD.key: "50/hour",
     },
 }
 
