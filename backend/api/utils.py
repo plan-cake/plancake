@@ -243,7 +243,7 @@ class PlancakeThrottle(SimpleRateThrottle):
 
     def get_cache_key(self, request, view):
         user = None
-        if type(request.user) == UserAccount:
+        if isinstance(request.user, UserAccount):
             user = request.user
         else:
             acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
