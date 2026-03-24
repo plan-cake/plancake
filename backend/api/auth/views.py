@@ -236,8 +236,6 @@ def login(request):
     password = request.validated_data.get("password")
     remember_me = request.validated_data.get("remember_me")
 
-    check_rate_limit(request, ThrottleScopes.LOGIN)
-
     # Check if the user is already logged in
     acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
     if acct_token:
@@ -269,6 +267,8 @@ def login(request):
         except Exception as e:
             logger.error(e)
             return GENERIC_ERR_RESPONSE
+
+    check_rate_limit(request, ThrottleScopes.LOGIN)
 
     BAD_AUTH_RESPONSE = Response(
         {"error": {"general": ["Email or password is incorrect."]}}, status=400
