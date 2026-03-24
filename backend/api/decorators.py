@@ -18,6 +18,7 @@ from api.settings import (
     REST_FRAMEWORK,
 )
 from api.utils import (
+    RateLimitError,
     delete_session_cookie,
     get_metadata,
     get_session,
@@ -35,7 +36,15 @@ def api_endpoint(method):
     """
 
     def decorator(func):
-        drf_view = api_view([method])(func)
+        # Wrap the function to catch RateLimitErrors
+        @functools.wraps(func)
+        def wrapper(request, *args, **kwargs):
+            try:
+                return func(request, *args, **kwargs)
+            except RateLimitError as e:
+                return e.response
+
+        drf_view = api_view([method])(wrapper)
         metadata = get_metadata(func)
         metadata.method = method
         drf_view.metadata = metadata

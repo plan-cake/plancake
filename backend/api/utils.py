@@ -4,6 +4,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.db.models import Q
 from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 
 from api.availability.utils import get_weekday_date
 from api.models import UserEvent, UserSession
@@ -13,6 +15,7 @@ from api.settings import (
     LONG_SESS_EXP_SECONDS,
     SESS_EXP_SECONDS,
     TEST_ENVIRONMENT,
+    ThrottleScope,
 )
 
 logger = logging.getLogger("api")
@@ -224,3 +227,42 @@ def format_event_info(event: UserEvent, include_participants: bool = False) -> d
         data["duration"] = event.duration
 
     return data
+
+
+class RateLimitError(Exception):
+    def __init__(self, message, response):
+        self.response = response
+        super().__init__(message)
+
+
+def check_rate_limit(request, throttle_scope: ThrottleScope) -> None:
+    """
+    Checks if a request should be allowed based on the provided throttle class. If not,
+    raises a RateLimitError with the Response to be sent back to the user.
+
+    An optional message can include the `{rate}` placeholder to dynamically insert the
+    rate limit value.
+
+    **Be careful that this error is not caught in a generic exception handler.** It should
+    be uncaught and allowed to propagate past the view function.
+    """
+    class DynamicThrottle(AnonRateThrottle):
+        scope = throttle_scope.key
+
+    throttler = DynamicThrottle()
+    if not throttler.allow_request(request, None):
+        msg = throttle_scope.message
+        if "{rate}" in msg:
+            msg = msg.replace("{rate}", throttler.get_rate())
+        logger.warning(msg)
+        response = Response(
+            {"error": {"general": [msg]}},
+            status=429,
+        )
+        if throttler.wait():
+            response["Retry-After"] = str(throttler.wait())
+
+        raise RateLimitError(
+            message=msg,
+            response=response,
+        )
