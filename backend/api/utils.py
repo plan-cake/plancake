@@ -5,13 +5,15 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from django.db.models import Q
 from rest_framework import serializers
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
+from rest_framework.throttling import SimpleRateThrottle
 
 from api.availability.utils import get_weekday_date
-from api.models import UserEvent, UserSession
+from api.models import UserAccount, UserEvent, UserSession
 from api.settings import (
+    ACCOUNT_COOKIE_NAME,
     COOKIE_DOMAIN,
     DEBUG,
+    GUEST_COOKIE_NAME,
     LONG_SESS_EXP_SECONDS,
     SESS_EXP_SECONDS,
     TEST_ENVIRONMENT,
@@ -229,14 +231,44 @@ def format_event_info(event: UserEvent, include_participants: bool = False) -> d
     return data
 
 
-class PlancakeThrottle(AnonRateThrottle):
+class PlancakeThrottle(SimpleRateThrottle):
     """
-    Custom throttle class that allows for dynamic rate limit scopes.
+    Custom throttle class that allows for dynamic rate limit scopes and integration with
+    the custom authentication system.
     """
 
     def __init__(self, scope):
         self.scope = scope.key
         super().__init__()
+
+    def get_cache_key(self, request, view):
+        user = None
+        if type(request.user) == UserAccount:
+            user = request.user
+        else:
+            acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+            guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
+            if acct_token:
+                session = get_session(acct_token)
+                if session:
+                    user = session.user_account
+            if not user and guest_token:
+                session = get_session(guest_token)
+                if session:
+                    user = session.user_account
+
+        # If the user is either logged in or using a guest account, use their ID
+        if user:
+            return self.cache_format % {
+                "scope": self.scope,
+                "ident": user.user_account_id,
+            }
+
+        # Otherwise, just use the IP address
+        return self.cache_format % {
+            "scope": self.scope,
+            "ident": self.get_ident(request),
+        }
 
 
 class RateLimitError(Exception):
