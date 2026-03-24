@@ -279,11 +279,8 @@ class RateLimitError(Exception):
 
 def check_rate_limit(request, throttle_scope: ThrottleScope) -> None:
     """
-    Checks if a request should be allowed based on the provided throttle class. If not,
+    Checks if a request should be allowed based on the provided throttle scope. If not,
     raises a RateLimitError with the Response to be sent back to the user.
-
-    An optional message can include the `{rate}` placeholder to dynamically insert the
-    rate limit value.
 
     **Be careful that this error is not caught in a generic exception handler.** It should
     be uncaught and allowed to propagate past the view function.
