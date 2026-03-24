@@ -106,12 +106,6 @@ def check_auth(func):
             except UserSession.DoesNotExist:
                 logger.info("Account session expired.")
                 acct_sess_expired = True
-            except DatabaseError as e:
-                logger.db_error(e)
-                return GENERIC_ERR_RESPONSE
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
 
         # At this point the account session either expired or did not exist
         guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
@@ -138,9 +132,6 @@ def check_auth(func):
                 request.user = None
                 # Run the function
                 response = func(request, *args, **kwargs)
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
         else:
             # Do NOT create a new guest account
             request.user = None
@@ -206,12 +197,6 @@ def require_auth(func):
             except UserSession.DoesNotExist:
                 logger.info("Account session expired.")
                 acct_sess_expired = True
-            except DatabaseError as e:
-                logger.db_error(e)
-                return GENERIC_ERR_RESPONSE
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
 
         # At this point the account session either expired or did not exist
         guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
@@ -251,56 +236,6 @@ def require_auth(func):
                         status=429,
                     )
                 # Create a new guest user
-                try:
-                    with transaction.atomic():
-                        guest_account = UserAccount.objects.create(is_guest=True)
-                        new_session_token = str(uuid.uuid4())
-                        guest_session = UserSession.objects.create(
-                            session_token=new_session_token,
-                            user_account=guest_account,
-                            is_extended=True,
-                        )
-                    logger.debug(
-                        "New guest session token: %s", guest_session.session_token
-                    )
-
-                    request.user = guest_account
-                    # Run the function
-                    response = func(request, *args, **kwargs)
-                    set_session_cookie(
-                        response,
-                        GUEST_COOKIE_NAME,
-                        guest_session.session_token,
-                        True,
-                    )
-                except DatabaseError as e:
-                    logger.db_error(e)
-                    return GENERIC_ERR_RESPONSE
-                except Exception as e:
-                    logger.error(e)
-                    return GENERIC_ERR_RESPONSE
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
-        else:
-            # Check guest creation rate limit
-            throttle = GuestAccountCreationThrottle()
-            if not throttle.allow_request(request, None):
-                logger.warning(
-                    "Guest creation limit (%s) reached.", throttle.get_rate()
-                )
-                return Response(
-                    {
-                        "error": {
-                            "general": [
-                                f"Guest creation limit ({throttle.get_rate()}) reached. Make sure cookies are enabled for this site, and try again later."
-                            ]
-                        }
-                    },
-                    status=429,
-                )
-            # Create a guest user with an extended session
-            try:
                 with transaction.atomic():
                     guest_account = UserAccount.objects.create(is_guest=True)
                     new_session_token = str(uuid.uuid4())
@@ -320,12 +255,43 @@ def require_auth(func):
                     guest_session.session_token,
                     True,
                 )
-            except DatabaseError as e:
-                logger.db_error(e)
-                return GENERIC_ERR_RESPONSE
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
+        else:
+            # Check guest creation rate limit
+            throttle = GuestAccountCreationThrottle()
+            if not throttle.allow_request(request, None):
+                logger.warning(
+                    "Guest creation limit (%s) reached.", throttle.get_rate()
+                )
+                return Response(
+                    {
+                        "error": {
+                            "general": [
+                                f"Guest creation limit ({throttle.get_rate()}) reached. Make sure cookies are enabled for this site, and try again later."
+                            ]
+                        }
+                    },
+                    status=429,
+                )
+            # Create a guest user with an extended session
+            with transaction.atomic():
+                guest_account = UserAccount.objects.create(is_guest=True)
+                new_session_token = str(uuid.uuid4())
+                guest_session = UserSession.objects.create(
+                    session_token=new_session_token,
+                    user_account=guest_account,
+                    is_extended=True,
+                )
+            logger.debug("New guest session token: %s", guest_session.session_token)
+
+            request.user = guest_account
+            # Run the function
+            response = func(request, *args, **kwargs)
+            set_session_cookie(
+                response,
+                GUEST_COOKIE_NAME,
+                guest_session.session_token,
+                True,
+            )
 
         # Make sure to return a message if the account session expired
         if acct_sess_expired:
@@ -385,12 +351,6 @@ def require_account_auth(func):
             except UserSession.DoesNotExist:
                 logger.info("Account session expired.")
                 return BAD_AUTH_RESPONSE
-            except DatabaseError as e:
-                logger.db_error(e)
-                return GENERIC_ERR_RESPONSE
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
         else:
             return BAD_AUTH_RESPONSE
 

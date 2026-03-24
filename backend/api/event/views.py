@@ -98,29 +98,22 @@ def create_date_event(request):
 
     check_rate_limit(request, ThrottleScopes.EVENT_CREATION)
 
-    try:
-        with transaction.atomic():
-            new_event = UserEvent.objects.create(
-                user_account=user,
-                title=title,
-                date_type=UserEvent.EventType.SPECIFIC,
-                duration=duration,
-                time_zone=time_zone,
-            )
-            UrlCode.objects.create(url_code=url_code, user_event=new_event)
-            # Create timeslot objects
-            EventDateTimeslot.objects.bulk_create(
-                [
-                    EventDateTimeslot(user_event=new_event, utc_timeslot=ts)
-                    for ts in set(timeslots)
-                ]
-            )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
+    with transaction.atomic():
+        new_event = UserEvent.objects.create(
+            user_account=user,
+            title=title,
+            date_type=UserEvent.EventType.SPECIFIC,
+            duration=duration,
+            time_zone=time_zone,
+        )
+        UrlCode.objects.create(url_code=url_code, user_event=new_event)
+        # Create timeslot objects
+        EventDateTimeslot.objects.bulk_create(
+            [
+                EventDateTimeslot(user_event=new_event, utc_timeslot=ts)
+                for ts in set(timeslots)
+            ]
+        )
 
     logger.debug(f"Event created with code: {url_code}")
     return Response({"event_code": url_code}, status=201)
@@ -170,36 +163,29 @@ def create_week_event(request):
 
     check_rate_limit(request, ThrottleScopes.EVENT_CREATION)
 
-    try:
-        with transaction.atomic():
-            new_event = UserEvent.objects.create(
-                user_account=user,
-                title=title,
-                date_type=UserEvent.EventType.GENERIC,
-                duration=duration,
-                time_zone=time_zone,
-            )
-            UrlCode.objects.create(url_code=url_code, user_event=new_event)
-            # Create timeslot objects
-            deduplicated_timeslots = set(
-                (js_weekday(ts.weekday()), ts.time()) for ts in timeslots
-            )
-            EventWeekdayTimeslot.objects.bulk_create(
-                [
-                    EventWeekdayTimeslot(
-                        user_event=new_event,
-                        weekday=weekday,
-                        local_timeslot=time,
-                    )
-                    for (weekday, time) in deduplicated_timeslots
-                ]
-            )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
+    with transaction.atomic():
+        new_event = UserEvent.objects.create(
+            user_account=user,
+            title=title,
+            date_type=UserEvent.EventType.GENERIC,
+            duration=duration,
+            time_zone=time_zone,
+        )
+        UrlCode.objects.create(url_code=url_code, user_event=new_event)
+        # Create timeslot objects
+        deduplicated_timeslots = set(
+            (js_weekday(ts.weekday()), ts.time()) for ts in timeslots
+        )
+        EventWeekdayTimeslot.objects.bulk_create(
+            [
+                EventWeekdayTimeslot(
+                    user_event=new_event,
+                    weekday=weekday,
+                    local_timeslot=time,
+                )
+                for (weekday, time) in deduplicated_timeslots
+            ]
+        )
 
     logger.debug(f"Event created with code: {url_code}")
     return Response({"event_code": url_code}, status=201)
@@ -308,12 +294,6 @@ def edit_date_event(request):
 
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     logger.debug(f"Event updated with code: {event_code}")
     return Response({"message": ["Event updated successfully."]}, status=200)
@@ -385,12 +365,6 @@ def edit_week_event(request):
 
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     logger.debug(f"Event updated with code: {event_code}")
     return Response({"message": ["Event updated successfully."]}, status=200)
@@ -427,12 +401,6 @@ def get_event_details(request):
             data["duration"] = event.duration
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response(
         {

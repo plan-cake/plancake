@@ -1,6 +1,6 @@
 import logging
 
-from django.db import DatabaseError, transaction
+from django.db import transaction
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 
@@ -27,7 +27,7 @@ from api.models import (
     EventWeekdayAvailability,
     UserEvent,
 )
-from api.settings import GENERIC_ERR_RESPONSE, ThrottleScopes
+from api.settings import ThrottleScopes
 from api.utils import MessageOutputSerializer, check_rate_limit
 
 logger = logging.getLogger("api")
@@ -151,12 +151,6 @@ def add_availability(request):
             },
             status=400,
         )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     logger.debug(
         f"Availability {'added' if new else 'updated'} for event with code: {event_code}"
@@ -201,12 +195,6 @@ def check_display_name(request):
             {"error": {"event_code": ["Event not found."]}},
             status=404,
         )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
 
 NOT_PARTICIPATED_ERROR = Response(
@@ -279,12 +267,6 @@ def get_self_availability(request):
         )
     except EventParticipant.DoesNotExist:
         return NOT_PARTICIPATED_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
 
 @api_endpoint("GET")
@@ -404,12 +386,6 @@ def get_all_availability(request):
             {"error": {"event_code": ["Event not found."]}},
             status=404,
         )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
 
 @api_endpoint("POST")
@@ -440,12 +416,6 @@ def remove_self_availability(request):
         )
     except EventParticipant.DoesNotExist:
         return NOT_PARTICIPATED_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response({"message": ["Availability removed successfully."]}, status=200)
 
@@ -490,11 +460,5 @@ def remove_availability(request):
             {"error": {"general": ["Event participant not found."]}},
             status=404,
         )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response({"message": ["Availability removed successfully."]}, status=200)
