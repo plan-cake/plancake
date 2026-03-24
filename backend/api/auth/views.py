@@ -76,15 +76,15 @@ def register(request):
     email = request.validated_data.get("email")
     password = request.validated_data.get("password")
 
-    try:
-        # Validate the password first
-        is_strong, criteria = validate_password(password)
-        if not is_strong:
-            return Response(
-                {"error": {"password": list_failed_criteria(criteria)}}, status=400
-            )
-        pwd_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    # Validate the password first
+    is_strong, criteria = validate_password(password)
+    if not is_strong:
+        return Response(
+            {"error": {"password": list_failed_criteria(criteria)}}, status=400
+        )
+    pwd_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
+    try:
         # Check if the email already exists
         if UserAccount.objects.filter(email=email).exists():
             logger.info("Email %s is already in use!", email)
