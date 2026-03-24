@@ -16,9 +16,11 @@ from api.settings import (
     GENERIC_ERR_RESPONSE,
     GUEST_COOKIE_NAME,
     REST_FRAMEWORK,
+    ThrottleScopes,
 )
 from api.utils import (
     RateLimitError,
+    check_rate_limit,
     delete_session_cookie,
     get_metadata,
     get_session,
@@ -40,6 +42,7 @@ def api_endpoint(method):
         @functools.wraps(func)
         def wrapper(request, *args, **kwargs):
             try:
+                check_rate_limit(request, ThrottleScopes.GLOBAL)
                 return func(request, *args, **kwargs)
             except RateLimitError as e:
                 return e.response

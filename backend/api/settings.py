@@ -96,6 +96,7 @@ class ThrottleScope:
 
 # Defining all scopes as object constants
 class ThrottleScopes:
+    GLOBAL = ThrottleScope("global", "Rate")
     USER_ACCOUNT_CREATION = ThrottleScope(
         "user_account_creation", "User account creation"
     )
@@ -115,6 +116,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [],
     "DEFAULT_THROTTLE_RATES": {
+        ThrottleScopes.GLOBAL.key: "300/min",
         ThrottleScopes.USER_ACCOUNT_CREATION.key: "3/hour",
         ThrottleScopes.RESEND_EMAIL.key: "3/hour",
         ThrottleScopes.GUEST_ACCOUNT_CREATION.key: "1/min",
