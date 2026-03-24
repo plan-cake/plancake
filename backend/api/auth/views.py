@@ -74,9 +74,10 @@ def register(request):
         return Response(
             {"error": {"password": list_failed_criteria(criteria)}}, status=400
         )
-    pwd_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
     check_rate_limit(request, ThrottleScopes.USER_ACCOUNT_CREATION)
+
+    pwd_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
     # Check if the email already exists
     if UserAccount.objects.filter(email=email).exists():
