@@ -11,7 +11,6 @@ from api.availability.utils import get_weekday_date
 from api.decorators import (
     api_endpoint,
     check_auth,
-    rate_limit,
     require_auth,
     validate_json_input,
     validate_output,
@@ -36,8 +35,8 @@ from api.event.utils import (
     validate_weekday_timeslots,
 )
 from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
-from api.settings import GENERIC_ERR_RESPONSE
-from api.utils import MessageOutputSerializer, format_event_info
+from api.settings import GENERIC_ERR_RESPONSE, ThrottleScopes
+from api.utils import MessageOutputSerializer, check_rate_limit, format_event_info
 
 logger = logging.getLogger("api")
 
@@ -56,9 +55,6 @@ class EventCreateThrottle(AnonRateThrottle):
 
 
 @api_endpoint("POST")
-@rate_limit(
-    EventCreateThrottle, "Event creation limit reached ({rate}). Try again later."
-)
 @require_auth
 @validate_json_input(DateEventCreateSerializer)
 @validate_output(EventCodeSerializer)
@@ -100,6 +96,8 @@ def create_date_event(request):
             logger.critical("Failed to generate a unique URL code.")
             return GENERIC_ERR_RESPONSE
 
+    check_rate_limit(request, ThrottleScopes.EVENT_CREATION)
+
     try:
         with transaction.atomic():
             new_event = UserEvent.objects.create(
@@ -129,9 +127,6 @@ def create_date_event(request):
 
 
 @api_endpoint("POST")
-@rate_limit(
-    EventCreateThrottle, "Event creation limit reached ({rate}). Try again later."
-)
 @require_auth
 @validate_json_input(WeekEventCreateSerializer)
 @validate_output(EventCodeSerializer)
@@ -172,6 +167,8 @@ def create_week_event(request):
         except Exception:
             logger.critical("Failed to generate a unique URL code.")
             return GENERIC_ERR_RESPONSE
+
+    check_rate_limit(request, ThrottleScopes.EVENT_CREATION)
 
     try:
         with transaction.atomic():

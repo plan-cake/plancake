@@ -15,7 +15,6 @@ from api.availability.utils import check_name_available, get_timeslots, get_week
 from api.decorators import (
     api_endpoint,
     check_auth,
-    rate_limit,
     require_auth,
     validate_json_input,
     validate_output,
@@ -28,8 +27,8 @@ from api.models import (
     EventWeekdayAvailability,
     UserEvent,
 )
-from api.settings import GENERIC_ERR_RESPONSE
-from api.utils import MessageOutputSerializer
+from api.settings import GENERIC_ERR_RESPONSE, ThrottleScopes
+from api.utils import MessageOutputSerializer, check_rate_limit
 
 logger = logging.getLogger("api")
 
@@ -43,10 +42,6 @@ class InvalidTimeslotError(Exception):
 
 
 @api_endpoint("POST")
-@rate_limit(
-    AvailabilityAddThrottle,
-    "Availability submission limit reached ({rate}). Try again later.",
-)
 @require_auth
 @validate_json_input(AvailabilityAddSerializer)
 @validate_output(MessageOutputSerializer)
@@ -80,6 +75,8 @@ def add_availability(request):
                     },
                     status=400,
                 )
+
+            check_rate_limit(request, ThrottleScopes.AVAILABILITY_ADD)
 
             timeslots = get_timeslots(user_event)
 
