@@ -295,8 +295,9 @@ def check_rate_limit(request, throttle_scope: ThrottleScope) -> None:
             {"error": {"general": [msg]}},
             status=429,
         )
-        if throttler.wait():
-            response["Retry-After"] = str(throttler.wait())
+        wait_time = throttler.wait()
+        if wait_time is not None:
+            response["Retry-After"] = str(wait_time)
 
         raise RateLimitError(
             message=msg,
