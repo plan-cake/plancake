@@ -229,6 +229,16 @@ def format_event_info(event: UserEvent, include_participants: bool = False) -> d
     return data
 
 
+class PlancakeThrottle(AnonRateThrottle):
+    """
+    Custom throttle class that allows for dynamic rate limit scopes.
+    """
+
+    def __init__(self, scope):
+        self.scope = scope.key
+        super().__init__()
+
+
 class RateLimitError(Exception):
     def __init__(self, message, response):
         self.response = response
@@ -246,10 +256,7 @@ def check_rate_limit(request, throttle_scope: ThrottleScope) -> None:
     **Be careful that this error is not caught in a generic exception handler.** It should
     be uncaught and allowed to propagate past the view function.
     """
-    class DynamicThrottle(AnonRateThrottle):
-        scope = throttle_scope.key
-
-    throttler = DynamicThrottle()
+    throttler = PlancakeThrottle(throttle_scope)
     if not throttler.allow_request(request, None):
         msg = throttle_scope.message
         if "{rate}" in msg:
