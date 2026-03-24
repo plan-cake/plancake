@@ -36,13 +36,19 @@ def api_endpoint(method):
     """
 
     def decorator(func):
-        # Wrap the function to catch RateLimitErrors
+        # Wrap the function to catch unhandled exceptions
         @functools.wraps(func)
         def wrapper(request, *args, **kwargs):
             try:
                 return func(request, *args, **kwargs)
             except RateLimitError as e:
                 return e.response
+            except DatabaseError as e:
+                logger.db_error(e)
+                return GENERIC_ERR_RESPONSE
+            except Exception as e:
+                logger.error(e)
+                return GENERIC_ERR_RESPONSE
 
         drf_view = api_view([method])(wrapper)
         metadata = get_metadata(func)
