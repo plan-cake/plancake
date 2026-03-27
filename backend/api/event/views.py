@@ -77,7 +77,6 @@ def create_date_event(request):
     """
     user = request.user
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
     custom_code = request.validated_data.get("custom_code")
@@ -107,7 +106,6 @@ def create_date_event(request):
                 user_account=user,
                 title=title,
                 date_type=UserEvent.EventType.SPECIFIC,
-                duration=duration,
                 time_zone=time_zone,
             )
             UrlCode.objects.create(url_code=url_code, user_event=new_event)
@@ -150,7 +148,6 @@ def create_week_event(request):
     """
     user = request.user
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
     custom_code = request.validated_data.get("custom_code")
@@ -180,7 +177,6 @@ def create_week_event(request):
                 user_account=user,
                 title=title,
                 date_type=UserEvent.EventType.GENERIC,
-                duration=duration,
                 time_zone=time_zone,
             )
             UrlCode.objects.create(url_code=url_code, user_event=new_event)
@@ -240,7 +236,6 @@ def edit_date_event(request):
     user = request.user
     event_code = request.validated_data.get("event_code")
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
 
@@ -289,7 +284,6 @@ def edit_date_event(request):
 
             # Update the event object itself
             event.title = title
-            event.duration = duration
             event.time_zone = time_zone
             event.save()
 
@@ -336,7 +330,6 @@ def edit_week_event(request):
     user = request.user
     event_code = request.validated_data.get("event_code")
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
 
@@ -359,7 +352,6 @@ def edit_week_event(request):
 
             # Update the event object itself
             event.title = title
-            event.duration = duration
             event.time_zone = time_zone
             event.save()
 
@@ -445,7 +437,7 @@ def delete_event(request):
 @validate_output(EventDetailSerializer)
 def get_event_details(request):
     """
-    Gets details about an event like title, duration, and timeslots.
+    Gets details about an event like type, title, and timeslots.
 
     This is useful for both displaying an event, and preparing for event editing.
     """
@@ -466,8 +458,6 @@ def get_event_details(request):
                     get_weekday_date(ts.weekday, ts.local_timeslot) for ts in timeslots
                 ]
 
-        if event.duration:
-            data["duration"] = event.duration
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
     except DatabaseError as e:

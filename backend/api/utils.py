@@ -792,7 +792,4 @@ def format_event_info(event: UserEvent, include_participants: bool = False) -> d
             participant.display_name for participant in event.participants.all()
         ]
 
-    if event.duration is not None:
-        data["duration"] = event.duration
-
     return data
