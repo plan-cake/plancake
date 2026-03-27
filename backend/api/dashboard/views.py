@@ -68,7 +68,7 @@ def get_dashboard(request):
     try:
         created_events = (
             UserEvent.objects.filter(user_account=user, url_code__isnull=False)
-            .order_by("created_at")
+            .order_by("-created_at")
             .select_related("url_code")
             .prefetch_related(
                 Prefetch(
@@ -94,7 +94,7 @@ def get_dashboard(request):
                 user_account=user,
                 user_event__url_code__isnull=False,
             )
-            .order_by("user_event__created_at")
+            .order_by("-user_event__created_at")
             .select_related("user_event__url_code")
             .prefetch_related(
                 Prefetch(
