@@ -33,6 +33,7 @@ export default function DateRangePopover({
           className={cn(
             "bg-background z-50 rounded-2xl border border-gray-400 p-4 shadow-lg",
             "data-[state=open]:data-[side=bottom]:animate-slideUpAndFade data-[state=open]:data-[side=left]:animate-slideRightAndFade data-[state=open]:data-[side=right]:animate-slideLeftAndFade data-[state=open]:data-[side=top]:animate-slideDownAndFade",
+            "data-[state=closed]:animate-slideDownAndFadeOut",
           )}
           aria-label="Date range picker"
         >
