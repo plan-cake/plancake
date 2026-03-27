@@ -8,7 +8,6 @@ import {
 import { useDebouncedCallback } from "use-debounce";
 
 import { useEventContext } from "@/core/event/context";
-import DurationSelector from "@/features/event/components/selectors/duration";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { MESSAGES } from "@/lib/messages";
@@ -16,6 +15,7 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { cn } from "@/lib/utils/classname";
+import TextInputField from "@/components/text-input-field";
 
 type AdvancedOptionsProps = {
   isEditing?: boolean;
@@ -56,7 +56,6 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
   const {
     state: { customCode, eventRange },
     setTimezone,
-    setDuration,
     setCustomCode,
     handleError,
   } = useEventContext();
@@ -88,18 +87,6 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
           id="timezone-select"
           value={eventRange.timezone}
           onChange={setTimezone}
-        />
-      </FormSelectorField>
-
-      <FormSelectorField
-        label="Intended Duration"
-        htmlFor="duration-select"
-        isVertical
-      >
-        <DurationSelector
-          id="duration-select"
-          value={eventRange.duration}
-          onChange={(v) => setDuration((v as number) || 0)}
         />
       </FormSelectorField>
 
