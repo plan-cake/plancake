@@ -7,7 +7,6 @@ from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 
 from api.availability.utils import get_weekday_date
 from api.models import UserAccount, UserSession
@@ -15,9 +14,11 @@ from api.settings import (
     ACCOUNT_COOKIE_NAME,
     GENERIC_ERR_RESPONSE,
     GUEST_COOKIE_NAME,
-    REST_FRAMEWORK,
+    ThrottleScopes,
 )
 from api.utils import (
+    RateLimitError,
+    check_rate_limit,
     delete_session_cookie,
     get_metadata,
     get_session,
@@ -35,7 +36,23 @@ def api_endpoint(method):
     """
 
     def decorator(func):
-        drf_view = api_view([method])(func)
+        # Wrap the function to catch unhandled exceptions
+        @functools.wraps(func)
+        def wrapper(request, *args, **kwargs):
+            try:
+                # Currently disabled global rate limit until the auth logic is cleaned up
+                # check_rate_limit(request, ThrottleScopes.GLOBAL)
+                return func(request, *args, **kwargs)
+            except RateLimitError as e:
+                return e.response
+            except DatabaseError as e:
+                logger.db_error(e)
+                return GENERIC_ERR_RESPONSE
+            except Exception as e:
+                logger.error(e)
+                return GENERIC_ERR_RESPONSE
+
+        drf_view = api_view([method])(wrapper)
         metadata = get_metadata(func)
         metadata.method = method
         drf_view.metadata = metadata
@@ -91,12 +108,6 @@ def check_auth(func):
             except UserSession.DoesNotExist:
                 logger.info("Account session expired.")
                 acct_sess_expired = True
-            except DatabaseError as e:
-                logger.db_error(e)
-                return GENERIC_ERR_RESPONSE
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
 
         # At this point the account session either expired or did not exist
         guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
@@ -123,9 +134,6 @@ def check_auth(func):
                 request.user = None
                 # Run the function
                 response = func(request, *args, **kwargs)
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
         else:
             # Do NOT create a new guest account
             request.user = None
@@ -143,10 +151,6 @@ def check_auth(func):
         return response
 
     return wrapper
-
-
-class GuestAccountCreationThrottle(AnonRateThrottle):
-    scope = "guest_account_creation"
 
 
 def require_auth(func):
@@ -191,12 +195,6 @@ def require_auth(func):
             except UserSession.DoesNotExist:
                 logger.info("Account session expired.")
                 acct_sess_expired = True
-            except DatabaseError as e:
-                logger.db_error(e)
-                return GENERIC_ERR_RESPONSE
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
 
         # At this point the account session either expired or did not exist
         guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
@@ -219,73 +217,8 @@ def require_auth(func):
                 )
             except UserSession.DoesNotExist:
                 logger.info("Guest session expired. Creating a new guest account...")
-                # Check guest creation rate limit
-                throttle = GuestAccountCreationThrottle()
-                if not throttle.allow_request(request, None):
-                    logger.warning(
-                        "Guest creation limit (%s) reached.", throttle.get_rate()
-                    )
-                    return Response(
-                        {
-                            "error": {
-                                "general": [
-                                    f"Guest creation limit ({throttle.get_rate()}) reached. Make sure cookies are enabled for this site, and try again later."
-                                ]
-                            }
-                        },
-                        status=429,
-                    )
+                check_rate_limit(request, ThrottleScopes.GUEST_ACCOUNT_CREATION)
                 # Create a new guest user
-                try:
-                    with transaction.atomic():
-                        guest_account = UserAccount.objects.create(is_guest=True)
-                        new_session_token = str(uuid.uuid4())
-                        guest_session = UserSession.objects.create(
-                            session_token=new_session_token,
-                            user_account=guest_account,
-                            is_extended=True,
-                        )
-                    logger.debug(
-                        "New guest session token: %s", guest_session.session_token
-                    )
-
-                    request.user = guest_account
-                    # Run the function
-                    response = func(request, *args, **kwargs)
-                    set_session_cookie(
-                        response,
-                        GUEST_COOKIE_NAME,
-                        guest_session.session_token,
-                        True,
-                    )
-                except DatabaseError as e:
-                    logger.db_error(e)
-                    return GENERIC_ERR_RESPONSE
-                except Exception as e:
-                    logger.error(e)
-                    return GENERIC_ERR_RESPONSE
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
-        else:
-            # Check guest creation rate limit
-            throttle = GuestAccountCreationThrottle()
-            if not throttle.allow_request(request, None):
-                logger.warning(
-                    "Guest creation limit (%s) reached.", throttle.get_rate()
-                )
-                return Response(
-                    {
-                        "error": {
-                            "general": [
-                                f"Guest creation limit ({throttle.get_rate()}) reached. Make sure cookies are enabled for this site, and try again later."
-                            ]
-                        }
-                    },
-                    status=429,
-                )
-            # Create a guest user with an extended session
-            try:
                 with transaction.atomic():
                     guest_account = UserAccount.objects.create(is_guest=True)
                     new_session_token = str(uuid.uuid4())
@@ -305,12 +238,28 @@ def require_auth(func):
                     guest_session.session_token,
                     True,
                 )
-            except DatabaseError as e:
-                logger.db_error(e)
-                return GENERIC_ERR_RESPONSE
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
+        else:
+            check_rate_limit(request, ThrottleScopes.GUEST_ACCOUNT_CREATION)
+            # Create a guest user with an extended session
+            with transaction.atomic():
+                guest_account = UserAccount.objects.create(is_guest=True)
+                new_session_token = str(uuid.uuid4())
+                guest_session = UserSession.objects.create(
+                    session_token=new_session_token,
+                    user_account=guest_account,
+                    is_extended=True,
+                )
+            logger.debug("New guest session token: %s", guest_session.session_token)
+
+            request.user = guest_account
+            # Run the function
+            response = func(request, *args, **kwargs)
+            set_session_cookie(
+                response,
+                GUEST_COOKIE_NAME,
+                guest_session.session_token,
+                True,
+            )
 
         # Make sure to return a message if the account session expired
         if acct_sess_expired:
@@ -370,12 +319,6 @@ def require_account_auth(func):
             except UserSession.DoesNotExist:
                 logger.info("Account session expired.")
                 return BAD_AUTH_RESPONSE
-            except DatabaseError as e:
-                logger.db_error(e)
-                return GENERIC_ERR_RESPONSE
-            except Exception as e:
-                logger.error(e)
-                return GENERIC_ERR_RESPONSE
         else:
             return BAD_AUTH_RESPONSE
 
@@ -550,41 +493,6 @@ def validate_output(serializer_class):
                 return GENERIC_ERR_RESPONSE
 
         get_metadata(wrapper).output_serializer_class = serializer_class
-        return wrapper
-
-    return decorator
-
-
-def get_rate_limit(scope):
-    return REST_FRAMEWORK.get("DEFAULT_THROTTLE_RATES", {}).get(scope, None)
-
-
-def rate_limit(
-    throttle_class, error_message="Rate limit ({rate}) exceeded. Try again later."
-):
-    """
-    A decorator that takes a throttle class and limits the endpoint accordingly.
-
-    An optional message can be passed, which can include the `{rate}` placeholder to
-    dynamically insert the rate limit value.
-    """
-
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(request, *args, **kwargs):
-            throttle = throttle_class()
-            if not throttle.allow_request(request, None):
-                msg = error_message
-                if "{rate}" in msg:
-                    msg = msg.replace("{rate}", throttle.get_rate())
-                logger.warning(msg)
-                return Response(
-                    {"error": {"general": [msg]}},
-                    status=429,
-                )
-            return func(request, *args, **kwargs)
-
-        get_metadata(wrapper).rate_limit = get_rate_limit(throttle_class.scope)
         return wrapper
 
     return decorator

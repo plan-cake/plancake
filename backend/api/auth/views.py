@@ -4,9 +4,8 @@ from datetime import datetime, timedelta
 
 import bcrypt
 from django.core.mail import send_mail
-from django.db import DatabaseError, transaction
+from django.db import transaction
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 
 from api.auth.serializers import (
     AccountDetailsSerializer,
@@ -20,7 +19,6 @@ from api.auth.serializers import (
 from api.auth.utils import list_failed_criteria, validate_password
 from api.decorators import (
     api_endpoint,
-    rate_limit,
     require_account_auth,
     validate_json_input,
     validate_output,
@@ -36,12 +34,13 @@ from api.settings import (
     ACCOUNT_COOKIE_NAME,
     BASE_URL,
     EMAIL_CODE_EXP_SECONDS,
-    GENERIC_ERR_RESPONSE,
     PWD_RESET_EXP_SECONDS,
     SEND_EMAILS,
+    ThrottleScopes,
 )
 from api.utils import (
     MessageOutputSerializer,
+    check_rate_limit,
     delete_session_cookie,
     get_session,
     set_session_cookie,
@@ -50,14 +49,7 @@ from api.utils import (
 logger = logging.getLogger("api")
 
 
-class RegisterAccountThrottle(AnonRateThrottle):
-    scope = "user_account_creation"
-
-
 @api_endpoint("POST")
-@rate_limit(
-    RegisterAccountThrottle, "Account creation limit reached ({rate}). Try again later."
-)
 @validate_json_input(RegisterAccountSerializer)
 @validate_output(MessageOutputSerializer)
 def register(request):
@@ -76,68 +68,56 @@ def register(request):
     email = request.validated_data.get("email")
     password = request.validated_data.get("password")
 
-    try:
-        # Validate the password first
-        is_strong, criteria = validate_password(password)
-        if not is_strong:
-            return Response(
-                {"error": {"password": list_failed_criteria(criteria)}}, status=400
-            )
-        pwd_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-
-        # Check if the email already exists
-        if UserAccount.objects.filter(email=email).exists():
-            logger.info("Email %s is already in use!", email)
-            if SEND_EMAILS:
-                send_mail(
-                    subject="Plancake - Email in Use",
-                    message=f"Looks like your email was already used for a Plancake account.\n\nNot you? Nothing to worry about, just ignore this email.",
-                    from_email=None,  # Use the default from settings
-                    recipient_list=[email],
-                    fail_silently=False,
-                )
-        else:
-            # Create an unverified user account
-            ver_code = str(uuid.uuid4())
-            with transaction.atomic():
-                UnverifiedUserAccount.objects.filter(email=email).delete()
-                UnverifiedUserAccount.objects.create(
-                    verification_code=ver_code,
-                    email=email,
-                    password_hash=pwd_hash,
-                )
-            logger.debug("Verification code for %s: %s", email, ver_code)
-
-            if SEND_EMAILS:
-                send_mail(
-                    subject="Plancake - Email Verification",
-                    message=f"Welcome to Plancake!\n\nClick this link to verify your email:\n{BASE_URL}/verify-email?code={ver_code}\n\nNot you? Nothing to worry about, just ignore this email.",
-                    from_email=None,  # Use the default from settings
-                    recipient_list=[email],
-                    fail_silently=False,
-                )
-
+    # Validate the password first
+    is_strong, criteria = validate_password(password)
+    if not is_strong:
         return Response(
-            {"message": ["An email has been sent to your address for verification."]},
-            status=200,
+            {"error": {"password": list_failed_criteria(criteria)}}, status=400
         )
 
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
+    check_rate_limit(request, ThrottleScopes.USER_ACCOUNT_CREATION)
 
+    pwd_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
-class ResendEmailThrottle(AnonRateThrottle):
-    scope = "resend_email"
+    # Check if the email already exists
+    if UserAccount.objects.filter(email=email).exists():
+        logger.info("Email %s is already in use!", email)
+        if SEND_EMAILS:
+            send_mail(
+                subject="Plancake - Email in Use",
+                message=f"Looks like your email was already used for a Plancake account.\n\nNot you? Nothing to worry about, just ignore this email.",
+                from_email=None,  # Use the default from settings
+                recipient_list=[email],
+                fail_silently=False,
+            )
+    else:
+        # Create an unverified user account
+        ver_code = str(uuid.uuid4())
+        with transaction.atomic():
+            UnverifiedUserAccount.objects.filter(email=email).delete()
+            UnverifiedUserAccount.objects.create(
+                verification_code=ver_code,
+                email=email,
+                password_hash=pwd_hash,
+            )
+        logger.debug("Verification code for %s: %s", email, ver_code)
+
+        if SEND_EMAILS:
+            send_mail(
+                subject="Plancake - Email Verification",
+                message=f"Welcome to Plancake!\n\nClick this link to verify your email:\n{BASE_URL}/verify-email?code={ver_code}\n\nNot you? Nothing to worry about, just ignore this email.",
+                from_email=None,  # Use the default from settings
+                recipient_list=[email],
+                fail_silently=False,
+            )
+
+    return Response(
+        {"message": ["An email has been sent to your address for verification."]},
+        status=200,
+    )
 
 
 @api_endpoint("POST")
-@rate_limit(
-    ResendEmailThrottle, "Resend email limit reached ({rate}). Try again later."
-)
 @validate_json_input(EmailSerializer)
 @validate_output(MessageOutputSerializer)
 def resend_register_email(request):
@@ -152,6 +132,8 @@ def resend_register_email(request):
     register again.
     """
     email = request.validated_data.get("email")
+
+    check_rate_limit(request, ThrottleScopes.RESEND_EMAIL)
 
     try:
         unverified_user = UnverifiedUserAccount.objects.get(
@@ -175,12 +157,6 @@ def resend_register_email(request):
 
     except UnverifiedUserAccount.DoesNotExist:
         logger.info("Unverified user with email %s does not exist!", email)
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response({"message": ["Verification email resent."]}, status=200)
 
@@ -221,22 +197,11 @@ def verify_email(request):
         return Response(
             {"error": {"verification_code": ["Invalid verification code."]}}, status=404
         )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response({"message": ["Email verified successfully."]}, status=200)
 
 
-class LoginThrottle(AnonRateThrottle):
-    scope = "login"
-
-
 @api_endpoint("POST")
-@rate_limit(LoginThrottle, "Login limit reached ({rate}). Try again later.")
 @validate_json_input(LoginSerializer)
 @validate_output(AccountDetailsSerializer)
 def login(request):
@@ -275,12 +240,8 @@ def login(request):
             return response
         except UserSession.DoesNotExist:
             logger.info("Account session expired.")
-        except DatabaseError as e:
-            logger.db_error(e)
-            return GENERIC_ERR_RESPONSE
-        except Exception as e:
-            logger.error(e)
-            return GENERIC_ERR_RESPONSE
+
+    check_rate_limit(request, ThrottleScopes.LOGIN)
 
     BAD_AUTH_RESPONSE = Response(
         {"error": {"general": ["Email or password is incorrect."]}}, status=400
@@ -303,12 +264,6 @@ def login(request):
     except UserAccount.DoesNotExist:
         logger.info("Login failed for %s: User does not exist.", email)
         return BAD_AUTH_RESPONSE
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     response = Response(
         {
@@ -340,15 +295,7 @@ def check_account_auth(request):
     )
 
 
-class PasswordResetThrottle(AnonRateThrottle):
-    scope = "password_reset"
-
-
 @api_endpoint("POST")
-@rate_limit(
-    PasswordResetThrottle,
-    "Password reset limit reached ({rate}). Try again later.",
-)
 @validate_json_input(EmailSerializer)
 @validate_output(MessageOutputSerializer)
 def start_password_reset(request):
@@ -362,6 +309,8 @@ def start_password_reset(request):
     reset token will be generated and the old one invalidated.
     """
     email = request.validated_data.get("email")
+
+    check_rate_limit(request, ThrottleScopes.PASSWORD_RESET)
 
     try:
         user = UserAccount.objects.get(email=email)
@@ -384,12 +333,6 @@ def start_password_reset(request):
 
     except UserAccount.DoesNotExist:
         logger.info("Password reset failed for %s: User does not exist.", email)
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response(
         {
@@ -458,12 +401,6 @@ def reset_password(request):
         return Response(
             {"error": {"reset_token": ["Invalid reset token."]}}, status=404
         )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response({"message": ["Password reset successfully."]}, status=200)
 
@@ -475,17 +412,10 @@ def logout(request):
     Logs out the currently-authenticated user account by deleting the session token in the
     database and the cookie on the client.
     """
-    try:
-        if token := request.COOKIES.get(ACCOUNT_COOKIE_NAME):
-            UserSession.objects.filter(session_token=token).delete()
-        else:
-            logger.info("User already logged out.")
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
+    if token := request.COOKIES.get(ACCOUNT_COOKIE_NAME):
+        UserSession.objects.filter(session_token=token).delete()
+    else:
+        logger.info("User already logged out.")
 
     response = Response({"message": ["Logged out successfully."]}, status=200)
     delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
@@ -506,14 +436,8 @@ def delete_account(request):
     if not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
         logger.info("Account deletion failed for %s: Incorrect password.", user.email)
         return Response({"error": {"password": ["Incorrect password."]}}, status=400)
-    try:
-        user.delete()
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
+
+    user.delete()
 
     response = Response({"message": ["Account deleted successfully."]}, status=200)
     delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
