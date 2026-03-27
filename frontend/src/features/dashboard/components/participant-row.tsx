@@ -10,7 +10,13 @@ export default function ParticipantRow({
   numIcons,
 }: ParticipantRowProps) {
   return (
-    <div className="flex text-sm">
+    <div
+      className={cn(
+        "flex bg-inherit text-sm",
+        // Every icon after the first has padding meant to act as a border
+        Math.min(numIcons, participants.length) > 1 && "-mb-0.5",
+      )}
+    >
       {participants.length > 0 ? (
         participants.map((participant, index) => {
           if (index >= numIcons) {
@@ -56,42 +62,42 @@ function ParticipantIcon({
 }) {
   return (
     <div
-      className={cn(
-        "bg-lion text-violet flex h-6 items-center justify-center rounded-full font-bold",
-        !isFirst && "outline-background -ml-1 outline-2",
-        // I know this is ugly but it gets the job done without using JavaScript
-        !isFirst &&
-          "group-hover:outline-[color-mix(in_oklab,var(--color-background)_95%,var(--color-foreground))]",
-        !isFirst &&
-          "group-[&:not(:has([data-actions]:active))]:group-active:outline-[color-mix(in_oklab,var(--color-background)_95%,var(--color-black))]",
-        // The "leading-[13px]" is to vertically center the text
-        // By setting the line height to 1 pixel less than the font size, it should cut
-        // off the descender space and properly center the numbers
-        iconText.length > 1 ? "min-w-6 px-1 leading-[13px]" : "w-6",
-      )}
-      aria-label={label}
-      role="img" // For screen readers to read the label instead of the text
+      className={
+        isFirst ? "mr-0.5" : "-ml-2 -mt-0.5 rounded-full bg-inherit p-0.5"
+      }
     >
-      {iconText.length === 1 ? (
-        <svg
-          viewBox="0 0 100 100"
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-full w-full fill-current"
-        >
-          <text
-            x="51%"
-            y="50%"
-            dominantBaseline="central"
-            textAnchor="middle"
-            fontSize="60"
-            fontWeight="bold"
+      <div
+        className={cn(
+          "bg-lion text-violet flex h-6 items-center justify-center rounded-full font-bold",
+          // The "leading-[13px]" is to vertically center the text
+          // By setting the line height to 1 pixel less than the font size, it should cut
+          // off the descender space and properly center the numbers
+          iconText.length > 1 ? "min-w-6 px-1 leading-[13px]" : "w-6",
+        )}
+        aria-label={label}
+        role="img" // For screen readers to read the label instead of the text
+      >
+        {iconText.length === 1 ? (
+          <svg
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-full w-full fill-current"
           >
-            {iconText}
-          </text>
-        </svg>
-      ) : (
-        iconText
-      )}
+            <text
+              x="51%"
+              y="50%"
+              dominantBaseline="central"
+              textAnchor="middle"
+              fontSize="60"
+              fontWeight="bold"
+            >
+              {iconText}
+            </text>
+          </svg>
+        ) : (
+          iconText
+        )}
+      </div>
     </div>
   );
 }
