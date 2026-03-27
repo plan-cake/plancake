@@ -15,7 +15,6 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { cn } from "@/lib/utils/classname";
-import TextInputField from "@/components/text-input-field";
 
 type AdvancedOptionsProps = {
   isEditing?: boolean;
@@ -92,7 +91,7 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
 
       <label
         htmlFor="custom-code-input"
-        className="flex justify-between text-gray-400"
+        className="mt-2 flex justify-between text-gray-400"
       >
         {!isEditing && "Custom"} Event Code
         {errors.customCode && (
