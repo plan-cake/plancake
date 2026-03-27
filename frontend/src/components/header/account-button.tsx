@@ -34,7 +34,6 @@ export default function AccountButton() {
       buttonStyle="frosted glass inset"
       label="Log In"
       href="/login"
-      loading={loginState === "loading"}
     />
   );
 }

@@ -9,7 +9,7 @@ export const AccountContext = createContext<{
   logout: () => void;
   refreshAccount: () => Promise<void>;
 }>({
-  loginState: "loading",
+  loginState: "logged_out",
   accountDetails: null,
   login: () => {},
   logout: () => {},

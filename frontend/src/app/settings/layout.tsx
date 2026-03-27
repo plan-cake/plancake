@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -27,15 +27,21 @@ export default function SettingsLayout({
   const router = useRouter();
   const { loginState } = useAccount();
   const { addToast } = useToast();
+  const previousLoginState = useRef(loginState);
 
   useEffect(() => {
     if (loginState === "logged_out") {
       router.replace("/login");
-      addToast("info", MESSAGES.INFO_NOT_LOGGED_IN);
+
+      // Only show the toast if they didn't JUST log out
+      if (previousLoginState.current !== "logged_in") {
+        addToast("info", MESSAGES.INFO_NOT_LOGGED_IN);
+      }
     }
+    previousLoginState.current = loginState;
   }, [addToast, loginState, router]);
 
-  if (loginState === "loading" || loginState === "logged_out") {
+  if (loginState === "logged_out") {
     return <Loading />;
   }
 

@@ -40,10 +40,7 @@ export default function AuthLayout({
     }
   }, [loginState, router, addToast, isAllowedRoute]);
 
-  if (
-    loginState === "loading" ||
-    (loginState === "logged_in" && !isAllowedRoute)
-  ) {
+  if (loginState === "logged_in" && !isAllowedRoute) {
     // Logged in status is included to avoid flickering on redirect
     return <Loading />;
   }
