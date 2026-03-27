@@ -11,7 +11,9 @@ export default function Page() {
         )}
       >
         <div>
-          <h2 className="text-error text-lg font-bold">Account Removal</h2>
+          <h2 className="text-error dark:text-foreground text-lg font-bold">
+            Account Removal
+          </h2>
           <p className="mt-1 text-sm opacity-80">
             Deleting your account{" "}
             <span className="font-bold underline">cannot</span> be undone.
