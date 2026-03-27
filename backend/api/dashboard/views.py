@@ -50,7 +50,8 @@ def get_dashboard(request):
     Returns dashboard data for the current user. This includes events that the user
     created and ones that the user participated in.
 
-    The events are sorted by their creation date.
+    The events are sorted by their creation date descending, meaning the most recent
+    events appear first.
 
     Events that no longer have a URL code from inactivity will not be included.
     """
