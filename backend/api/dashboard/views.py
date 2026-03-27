@@ -50,7 +50,8 @@ def get_dashboard(request):
     Returns dashboard data for the current user. This includes events that the user
     created and ones that the user participated in.
 
-    The events are sorted by their creation date.
+    The events are sorted by their creation date descending, meaning the most recent
+    events appear first.
 
     Events that no longer have a URL code from inactivity will not be included.
     """
@@ -68,7 +69,7 @@ def get_dashboard(request):
     try:
         created_events = (
             UserEvent.objects.filter(user_account=user, url_code__isnull=False)
-            .order_by("created_at")
+            .order_by("-created_at")
             .select_related("url_code")
             .prefetch_related(
                 Prefetch(
@@ -94,7 +95,7 @@ def get_dashboard(request):
                 user_account=user,
                 user_event__url_code__isnull=False,
             )
-            .order_by("user_event__created_at")
+            .order_by("-user_event__created_at")
             .select_related("user_event__url_code")
             .prefetch_related(
                 Prefetch(
