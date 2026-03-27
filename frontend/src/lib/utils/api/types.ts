@@ -47,7 +47,6 @@ export type EventCode = {
 
 export type NewEventData = {
   title: string;
-  duration?: number;
   timeslots: string[];
   time_zone: string;
   custom_code?: string;
@@ -59,7 +58,6 @@ export type CustomCode = {
 
 export type EventEditData = {
   title: string;
-  duration?: number;
   timeslots: string[];
   time_zone: string;
   event_code: string;
@@ -69,7 +67,6 @@ type ApiEventType = "Date" | "Week";
 
 export type EventDetails = {
   title: string;
-  duration: number | null;
   timeslots: string[];
   time_zone: string;
   is_creator: boolean;
@@ -109,7 +106,6 @@ export type AllAvailability = {
 export type DashboardEvent = {
   title: string;
   event_type: ApiEventType;
-  duration: number | null;
   start_date: string;
   end_date: string;
   start_time: string;

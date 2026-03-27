@@ -74,10 +74,6 @@ export function useEventInfo(initialData?: EventInformation) {
     dispatch({ type: "SET_TIMEZONE", payload: tz });
   }, []);
 
-  const setDuration = useCallback((duration: number) => {
-    dispatch({ type: "SET_DURATION", payload: duration });
-  }, []);
-
   const setStartTime = useCallback(
     (time: string) => {
       if (checkTimeRange(time, state.eventRange.timeRange.to)) {
@@ -139,7 +135,6 @@ export function useEventInfo(initialData?: EventInformation) {
       setCustomCode,
       setEventRangeInfo,
       setTimezone,
-      setDuration,
       setStartTime,
       setEndTime,
       setDateRange,
@@ -158,7 +153,6 @@ export function useEventInfo(initialData?: EventInformation) {
       setCustomCode,
       setEventRangeInfo,
       setTimezone,
-      setDuration,
       setStartTime,
       setEndTime,
       setDateRange,
