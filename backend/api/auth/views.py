@@ -177,6 +177,8 @@ def verify_email(request):
     """
     ver_code = request.validated_data.get("verification_code")
 
+    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
+
     try:
         unverified_user = UnverifiedUserAccount.objects.get(
             verification_code=ver_code,
@@ -358,6 +360,8 @@ def reset_password(request):
     """
     reset_token = request.validated_data.get("reset_token")
     new_password = request.validated_data.get("new_password")
+
+    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
 
     is_strong, criteria = validate_password(new_password)
     if not is_strong:

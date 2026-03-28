@@ -114,6 +114,8 @@ def check_authed_password_reset_code(request):
     user = request.user
     reset_code = request.validated_data["reset_code"]
 
+    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
+
     try:
         AuthedPasswordResetCode.objects.get(
             user_account=user,
@@ -150,6 +152,8 @@ def authed_password_reset(request):
     reset_code = request.validated_data["reset_code"]
     new_password = request.validated_data["new_password"]
     prune_sessions = request.validated_data["prune_sessions"]
+
+    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
 
     is_strong, criteria = validate_password(new_password)
     if not is_strong:
