@@ -100,7 +100,12 @@ def start_authed_password_reset(request):
 
 
 class AuthedPasswordResetCodeSerializer(serializers.Serializer):
-    reset_code = serializers.CharField(required=True, max_length=6)
+    reset_code = serializers.RegexField(
+        regex=r"^\d{6}$",
+        required=True,
+        min_length=6,
+        max_length=6,
+    )
 
 
 @api_endpoint("POST")
