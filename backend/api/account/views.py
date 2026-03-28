@@ -9,6 +9,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.response import Response
 
+from api.auth.utils import list_failed_criteria, validate_password
 from api.availability.serializers import DisplayNameSerializer
 from api.decorators import (
     api_endpoint,
@@ -149,6 +150,13 @@ def authed_password_reset(request):
     reset_code = request.validated_data["reset_code"]
     new_password = request.validated_data["new_password"]
     prune_sessions = request.validated_data["prune_sessions"]
+
+    is_strong, criteria = validate_password(new_password)
+    if not is_strong:
+        logger.info("Password reset failed: Invalid new password.")
+        return Response(
+            {"error": {"new_password": list_failed_criteria(criteria)}}, status=400
+        )
 
     try:
         with transaction.atomic():
