@@ -451,24 +451,16 @@ def change_password(request):
             {"error": {"new_password": list_failed_criteria(criteria)}}, status=400
         )
 
-    try:
-        with transaction.atomic():
-            user.password_hash = bcrypt.hashpw(
-                new_password.encode(), bcrypt.gensalt()
-            ).decode()
-            user.save()
+    with transaction.atomic():
+        user.password_hash = bcrypt.hashpw(
+            new_password.encode(), bcrypt.gensalt()
+        ).decode()
+        user.save()
 
-            if prune_sessions:
-                UserSession.objects.filter(user_account=user).exclude(
-                    session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-                ).delete()
-
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
+        if prune_sessions:
+            UserSession.objects.filter(user_account=user).exclude(
+                session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+            ).delete()
 
     return Response({"message": ["Password changed successfully."]}, status=200)
 

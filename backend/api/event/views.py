@@ -386,12 +386,6 @@ def delete_event(request):
 
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response({"message": ["Event deleted successfully."]}, status=200)
 
