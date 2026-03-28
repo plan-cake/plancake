@@ -44,6 +44,7 @@ from api.utils import (
     check_rate_limit,
     delete_session_cookie,
     get_session,
+    prune_account_sessions,
     set_session_cookie,
 )
 
@@ -458,9 +459,7 @@ def change_password(request):
         user.save()
 
         if prune_sessions:
-            UserSession.objects.filter(user_account=user).exclude(
-                session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-            ).delete()
+            prune_account_sessions(request)
 
     return Response({"message": ["Password changed successfully."]}, status=200)
 

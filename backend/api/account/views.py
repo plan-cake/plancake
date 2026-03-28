@@ -16,14 +16,9 @@ from api.decorators import (
     validate_json_input,
     validate_output,
 )
-from api.models import AuthedPasswordResetCode, UserSession
-from api.settings import (
-    ACCOUNT_COOKIE_NAME,
-    AUTHED_PWD_RESET_EXP_SECONDS,
-    SEND_EMAILS,
-    ThrottleScopes,
-)
-from api.utils import MessageOutputSerializer, check_rate_limit
+from api.models import AuthedPasswordResetCode
+from api.settings import AUTHED_PWD_RESET_EXP_SECONDS, SEND_EMAILS, ThrottleScopes
+from api.utils import MessageOutputSerializer, check_rate_limit, prune_account_sessions
 
 logger = logging.getLogger("api")
 
@@ -186,9 +181,7 @@ def authed_password_reset(request):
             reset_code_obj.delete()
 
             if prune_sessions:
-                UserSession.objects.filter(user_account=user).exclude(
-                    session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-                ).delete()
+                prune_account_sessions(request)
 
     except AuthedPasswordResetCode.DoesNotExist:
         return Response(
