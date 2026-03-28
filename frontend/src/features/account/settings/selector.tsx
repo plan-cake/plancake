@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, startTransition, useOptimistic } from "react";
 
 import { CheckIcon, ExitIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 
 import TextInputField from "@/components/text-input-field";
-import { useAccount } from "@/features/account/context";
 import AccountSettingsDrawer from "@/features/account/settings/drawer";
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/settings/lib/constants";
 import AccountSettingsPopover from "@/features/account/settings/popover";
+import { AccountDetails } from "@/features/account/type";
 import ActionButton from "@/features/button/components/action";
 import { useToast } from "@/features/system-feedback";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
@@ -21,17 +21,24 @@ export default function AccountSettings({
   children,
   open,
   setOpenChange,
+  accountDetails,
 }: {
   children: React.ReactNode;
   open: boolean;
   setOpenChange: (open: boolean) => void;
+  accountDetails: AccountDetails;
 }) {
   const isMobile = useCheckMobile();
 
   if (isMobile) {
     return (
       <AccountSettingsDrawer
-        content={<SettingsContent setOpenChange={setOpenChange} />}
+        content={
+          <SettingsContent
+            setOpenChange={setOpenChange}
+            accountDetails={accountDetails}
+          />
+        }
         open={open}
         setOpen={setOpenChange}
       >
@@ -42,7 +49,12 @@ export default function AccountSettings({
 
   return (
     <AccountSettingsPopover
-      content={<SettingsContent setOpenChange={setOpenChange} />}
+      content={
+        <SettingsContent
+          setOpenChange={setOpenChange}
+          accountDetails={accountDetails}
+        />
+      }
       open={open}
       setOpen={setOpenChange}
     >
@@ -53,10 +65,11 @@ export default function AccountSettings({
 
 function SettingsContent({
   setOpenChange,
+  accountDetails,
 }: {
   setOpenChange: (open: boolean) => void;
+  accountDetails: AccountDetails;
 }) {
-  const { login, logout, accountDetails } = useAccount();
   const router = useRouter();
 
   const [defaultName, setDefaultName] = useState(
@@ -64,45 +77,44 @@ function SettingsContent({
   );
   const [defaultNameError, setDefaultNameError] = useState("");
 
-  // editing states
-  const isEditingDefaultName =
-    defaultName !== (accountDetails?.defaultName || "");
+  const [optimisticBaseName, setOptimisticBaseName] = useOptimistic(
+    accountDetails?.defaultName || "",
+    (newName: string) => newName,
+  );
 
-  const applyDefaultName = async () => {
+  // editing states
+  const isEditingDefaultName = defaultName !== optimisticBaseName;
+
+  const applyDefaultName = async (): Promise<boolean> => {
     if (!isEditingDefaultName) return true;
     setDefaultNameError("");
-    try {
-      if (defaultName) {
+
+    return new Promise<boolean>((resolve) => {
+      startTransition(async () => {
+        // UI update
+        setOptimisticBaseName(defaultName);
+
         try {
-          await clientPost(ROUTES.account.setDefaultName, {
-            display_name: defaultName,
-          });
-          login({ ...accountDetails!, defaultName: defaultName });
-          addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_SAVED);
-          return true;
+          if (defaultName) {
+            await clientPost(ROUTES.account.setDefaultName, {
+              display_name: defaultName,
+            });
+            addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_SAVED);
+          } else {
+            await clientPost(ROUTES.account.removeDefaultName);
+            addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_REMOVED);
+          }
+
+          router.refresh();
+          resolve(true);
         } catch (e) {
+          console.error("Fetch error:", e);
           const error = e as ApiErrorResponse;
-          addToast("error", error.formattedMessage);
-          return false;
+          addToast("error", error?.formattedMessage || MESSAGES.ERROR_GENERIC);
+          resolve(false);
         }
-      } else {
-        try {
-          await clientPost(ROUTES.account.removeDefaultName);
-          login({ ...accountDetails!, defaultName: "" });
-          setDefaultName("");
-          addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_REMOVED);
-          return true;
-        } catch (e) {
-          const error = e as ApiErrorResponse;
-          addToast("error", error.formattedMessage);
-          return false;
-        }
-      }
-    } catch (e) {
-      console.error("Fetch error:", e);
-      addToast("error", MESSAGES.ERROR_GENERIC);
-      return false;
-    }
+      });
+    });
   };
 
   const handleDefaultNameChange = (value: string) => {
@@ -120,8 +132,8 @@ function SettingsContent({
   const signOut = async () => {
     try {
       await clientPost(ROUTES.auth.logout);
-      logout();
       router.push("/login");
+      router.refresh();
       addToast("success", MESSAGES.SUCCESS_LOGOUT);
       setOpenChange(false);
       return true;

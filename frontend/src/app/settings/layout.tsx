@@ -1,48 +1,28 @@
-"use client";
+import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { useEffect, useRef } from "react";
-
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-
-import Loading from "@/app/loading";
 import HeaderSpacer from "@/components/header-spacer";
-import { useAccount } from "@/features/account/context";
-import { useToast } from "@/features/system-feedback";
-import { MESSAGES } from "@/lib/messages";
-import { cn } from "@/lib/utils/classname";
+import { getSession } from "@/features/account/get-session";
+import { SettingsProvider } from "@/features/account/settings/context";
+import SettingsNav from "@/features/account/settings/sidebar-nav";
+import { constructMetadata } from "@/lib/utils/construct-metadata";
 
-const SETTINGS_TABS = [
-  { href: "/settings", label: "General" },
-  { href: "/settings/security", label: "Security" },
-  { href: "/settings/remove", label: "Account Removal" },
-] as const;
+export function generateMetadata(): Metadata {
+  return constructMetadata(
+    "Account Settings",
+    "Manage your account settings and preferences on Plancake.",
+  );
+}
 
-export default function SettingsLayout({
+export default async function SettingsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const { loginState } = useAccount();
-  const { addToast } = useToast();
-  const previousLoginState = useRef(loginState);
+  const accountDetails = await getSession();
 
-  useEffect(() => {
-    if (loginState === "logged_out") {
-      router.replace("/login");
-
-      // Only show the toast if they didn't JUST log out
-      if (previousLoginState.current !== "logged_in") {
-        addToast("info", MESSAGES.INFO_NOT_LOGGED_IN);
-      }
-    }
-    previousLoginState.current = loginState;
-  }, [addToast, loginState, router]);
-
-  if (loginState === "logged_out") {
-    return <Loading />;
+  if (!accountDetails) {
+    redirect("/login?redirect=/settings");
   }
 
   return (
@@ -58,29 +38,14 @@ export default function SettingsLayout({
 
       <div className="flex flex-col gap-4 md:flex-row md:gap-12">
         <aside className="w-full shrink-0 md:w-64">
-          <nav className="flex flex-row gap-1 overflow-x-auto pb-2 md:flex-col md:overflow-visible md:pb-0">
-            {SETTINGS_TABS.map((tab) => {
-              const isActive = pathname === tab.href;
-
-              return (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  className={cn(
-                    "focus-visible:ring-primary/50 text-md relative flex items-center whitespace-nowrap rounded-full px-4 py-2.5 font-medium outline-none focus-visible:ring-2",
-                    isActive
-                      ? "bg-foreground/10 text-foreground"
-                      : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground",
-                  )}
-                >
-                  {tab.label}
-                </Link>
-              );
-            })}
-          </nav>
+          <SettingsNav />
         </aside>
 
-        <main className="flex max-w-2xl flex-1 flex-col gap-6">{children}</main>
+        <main className="flex max-w-2xl flex-1 flex-col gap-6">
+          <SettingsProvider accountDetails={accountDetails}>
+            {children}
+          </SettingsProvider>
+        </main>
       </div>
     </div>
   );

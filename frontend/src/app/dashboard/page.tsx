@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 
 import ClientPage from "@/app/dashboard/page-client";
+import { getSession } from "@/features/account/get-session";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import handleErrorResponse from "@/lib/utils/api/handle-api-error";
@@ -16,12 +17,13 @@ export function generateMetadata(): Metadata {
 }
 
 export default async function Page() {
+  const accountDetails = await getSession();
   try {
     const eventData = await serverGet(ROUTES.dashboard.get, undefined, {
       cache: "no-store",
     });
     const processedData = processDashboardData(eventData);
-    return <ClientPage {...processedData} />;
+    return <ClientPage {...processedData} logged_in={!!accountDetails} />;
   } catch (e) {
     const error = e as ApiErrorResponse;
     handleErrorResponse(error.status, error.data);

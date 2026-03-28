@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
-import { useAccount } from "@/features/account/context";
+import { useSettingsAccount } from "@/features/account/settings/context";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import EmptyButton from "@/features/button/components/empty";
 import { ConfirmationDialog, useToast } from "@/features/system-feedback";
@@ -14,6 +14,7 @@ import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function ChangePasswordDialog() {
+  const accountDetails = useSettingsAccount();
   const isMobile = useCheckMobile();
 
   // TOASTS AND ERROR STATES
@@ -49,8 +50,6 @@ export default function ChangePasswordDialog() {
     handleError("api", "");
     setConfirmPassword(value);
   };
-
-  const { accountDetails } = useAccount();
 
   const handleForgotPassword = async () => {
     if (!accountDetails?.email) {

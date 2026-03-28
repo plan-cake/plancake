@@ -5,7 +5,7 @@ import { useState } from "react";
 import { CheckIcon } from "@radix-ui/react-icons";
 
 import TextInputField from "@/components/text-input-field";
-import { useAccount } from "@/features/account/context";
+import { useSettingsAccount } from "@/features/account/settings/context";
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/settings/lib/constants";
 import ActionButton from "@/features/button/components/action";
 import { useToast } from "@/features/system-feedback/toast/context";
@@ -16,7 +16,7 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { cn } from "@/lib/utils/classname";
 
 export default function Page() {
-  const { refreshAccount, accountDetails } = useAccount();
+  const accountDetails = useSettingsAccount();
   const { addToast } = useToast();
 
   const [defaultName, setDefaultName] = useState(
@@ -36,7 +36,6 @@ export default function Page() {
           await clientPost(ROUTES.account.setDefaultName, {
             display_name: defaultName,
           });
-          await refreshAccount();
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_SAVED);
           return true;
         } catch (e) {
@@ -47,7 +46,6 @@ export default function Page() {
       } else {
         try {
           await clientPost(ROUTES.account.removeDefaultName);
-          await refreshAccount();
           setDefaultName("");
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_REMOVED);
           return true;
