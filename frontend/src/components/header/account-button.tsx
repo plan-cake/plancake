@@ -21,7 +21,7 @@ interface AccountButtonProps {
 export default function AccountButton({
   onMenuOpenChange,
 }: AccountButtonProps) {
-  const { loginState, logout } = useAccount();
+  const { loginState, logout, accountDetails } = useAccount();
   const router = useRouter();
   const { addToast } = useToast();
 
@@ -70,8 +70,13 @@ export default function AccountButton({
             aria-label="Account settings"
           />
         }
-        buttons={[accountSettingsButton, signOutButton]}
-      />
+      >
+        <h2 className="text-foreground text-center font-bold">
+          {accountDetails?.email}
+        </h2>
+        {accountSettingsButton}
+        {signOutButton}
+      </KebabMenu>
     );
   }
 

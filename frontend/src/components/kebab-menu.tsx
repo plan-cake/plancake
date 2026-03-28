@@ -1,18 +1,10 @@
 "use client";
 
-import {
-  Fragment,
-  useState,
-  useId,
-  useEffect,
-  useRef,
-  useCallback,
-} from "react";
+import { useState, useId, useEffect, useRef, useCallback } from "react";
 
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import { motion, AnimatePresence, Transition } from "framer-motion";
 
-import { ButtonArray } from "@/features/button/button-array";
 import EmptyButton from "@/features/button/components/empty";
 import { cn } from "@/lib/utils/classname";
 
@@ -24,12 +16,12 @@ const morphTransition: Transition = {
 };
 
 export default function KebabMenu({
-  buttons,
+  children,
   trigger,
   onOpenChange,
   nested = false,
 }: {
-  buttons: ButtonArray;
+  children: React.ReactNode;
   trigger?: React.ReactNode;
   onOpenChange?: (open: boolean) => void;
   nested?: boolean;
@@ -113,9 +105,7 @@ export default function KebabMenu({
             )}
             onClick={() => handleOpenChange(false)}
           >
-            {buttons.map((button, index) => (
-              <Fragment key={index}>{button}</Fragment>
-            ))}
+            {children}
           </motion.div>
         )}
       </AnimatePresence>
