@@ -3,7 +3,9 @@ import random
 import string
 from datetime import datetime, timedelta
 
+import bcrypt
 from django.core.mail import send_mail
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.response import Response
 
@@ -14,8 +16,13 @@ from api.decorators import (
     validate_json_input,
     validate_output,
 )
-from api.models import AuthedPasswordResetCode
-from api.settings import AUTHED_PWD_RESET_EXP_SECONDS, SEND_EMAILS, ThrottleScopes
+from api.models import AuthedPasswordResetCode, UserSession
+from api.settings import (
+    ACCOUNT_COOKIE_NAME,
+    AUTHED_PWD_RESET_EXP_SECONDS,
+    SEND_EMAILS,
+    ThrottleScopes,
+)
 from api.utils import MessageOutputSerializer, check_rate_limit
 
 logger = logging.getLogger("api")
@@ -128,3 +135,65 @@ def check_authed_password_reset_code(request):
         {"message": ["Reset code is valid."]},
         status=200,
     )
+
+
+class AuthedPasswordResetSerializer(AuthedPasswordResetCodeSerializer):
+    new_password = serializers.CharField(required=True)
+    prune_sessions = serializers.BooleanField(default=False, required=False)
+
+
+@api_endpoint("POST")
+@require_account_auth
+@validate_json_input(AuthedPasswordResetSerializer)
+@validate_output(MessageOutputSerializer)
+def authed_password_reset(request):
+    """
+    Resets the user's password using the provided authed reset code.
+    """
+    user = request.user
+    reset_code = request.validated_data["reset_code"]
+    new_password = request.validated_data["new_password"]
+    prune_sessions = request.validated_data["prune_sessions"]
+
+    try:
+        with transaction.atomic():
+            # Check the authed reset code
+            reset_code_obj = AuthedPasswordResetCode.objects.get(
+                user_account=user,
+                reset_code=reset_code,
+                created_at__gte=datetime.now()
+                - timedelta(seconds=AUTHED_PWD_RESET_EXP_SECONDS),
+            )
+
+            # Check if the new password is actually new
+            if bcrypt.checkpw(new_password.encode(), user.password_hash.encode()):
+                logger.info("Authed password reset failed: New password was not new.")
+                return Response(
+                    {
+                        "error": {
+                            "new_password": [
+                                "New password must be different from old password."
+                            ]
+                        }
+                    },
+                    status=400,
+                )
+
+            user.password_hash = bcrypt.hashpw(
+                new_password.encode(), bcrypt.gensalt()
+            ).decode()
+            user.save()
+            reset_code_obj.delete()
+
+            if prune_sessions:
+                UserSession.objects.filter(user_account=user).exclude(
+                    session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+                ).delete()
+
+    except AuthedPasswordResetCode.DoesNotExist:
+        return Response(
+            {"error": {"reset_code": ["Invalid reset code."]}},
+            status=400,
+        )
+
+    return Response({"message": ["Password reset successfully."]}, status=200)
