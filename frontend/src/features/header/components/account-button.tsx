@@ -8,6 +8,7 @@ import { useAccount } from "@/features/account/context";
 import AccountSettings from "@/features/account/settings/selector";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
+import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
 import { clientGet } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 
@@ -40,25 +41,32 @@ export default function AccountButton() {
 
   if (loginState === "logged_in") {
     return (
-      <AccountSettings
-        open={accountSettingsOpen}
-        setOpenChange={setAccountSettingsOpen}
+      <ShrinkingHeaderButton
+        buttonStyle="frosted glass inset"
+        icon={<PersonIcon />}
       >
-        <EmptyButton
-          buttonStyle="frosted glass inset"
-          icon={<PersonIcon />}
-          aria-label="Account settings"
-        />
-      </AccountSettings>
+        <AccountSettings
+          open={accountSettingsOpen}
+          setOpenChange={setAccountSettingsOpen}
+        >
+          <EmptyButton
+            buttonStyle="frosted glass inset"
+            icon={<PersonIcon />}
+            aria-label="Account settings"
+          />
+        </AccountSettings>
+      </ShrinkingHeaderButton>
     );
   }
 
   return (
-    <LinkButton
-      buttonStyle="frosted glass inset"
-      label="Log In"
-      href="/login"
-      loading={loginState === "loading"}
-    />
+    <ShrinkingHeaderButton buttonStyle="frosted glass inset" label="Log In">
+      <LinkButton
+        buttonStyle="frosted glass inset"
+        label="Log In"
+        href="/login"
+        loading={loginState === "loading"}
+      />
+    </ShrinkingHeaderButton>
   );
 }
