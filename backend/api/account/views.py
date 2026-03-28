@@ -1,8 +1,10 @@
 import logging
 import random
 import string
+from datetime import datetime, timedelta
 
 from django.core.mail import send_mail
+from rest_framework import serializers
 from rest_framework.response import Response
 
 from api.availability.serializers import DisplayNameSerializer
@@ -13,7 +15,7 @@ from api.decorators import (
     validate_output,
 )
 from api.models import AuthedPasswordResetCode
-from api.settings import SEND_EMAILS, ThrottleScopes
+from api.settings import AUTHED_PWD_RESET_EXP_SECONDS, SEND_EMAILS, ThrottleScopes
 from api.utils import MessageOutputSerializer, check_rate_limit
 
 logger = logging.getLogger("api")
@@ -89,5 +91,39 @@ def start_authed_password_reset(request):
 
     return Response(
         {"message": ["An email has been sent to your address with the reset code."]},
+        status=200,
+    )
+
+
+class AuthedPasswordResetCodeSerializer(serializers.Serializer):
+    reset_code = serializers.CharField(required=True, max_length=6)
+
+
+@api_endpoint("POST")
+@require_account_auth
+@validate_json_input(AuthedPasswordResetCodeSerializer)
+@validate_output(MessageOutputSerializer)
+def check_authed_password_reset_code(request):
+    """
+    Checks the provided authed password reset code.
+    """
+    user = request.user
+    reset_code = request.validated_data["reset_code"]
+
+    try:
+        AuthedPasswordResetCode.objects.get(
+            user_account=user,
+            reset_code=reset_code,
+            created_at__gte=datetime.now()
+            - timedelta(seconds=AUTHED_PWD_RESET_EXP_SECONDS),
+        )
+    except AuthedPasswordResetCode.DoesNotExist:
+        return Response(
+            {"error": {"reset_code": ["Invalid reset code."]}},
+            status=400,
+        )
+
+    return Response(
+        {"message": ["Reset code is valid."]},
         status=200,
     )
