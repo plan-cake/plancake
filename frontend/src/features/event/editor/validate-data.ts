@@ -3,8 +3,9 @@ import { findRangeFromWeekdayArray } from "@/core/event/weekday-utils";
 import { EventEditorType } from "@/features/event/editor/types";
 import { MESSAGES } from "@/lib/messages";
 
-export const MAX_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
-export const MAX_DURATION = "30 days";
+const MAX_DAYS = 64;
+export const MAX_DURATION_MS = MAX_DAYS * 24 * 60 * 60 * 1000;
+export const MAX_DURATION = `${MAX_DAYS} days`;
 
 export const MAX_TITLE_LENGTH = 50;
 
@@ -27,7 +28,7 @@ export async function validateEventData(
     if (!eventRange.dateRange?.from || !eventRange.dateRange?.to) {
       errors.dateRange = MESSAGES.ERROR_EVENT_RANGE_INVALID;
     } else {
-      // check if the date range is more than 30 days
+      // check if the date range is more than 64 days
       const fromDate = new Date(eventRange.dateRange.from);
       const toDate = new Date(eventRange.dateRange.to);
       if (checkDateRange(fromDate, toDate)) {

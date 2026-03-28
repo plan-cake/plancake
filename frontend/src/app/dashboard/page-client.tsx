@@ -4,12 +4,12 @@ import { useState } from "react";
 
 import Link from "next/link";
 
-import HeaderSpacer from "@/components/header-spacer";
 import SegmentedControl from "@/components/segmented-control";
 import { useAccount } from "@/features/account/context";
 import EventGrid, {
   EventGridProps,
 } from "@/features/dashboard/components/event-grid";
+import HeaderSpacer from "@/features/header/components/header-spacer";
 import { Banner } from "@/features/system-feedback";
 
 type DashboardTab = "created" | "participated";

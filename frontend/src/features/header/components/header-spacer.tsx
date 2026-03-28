@@ -1,3 +1,6 @@
+"use client";
+
+import { useHeaderSize } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
 export default function HeaderSpacer({
@@ -5,10 +8,13 @@ export default function HeaderSpacer({
 }: {
   scrollable?: boolean;
 }) {
+  const { heightClass } = useHeaderSize();
+
   return (
     <div
       className={cn(
-        "h-25 bg-background z-20 w-full",
+        heightClass,
+        "bg-background z-20 w-full",
         scrollable ? "" : "sticky top-0",
       )}
     />

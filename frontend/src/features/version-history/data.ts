@@ -104,7 +104,21 @@ export function getVersionHistoryData(): VersionHistoryData {
             "Fixed an issue where nicknames would attempt to autofill on initial save",
             "Fixed an issue where dialogs would look blurry on certain browsers",
           ],
-        }
+        },
+        {
+          version: "v0.3.3",
+          releaseDate: { year: 2026, month: 2, day: 27 },
+          changes: [
+            "Added functionality for the header to shrink on mobile",
+            "Added check marks to checkboxes for clarity",
+            "Added focus rings to dropdowns for better accessibility",
+            "Updated the dashboard to show the most recent events first",
+            "Updated rate limits to apply on a per-user basis instead of by IP address",
+            "Updated resend email button on initial registration for better feedback",
+            "Updated the date picker to have an exit animation",
+            "Increased the maximum event days from 30 to 64",
+          ],
+        },
       ],
     },
   ];

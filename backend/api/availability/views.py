@@ -1,8 +1,7 @@
 import logging
 
-from django.db import DatabaseError, transaction
+from django.db import transaction
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 
 from api.availability.serializers import (
     AvailabilityAddSerializer,
@@ -12,6 +11,14 @@ from api.availability.serializers import (
     EventCodeSerializer,
 )
 from api.availability.utils import check_name_available, get_timeslots, get_weekday_date
+from api.decorators import (
+    api_endpoint,
+    check_auth,
+    require_auth,
+    validate_json_input,
+    validate_output,
+    validate_query_param_input,
+)
 from api.models import (
     AvailabilityStatus,
     EventDateAvailability,
@@ -19,23 +26,10 @@ from api.models import (
     EventWeekdayAvailability,
     UserEvent,
 )
-from api.settings import GENERIC_ERR_RESPONSE
-from api.utils import (
-    MessageOutputSerializer,
-    api_endpoint,
-    check_auth,
-    rate_limit,
-    require_auth,
-    validate_json_input,
-    validate_output,
-    validate_query_param_input,
-)
+from api.settings import ThrottleScopes
+from api.utils import MessageOutputSerializer, check_rate_limit
 
 logger = logging.getLogger("api")
-
-
-class AvailabilityAddThrottle(AnonRateThrottle):
-    scope = "availability_add"
 
 
 class InvalidTimeslotError(Exception):
@@ -43,10 +37,6 @@ class InvalidTimeslotError(Exception):
 
 
 @api_endpoint("POST")
-@rate_limit(
-    AvailabilityAddThrottle,
-    "Availability submission limit reached ({rate}). Try again later.",
-)
 @require_auth
 @validate_json_input(AvailabilityAddSerializer)
 @validate_output(MessageOutputSerializer)
@@ -80,6 +70,8 @@ def add_availability(request):
                     },
                     status=400,
                 )
+
+            check_rate_limit(request, ThrottleScopes.AVAILABILITY_ADD)
 
             timeslots = get_timeslots(user_event)
 
@@ -154,12 +146,6 @@ def add_availability(request):
             },
             status=400,
         )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     logger.debug(
         f"Availability {'added' if new else 'updated'} for event with code: {event_code}"
@@ -204,12 +190,6 @@ def check_display_name(request):
             {"error": {"event_code": ["Event not found."]}},
             status=404,
         )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
 
 NOT_PARTICIPATED_ERROR = Response(
@@ -282,12 +262,6 @@ def get_self_availability(request):
         )
     except EventParticipant.DoesNotExist:
         return NOT_PARTICIPATED_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
 
 @api_endpoint("GET")
@@ -407,12 +381,6 @@ def get_all_availability(request):
             {"error": {"event_code": ["Event not found."]}},
             status=404,
         )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
 
 @api_endpoint("POST")
@@ -443,12 +411,6 @@ def remove_self_availability(request):
         )
     except EventParticipant.DoesNotExist:
         return NOT_PARTICIPATED_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response({"message": ["Availability removed successfully."]}, status=200)
 
@@ -493,11 +455,5 @@ def remove_availability(request):
             {"error": {"general": ["Event participant not found."]}},
             status=404,
         )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response({"message": ["Availability removed successfully."]}, status=200)
