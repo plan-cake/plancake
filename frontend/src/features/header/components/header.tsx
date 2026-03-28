@@ -15,6 +15,8 @@ const SCROLL_THRESHOLD = 50;
 
 export default function Header() {
   const [mounted, setMounted] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+
   const isMobile = useCheckMobile();
   const lastScrollPoint = useRef(0);
   const scrollCheckpoint = useRef(0);
@@ -73,6 +75,16 @@ export default function Header() {
     return null;
   }
 
+  const handleMenuChange = (menuName: string, isOpen: boolean) => {
+    if (isOpen) {
+      setActiveMenu(menuName);
+    } else if (activeMenu === menuName) {
+      setActiveMenu(null);
+    }
+  };
+
+  const isAnyMenuOpen = activeMenu !== null;
+
   return (
     <header className={cn(heightClass, "fixed top-0 z-40 w-full pt-4")}>
       <nav
@@ -91,15 +103,28 @@ export default function Header() {
 
         <div
           className={cn(
-            "frosted-glass flex h-fit items-center rounded-full",
+            "frosted-glass relative flex h-fit items-center rounded-full",
             "header-transition-[gap,padding]",
             isShrunk ? "gap-1 p-1" : "gap-2 p-2",
+            "transition-transform duration-300 ease-in-out",
+            isAnyMenuOpen ? "scale-95" : "scale-100",
           )}
         >
           <NewEventButton />
           <ThemeToggle />
           <DashboardButton />
-          <AccountButton />
+          <AccountButton
+            onMenuOpenChange={(isOpen) => handleMenuChange("account", isOpen)}
+          />
+
+          <div
+            className={cn(
+              "bg-violet/20 pointer-events-none absolute inset-0 rounded-full",
+              "transition-opacity duration-300 ease-in-out",
+              isAnyMenuOpen ? "opacity-100" : "opacity-0",
+            )}
+            aria-hidden="true"
+          />
         </div>
       </nav>
     </header>

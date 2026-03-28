@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Modak, Nunito } from "next/font/google";
 
-import Header from "@/components/header/header";
 import { AccountDetails } from "@/features/account/type";
+import Header from "@/features/header/components/header";
 import { Providers } from "@/lib/providers";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";

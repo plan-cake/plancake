@@ -6,8 +6,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import Loading from "@/app/loading";
-import HeaderSpacer from "@/components/header-spacer";
 import { useAccount } from "@/features/account/context";
+import HeaderSpacer from "@/features/header/components/header-spacer";
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
