@@ -6,7 +6,6 @@ const defaultTimeRange = { from: "09:00", to: "17:00" };
 
 export const DEFAULT_RANGE_SPECIFIC: SpecificDateRange = {
   type: "specific" as const,
-  duration: 0,
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   dateRange: {
     from: format(new Date(), "yyyy-MM-dd"),
@@ -18,7 +17,6 @@ export const DEFAULT_RANGE_SPECIFIC: SpecificDateRange = {
 
 export const DEFAULT_RANGE_WEEKDAY: WeekdayRange = {
   type: "weekday" as const,
-  duration: 0,
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   weekdays: ["Mon", "Tue", "Wed"],
   timeRange: defaultTimeRange,

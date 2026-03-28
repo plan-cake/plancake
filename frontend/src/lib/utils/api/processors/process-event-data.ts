@@ -42,7 +42,6 @@ export function processEventData(eventData: EventDetails): {
   if (eventData.event_type === "Date") {
     eventRange = {
       type: "specific",
-      duration: eventData.duration || 0,
       timezone: eventData.time_zone,
       dateRange: {
         from: start.date,
@@ -57,7 +56,6 @@ export function processEventData(eventData: EventDetails): {
     const weekdays = createWeekdayArray(start.weekday, end.weekday);
     eventRange = {
       type: "weekday",
-      duration: eventData.duration || 0,
       timezone: eventData.time_zone,
       weekdays: weekdays,
       timeRange: {

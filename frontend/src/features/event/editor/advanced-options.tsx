@@ -8,7 +8,6 @@ import {
 import { useDebouncedCallback } from "use-debounce";
 
 import { useEventContext } from "@/core/event/context";
-import DurationSelector from "@/features/event/components/selectors/duration";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { MESSAGES } from "@/lib/messages";
@@ -56,7 +55,6 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
   const {
     state: { customCode, eventRange },
     setTimezone,
-    setDuration,
     setCustomCode,
     handleError,
   } = useEventContext();
@@ -91,21 +89,9 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
         />
       </FormSelectorField>
 
-      <FormSelectorField
-        label="Intended Duration"
-        htmlFor="duration-select"
-        isVertical
-      >
-        <DurationSelector
-          id="duration-select"
-          value={eventRange.duration}
-          onChange={(v) => setDuration((v as number) || 0)}
-        />
-      </FormSelectorField>
-
       <label
         htmlFor="custom-code-input"
-        className="flex justify-between text-gray-400"
+        className="mt-2 flex justify-between text-gray-400"
       >
         {!isEditing && "Custom"} Event Code
         {errors.customCode && (

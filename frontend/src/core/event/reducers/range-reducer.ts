@@ -14,7 +14,6 @@ export type EventRangeAction =
   | { type: "SET_START_TIME"; payload: string }
   | { type: "SET_END_TIME"; payload: string }
   | { type: "SET_WEEKDAYS"; payload: Weekday[] }
-  | { type: "SET_DURATION"; payload: number }
   | { type: "SET_TIMEZONE"; payload: string }
   | { type: "RESET" };
 
@@ -35,7 +34,6 @@ export function EventRangeReducer(
       }
 
       const baseEvent = {
-        duration: state.duration,
         timezone: state.timezone,
         timeRange: state.timeRange,
       };
@@ -97,13 +95,6 @@ export function EventRangeReducer(
       return {
         ...state,
         weekdays: action.payload,
-      };
-    }
-
-    case "SET_DURATION": {
-      return {
-        ...state,
-        duration: action.payload,
       };
     }
 

@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 
 import AccountProvider from "@/features/account/provider";
 import { AccountDetails } from "@/features/account/type";
+import HeaderSizeProvider from "@/features/header/provider";
 import { ToastProvider } from "@/features/system-feedback";
 
 export function Providers({
@@ -16,7 +17,9 @@ export function Providers({
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AccountProvider accountDetails={accountDetails}>
-        <ToastProvider>{children}</ToastProvider>
+        <HeaderSizeProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </HeaderSizeProvider>
       </AccountProvider>
     </ThemeProvider>
   );

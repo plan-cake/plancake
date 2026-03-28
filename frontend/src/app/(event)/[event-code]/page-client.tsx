@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Pencil1Icon, Pencil2Icon } from "@radix-ui/react-icons";
 
 import CopyToastButton from "@/components/copy-toast-button";
-import HeaderSpacer from "@/components/header-spacer";
 import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
 import LinkButton from "@/features/button/components/link";
@@ -19,6 +18,8 @@ import {
 import DisplaySettings from "@/features/event/results/display-settings";
 import ResultsDrawer from "@/features/event/results/drawer";
 import { ResultsInformation } from "@/features/event/results/lib/types";
+import HeaderSpacer from "@/features/header/components/header-spacer";
+import { useHeaderSize } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -74,6 +75,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
     return drawerSnap;
   };
+
+  /* HEADER SPACING */
+  const { topMarginClass } = useHeaderSize();
 
   /* BANNERS */
   const banners = getResultBanners(
@@ -166,7 +170,12 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           )}
         >
           {banners}
-          <div className="top-25 sticky flex max-h-[calc(100vh-8rem)] flex-col gap-y-4">
+          <div
+            className={cn(
+              "sticky flex max-h-[calc(100vh-8rem)] flex-col gap-y-4",
+              topMarginClass,
+            )}
+          >
             <AttendeesPanel />
             <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
               <DisplaySettings

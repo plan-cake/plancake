@@ -15,7 +15,6 @@ export type EventSubmitData = {
 
 type EventSubmitJsonBody = {
   title: string;
-  duration?: number;
   time_zone: string;
   timeslots: string[];
   custom_code?: string;
@@ -51,11 +50,6 @@ export default async function submitEvent(
       timeslotToISOString(d, data.eventRange.timezone, eventType),
     ),
   };
-
-  // only include duration if set
-  if (data.eventRange.duration && data.eventRange.duration > 0) {
-    jsonBody.duration = data.eventRange.duration;
-  }
 
   if (type === "new" && data.code) {
     jsonBody.custom_code = data.code;
