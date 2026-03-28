@@ -76,7 +76,8 @@ def start_authed_password_reset(request):
     reset_code = "".join(random.SystemRandom().choices(string.digits, k=6))
 
     AuthedPasswordResetCode.objects.update_or_create(
-        user_account=user, defaults={"reset_code": reset_code}
+        user_account=user,
+        defaults={"reset_code": reset_code, "created_at": datetime.now()},
     )
     logger.debug("Authed password reset code for %s: %s", user.email, reset_code)
 
