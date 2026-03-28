@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+import Checkbox from "@/components/checkbox";
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
 import { useAccount } from "@/features/account/context";
@@ -26,6 +27,7 @@ export default function ChangePasswordDialog() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordCriteria, setPasswordCriteria] = useState({});
   const [showPasswordCriteria, setShowPasswordCriteria] = useState(false);
+  const [pruneSessions, setPruneSessions] = useState(false);
 
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
@@ -106,6 +108,7 @@ export default function ChangePasswordDialog() {
       await clientPost(ROUTES.auth.changePassword, {
         password: currentPassword,
         new_password: newPassword,
+        prune_sessions: pruneSessions,
       });
       handleOpenChange(false);
       addToast("success", MESSAGES.SUCESSS_PASSWORD_CHANGED);
@@ -182,7 +185,14 @@ export default function ChangePasswordDialog() {
               error={errors.confirmPassword || errors.api}
             />
           </div>
-          <div className="mt-4 flex justify-center text-sm">
+          <div className="mt-4 flex justify-between text-sm">
+            <div className="m-0 flex flex-col gap-2">
+              <Checkbox
+                label="Logout of all other devices"
+                checked={pruneSessions}
+                onChange={() => setPruneSessions(!pruneSessions)}
+              />
+            </div>
             <button
               type="button"
               onClick={handleForgotPassword}
