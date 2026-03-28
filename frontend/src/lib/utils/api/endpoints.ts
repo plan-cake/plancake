@@ -226,7 +226,7 @@ export const ROUTES = {
      * @method POST
      * @throws 401 - If the user is not logged in.
      */
-    startAuthedPasswordReset: route<MessageResponse, Email>("/account/start-authed-password-reset/"),
+    startAuthedPasswordReset: route<MessageResponse>("/account/start-authed-password-reset/"),
     /**
      * Checks the validity of a password reset code for a logged-in user.
      * @method POST
