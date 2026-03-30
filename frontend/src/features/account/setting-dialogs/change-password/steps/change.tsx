@@ -56,16 +56,14 @@ export default function ChangeStep({ flow }: ChangePasswordStepProps) {
           error={flow.errors.confirmPassword || flow.errors.api}
         />
       </div>
-      <div className="mt-4 flex justify-between text-sm">
-        <div className="m-0 flex flex-col gap-2">
-          <Checkbox
-            label="Logout of all other devices"
-            checked={flow.form.pruneSessions}
-            onChange={() =>
-              flow.updateForm("pruneSessions", !flow.form.pruneSessions)
-            }
-          />
-        </div>
+      <div className="mt-4 flex flex-wrap justify-between gap-2 text-sm">
+        <Checkbox
+          label="Logout of all other devices"
+          checked={flow.form.pruneSessions}
+          onChange={() =>
+            flow.updateForm("pruneSessions", !flow.form.pruneSessions)
+          }
+        />
         <button
           type="button"
           onClick={flow.handleForgotPassword}
