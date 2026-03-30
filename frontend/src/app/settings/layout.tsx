@@ -49,7 +49,7 @@ export default function SettingsLayout({
     <div className="flex min-h-screen flex-col px-6 pb-6">
       <HeaderSpacer />
 
-      <div className="top-25 bg-background z-15 sticky flex w-full flex-col gap-1 pb-6 pt-4">
+      <div className="bg-background flex w-full flex-col gap-1 pb-6 pt-4">
         <h1 className="text-2xl font-bold tracking-tight">Account Settings</h1>
         <p className="text-foreground/60 text-sm">
           Manage your account settings and preferences!
