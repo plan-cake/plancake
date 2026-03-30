@@ -49,18 +49,16 @@ export function useChangePasswordFlow() {
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
-      setTimeout(() => {
-        setForm({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-          resetCode: "",
-          pruneSessions: false,
-        });
-        setShowCriteria(false);
-        setStep("CHANGE");
-        clearAllErrors();
-      }, 300);
+      setForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+        resetCode: "",
+        pruneSessions: false,
+      });
+      setShowCriteria(false);
+      setStep("CHANGE");
+      clearAllErrors();
     }
   };
 
