@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { motion } from "framer-motion";
+
 import AccountButton from "@/features/header/components/account-button";
 import DashboardButton from "@/features/header/components/dashboard-button";
 import LogoArea from "@/features/header/components/logo-area";
@@ -101,13 +103,14 @@ export default function Header() {
       >
         <LogoArea isShrunk={isShrunk} />
 
-        <div
+        <motion.div
+          layout
+          animate={{ scale: isAnyMenuOpen ? 0.95 : 1 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
           className={cn(
             "frosted-glass relative flex h-fit items-center rounded-full",
             "header-transition-[gap,padding]",
             isShrunk ? "gap-1 p-1" : "gap-2 p-2",
-            "transition-transform duration-300 ease-in-out",
-            isAnyMenuOpen ? "scale-95" : "scale-100",
           )}
         >
           <NewEventButton />
@@ -125,7 +128,7 @@ export default function Header() {
             )}
             aria-hidden="true"
           />
-        </div>
+        </motion.div>
       </nav>
     </header>
   );

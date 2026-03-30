@@ -26,7 +26,6 @@ export default function KebabMenu({
   onOpenChange?: (open: boolean) => void;
   nested?: boolean;
 }) {
-  const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const id = useId();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,10 +52,6 @@ export default function KebabMenu({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [handleOpenChange, isOpen]);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   return (
     <div className="relative" ref={containerRef}>
       <div className="pointer-events-none invisible" aria-hidden="true">
@@ -73,9 +68,9 @@ export default function KebabMenu({
       <AnimatePresence initial={false}>
         {!isOpen ? (
           <motion.div
-            layout={isMounted}
+            layout
             key="trigger"
-            layoutId={isMounted ? "popover-morph-" + id : undefined}
+            layoutId={"popover-morph-" + id}
             transition={morphTransition}
             className="absolute right-0 top-0 z-10 inline-block cursor-pointer rounded-full"
             aria-haspopup="menu"
@@ -98,9 +93,9 @@ export default function KebabMenu({
             layoutId={"popover-morph-" + id}
             transition={morphTransition}
             className={cn(
-              "absolute right-0 top-0 z-[100]",
+              "absolute right-2 top-1 z-[100]",
               "flex min-w-[200px] origin-top-right flex-col gap-2",
-              "frosted-glass rounded-4xl overflow-hidden p-4 shadow-lg",
+              "frosted-glass overflow-hidden rounded-3xl p-4 shadow-lg",
               nested && "scale-110",
             )}
             onClick={() => handleOpenChange(false)}
