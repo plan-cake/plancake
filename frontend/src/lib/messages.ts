@@ -1,4 +1,4 @@
-import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/settings/lib/constants";
+import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
 import {
   MAX_DURATION,
   MAX_TITLE_LENGTH,
@@ -35,7 +35,7 @@ export const MESSAGES = {
 
   // success messages
   SUCCESS_EMAIL_SENT: "Email resent. Please check your inbox.",
-  SUCESSS_PASSWORD_CHANGED: "Password changed successfully.",
+  SUCCESS_PASSWORD_CHANGED: "Password changed successfully.",
   SUCCESS_PASSWORD_RESET: "Password has been reset successfully.",
   SUCCESS_PASSWORD_RESET_EMAIL_SENT:
     "Password reset email sent. Please check your inbox.",

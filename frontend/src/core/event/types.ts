@@ -10,7 +10,6 @@ export type EventInformation = {
 
 type BaseEventRange = {
   type: EventType;
-  duration: number;
   timezone: string;
   timeRange: {
     from: string;

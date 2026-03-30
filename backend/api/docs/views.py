@@ -3,8 +3,9 @@ import inspect
 from rest_framework import serializers
 from rest_framework.response import Response
 
+from api.decorators import api_endpoint, validate_output
 from api.docs.utils import get_all_endpoints, get_serializer_format
-from api.utils import APIMetadata, api_endpoint, validate_output
+from api.utils import APIMetadata
 
 
 class EndpointSerializer(serializers.Serializer):

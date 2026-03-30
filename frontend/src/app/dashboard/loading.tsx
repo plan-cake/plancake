@@ -1,4 +1,4 @@
-import HeaderSpacer from "@/components/header-spacer";
+import HeaderSpacer from "@/features/header/components/header-spacer";
 
 export default function Loading() {
   return (

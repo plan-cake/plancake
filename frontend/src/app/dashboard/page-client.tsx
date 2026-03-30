@@ -4,11 +4,11 @@ import { startTransition, useOptimistic, useRef, useState } from "react";
 
 import Link from "next/link";
 
-import HeaderSpacer from "@/components/header-spacer";
 import SegmentedControl from "@/components/segmented-control";
 import { DashboardEventProps } from "@/features/dashboard/components/event";
 import EventGrid from "@/features/dashboard/components/event-grid";
 import { deleteEvent } from "@/features/dashboard/delete-event";
+import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   Banner,
   ConfirmationDialog,

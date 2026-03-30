@@ -2,12 +2,19 @@ import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from django.db import DatabaseError, transaction
+from django.db import transaction
 from django.db.models import Q
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 
 from api.availability.utils import get_weekday_date
+from api.decorators import (
+    api_endpoint,
+    check_auth,
+    require_auth,
+    validate_json_input,
+    validate_output,
+    validate_query_param_input,
+)
 from api.event.serializers import (
     DateEventCreateSerializer,
     DateEventEditSerializer,
@@ -27,18 +34,8 @@ from api.event.utils import (
     validate_weekday_timeslots,
 )
 from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
-from api.settings import GENERIC_ERR_RESPONSE
-from api.utils import (
-    MessageOutputSerializer,
-    api_endpoint,
-    check_auth,
-    format_event_info,
-    rate_limit,
-    require_auth,
-    validate_json_input,
-    validate_output,
-    validate_query_param_input,
-)
+from api.settings import GENERIC_ERR_RESPONSE, ThrottleScopes
+from api.utils import MessageOutputSerializer, check_rate_limit, format_event_info
 
 logger = logging.getLogger("api")
 
@@ -52,14 +49,7 @@ INVALID_TIMESLOT_TIME_ERROR = Response(
 )
 
 
-class EventCreateThrottle(AnonRateThrottle):
-    scope = "event_creation"
-
-
 @api_endpoint("POST")
-@rate_limit(
-    EventCreateThrottle, "Event creation limit reached ({rate}). Try again later."
-)
 @require_auth
 @validate_json_input(DateEventCreateSerializer)
 @validate_output(EventCodeSerializer)
@@ -77,7 +67,6 @@ def create_date_event(request):
     """
     user = request.user
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
     custom_code = request.validated_data.get("custom_code")
@@ -101,38 +90,29 @@ def create_date_event(request):
             logger.critical("Failed to generate a unique URL code.")
             return GENERIC_ERR_RESPONSE
 
-    try:
-        with transaction.atomic():
-            new_event = UserEvent.objects.create(
-                user_account=user,
-                title=title,
-                date_type=UserEvent.EventType.SPECIFIC,
-                duration=duration,
-                time_zone=time_zone,
-            )
-            UrlCode.objects.create(url_code=url_code, user_event=new_event)
-            # Create timeslot objects
-            EventDateTimeslot.objects.bulk_create(
-                [
-                    EventDateTimeslot(user_event=new_event, utc_timeslot=ts)
-                    for ts in set(timeslots)
-                ]
-            )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
+    check_rate_limit(request, ThrottleScopes.EVENT_CREATION)
+
+    with transaction.atomic():
+        new_event = UserEvent.objects.create(
+            user_account=user,
+            title=title,
+            date_type=UserEvent.EventType.SPECIFIC,
+            time_zone=time_zone,
+        )
+        UrlCode.objects.create(url_code=url_code, user_event=new_event)
+        # Create timeslot objects
+        EventDateTimeslot.objects.bulk_create(
+            [
+                EventDateTimeslot(user_event=new_event, utc_timeslot=ts)
+                for ts in set(timeslots)
+            ]
+        )
 
     logger.debug(f"Event created with code: {url_code}")
     return Response({"event_code": url_code}, status=201)
 
 
 @api_endpoint("POST")
-@rate_limit(
-    EventCreateThrottle, "Event creation limit reached ({rate}). Try again later."
-)
 @require_auth
 @validate_json_input(WeekEventCreateSerializer)
 @validate_output(EventCodeSerializer)
@@ -150,7 +130,6 @@ def create_week_event(request):
     """
     user = request.user
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
     custom_code = request.validated_data.get("custom_code")
@@ -174,36 +153,30 @@ def create_week_event(request):
             logger.critical("Failed to generate a unique URL code.")
             return GENERIC_ERR_RESPONSE
 
-    try:
-        with transaction.atomic():
-            new_event = UserEvent.objects.create(
-                user_account=user,
-                title=title,
-                date_type=UserEvent.EventType.GENERIC,
-                duration=duration,
-                time_zone=time_zone,
-            )
-            UrlCode.objects.create(url_code=url_code, user_event=new_event)
-            # Create timeslot objects
-            deduplicated_timeslots = set(
-                (js_weekday(ts.weekday()), ts.time()) for ts in timeslots
-            )
-            EventWeekdayTimeslot.objects.bulk_create(
-                [
-                    EventWeekdayTimeslot(
-                        user_event=new_event,
-                        weekday=weekday,
-                        local_timeslot=time,
-                    )
-                    for (weekday, time) in deduplicated_timeslots
-                ]
-            )
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
+    check_rate_limit(request, ThrottleScopes.EVENT_CREATION)
+
+    with transaction.atomic():
+        new_event = UserEvent.objects.create(
+            user_account=user,
+            title=title,
+            date_type=UserEvent.EventType.GENERIC,
+            time_zone=time_zone,
+        )
+        UrlCode.objects.create(url_code=url_code, user_event=new_event)
+        # Create timeslot objects
+        deduplicated_timeslots = set(
+            (js_weekday(ts.weekday()), ts.time()) for ts in timeslots
+        )
+        EventWeekdayTimeslot.objects.bulk_create(
+            [
+                EventWeekdayTimeslot(
+                    user_event=new_event,
+                    weekday=weekday,
+                    local_timeslot=time,
+                )
+                for (weekday, time) in deduplicated_timeslots
+            ]
+        )
 
     logger.debug(f"Event created with code: {url_code}")
     return Response({"event_code": url_code}, status=201)
@@ -240,7 +213,6 @@ def edit_date_event(request):
     user = request.user
     event_code = request.validated_data.get("event_code")
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
 
@@ -289,7 +261,6 @@ def edit_date_event(request):
 
             # Update the event object itself
             event.title = title
-            event.duration = duration
             event.time_zone = time_zone
             event.save()
 
@@ -312,12 +283,6 @@ def edit_date_event(request):
 
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     logger.debug(f"Event updated with code: {event_code}")
     return Response({"message": ["Event updated successfully."]}, status=200)
@@ -336,7 +301,6 @@ def edit_week_event(request):
     user = request.user
     event_code = request.validated_data.get("event_code")
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
 
@@ -359,7 +323,6 @@ def edit_week_event(request):
 
             # Update the event object itself
             event.title = title
-            event.duration = duration
             event.time_zone = time_zone
             event.save()
 
@@ -389,12 +352,6 @@ def edit_week_event(request):
 
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     logger.debug(f"Event updated with code: {event_code}")
     return Response({"message": ["Event updated successfully."]}, status=200)
@@ -429,12 +386,6 @@ def delete_event(request):
 
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response({"message": ["Event deleted successfully."]}, status=200)
 
@@ -445,7 +396,7 @@ def delete_event(request):
 @validate_output(EventDetailSerializer)
 def get_event_details(request):
     """
-    Gets details about an event like title, duration, and timeslots.
+    Gets details about an event like type, title, and timeslots.
 
     This is useful for both displaying an event, and preparing for event editing.
     """
@@ -466,16 +417,8 @@ def get_event_details(request):
                     get_weekday_date(ts.weekday, ts.local_timeslot) for ts in timeslots
                 ]
 
-        if event.duration:
-            data["duration"] = event.duration
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
-    except DatabaseError as e:
-        logger.db_error(e)
-        return GENERIC_ERR_RESPONSE
-    except Exception as e:
-        logger.error(e)
-        return GENERIC_ERR_RESPONSE
 
     return Response(
         {

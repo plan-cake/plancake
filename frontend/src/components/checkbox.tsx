@@ -1,5 +1,7 @@
 import { useId } from "react";
 
+import { CheckIcon } from "@radix-ui/react-icons";
+
 import { cn } from "@/lib/utils/classname";
 
 type CheckboxProps = {
@@ -14,20 +16,33 @@ export default function Checkbox(props: CheckboxProps) {
   const id = useId();
   return (
     <div className="flex items-center gap-2">
-      <input
-        type="checkbox"
-        id={"checkbox-" + id}
-        className={cn(
-          "h-4 w-4 appearance-none rounded-sm border border-gray-300",
-          "checked:border-accent checked:bg-accent peer",
-          "hover:cursor-pointer",
+      <div className="relative flex">
+        <input
+          type="checkbox"
+          id={"checkbox-" + id}
+          className={cn(
+            "h-4 w-4 appearance-none rounded-sm border border-gray-300",
+            "checked:border-accent checked:bg-accent",
+            "cursor-pointer",
+          )}
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+        />
+        {checked && (
+          <CheckIcon
+            className="centered-absolute pointer-events-none h-4 w-4 text-white"
+            aria-hidden
+            focusable={false}
+          />
         )}
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-      />
+      </div>
       <label
         htmlFor={"checkbox-" + id}
-        className={`peer-checked:text-accent ${textSize === "sm" ? "text-sm" : "text-md"}`}
+        className={cn(
+          "cursor-pointer select-none",
+          textSize === "sm" ? "text-sm" : "text-md",
+          checked && "text-accent",
+        )}
       >
         {label}
       </label>

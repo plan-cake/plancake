@@ -1,6 +1,6 @@
 "use client";
 
-import ChangePasswordDialog from "@/features/account/settings/dialogs/change-password";
+import ChangePasswordDialog from "@/features/account/setting-dialogs/change-password/main-dialog";
 
 export default function Page() {
   return (

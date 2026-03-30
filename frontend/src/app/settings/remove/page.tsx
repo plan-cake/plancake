@@ -1,4 +1,4 @@
-import DeleteAccountDialog from "@/features/account/settings/dialogs/delete-account";
+import DeleteAccountDialog from "@/features/account/setting-dialogs/delete-account";
 import { cn } from "@/lib/utils/classname";
 
 export default function Page() {

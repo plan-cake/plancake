@@ -5,8 +5,8 @@ import { useState } from "react";
 import { CheckIcon } from "@radix-ui/react-icons";
 
 import TextInputField from "@/components/text-input-field";
+import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
 import { useSettingsAccount } from "@/features/account/settings/context";
-import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/settings/lib/constants";
 import ActionButton from "@/features/button/components/action";
 import { useToast } from "@/features/system-feedback/toast/context";
 import { MESSAGES } from "@/lib/messages";

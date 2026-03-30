@@ -86,19 +86,46 @@ TIME_ZONE = "UTC"
 
 USE_TZ = False
 
+
+# Throttle scope classes for consistent rate limit handling
+class ThrottleScope:
+    def __init__(self, key, limited_action):
+        self.key = key
+        self.message = limited_action + " limit reached ({rate}). Try again later."
+
+
+# Defining all scopes as object constants
+class ThrottleScopes:
+    GLOBAL = ThrottleScope("global", "Rate")
+    USER_ACCOUNT_CREATION = ThrottleScope(
+        "user_account_creation", "User account creation"
+    )
+    RESEND_EMAIL = ThrottleScope("resend_email", "Email resend")
+    GUEST_ACCOUNT_CREATION = ThrottleScope(
+        "guest_account_creation", "Guest account creation"
+    )
+    LOGIN = ThrottleScope("login", "Login")
+    PASSWORD_RESET = ThrottleScope("password_reset", "Password reset")
+    EVENT_CREATION = ThrottleScope("event_creation", "Event creation")
+    AVAILABILITY_ADD = ThrottleScope("availability_add", "Availability submission")
+    CODE_CHECK = ThrottleScope("code_check", "Verification code checking")
+
+
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [],
     "DEFAULT_THROTTLE_RATES": {
-        "user_account_creation": "3/hour",
-        "resend_email": "3/hour",
-        "guest_account_creation": "1/min",
-        "login": "6/hour",
-        "password_reset": "3/hour",
-        "event_creation": "6/hour",
-        "availability_add": "12/hour",
+        ThrottleScopes.GLOBAL.key: "300/min",
+        ThrottleScopes.USER_ACCOUNT_CREATION.key: "10/hour",
+        ThrottleScopes.RESEND_EMAIL.key: "20/hour",
+        ThrottleScopes.GUEST_ACCOUNT_CREATION.key: "10/min",
+        ThrottleScopes.LOGIN.key: "30/hour",
+        ThrottleScopes.PASSWORD_RESET.key: "10/hour",
+        ThrottleScopes.EVENT_CREATION.key: "25/hour",
+        ThrottleScopes.AVAILABILITY_ADD.key: "50/hour",
+        ThrottleScopes.CODE_CHECK.key: "50/hour",
     },
 }
 
@@ -109,6 +136,8 @@ LONG_SESS_EXP_SECONDS = 31536000  # 1 year
 EMAIL_CODE_EXP_SECONDS = 600  # 10 minutes
 
 PWD_RESET_EXP_SECONDS = 600  # 10 minutes
+
+AUTHED_PWD_RESET_EXP_SECONDS = 600  # 10 minutes
 
 URL_CODE_EXP_SECONDS = 1209600  # 14 days
 
@@ -222,4 +251,4 @@ RAND_URL_CODE_LENGTH = 8
 
 RAND_URL_CODE_ATTEMPTS = 4
 
-MAX_EVENT_DAYS = 30  # 1 month
+MAX_EVENT_DAYS = 64

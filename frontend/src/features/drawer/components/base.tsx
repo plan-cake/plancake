@@ -5,6 +5,7 @@ import { Drawer } from "vaul";
 import { DrawerProps } from "@/features/drawer/props";
 import { useDrawerResize } from "@/features/drawer/useDrawerResize";
 import { useVaulStickyFooter } from "@/features/drawer/useStickyFooter";
+import useKeyboardHeight from "@/lib/hooks/use-keyboard-height";
 import { cn } from "@/lib/utils/classname";
 
 export default function BaseDrawer({
@@ -27,6 +28,8 @@ export default function BaseDrawer({
   ...rest
 }: DrawerProps) {
   useDrawerResize();
+  const keyboardHeight = useKeyboardHeight();
+  const keyboardOffset = keyboardHeight - 100;
 
   const contentRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -140,6 +143,7 @@ export default function BaseDrawer({
                   : isPill && _type === "morphing"
                     ? visibleHeight
                     : "100%",
+              paddingBottom: keyboardHeight > 0 ? `${keyboardOffset}px` : "0px",
             }}
           >
             {/* Invisible spacer that pushes the morphing pill down */}
