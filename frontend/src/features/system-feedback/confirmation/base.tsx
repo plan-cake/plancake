@@ -78,7 +78,6 @@ export default function ConfirmationDialog({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
       if (e.key === "Escape") handleClose();
       else if (e.key === "Enter") handleConfirm();
     };
