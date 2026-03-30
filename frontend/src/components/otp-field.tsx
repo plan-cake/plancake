@@ -26,7 +26,7 @@ const OTPField = React.forwardRef<HTMLDivElement, OTPFieldProps>(
           <OneTimePasswordField.Input
             key={index}
             className={cn(
-              "h-12 w-12 rounded-xl border bg-transparent text-center text-lg font-semibold transition-colors",
+              "h-12 w-10 rounded-xl border bg-transparent text-center text-lg font-semibold transition-colors",
               "focus:outline-none focus:ring-2",
               "disabled:cursor-not-allowed disabled:opacity-50",
               error
