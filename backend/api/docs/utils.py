@@ -44,6 +44,8 @@ def get_readable_field_name(field_name):
             return "string"
         case "TimeZoneField":
             return "string"
+        case "RegexField":
+            return "string"
         case _:
             return "object"
 
