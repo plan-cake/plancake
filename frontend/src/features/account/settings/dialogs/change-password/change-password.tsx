@@ -277,7 +277,7 @@ export default function ChangePasswordDialog() {
         <p>
           We sent a password reset code to your email. Enter the code below!
         </p>
-        <div className="my-4 flex flex-col justify-center">
+        <div className="mb-6 flex flex-col justify-center gap-2">
           <p
             className={cn(
               "text-error h-5 text-center text-sm",
@@ -327,7 +327,7 @@ export default function ChangePasswordDialog() {
     onConfirmHandler = handleAuthedReset;
     dialogDescription = (
       <div>
-        <p>Great! Now enter the new password you would like to use.</p>
+        <p>Enter your new password!</p>
         <div className="mt-[25px] flex flex-col justify-center gap-4">
           <TextInputField
             key="newPassword"
