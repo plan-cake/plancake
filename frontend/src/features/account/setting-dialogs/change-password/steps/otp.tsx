@@ -1,6 +1,6 @@
 import LinkText from "@/components/link-text";
 import OTPField from "@/components/otp-field";
-import { ChangePasswordStepProps } from "@/features/account/settings/dialogs/change-password/use-change-password";
+import { ChangePasswordStepProps } from "@/features/account/setting-dialogs/change-password/use-change-password";
 import { cn } from "@/lib/utils/classname";
 
 export default function OtpStep({ flow }: ChangePasswordStepProps) {

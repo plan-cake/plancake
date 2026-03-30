@@ -9,6 +9,7 @@ import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export type AuthedChangePasswordStep = "CHANGE" | "OTP" | "RESET";
+
 export type ChangePasswordStepProps = {
   flow: ReturnType<typeof useChangePasswordFlow>;
 };

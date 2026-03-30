@@ -1,4 +1,4 @@
-import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/settings/lib/constants";
+import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
 import {
   MAX_DURATION,
   MAX_TITLE_LENGTH,

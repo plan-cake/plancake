@@ -1,6 +1,6 @@
 import Checkbox from "@/components/checkbox";
 import TextInputField from "@/components/text-input-field";
-import { ChangePasswordStepProps } from "@/features/account/settings/dialogs/change-password/use-change-password";
+import { ChangePasswordStepProps } from "@/features/account/setting-dialogs/change-password/use-change-password";
 
 export default function ResetStep({ flow }: ChangePasswordStepProps) {
   return (

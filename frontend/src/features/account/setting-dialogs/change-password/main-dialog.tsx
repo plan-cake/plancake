@@ -1,9 +1,9 @@
 "use client";
 
-import ChangeStep from "@/features/account/settings/dialogs/change-password/steps/change";
-import OtpStep from "@/features/account/settings/dialogs/change-password/steps/otp";
-import ResetStep from "@/features/account/settings/dialogs/change-password/steps/reset";
-import { useChangePasswordFlow } from "@/features/account/settings/dialogs/change-password/use-change-password";
+import ChangeStep from "@/features/account/setting-dialogs/change-password/steps/change";
+import OtpStep from "@/features/account/setting-dialogs/change-password/steps/otp";
+import ResetStep from "@/features/account/setting-dialogs/change-password/steps/reset";
+import { useChangePasswordFlow } from "@/features/account/setting-dialogs/change-password/use-change-password";
 import EmptyButton from "@/features/button/components/empty";
 import { ConfirmationDialog } from "@/features/system-feedback";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
