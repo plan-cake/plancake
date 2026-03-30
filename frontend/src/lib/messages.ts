@@ -35,7 +35,7 @@ export const MESSAGES = {
 
   // success messages
   SUCCESS_EMAIL_SENT: "Email resent. Please check your inbox.",
-  SUCESSS_PASSWORD_CHANGED: "Password changed successfully.",
+  SUCCESS_PASSWORD_CHANGED: "Password changed successfully.",
   SUCCESS_PASSWORD_RESET: "Password has been reset successfully.",
   SUCCESS_PASSWORD_RESET_EMAIL_SENT:
     "Password reset email sent. Please check your inbox.",

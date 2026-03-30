@@ -120,7 +120,7 @@ export function useChangePasswordFlow() {
         prune_sessions: form.pruneSessions,
       });
       handleOpenChange(false);
-      addToast("success", MESSAGES.SUCESSS_PASSWORD_CHANGED);
+      addToast("success", MESSAGES.SUCCESS_PASSWORD_CHANGED);
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -158,7 +158,7 @@ export function useChangePasswordFlow() {
         prune_sessions: form.pruneSessions,
       });
       handleOpenChange(false);
-      addToast("success", MESSAGES.SUCESSS_PASSWORD_CHANGED);
+      addToast("success", MESSAGES.SUCCESS_PASSWORD_CHANGED);
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
