@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { motion } from "framer-motion";
 
 import ActionButton from "@/features/button/components/action";
 import { FloatingDrawer } from "@/features/drawer";
@@ -110,10 +111,14 @@ export default function ConfirmationDialog({
         showHandle={false}
         headerContent={<div className="h-2" />}
       >
-        <div className="flex flex-col items-center">
-          {showIcon && renderIcon()}
-          <p className="text-lg font-bold">{title}</p>
-          <div className="text-foreground mt-2 text-center">{description}</div>
+        <div className="flex flex-col items-center overflow-hidden">
+          <div className="flex flex-col items-center">
+            {showIcon && renderIcon()}
+            <p className="text-lg font-bold">{title}</p>
+          </div>
+          <div className="text-foreground mt-2 w-full text-center">
+            {description}
+          </div>
           <div className="mt-8 flex w-full justify-center gap-4">
             <ActionButton
               buttonStyle="transparent"
@@ -159,34 +164,52 @@ export default function ConfirmationDialog({
           )}
         />
         <Dialog.Content
+          asChild
           onEscapeKeyDown={(event) => event.stopPropagation()}
-          className={cn(
-            "dialog-content fixed inset-0 z-40 m-auto",
-            "bg-panel rounded-3xl p-6 shadow-md focus:outline-none",
-            "h-fit w-3/4 md:w-fit md:max-w-3xl",
-          )}
         >
-          <Dialog.Title className="flex flex-col items-center gap-4">
-            {showIcon && renderIcon()}
-            <p className="text-lg font-bold">{title}</p>
-          </Dialog.Title>
-          <Dialog.Description asChild className="mt-2 text-center">
-            {description}
-          </Dialog.Description>
+          {/* We replace the default Dialog content node with a motion.div */}
+          <motion.div
+            layout
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className={cn(
+              "dialog-content fixed inset-0 z-40 m-auto flex flex-col overflow-hidden",
+              "bg-panel rounded-3xl p-6 shadow-md focus:outline-none",
+              "h-fit w-3/4 md:w-fit md:max-w-3xl",
+            )}
+          >
+            <Dialog.Title asChild>
+              <motion.div
+                layout="position"
+                className="flex flex-col items-center gap-4"
+              >
+                {showIcon && renderIcon()}
+                <p className="text-lg font-bold">{title}</p>
+              </motion.div>
+            </Dialog.Title>
 
-          <div className="mt-[25px] flex justify-center gap-4">
-            <ActionButton
-              buttonStyle="transparent"
-              label="Cancel"
-              onClick={handleClose}
-            />
-            <ActionButton
-              buttonStyle={config.btnStyle}
-              label="Confirm"
-              onClick={handleConfirm}
-              loadOnSuccess={!autoClose}
-            />
-          </div>
+            <Dialog.Description asChild>
+              <motion.div layout="position" className="mt-2 w-full text-center">
+                {description}
+              </motion.div>
+            </Dialog.Description>
+
+            <motion.div
+              layout="position"
+              className="mt-[25px] flex justify-center gap-4"
+            >
+              <ActionButton
+                buttonStyle="transparent"
+                label="Cancel"
+                onClick={handleClose}
+              />
+              <ActionButton
+                buttonStyle={config.btnStyle}
+                label="Confirm"
+                onClick={handleConfirm}
+                loadOnSuccess={!autoClose}
+              />
+            </motion.div>
+          </motion.div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
