@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { motion } from "framer-motion";
@@ -45,19 +45,22 @@ export default function ConfirmationDialog({
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
 
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!isControlled) {
-      setInternalOpen(newOpen);
-    }
-    onOpenChange?.(newOpen);
-  };
+  const handleOpenChange = useCallback(
+    (newOpen: boolean) => {
+      if (!isControlled) {
+        setInternalOpen(newOpen);
+      }
+      onOpenChange?.(newOpen);
+    },
+    [isControlled, onOpenChange],
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     handleOpenChange(false);
     return true;
-  };
+  }, [handleOpenChange]);
 
-  const handleConfirm = async () => {
+  const handleConfirm = useCallback(async () => {
     // If autoClose is enabled, we optimistically close
     // the dialog before calling onConfirm
     if (autoClose) {
@@ -71,7 +74,17 @@ export default function ConfirmationDialog({
       handleOpenChange(false);
     }
     return success;
-  };
+  }, [autoClose, onConfirm, handleOpenChange]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault();
+      if (e.key === "Escape") handleClose();
+      else if (e.key === "Enter") handleConfirm();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleClose, handleConfirm]);
 
   const config = DIALOG_CONFIG[type] || DIALOG_CONFIG.info;
   const Icon = config.icon;
@@ -163,11 +176,7 @@ export default function ConfirmationDialog({
               "bg-[color-mix(in_oklab,var(--color-error)_15%,black_20%)]",
           )}
         />
-        <Dialog.Content
-          asChild
-          onEscapeKeyDown={(event) => event.stopPropagation()}
-        >
-          {/* We replace the default Dialog content node with a motion.div */}
+        <Dialog.Content asChild>
           <motion.div
             layout
             transition={{ duration: 0.25, ease: "easeInOut" }}
