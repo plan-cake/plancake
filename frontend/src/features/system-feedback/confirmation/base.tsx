@@ -77,13 +77,31 @@ export default function ConfirmationDialog({
   }, [autoClose, onConfirm, handleOpenChange]);
 
   useEffect(() => {
+    // If the dialog is not open, then don't add the keydown listener
+    if (!open) return;
+
+    // Add keydown listener for Enter and Escape keys to trigger confirm or cancel
+    // actions.
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore key events coming from text inputs or editable elements
+      const target = e.target as HTMLElement | null;
+      const tagName = target?.tagName;
+      const isTextInput =
+        tagName === "INPUT" ||
+        tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+      if (isTextInput) {
+        return;
+      }
+
       if (e.key === "Escape") handleClose();
       else if (e.key === "Enter") handleConfirm();
     };
+
     window.addEventListener("keydown", handleKeyDown);
+
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleClose, handleConfirm]);
+  }, [handleClose, handleConfirm, open]);
 
   const config = DIALOG_CONFIG[type] || DIALOG_CONFIG.info;
   const Icon = config.icon;
