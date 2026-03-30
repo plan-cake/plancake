@@ -44,6 +44,7 @@ from api.utils import (
     check_rate_limit,
     delete_session_cookie,
     get_session,
+    prune_account_sessions,
     set_session_cookie,
 )
 
@@ -175,6 +176,8 @@ def verify_email(request):
     This endpoint does NOT automatically log in the user after verifying.
     """
     ver_code = request.validated_data.get("verification_code")
+
+    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
 
     try:
         unverified_user = UnverifiedUserAccount.objects.get(
@@ -358,6 +361,8 @@ def reset_password(request):
     reset_token = request.validated_data.get("reset_token")
     new_password = request.validated_data.get("new_password")
 
+    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
+
     is_strong, criteria = validate_password(new_password)
     if not is_strong:
         logger.info("Password reset failed: Invalid new password.")
@@ -458,9 +463,7 @@ def change_password(request):
         user.save()
 
         if prune_sessions:
-            UserSession.objects.filter(user_account=user).exclude(
-                session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-            ).delete()
+            prune_account_sessions(request)
 
     return Response({"message": ["Password changed successfully."]}, status=200)
 

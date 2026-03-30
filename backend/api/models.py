@@ -60,6 +60,17 @@ class PasswordResetToken(models.Model):
     created_at = DateTimeNoTZField(auto_now_add=True)
 
 
+class AuthedPasswordResetCode(models.Model):
+    user_account = models.OneToOneField(
+        UserAccount,
+        on_delete=models.CASCADE,
+        related_name="authed_password_reset_code",
+        primary_key=True,
+    )
+    reset_code = models.CharField(max_length=6)
+    created_at = DateTimeNoTZField(auto_now_add=True)
+
+
 class UserLogin(models.Model):
     user_login_id = models.AutoField(primary_key=True)
     user_account = models.ForeignKey(

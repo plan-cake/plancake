@@ -123,3 +123,13 @@ export type DashboardData = {
 export type DisplayName = {
   display_name: string;
 }
+
+export type AuthedPasswordResetCode = {
+  reset_code: string;
+}
+
+export type AuthedPasswordResetData = {
+  reset_code: string;
+  new_password: string;
+  prune_sessions?: boolean;
+}

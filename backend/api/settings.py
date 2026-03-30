@@ -108,6 +108,7 @@ class ThrottleScopes:
     PASSWORD_RESET = ThrottleScope("password_reset", "Password reset")
     EVENT_CREATION = ThrottleScope("event_creation", "Event creation")
     AVAILABILITY_ADD = ThrottleScope("availability_add", "Availability submission")
+    CODE_CHECK = ThrottleScope("code_check", "Verification code checking")
 
 
 REST_FRAMEWORK = {
@@ -124,6 +125,7 @@ REST_FRAMEWORK = {
         ThrottleScopes.PASSWORD_RESET.key: "10/hour",
         ThrottleScopes.EVENT_CREATION.key: "25/hour",
         ThrottleScopes.AVAILABILITY_ADD.key: "50/hour",
+        ThrottleScopes.CODE_CHECK.key: "50/hour",
     },
 }
 
@@ -134,6 +136,8 @@ LONG_SESS_EXP_SECONDS = 31536000  # 1 year
 EMAIL_CODE_EXP_SECONDS = 600  # 10 minutes
 
 PWD_RESET_EXP_SECONDS = 600  # 10 minutes
+
+AUTHED_PWD_RESET_EXP_SECONDS = 600  # 10 minutes
 
 URL_CODE_EXP_SECONDS = 1209600  # 14 days
 
