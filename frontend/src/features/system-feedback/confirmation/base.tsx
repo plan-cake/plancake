@@ -86,11 +86,9 @@ export default function ConfirmationDialog({
       // Ignore key events coming from text inputs or editable elements
       const target = e.target as HTMLElement | null;
       const tagName = target?.tagName;
-      const isTextInput =
-        tagName === "INPUT" ||
-        tagName === "TEXTAREA" ||
-        target?.isContentEditable;
-      if (isTextInput) {
+      const isMultilineText =
+        tagName === "TEXTAREA" || target?.isContentEditable;
+      if (isMultilineText) {
         return;
       }
 

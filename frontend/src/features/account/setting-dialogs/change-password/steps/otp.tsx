@@ -21,7 +21,17 @@ export default function OtpStep({ flow }: ChangePasswordStepProps) {
           length={6}
           value={flow.form.resetCode}
           error={!!flow.errors.resetCode}
-          onValueChange={(val) => flow.updateForm("resetCode", val)}
+          onValueChange={(val) => {
+            flow.updateForm("resetCode", val);
+
+            // Auto submit OTP on the 6th character, giving a small delay for the UI
+            // to update and how the last character entered
+            if (val.length === 6) {
+              setTimeout(() => {
+                flow.handleVerifyOTP();
+              }, 10);
+            }
+          }}
         />
       </div>
       <div className="mt-2 flex justify-between text-sm">
