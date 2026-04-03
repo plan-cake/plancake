@@ -106,7 +106,17 @@ export default function KebabMenu({
               "frosted-glass overflow-hidden rounded-3xl p-4 shadow-lg",
               nested && "scale-110",
             )}
-            onClick={() => handleOpenChange(false)}
+            onClick={(e) => {
+              const target = e.target as HTMLElement;
+              if (
+                target.closest("button") ||
+                target.closest("a") ||
+                target.closest('[role="button"]') ||
+                target.closest('[role="menuitem"]')
+              ) {
+                handleOpenChange(false);
+              }
+            }}
           >
             {children}
           </motion.div>
