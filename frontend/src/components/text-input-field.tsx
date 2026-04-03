@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import * as Collapsible from "@radix-ui/react-collapsible";
 import {
   EyeNoneIcon,
   EyeOpenIcon,
@@ -196,11 +197,13 @@ export default function TextInputField(props: TextInputFieldProps) {
       </div>
 
       {/* Password Criteria */}
-      {showPasswordCriteria && (
-        <div className="mt-2 w-full px-4">
-          <PasswordCriteria criteria={passwordCriteria} />
-        </div>
-      )}
+      <Collapsible.Root open={showPasswordCriteria}>
+        <Collapsible.Content className="collapsible-content">
+          <div className="px-4 pb-1 pt-2">
+            <PasswordCriteria criteria={passwordCriteria} />
+          </div>
+        </Collapsible.Content>
+      </Collapsible.Root>
     </div>
   );
 }
