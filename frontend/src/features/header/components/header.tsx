@@ -104,15 +104,19 @@ export default function Header() {
         <LogoArea isShrunk={isShrunk} />
 
         <motion.div
-          layout
           animate={{ scale: isAnyMenuOpen ? 0.95 : 1 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className={cn(
-            "frosted-glass relative flex h-fit items-center rounded-full",
+            "relative isolate flex h-fit items-center rounded-full",
             "header-transition-[gap,padding]",
             isShrunk ? "gap-1 p-1" : "gap-2 p-2",
           )}
         >
+          <div
+            className="frosted-glass pointer-events-none absolute inset-0 -z-10 rounded-full"
+            aria-hidden="true"
+          />
+
           <NewEventButton />
           <ThemeToggle />
           <DashboardButton />
