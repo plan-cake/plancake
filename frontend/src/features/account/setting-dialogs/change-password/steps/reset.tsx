@@ -18,9 +18,11 @@ export default function ResetStep({ flow }: ChangePasswordStepProps) {
           }}
           onFocus={() => flow.setShowCriteria(true)}
           onBlur={() => {
-            if (!flow.form.newPassword || flow.passwordIsStrong) {
-              flow.setShowCriteria(false);
-            }
+            setTimeout(() => {
+              if (!flow.form.newPassword || flow.passwordIsStrong) {
+                flow.setShowCriteria(false);
+              }
+            }, 0);
           }}
           outlined
           error={flow.errors.newPassword || flow.errors.api}
