@@ -195,7 +195,7 @@ export default function ConfirmationDialog({
             className={cn(
               "dialog-content fixed inset-0 z-40 m-auto flex flex-col overflow-hidden",
               "bg-panel rounded-3xl p-6 shadow-md focus:outline-none",
-              "h-fit w-3/4 md:w-fit md:max-w-3xl",
+              "min-w-sm h-fit w-fit max-w-lg",
             )}
           >
             <Dialog.Title asChild>
