@@ -62,6 +62,10 @@ export default function KebabMenu({
 
   return (
     <div className="relative" ref={containerRef}>
+      {/* The invisible trigger is used to reserve space in the layout for the
+      menu button, preventing layout shifts when the menu opens/closes. The
+      actual visible trigger is absolutely positioned on top of it and only
+      rendered when the menu is closed. */}
       <div className="pointer-events-none invisible" aria-hidden="true">
         {trigger ? (
           trigger
@@ -72,7 +76,6 @@ export default function KebabMenu({
           />
         )}
       </div>
-
       <AnimatePresence initial={false}>
         {!open ? (
           <motion.div
