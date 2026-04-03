@@ -18,28 +18,36 @@ const morphTransition: Transition = {
 export default function KebabMenu({
   children,
   trigger,
+  open: controlledOpen,
   onOpenChange,
   nested = false,
 }: {
   children: React.ReactNode;
   trigger?: React.ReactNode;
+  open?: boolean;
   onOpenChange?: (open: boolean) => void;
   nested?: boolean;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
   const id = useId();
   const containerRef = useRef<HTMLDivElement>(null);
 
+  /* OPEN STATE MANAGEMENT */
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+
   const handleOpenChange = useCallback(
-    (open: boolean) => {
-      setIsOpen(open);
-      onOpenChange?.(open);
+    (newOpen: boolean) => {
+      if (!isControlled) {
+        setInternalOpen(newOpen);
+      }
+      onOpenChange?.(newOpen);
     },
-    [onOpenChange],
+    [isControlled, onOpenChange],
   );
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!open) return;
     const handleClickOutside = (event: MouseEvent) => {
       if (
         containerRef.current &&
@@ -50,7 +58,7 @@ export default function KebabMenu({
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [handleOpenChange, isOpen]);
+  }, [handleOpenChange, open]);
 
   return (
     <div className="relative" ref={containerRef}>
@@ -66,7 +74,7 @@ export default function KebabMenu({
       </div>
 
       <AnimatePresence initial={false}>
-        {!isOpen ? (
+        {!open ? (
           <motion.div
             layout
             key="trigger"
@@ -74,7 +82,7 @@ export default function KebabMenu({
             transition={morphTransition}
             className="absolute right-0 top-0 z-10 inline-block cursor-pointer rounded-full"
             aria-haspopup="menu"
-            aria-expanded={isOpen}
+            aria-expanded={open}
             onClick={() => handleOpenChange(true)}
           >
             {trigger ? (

@@ -9,22 +9,20 @@ import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
+import { useHeaderSize } from "@/features/header/context";
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
-interface AccountButtonProps {
-  onMenuOpenChange?: (isOpen: boolean) => void;
-}
-
-export default function AccountButton({
-  onMenuOpenChange,
-}: AccountButtonProps) {
+export default function AccountButton() {
+  const { activeMenu, setActiveMenu } = useHeaderSize();
   const { loginState, logout, accountDetails } = useAccount();
   const router = useRouter();
   const { addToast } = useToast();
+
+  const isMenuOpen = activeMenu === "account";
 
   const signOut = async () => {
     try {
@@ -66,7 +64,8 @@ export default function AccountButton({
       >
         <KebabMenu
           nested
-          onOpenChange={onMenuOpenChange}
+          open={isMenuOpen}
+          onOpenChange={(isOpen) => setActiveMenu(isOpen ? "account" : null)}
           trigger={
             <EmptyButton
               className="relative z-10"

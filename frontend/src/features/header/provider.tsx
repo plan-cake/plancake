@@ -11,9 +11,11 @@ export default function HeaderSizeProvider({
   children: React.ReactNode;
 }) {
   const [isShrunk, setIsShrunk] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   const shrink = useCallback(() => {
     setIsShrunk(true);
+    setActiveMenu(null);
   }, []);
 
   const expand = useCallback(() => {
@@ -35,6 +37,8 @@ export default function HeaderSizeProvider({
         topMarginClass,
         shrink,
         expand,
+        activeMenu,
+        setActiveMenu,
       }}
     >
       {children}
