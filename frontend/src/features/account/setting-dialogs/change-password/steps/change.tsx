@@ -60,7 +60,7 @@ export default function ChangeStep({ flow }: ChangePasswordStepProps) {
       </div>
       <div className="mt-4 flex flex-wrap justify-between gap-2 text-sm">
         <Checkbox
-          label="Logout of all other devices"
+          label="Sign out of all other devices"
           checked={flow.form.pruneSessions}
           onChange={() =>
             flow.updateForm("pruneSessions", !flow.form.pruneSessions)

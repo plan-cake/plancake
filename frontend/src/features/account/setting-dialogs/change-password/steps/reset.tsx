@@ -44,7 +44,7 @@ export default function ResetStep({ flow }: ChangePasswordStepProps) {
       <div className="mt-4 flex justify-start text-sm">
         <div className="m-0 flex flex-col gap-2">
           <Checkbox
-            label="Logout of all other devices"
+            label="Sign out of all other devices"
             checked={flow.form.pruneSessions}
             onChange={() =>
               flow.updateForm("pruneSessions", !flow.form.pruneSessions)

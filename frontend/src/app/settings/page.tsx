@@ -81,7 +81,7 @@ export default function Page() {
           <p className="mt-1 leading-tight opacity-75">
             Your email address is{" "}
             <span className="text-foreground font-semibold">
-              {accountDetails?.email}
+              {accountDetails?.email}.
             </span>
           </p>
         </div>

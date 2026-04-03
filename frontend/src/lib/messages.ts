@@ -43,7 +43,7 @@ export const MESSAGES = {
   SUCCESS_DEFAULT_NAME_SAVED: "Nickname saved successfully.",
   SUCCESS_DEFAULT_NAME_REMOVED: "Nickname removed successfully.",
   SUCCESS_EVENT_DELETE: "Event deleted successfully.",
-  SUCCESS_ACCOUNT_DELETE: "Account deleted successfully. Have a nice day.",
+  SUCCESS_ACCOUNT_DELETE: "Account deleted successfully. Have a nice day!",
 
   // copy link messages
   COPY_LINK_SUCCESS: "Link copied to clipboard!",
