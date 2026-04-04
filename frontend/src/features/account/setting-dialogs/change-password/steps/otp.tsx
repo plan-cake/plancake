@@ -7,10 +7,10 @@ export default function OtpStep({ flow }: ChangePasswordStepProps) {
   return (
     <div>
       <p>We sent a password reset code to your email. Enter the code below!</p>
-      <div className="mb-6 flex flex-col justify-center gap-2">
+      <div className="mb-6 flex flex-col items-center justify-center gap-2">
         <p
           className={cn(
-            "text-error h-5 text-center text-sm",
+            "text-error flex h-fit min-h-5 items-end justify-center text-center text-sm",
             !flow.errors.resetCode && "invisible",
           )}
         >
@@ -28,7 +28,7 @@ export default function OtpStep({ flow }: ChangePasswordStepProps) {
             // to update and how the last character entered
             if (val.length === 6) {
               setTimeout(() => {
-                flow.handleVerifyOTP();
+                flow.handleVerifyOTP(val);
               }, 10);
             }
           }}

@@ -74,24 +74,22 @@ export function useChangePasswordFlow() {
     }
   };
 
-  const handleVerifyOTP = async () => {
+  const handleVerifyOTP = async (code?: string) => {
     clearAllErrors();
+    const codeToVerify = code ?? form.resetCode;
+
     if (!form.resetCode) {
       handleError("resetCode", "Please enter the code.");
       return false;
     }
     try {
       await clientPost(ROUTES.account.checkAuthedPasswordResetCode, {
-        reset_code: form.resetCode,
+        reset_code: codeToVerify,
       });
       setStep("RESET");
       return false;
-    } catch (e) {
-      const error = e as ApiErrorResponse;
-      handleError(
-        "resetCode",
-        error.formattedMessage.split(": ")[1] || "Invalid code.",
-      );
+    } catch {
+      handleError("resetCode", "Invalid code. Try Again.");
       return false;
     }
   };
