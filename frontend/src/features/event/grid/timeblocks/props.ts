@@ -4,12 +4,12 @@ import {
 } from "@/core/availability/types";
 
 export type TimeBlockProps = {
-  ref?: React.Ref<HTMLDivElement>;
   numQuarterHours: number;
   visibleDaysCount: number;
   children: React.ReactNode;
   hasPrev?: boolean;
   hasNext?: boolean;
+  onPointerLeave?: () => void;
 };
 
 type TimeSlot = {

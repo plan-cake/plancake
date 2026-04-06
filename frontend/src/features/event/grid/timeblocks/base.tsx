@@ -6,17 +6,17 @@ import { TimeBlockProps } from "@/features/event/grid/timeblocks/props";
 import { cn } from "@/lib/utils/classname";
 
 export default function BaseTimeBlock({
-  ref,
   numQuarterHours,
   visibleDaysCount,
   children,
   hasNext = false,
   hasPrev = false,
+  onPointerLeave,
 }: TimeBlockProps) {
   return (
     <div
-      ref={ref}
       className="relative isolate grid"
+      onPointerLeave={onPointerLeave}
       style={{
         gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${hasNext ? SIDE_WIDTH : 10}px`,
       }}
