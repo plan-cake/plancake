@@ -10,12 +10,16 @@ export const HeaderSizeContext = createContext<{
   topMarginClass: HeaderMarginClass;
   shrink: () => void;
   expand: () => void;
+  activeMenu: string | null;
+  setActiveMenu: (menu: string | null) => void;
 }>({
   isShrunk: false,
   heightClass: "header-transition-[height] h-23",
   topMarginClass: "header-transition-[top] top-23",
-  shrink: () => { },
-  expand: () => { },
+  shrink: () => {},
+  expand: () => {},
+  activeMenu: null,
+  setActiveMenu: () => {},
 });
 
 export function useHeaderSize() {

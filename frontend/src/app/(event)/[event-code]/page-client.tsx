@@ -120,16 +120,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         <h1 className="text-2xl font-bold">{eventTitle}</h1>
 
         <div className="md:hidden">
-          <KebabMenu
-            buttons={
-              isCreator
-                ? [
-                    editButton("frosted glass inset"),
-                    copyButton("frosted glass inset"),
-                  ]
-                : [copyButton("frosted glass inset")]
-            }
-          />
+          <KebabMenu>
+            {isCreator && editButton("frosted glass inset")}
+            {copyButton("frosted glass inset")}
+          </KebabMenu>
         </div>
 
         <div className="ml-auto hidden flex-wrap justify-end gap-2 md:flex">
