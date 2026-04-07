@@ -153,22 +153,27 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     const modifiers = {
       range_preview_start: (date: Date) => {
         if (!isSelectingEnd || !localRange?.from || !hoverDate) return false;
-        return isSameDay(date, localRange.from);
+        const start = isBefore(hoverDate, localRange.from)
+          ? hoverDate
+          : localRange.from;
+        return isSameDay(date, start);
       },
-      range_preview: (date: Date) => {
+      range_preview_end: (date: Date) => {
         if (!isSelectingEnd || !localRange?.from || !hoverDate) return false;
-
-        const canSelectForward =
-          (isAfter(date, localRange.from) ||
-            isSameDay(date, localRange.from)) &&
-          (isBefore(date, hoverDate) || isSameDay(date, hoverDate));
-
-        const canSelectBackward =
-          (isBefore(date, localRange.from) ||
-            isSameDay(date, localRange.from)) &&
-          (isAfter(date, hoverDate) || isSameDay(date, hoverDate));
-
-        return canSelectForward || canSelectBackward;
+        const end = isAfter(hoverDate, localRange.from)
+          ? hoverDate
+          : localRange.from;
+        return isSameDay(date, end);
+      },
+      range_preview_middle: (date: Date) => {
+        if (!isSelectingEnd || !localRange?.from || !hoverDate) return false;
+        const start = isBefore(hoverDate, localRange.from)
+          ? hoverDate
+          : localRange.from;
+        const end = isAfter(hoverDate, localRange.from)
+          ? hoverDate
+          : localRange.from;
+        return isAfter(date, start) && isBefore(date, end);
       },
     };
 
@@ -189,8 +194,9 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
           // modifiers + styles
           modifiers={modifiers}
           modifiersClassNames={{
-            range_preview: "rdp-range_preview",
             range_preview_start: "rdp-range_preview_start",
+            range_preview_middle: "rdp-range_preview_middle",
+            range_preview_end: "rdp-range_preview_end",
           }}
           classNames={{
             root: `${defaultClassNames.root} flex justify-center items-center`,
