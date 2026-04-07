@@ -8,29 +8,20 @@ class CustomCodeSerializer(serializers.Serializer):
     custom_code = serializers.CharField(required=False, max_length=255)
 
 
+class RequiredCustomCodeSerializer(serializers.Serializer):
+    custom_code = serializers.CharField(required=True, max_length=255)
+
+
 class EventCodeSerializer(serializers.Serializer):
     event_code = serializers.CharField(required=True, max_length=255)
 
 
 class EventInfoSerializer(serializers.Serializer):
     title = serializers.CharField(required=True, max_length=50)
-    duration = serializers.IntegerField(required=False)
     timeslots = serializers.ListField(
         child=serializers.DateTimeField(), required=True, allow_empty=False
     )
     time_zone = TimeZoneField(required=True)
-
-    def validate(self, attrs):
-        DURATION_VALUES = [15, 30, 45, 60]
-        if "duration" in attrs and attrs.get("duration") not in DURATION_VALUES:
-            raise serializers.ValidationError(
-                {
-                    "duration": [
-                        f"Invalid value. Valid values are: {', '.join(map(str, DURATION_VALUES))}"
-                    ]
-                }
-            )
-        return super().validate(attrs)
 
 
 class DateEventCreateSerializer(EventInfoSerializer, CustomCodeSerializer):

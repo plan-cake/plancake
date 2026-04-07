@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -13,7 +13,9 @@ import { useAccount } from "@/features/account/context";
 import ActionButton from "@/features/button/components/action";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
-import { formatApiError } from "@/lib/utils/api/handle-api-error";
+import { clientPost } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function Page() {
   const [email, setEmail] = useState("");
@@ -23,8 +25,7 @@ export default function Page() {
   const router = useRouter();
 
   // TOASTS AND ERROR STATES
-  const { errors, handleError, clearAllErrors, handleGenericError } =
-    useFormErrors();
+  const { errors, handleError, clearAllErrors } = useFormErrors();
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
@@ -51,43 +52,31 @@ export default function Page() {
     }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/login/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ email, password, remember_me: rememberMe }),
-        },
-      );
-
-      if (res.ok) {
-        const data = await res.json();
-        login({
-          email: data.email,
-          defaultName: data.default_display_name,
-        });
-        router.push("/dashboard");
-        return true;
+      const data = await clientPost(ROUTES.auth.login, {
+        email,
+        password,
+        remember_me: rememberMe,
+      });
+      login({
+        email: data.email,
+        defaultName: data.default_display_name,
+      });
+      router.push("/dashboard");
+      return true;
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      if (error.rateLimited) {
+        handleError("rate_limit", error.formattedMessage);
+      } else if (error.formattedMessage.includes("Email:")) {
+        handleError("email", error.formattedMessage.split("Email:")[1].trim());
+      } else if (error.formattedMessage.includes("Password:")) {
+        handleError(
+          "password",
+          error.formattedMessage.split("Password:")[1].trim(),
+        );
       } else {
-        const body = await res.json();
-
-        const errorMessage = formatApiError(body);
-
-        if (res.status === 429) {
-          handleError("rate_limit", errorMessage);
-        } else if (errorMessage.includes("Email:")) {
-          handleError("email", errorMessage.split("Email:")[1].trim());
-        } else if (errorMessage.includes("Password:")) {
-          handleError("password", errorMessage.split("Password:")[1].trim());
-        } else {
-          handleError("api", errorMessage);
-        }
-        return false;
+        handleError("api", error.formattedMessage);
       }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      handleGenericError();
       return false;
     }
   };

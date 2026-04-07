@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 import { CheckIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 import * as Select from "@radix-ui/react-select";
 
-import { SelectorProps } from "@/features/selector/types";
+import { DropdownProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
 export default function Dropdown<TValue extends string | number>({
@@ -13,7 +13,7 @@ export default function Dropdown<TValue extends string | number>({
   options,
   disabled,
   className,
-}: SelectorProps<TValue>) {
+}: DropdownProps<TValue>) {
   return (
     <Select.Root
       value={value?.toString()}
@@ -26,7 +26,7 @@ export default function Dropdown<TValue extends string | number>({
       <Select.Trigger
         id={id}
         className={cn(
-          "text-accent inline-flex items-center rounded-2xl text-start hover:cursor-pointer",
+          "text-accent-text inline-flex items-center rounded-2xl text-start hover:cursor-pointer focus:outline-none",
           "bg-accent/15 hover:bg-accent/25 active:bg-accent/40 px-3 py-1",
           "focus-visible:rounded-full focus-visible:outline-2",
           "focus-visible:outline-foreground focus-visible:outline-offset-2",
@@ -76,7 +76,7 @@ const DropdownItem = forwardRef<HTMLDivElement, DropdownItemProps>(
           "data-[highlighted]:bg-accent relative flex h-[30px] select-none items-center rounded-xl px-6 leading-none",
           "hover:outline-none data-[disabled]:pointer-events-none data-[disabled]:text-gray-400 data-[highlighted]:text-white",
           "data-[highlighted]:outline-foreground data-[highlighted]:outline data-[highlighted]:outline-2 data-[highlighted]:outline-offset-2",
-          "focus-visible:rounded-xl focus-visible:outline-2 focus-visible:outline-foreground focus-visible:outline-offset-2",
+          "focus-visible:outline-foreground focus-visible:rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2",
         )}
       >
         <Select.ItemText>{children}</Select.ItemText>

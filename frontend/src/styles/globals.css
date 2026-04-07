@@ -17,3 +17,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-nunito);
 }
+
+.vaul-resizing [data-vaul-drawer] {
+  transition: none !important;
+}

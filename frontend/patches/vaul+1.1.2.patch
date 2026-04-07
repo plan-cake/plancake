@@ -1,0 +1,101 @@
+diff --git a/node_modules/vaul/dist/index.mjs b/node_modules/vaul/dist/index.mjs
+index 0dbbce5..5caf26a 100644
+--- a/node_modules/vaul/dist/index.mjs
++++ b/node_modules/vaul/dist/index.mjs
+@@ -241,7 +241,7 @@ function preventScrollMobileSafari() {
+                 // This will have prevented the browser from scrolling the focused element into view,
+                 // so we need to do this ourselves in a way that doesn't cause the whole page to scroll.
+                 if (visualViewport) {
+-                    if (visualViewport.height < window.innerHeight) {
++                    if (visualViewport.height < window.visualViewport?.height || window.innerHeight) {
+                         // If the keyboard is already visible, do this after one additional frame
+                         // to wait for the transform to be removed.
+                         requestAnimationFrame(()=>{
+@@ -512,18 +512,23 @@ function useSnapPoints({ activeSnapPointProp, setActiveSnapPointProp, snapPoints
+         onChange: setActiveSnapPointProp
+     });
+     const [windowDimensions, setWindowDimensions] = React__default.useState(typeof window !== 'undefined' ? {
+-        innerWidth: window.innerWidth,
+-        innerHeight: window.innerHeight
++        innerWidth: window.visualViewport?.width || window.innerWidth,
++        innerHeight: window.visualViewport?.height || window.innerHeight,
+     } : undefined);
+     React__default.useEffect(()=>{
+         function onResize() {
+             setWindowDimensions({
+-                innerWidth: window.innerWidth,
+-                innerHeight: window.innerHeight
++                innerWidth: window.visualViewport?.width || window.innerWidth,
++                innerHeight: window.visualViewport?.height || window.innerHeight,
+             });
+         }
++        window.visualViewport?.addEventListener('resize', onResize);
+         window.addEventListener('resize', onResize);
+-        return ()=>window.removeEventListener('resize', onResize);
++
++        return () => {
++            window.visualViewport?.removeEventListener('resize', onResize);
++            window.removeEventListener('resize', onResize);
++        };
+     }, []);
+     const isLastSnapPoint = React__default.useMemo(()=>activeSnapPoint === (snapPoints == null ? void 0 : snapPoints[snapPoints.length - 1]) || null, [
+         snapPoints,
+@@ -542,8 +547,8 @@ function useSnapPoints({ activeSnapPointProp, setActiveSnapPointProp, snapPoints
+             width: container.getBoundingClientRect().width,
+             height: container.getBoundingClientRect().height
+         } : typeof window !== 'undefined' ? {
+-            width: window.innerWidth,
+-            height: window.innerHeight
++            width: window.visualViewport?.width || window.innerWidth,
++            height: window.visualViewport?.height || window.innerHeight,
+         } : {
+             width: 0,
+             height: 0
+@@ -645,7 +650,7 @@ function useSnapPoints({ activeSnapPointProp, setActiveSnapPointProp, snapPoints
+             if (typeof prev !== 'number' || typeof curr !== 'number') return prev;
+             return Math.abs(curr - currentPosition) < Math.abs(prev - currentPosition) ? curr : prev;
+         });
+-        const dim = isVertical(direction) ? window.innerHeight : window.innerWidth;
++        const dim = isVertical(direction) ? window.visualViewport?.height || window.innerHeight : window.visualViewport?.width || window.innerWidth;
+         if (velocity > VELOCITY_THRESHOLD && Math.abs(draggedDistance) < dim * 0.4) {
+             const dragDirection = hasDraggedUp ? 1 : -1; // 1 = up, -1 = down
+             // Don't do anything if we swipe upwards while being on the last snap point
+@@ -793,7 +798,7 @@ let previousBodyPosition = null;
+             });
+             window.setTimeout(()=>window.requestAnimationFrame(()=>{
+                     // Attempt to check if the bottom bar appeared due to the position change
+-                    const bottomBarHeight = innerHeight - window.innerHeight;
++                    const bottomBarHeight = innerHeight - (window.visualViewport?.height || window.innerHeight);
+                     if (bottomBarHeight && scrollPos.current >= innerHeight) {
+                         // Move the content further up so that the bottom bar doesn't hide it
+                         document.body.style.top = `${-(scrollPos.current + bottomBarHeight)}px`;
+@@ -1117,7 +1122,7 @@ function Root({ open: openProp, onOpenChange, children, onDrag: onDragProp, onRe
+             if (isInput(focusedElement) || keyboardIsOpen.current) {
+                 var _window_visualViewport;
+                 const visualViewportHeight = ((_window_visualViewport = window.visualViewport) == null ? void 0 : _window_visualViewport.height) || 0;
+-                const totalHeight = window.innerHeight;
++                const totalHeight = window.visualViewport?.height || window.innerHeight;
+                 // This is the height of the keyboard
+                 let diffFromInitial = totalHeight - visualViewportHeight;
+                 const drawerHeight = drawerRef.current.getBoundingClientRect().height || 0;
+@@ -1261,9 +1266,9 @@ function Root({ open: openProp, onOpenChange, children, onDrag: onDragProp, onRe
+             return;
+         }
+         var _drawerRef_current_getBoundingClientRect_height;
+-        const visibleDrawerHeight = Math.min((_drawerRef_current_getBoundingClientRect_height = drawerRef.current.getBoundingClientRect().height) != null ? _drawerRef_current_getBoundingClientRect_height : 0, window.innerHeight);
++        const visibleDrawerHeight = Math.min((_drawerRef_current_getBoundingClientRect_height = drawerRef.current.getBoundingClientRect().height) != null ? _drawerRef_current_getBoundingClientRect_height : 0, window.visualViewport?.height || window.innerHeight);
+         var _drawerRef_current_getBoundingClientRect_width;
+-        const visibleDrawerWidth = Math.min((_drawerRef_current_getBoundingClientRect_width = drawerRef.current.getBoundingClientRect().width) != null ? _drawerRef_current_getBoundingClientRect_width : 0, window.innerWidth);
++        const visibleDrawerWidth = Math.min((_drawerRef_current_getBoundingClientRect_width = drawerRef.current.getBoundingClientRect().width) != null ? _drawerRef_current_getBoundingClientRect_width : 0, window.visualViewport?.width || window.innerWidth);
+         const isHorizontalSwipe = direction === 'left' || direction === 'right';
+         if (Math.abs(swipeAmount) >= (isHorizontalSwipe ? visibleDrawerWidth : visibleDrawerHeight) * closeThreshold) {
+             closeDrawer();
+@@ -1318,7 +1323,7 @@ function Root({ open: openProp, onOpenChange, children, onDrag: onDragProp, onRe
+         });
+     }
+     function onNestedRelease(_event, o) {
+-        const dim = isVertical(direction) ? window.innerHeight : window.innerWidth;
++        const dim = isVertical(direction) ? window.visualViewport?.height || window.innerHeight : window.visualViewport?.width || window.innerWidth;
+         const scale = o ? (dim - NESTED_DISPLACEMENT) / dim : 1;
+         const translate = o ? -NESTED_DISPLACEMENT : 0;
+         if (o) {

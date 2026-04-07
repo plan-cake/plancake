@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { Modak, Nunito } from "next/font/google";
 
+import { AccountDetails } from "@/features/account/type";
 import Header from "@/features/header/components/header";
 import { Providers } from "@/lib/providers";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
+import { serverGet } from "@/lib/utils/api/server-fetch";
 import "@/styles/globals.css";
 
 const modak = Modak({
@@ -61,11 +65,31 @@ export function generateMetadata(): Metadata {
   };
 }
 
-export default function RootLayout({
+async function checkLoginStatus(): Promise<AccountDetails | null> {
+  try {
+    const data = await serverGet(ROUTES.auth.checkAccountAuth);
+    return {
+      email: data.email,
+      defaultName: data.default_display_name,
+    };
+  } catch (e) {
+    const error = e as ApiErrorResponse;
+
+    if (error.status === 401 || error.status === 403) {
+      return null;
+    }
+
+    throw error;
+  }
+}
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const accountDetails = await checkLoginStatus();
+
   return (
     <html
       lang="en"
@@ -74,7 +98,7 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased">
         <div className="mx-auto flex min-h-dvh max-w-[1440px] flex-col">
-          <Providers>
+          <Providers accountDetails={accountDetails}>
             <Header />
             {children}
           </Providers>

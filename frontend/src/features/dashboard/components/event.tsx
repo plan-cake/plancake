@@ -1,9 +1,10 @@
 import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
-import { ClockIcon, Pencil1Icon } from "@radix-ui/react-icons";
+import { ClockIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { EventType } from "@/core/event/types";
 import DashboardCopyButton from "@/features/dashboard/components/copy-button";
 import DateRangeRow from "@/features/dashboard/components/date-range-row";
 import ParticipantRow from "@/features/dashboard/components/participant-row";
@@ -18,13 +19,14 @@ export type DashboardEventProps = {
   myEvent: boolean;
   code: string;
   title: string;
-  type: "specific" | "weekday";
+  type: EventType;
   participants: string[];
   startTime: string;
   endTime: string;
   startDate: string;
   endDate: string;
   timezone: string;
+  onDelete?: () => void;
 };
 
 export default function DashboardEvent({
@@ -34,9 +36,15 @@ export default function DashboardEvent({
   type,
   participants,
   timezone,
+  onDelete,
   ...dateTimeProps
 }: DashboardEventProps) {
   const router = useRouter();
+
+  function handleDelete(e: MouseEvent<HTMLButtonElement>) {
+    e.preventDefault(); // prevent the link behind it triggering
+    if (onDelete) onDelete();
+  }
 
   function navigateToEdit(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault(); // prevent the link behind it triggering
@@ -89,7 +97,8 @@ export default function DashboardEvent({
       href={`/${code}`}
       className={cn(
         "bg-background flex h-fit w-full flex-col rounded-lg p-4",
-        "transition-shadow hover:shadow-lg hover:shadow-black/25",
+        "hover:bg-[color-mix(in_oklab,var(--color-background)_95%,var(--color-foreground))]",
+        "[&:not(:has([data-actions]:active))]:active:bg-[color-mix(in_oklab,var(--color-background)_95%,var(--color-black))]",
       )}
     >
       <div className="text-lg font-bold leading-tight">{title}</div>
@@ -106,21 +115,39 @@ export default function DashboardEvent({
         <ClockIcon className="h-5 w-5" />
         {formatTimeRange(start.time, end.time)}
       </div>
-      <div className="mt-1.5" ref={participantRowRef}>
+      <div className="mt-1.5 bg-inherit" ref={participantRowRef}>
         <ParticipantRow participants={participants} numIcons={numIcons} />
       </div>
-      <div className="mt-2.5 flex items-center gap-2">
+      <div data-actions className="mt-2.5 flex items-center gap-2">
         <DashboardCopyButton code={code} />
         {myEvent && (
-          <button className="cursor-pointer" onClick={navigateToEdit}>
-            <div
-              className={
-                "border-foreground hover:bg-foreground/25 w-fit rounded-full border p-1.5"
-              }
+          <>
+            <button className="cursor-pointer" onClick={navigateToEdit}>
+              <div
+                className={cn(
+                  "border-foreground w-fit rounded-full border p-1.5",
+                  "hover:bg-foreground/20 active:bg-foreground/10",
+                )}
+              >
+                <Pencil1Icon className="h-4 w-4" />
+              </div>
+            </button>
+            <button
+              className="cursor-pointer"
+              onClick={handleDelete}
+              aria-label="Delete Event"
             >
-              <Pencil1Icon className="h-4 w-4" />
-            </div>
-          </button>
+              <div
+                className={cn(
+                  "border-foreground w-fit rounded-full border p-1.5",
+                  "hover:bg-error/20 hover:text-error hover:border-error",
+                  "active:bg-error/40",
+                )}
+              >
+                <TrashIcon className="h-4 w-4" />
+              </div>
+            </button>
+          </>
         )}
       </div>
     </Link>

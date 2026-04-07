@@ -5,16 +5,15 @@ import {
   DEFAULT_RANGE_SPECIFIC,
   DEFAULT_RANGE_WEEKDAY,
 } from "@/core/event/lib/default-range";
-import { EventRange, Weekday } from "@/core/event/types";
+import { EventRange, EventType, Weekday } from "@/core/event/types";
 
 export type EventRangeAction =
   | { type: "SET_RANGE_INFO"; payload: EventRange }
-  | { type: "SET_RANGE_TYPE"; payload: "specific" | "weekday" }
+  | { type: "SET_RANGE_TYPE"; payload: EventType }
   | { type: "SET_DATE_RANGE"; payload: { from: string; to: string } }
   | { type: "SET_START_TIME"; payload: string }
   | { type: "SET_END_TIME"; payload: string }
   | { type: "SET_WEEKDAYS"; payload: Weekday[] }
-  | { type: "SET_DURATION"; payload: number }
   | { type: "SET_TIMEZONE"; payload: string }
   | { type: "RESET" };
 
@@ -35,7 +34,6 @@ export function EventRangeReducer(
       }
 
       const baseEvent = {
-        duration: state.duration,
         timezone: state.timezone,
         timeRange: state.timeRange,
       };
@@ -97,13 +95,6 @@ export function EventRangeReducer(
       return {
         ...state,
         weekdays: action.payload,
-      };
-    }
-
-    case "SET_DURATION": {
-      return {
-        ...state,
-        duration: action.payload,
       };
     }
 

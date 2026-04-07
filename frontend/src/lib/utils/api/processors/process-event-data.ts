@@ -1,12 +1,12 @@
 import { EventRange } from "@/core/event/types";
 import { createWeekdayArray } from "@/core/event/weekday-utils";
-import { EventDetailsResponse } from "@/features/event/editor/fetch-data";
+import { EventDetails } from "@/lib/utils/api/types";
 import {
   getTimezoneDetails,
   parseIsoDateTime,
 } from "@/lib/utils/date-time-format";
 
-export function processEventData(eventData: EventDetailsResponse): {
+export function processEventData(eventData: EventDetails): {
   eventName: string;
   eventRange: EventRange;
   timeslots: Date[];
@@ -42,7 +42,6 @@ export function processEventData(eventData: EventDetailsResponse): {
   if (eventData.event_type === "Date") {
     eventRange = {
       type: "specific",
-      duration: eventData.duration || 0,
       timezone: eventData.time_zone,
       dateRange: {
         from: start.date,
@@ -57,7 +56,6 @@ export function processEventData(eventData: EventDetailsResponse): {
     const weekdays = createWeekdayArray(start.weekday, end.weekday);
     eventRange = {
       type: "weekday",
-      duration: eventData.duration || 0,
       timezone: eventData.time_zone,
       weekdays: weekdays,
       timeRange: {

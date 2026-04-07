@@ -7,7 +7,9 @@ import { notFound, useSearchParams } from "next/navigation";
 import MessagePage from "@/components/layout/message-page";
 import LinkButton from "@/features/button/components/link";
 import { useToast } from "@/features/system-feedback";
-import { MESSAGES } from "@/lib/messages";
+import { clientPost } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function Page() {
   const [verifying, setVerifying] = useState(true);
@@ -30,21 +32,13 @@ export default function Page() {
         return;
       }
 
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ verification_code: token }),
-      })
-        .then(async (res) => {
-          if (res.ok) {
-            setEmailVerified(true);
-          }
-        })
-        .catch((err) => {
-          console.error("Fetch error:", err);
-          addToast("error", MESSAGES.ERROR_GENERIC);
-        });
+      try {
+        await clientPost(ROUTES.auth.verifyEmail, { verification_code: token });
+        setEmailVerified(true);
+      } catch (e) {
+        const error = e as ApiErrorResponse;
+        addToast("error", error.formattedMessage);
+      }
 
       setVerifying(false);
     };

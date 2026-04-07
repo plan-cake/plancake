@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useCallback } from "react";
+import { useCallback, useMemo, useReducer } from "react";
 
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -6,7 +6,7 @@ import { DateRange } from "react-day-picker";
 import { DEFAULT_RANGE_SPECIFIC } from "@/core/event/lib/default-range";
 import { expandEventRange } from "@/core/event/lib/expand-event-range";
 import { EventInfoReducer } from "@/core/event/reducers/info-reducer";
-import { EventInformation, EventRange, Weekday } from "@/core/event/types";
+import { EventInformation, EventRange, EventType, Weekday } from "@/core/event/types";
 import {
   checkDateRange,
   checkTimeRange,
@@ -66,16 +66,12 @@ export function useEventInfo(initialData?: EventInformation) {
     dispatch({ type: "SET_RANGE_INFO", payload: info });
   }, []);
 
-  const setEventType = useCallback((type: "specific" | "weekday") => {
+  const setEventType = useCallback((type: EventType) => {
     dispatch({ type: "SET_RANGE_TYPE", payload: type });
   }, []);
 
   const setTimezone = useCallback((tz: string) => {
     dispatch({ type: "SET_TIMEZONE", payload: tz });
-  }, []);
-
-  const setDuration = useCallback((duration: number) => {
-    dispatch({ type: "SET_DURATION", payload: duration });
   }, []);
 
   const setStartTime = useCallback(
@@ -139,7 +135,6 @@ export function useEventInfo(initialData?: EventInformation) {
       setCustomCode,
       setEventRangeInfo,
       setTimezone,
-      setDuration,
       setStartTime,
       setEndTime,
       setDateRange,
@@ -158,7 +153,6 @@ export function useEventInfo(initialData?: EventInformation) {
       setCustomCode,
       setEventRangeInfo,
       setTimezone,
-      setDuration,
       setStartTime,
       setEndTime,
       setDateRange,

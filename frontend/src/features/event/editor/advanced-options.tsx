@@ -8,10 +8,12 @@ import {
 import { useDebouncedCallback } from "use-debounce";
 
 import { useEventContext } from "@/core/event/context";
-import DurationSelector from "@/features/event/components/selectors/duration";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { MESSAGES } from "@/lib/messages";
+import { clientPost } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { cn } from "@/lib/utils/classname";
 
 type AdvancedOptionsProps = {
@@ -53,38 +55,27 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
   const {
     state: { customCode, eventRange },
     setTimezone,
-    setDuration,
     setCustomCode,
     handleError,
   } = useEventContext();
-
-  const [localCode, setLocalCode] = useState(customCode);
-
   const checkCodeAvailability = useDebouncedCallback(async (code: string) => {
     if (isEditing || !code) return;
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/event/check-code/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ custom_code: code }),
-        },
-      );
-      if (!response.ok)
+      await clientPost(ROUTES.event.checkCode, { custom_code: code });
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      if (error.status === 400) {
         handleError("customCode", MESSAGES.ERROR_EVENT_CODE_TAKEN);
-    } catch {
-      handleError("api", MESSAGES.ERROR_GENERIC);
+      } else {
+        handleError("api", MESSAGES.ERROR_GENERIC);
+      }
     }
-
-    setCustomCode(code);
   }, 500);
 
   const handleCustomCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    setLocalCode(newValue);
+    setCustomCode(newValue);
     checkCodeAvailability(newValue);
   };
 
@@ -98,21 +89,9 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
         />
       </FormSelectorField>
 
-      <FormSelectorField
-        label="Intended Duration"
-        htmlFor="duration-select"
-        isVertical
-      >
-        <DurationSelector
-          id="duration-select"
-          value={eventRange.duration}
-          onChange={(v) => setDuration((v as number) || 0)}
-        />
-      </FormSelectorField>
-
       <label
         htmlFor="custom-code-input"
-        className="flex justify-between text-gray-400"
+        className="mt-2 flex justify-between text-gray-400"
       >
         {!isEditing && "Custom"} Event Code
         {errors.customCode && (
@@ -122,7 +101,7 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
       <input
         id="custom-code-input"
         type="text"
-        value={localCode}
+        value={customCode}
         onChange={handleCustomCodeChange}
         placeholder="optional"
         disabled={isEditing}

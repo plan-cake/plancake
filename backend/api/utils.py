@@ -225,9 +225,6 @@ def format_event_info(event: UserEvent, include_participants: bool = False) -> d
             participant.display_name for participant in event.participants.all()
         ]
 
-    if event.duration is not None:
-        data["duration"] = event.duration
-
     return data
 
 
@@ -303,3 +300,12 @@ def check_rate_limit(request, throttle_scope: ThrottleScope) -> None:
             message=msg,
             response=response,
         )
+
+
+def prune_account_sessions(request):
+    """
+    Deletes all of the current account's sessions except for the current one.
+    """
+    UserSession.objects.filter(user_account=request.user).exclude(
+        session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+    ).delete()

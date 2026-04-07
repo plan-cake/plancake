@@ -8,7 +8,7 @@ import {
 export const TOAST_CONFIG = {
   error: {
     icon: ExclamationTriangleIcon,
-    background: "red",
+    background: "error",
     textColor: "white",
     title: "ERROR",
   },

@@ -12,15 +12,16 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
-import { formatApiError } from "@/lib/utils/api/handle-api-error";
+import { clientPost } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function Page() {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
 
   // TOASTS AND ERROR STATES
-  const { errors, handleError, clearAllErrors, handleGenericError } =
-    useFormErrors();
+  const { errors, handleError, clearAllErrors } = useFormErrors();
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
@@ -37,35 +38,18 @@ export default function Page() {
     }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/start-password-reset/`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ email }),
-        },
-      );
-
-      if (res.ok) {
-        setEmailSent(true);
-        return true;
+      await clientPost(ROUTES.auth.startPasswordReset, { email });
+      setEmailSent(true);
+      return true;
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      if (error.rateLimited) {
+        handleError("rate_limit", error.formattedMessage);
+      } else if (error.formattedMessage.includes("Email:")) {
+        handleError("email", error.formattedMessage.split("Email:")[1].trim());
       } else {
-        const body = await res.json();
-        const errorMessage = formatApiError(body);
-
-        if (res.status === 429) {
-          handleError("rate_limit", errorMessage);
-        } else if (errorMessage.includes("Email:")) {
-          handleError("email", errorMessage.split("Email:")[1].trim());
-        } else {
-          handleError("api", errorMessage);
-        }
-        return false;
+        handleError("api", error.formattedMessage);
       }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      handleGenericError();
       return false;
     }
   };

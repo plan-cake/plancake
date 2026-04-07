@@ -16,11 +16,11 @@ from api.decorators import (
     validate_query_param_input,
 )
 from api.event.serializers import (
-    CustomCodeSerializer,
     DateEventCreateSerializer,
     DateEventEditSerializer,
     EventCodeSerializer,
     EventDetailSerializer,
+    RequiredCustomCodeSerializer,
     WeekEventCreateSerializer,
     WeekEventEditSerializer,
 )
@@ -67,7 +67,6 @@ def create_date_event(request):
     """
     user = request.user
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
     custom_code = request.validated_data.get("custom_code")
@@ -98,7 +97,6 @@ def create_date_event(request):
             user_account=user,
             title=title,
             date_type=UserEvent.EventType.SPECIFIC,
-            duration=duration,
             time_zone=time_zone,
         )
         UrlCode.objects.create(url_code=url_code, user_event=new_event)
@@ -132,7 +130,6 @@ def create_week_event(request):
     """
     user = request.user
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
     custom_code = request.validated_data.get("custom_code")
@@ -163,7 +160,6 @@ def create_week_event(request):
             user_account=user,
             title=title,
             date_type=UserEvent.EventType.GENERIC,
-            duration=duration,
             time_zone=time_zone,
         )
         UrlCode.objects.create(url_code=url_code, user_event=new_event)
@@ -187,7 +183,7 @@ def create_week_event(request):
 
 
 @api_endpoint("POST")
-@validate_json_input(CustomCodeSerializer)
+@validate_json_input(RequiredCustomCodeSerializer)
 @validate_output(MessageOutputSerializer)
 def check_code(request):
     """
@@ -217,7 +213,6 @@ def edit_date_event(request):
     user = request.user
     event_code = request.validated_data.get("event_code")
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
 
@@ -266,7 +261,6 @@ def edit_date_event(request):
 
             # Update the event object itself
             event.title = title
-            event.duration = duration
             event.time_zone = time_zone
             event.save()
 
@@ -307,7 +301,6 @@ def edit_week_event(request):
     user = request.user
     event_code = request.validated_data.get("event_code")
     title = request.validated_data.get("title")
-    duration = request.validated_data.get("duration")
     timeslots = request.validated_data.get("timeslots")
     time_zone = request.validated_data.get("time_zone")
 
@@ -330,7 +323,6 @@ def edit_week_event(request):
 
             # Update the event object itself
             event.title = title
-            event.duration = duration
             event.time_zone = time_zone
             event.save()
 
@@ -365,13 +357,46 @@ def edit_week_event(request):
     return Response({"message": ["Event updated successfully."]}, status=200)
 
 
+@api_endpoint("POST")
+@check_auth
+@validate_json_input(EventCodeSerializer)
+@validate_output(MessageOutputSerializer)
+def delete_event(request):
+    """
+    Deletes an event, identified by its URL code.
+
+    The event must be originally created by the current user.
+    """
+    user = request.user
+    event_code = request.validated_data.get("event_code")
+
+    NOT_CREATOR_ERROR = Response(
+        {"error": {"general": ["User must be event creator."]}}, status=403
+    )
+
+    if not user:
+        return NOT_CREATOR_ERROR
+
+    try:
+        event = UserEvent.objects.get(url_code=event_code)
+        if event.user_account != user:
+            return NOT_CREATOR_ERROR
+        # This should remove everything with foreign key cascades
+        event.delete()
+
+    except UserEvent.DoesNotExist:
+        return EVENT_NOT_FOUND_ERROR
+
+    return Response({"message": ["Event deleted successfully."]}, status=200)
+
+
 @api_endpoint("GET")
 @check_auth
 @validate_query_param_input(EventCodeSerializer)
 @validate_output(EventDetailSerializer)
 def get_event_details(request):
     """
-    Gets details about an event like title, duration, and timeslots.
+    Gets details about an event like type, title, and timeslots.
 
     This is useful for both displaying an event, and preparing for event editing.
     """
@@ -392,8 +417,6 @@ def get_event_details(request):
                     get_weekday_date(ts.weekday, ts.local_timeslot) for ts in timeslots
                 ]
 
-        if event.duration:
-            data["duration"] = event.duration
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
 

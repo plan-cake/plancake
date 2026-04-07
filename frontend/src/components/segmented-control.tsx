@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { cn } from "@/lib/utils/classname";
 
 type SegmentedControlProps<T extends string> = {
-  options: { label: string; value: T }[];
+  options: { label: React.ReactNode; value: T }[];
   value: T;
   onChange: (value: T) => void;
   className?: string;
@@ -54,7 +54,7 @@ export default function SegmentedControl<T extends string>({
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              "z-10 w-full rounded-full py-2 text-sm font-medium transition-colors duration-300 focus:outline-none",
+              "z-10 flex w-full items-center justify-center rounded-full py-2 text-sm font-medium transition-colors duration-300 focus:outline-none",
               isSelected
                 ? "text-white"
                 : "text-foreground hover:bg-accent/25 cursor-pointer",

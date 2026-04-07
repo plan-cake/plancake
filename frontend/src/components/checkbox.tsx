@@ -8,18 +8,23 @@ type CheckboxProps = {
   label: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  textSize?: "sm" | "md";
 };
 
 export default function Checkbox(props: CheckboxProps) {
-  const { label, checked, onChange } = props;
+  const { label, checked, onChange, textSize = "md" } = props;
   const id = useId();
   return (
     <div className="flex items-center gap-2">
       <div className="relative flex">
         <input
           type="checkbox"
-          id={id}
-          className="checked:border-accent checked:bg-accent h-4 w-4 appearance-none rounded-sm border border-gray-300"
+          id={"checkbox-" + id}
+          className={cn(
+            "h-4 w-4 appearance-none rounded-sm border border-gray-300",
+            "checked:border-accent checked:bg-accent",
+            "cursor-pointer",
+          )}
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
         />
@@ -32,8 +37,12 @@ export default function Checkbox(props: CheckboxProps) {
         )}
       </div>
       <label
-        htmlFor={id}
-        className={cn("select-none text-sm", checked && "text-accent")}
+        htmlFor={"checkbox-" + id}
+        className={cn(
+          "cursor-pointer select-none",
+          textSize === "sm" ? "text-sm" : "text-md",
+          checked && "text-accent",
+        )}
       >
         {label}
       </label>

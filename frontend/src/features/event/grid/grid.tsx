@@ -117,7 +117,7 @@ export default function ScheduleGrid({
       <div
         className={cn(
           "relative flex-grow select-none overflow-x-hidden pb-1 pt-2",
-          mode === "preview" && "overflow-y-auto",
+          mode === "preview" ? "overflow-y-auto" : "overflow-y-hidden",
         )}
       >
         <div className="z-5 pointer-events-none absolute left-0 top-2 flex w-full flex-col gap-4">
@@ -186,7 +186,7 @@ export default function ScheduleGrid({
 
 const GridError = ({ message }: { message: string }) => (
   <div className="flex h-full w-full items-center justify-center text-sm">
-    <ExclamationTriangleIcon className="text-red mr-2 h-5 w-5" />
+    <ExclamationTriangleIcon className="text-error mr-2 h-5 w-5" />
     {message}
   </div>
 );

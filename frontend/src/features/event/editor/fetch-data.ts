@@ -1,46 +1,24 @@
 import { cache } from "react";
 
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import handleErrorResponse from "@/lib/utils/api/handle-api-error";
-
-export type EventDetailsResponse = {
-  title: string;
-  duration?: number;
-  time_zone: string;
-  timeslots: string[];
-  is_creator: boolean;
-  event_type: "Date" | "Week";
-  start_date?: string;
-  end_date?: string;
-  start_time: string;
-  end_time: string;
-};
+import { serverGet } from "@/lib/utils/api/server-fetch";
+import { EventDetails } from "@/lib/utils/api/types";
 
 export const getCachedEventDetails = cache(
-  async (eventCode: string, cookieHeader?: string) => {
-    return await fetchEventDetails(eventCode, cookieHeader);
+  async (eventCode: string) => {
+    return await fetchEventDetails(eventCode);
   },
 );
 
 async function fetchEventDetails(
   eventCode: string,
-  cookieHeader?: string,
-): Promise<EventDetailsResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const res = await fetch(
-    `${baseUrl}/event/get-details/?event_code=${eventCode}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: cookieHeader ? cookieHeader : "",
-      },
-      cache: "no-store",
-    },
-  );
-
-  if (!res.ok) {
-    handleErrorResponse(res.status, await res.json());
+): Promise<EventDetails> {
+  try {
+    return await serverGet(ROUTES.event.getDetails, { event_code: eventCode }, { cache: "no-store" });
+  } catch (e) {
+    const error = e as ApiErrorResponse;
+    handleErrorResponse(error.status, error.data);
   }
-
-  return res.json();
 }

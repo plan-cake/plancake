@@ -1,6 +1,8 @@
 import { format, parse, parseISO } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
+import { EventType } from "@/core/event/types";
+
 /* TIMEZONE UTILS */
 
 // expects a timezone value (e.g., "America/New_York") and returns
@@ -61,13 +63,45 @@ export function getTimezoneDetails({
 export function timeslotToISOString(
   timeslot: Date,
   timezone: string,
-  eventType: string,
+  eventType: EventType,
 ): string {
   if (eventType === "specific") {
     return timeslot.toISOString();
   } else {
     return formatInTimeZone(timeslot, timezone, "yyyy-MM-dd'T'HH:mm:ss");
   }
+}
+
+
+/**
+ * Checks if two timezones are equivalent even if they represent different locations.
+ * 
+ * For example, "America/New_York" and "America/Detroit" are equal because they are both
+ * in Eastern Time.
+ * 
+ * IMPORTANT: This function also checks if the timezones have the same DST rules by
+ * comparing offsets in January and July.
+ * 
+ * For example, "America/New_York" and "America/Caracas" are NOT equal because Caracas
+ * does not observe DST, despite both having the same offset during part of the year.
+ * 
+ * @param tz1 The first timezone to compare
+ * @param tz2 The second timezone to compare
+ * @returns `true` if the timezones are equivalent, `false` otherwise
+ */
+export function tzEqual(tz1: string, tz2: string): boolean {
+  if (tz1 === tz2) return true;
+
+  const currentYear = new Date().getUTCFullYear();
+  const jan1 = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0));
+  const jul1 = new Date(Date.UTC(currentYear, 6, 1, 0, 0, 0));
+
+  const tz1OffsetJan = formatInTimeZone(jan1, tz1, "xxx");
+  const tz1OffsetJul = formatInTimeZone(jul1, tz1, "xxx");
+  const tz2OffsetJan = formatInTimeZone(jan1, tz2, "xxx");
+  const tz2OffsetJul = formatInTimeZone(jul1, tz2, "xxx");
+
+  return tz1OffsetJan === tz2OffsetJan && tz1OffsetJul === tz2OffsetJul;
 }
 
 /*
@@ -85,7 +119,7 @@ export function timeslotToISOString(
 export function parseIsoDateTime(
   slotIso: string,
   timezone: string,
-  eventType: string,
+  eventType: EventType,
 ): Date {
   if (eventType === "specific") {
     return parseISO(slotIso + "Z");
@@ -99,7 +133,7 @@ export function parseIsoDateTime(
 export function formatDateTime(
   timeslot: string,
   timezone: string,
-  eventType: string,
+  eventType: EventType,
 ): string {
   return parseIsoDateTime(timeslot, timezone, eventType).toISOString();
 }

@@ -35,6 +35,7 @@ def check_custom_code(code):
         "forgot-password",
         "login",
         "new-event",
+        "settings",
         "reset-password",
         "register",
         "verify-email",

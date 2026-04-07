@@ -10,7 +10,7 @@ export default function WeekdayRow({
   endWeekday,
 }: WeekdayRowProps) {
   return (
-    <div className={`flex w-full`}>
+    <div className="bg-panel flex w-fit rounded-full">
       {["S", "M", "T", "W", "T", "F", "S"].map((initial, index) => (
         <WeekdayRowIcon
           key={index}
