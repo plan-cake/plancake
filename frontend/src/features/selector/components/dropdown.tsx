@@ -80,7 +80,7 @@ const DropdownItem = forwardRef<HTMLDivElement, DropdownItemProps>(
         )}
       >
         <Select.ItemText>{children}</Select.ItemText>
-        <Select.ItemIndicator className="absolute left-2 inline-flex w-4 items-center justify-center">
+        <Select.ItemIndicator className="absolute left-1 inline-flex w-4 items-center justify-center">
           <CheckIcon />
         </Select.ItemIndicator>
       </Select.Item>

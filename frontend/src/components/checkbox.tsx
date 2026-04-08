@@ -30,7 +30,7 @@ export default function Checkbox(props: CheckboxProps) {
         />
         {checked && (
           <CheckIcon
-            className="centered-absolute pointer-events-none h-4 w-4 text-white"
+            className="centered-absolute pointer-events-none h-3 w-3 text-white"
             aria-hidden
             focusable={false}
           />
