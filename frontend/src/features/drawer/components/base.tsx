@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
 
+import { Cross1Icon } from "@radix-ui/react-icons";
 import { Drawer } from "vaul";
 
+import ActionButton from "@/features/button/components/action";
 import { DrawerProps } from "@/features/drawer/props";
 import { useDrawerResize } from "@/features/drawer/useDrawerResize";
 import { useVaulStickyFooter } from "@/features/drawer/useStickyFooter";
@@ -160,10 +162,11 @@ export default function BaseDrawer({
               className={cn(
                 "mx-auto flex w-full flex-col transition-[max-width,border-radius,margin,padding] duration-300",
                 isPill
-                  ? "border-foreground/10 rounded-4xl mb-4 max-h-[calc(100svh-2rem)] max-w-[calc(100%-2rem)] overflow-y-auto border"
+                  ? "border-foreground/10 rounded-4xl mb-4 max-h-[calc(100svh-2rem)] max-w-[calc(100%-2rem)] overflow-hidden border"
                   : "border-foreground/10 max-w-full overflow-hidden rounded-t-[32px] border",
                 frostedGlass ? "frosted-glass" : "bg-panel",
-                !isPill && "max-h-full min-h-0 flex-1",
+                (_type === "floating" || !isPill) &&
+                  "max-h-full min-h-0 flex-1",
               )}
               style={{
                 paddingBottom:
@@ -174,7 +177,7 @@ export default function BaseDrawer({
                 onClick={() => setSnap(snapPoints?.[1] ?? null)}
                 className={cn(
                   "flex w-full flex-col",
-                  !isPill && "h-full min-h-0 flex-1",
+                  (_type === "floating" || !isPill) && "h-full min-h-0 flex-1",
                 )}
               >
                 <div className="shrink-0 px-6 pb-2">
