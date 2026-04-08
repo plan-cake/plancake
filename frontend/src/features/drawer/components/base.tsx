@@ -257,12 +257,12 @@ export default function BaseDrawer({
                     scrollableBody && "overflow-y-auto",
                     bodyClassName,
                     isPill && _type === "morphing"
-                      ? "pointer-events-none hidden pb-0 opacity-0"
+                      ? "pointer-events-none pb-0 opacity-0"
                       : "pb-4 opacity-100",
                   )}
                   data-vaul-no-drag
                 >
-                  {children}
+                  {(!isPill || _type !== "morphing") && children}
                 </div>
 
                 {footerContent && (
