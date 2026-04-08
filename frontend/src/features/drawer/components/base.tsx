@@ -33,9 +33,11 @@ export default function BaseDrawer({
   const keyboardOffset = useKeyboardHeight();
 
   const contentRef = useRef<HTMLDivElement>(null);
+  const wasDraggingRef = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  useVaulStickyFooter(contentRef, isDragging);
+  useVaulStickyFooter(contentRef, isDragging || isAnimating);
 
   /**
    * CONDITIONAL PROPS BASED ON VARIANT
@@ -109,8 +111,16 @@ export default function BaseDrawer({
       dismissible={_type === "morphing" ? !isPill : true}
       activeSnapPoint={snap}
       setActiveSnapPoint={setSnap}
-      onDrag={() => setIsDragging(true)}
-      onRelease={() => setIsDragging(false)}
+      onDrag={() => {
+        setIsDragging(true);
+        wasDraggingRef.current = true;
+      }}
+      onRelease={() => {
+        setIsDragging(false);
+        setTimeout(() => {
+          wasDraggingRef.current = false;
+        }, 50);
+      }}
     >
       {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
 
@@ -174,7 +184,14 @@ export default function BaseDrawer({
               }}
             >
               <div
-                onClick={() => setSnap(snapPoints?.[1] ?? null)}
+                onClick={() => {
+                  if (wasDraggingRef.current) return;
+                  if (isPill) {
+                    setIsAnimating(true);
+                    setSnap(snapPoints?.[1] ?? null);
+                    setTimeout(() => setIsAnimating(false), 500);
+                  }
+                }}
                 className={cn(
                   "flex w-full flex-col",
                   (_type === "floating" || !isPill) && "h-full min-h-0 flex-1",
@@ -236,12 +253,12 @@ export default function BaseDrawer({
                     scrollableBody && "overflow-y-auto",
                     bodyClassName,
                     isPill && _type === "morphing"
-                      ? "pointer-events-none pb-0 opacity-0"
+                      ? "pointer-events-none hidden pb-0 opacity-0"
                       : "pb-4 opacity-100",
                   )}
                   data-vaul-no-drag
                 >
-                  {(!isPill || _type !== "morphing") && children}
+                  {children}
                 </div>
 
                 {footerContent && (
