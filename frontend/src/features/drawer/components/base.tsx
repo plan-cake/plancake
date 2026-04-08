@@ -189,7 +189,7 @@ export default function BaseDrawer({
                   if (isPill) {
                     setIsAnimating(true);
                     setSnap(snapPoints?.[1] ?? null);
-                    setTimeout(() => setIsAnimating(false), 500);
+                    setIsAnimating(false);
                   }
                 }}
                 className={cn(
