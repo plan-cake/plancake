@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
 
@@ -44,19 +44,22 @@ export default function ConfirmationDialog({
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
 
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!isControlled) {
-      setInternalOpen(newOpen);
-    }
-    onOpenChange?.(newOpen);
-  };
+  const handleOpenChange = useCallback(
+    (newOpen: boolean) => {
+      if (!isControlled) {
+        setInternalOpen(newOpen);
+      }
+      onOpenChange?.(newOpen);
+    },
+    [isControlled, onOpenChange],
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     handleOpenChange(false);
     return true;
-  };
+  }, [handleOpenChange]);
 
-  const handleConfirm = async () => {
+  const handleConfirm = useCallback(async () => {
     // If autoClose is enabled, we optimistically close
     // the dialog before calling onConfirm
     if (autoClose) {
@@ -70,7 +73,32 @@ export default function ConfirmationDialog({
       handleOpenChange(false);
     }
     return success;
-  };
+  }, [autoClose, onConfirm, handleOpenChange]);
+
+  useEffect(() => {
+    // If the dialog is not open, then don't add the keydown listener
+    if (!open) return;
+
+    // Add keydown listener for Enter and Escape keys to trigger confirm or cancel
+    // actions.
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore key events coming from text inputs or editable elements
+      const target = e.target as HTMLElement | null;
+      const tagName = target?.tagName;
+      const isMultilineText =
+        tagName === "TEXTAREA" || target?.isContentEditable;
+      if (isMultilineText) {
+        return;
+      }
+
+      if (e.key === "Escape") handleClose();
+      else if (e.key === "Enter") handleConfirm();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleClose, handleConfirm, open]);
 
   const config = DIALOG_CONFIG[type] || DIALOG_CONFIG.info;
   const Icon = config.icon;
@@ -110,10 +138,14 @@ export default function ConfirmationDialog({
         showHandle={false}
         headerContent={<div className="h-2" />}
       >
-        <div className="flex flex-col items-center">
-          {showIcon && renderIcon()}
-          <p className="text-lg font-bold">{title}</p>
-          <div className="text-foreground mt-2 text-center">{description}</div>
+        <div className="flex flex-col items-center overflow-hidden">
+          <div className="flex flex-col items-center">
+            {showIcon && renderIcon()}
+            <p className="text-lg font-bold">{title}</p>
+          </div>
+          <div className="text-foreground mt-2 w-full text-center">
+            {description}
+          </div>
           <div className="mt-8 flex w-full justify-center gap-4">
             <ActionButton
               buttonStyle="transparent"
@@ -151,35 +183,45 @@ export default function ConfirmationDialog({
       )}
 
       <Dialog.Portal>
-        <Dialog.Overlay className="dialog-overlay fixed inset-0 z-40 bg-gray-700/40 transition-opacity" />
-        <Dialog.Content
-          onEscapeKeyDown={(event) => event.stopPropagation()}
+        <Dialog.Overlay
           className={cn(
-            "dialog-content fixed inset-0 z-40 m-auto",
-            "bg-panel rounded-3xl p-6 shadow-md focus:outline-none",
-            "h-fit w-3/4 md:w-fit md:max-w-3xl",
+            "dialog-overlay fixed inset-0 z-40 bg-gray-700/40 transition-opacity",
+            type == "error" &&
+              "bg-[color-mix(in_oklab,var(--color-error)_15%,black_20%)]",
           )}
-        >
-          <Dialog.Title className="flex flex-col items-center gap-4">
-            {showIcon && renderIcon()}
-            <p className="text-lg font-bold">{title}</p>
-          </Dialog.Title>
-          <Dialog.Description className="mt-2 text-center">
-            {description}
-          </Dialog.Description>
+        />
+        <Dialog.Content asChild>
+          <div
+            className={cn(
+              "dialog-content fixed inset-0 z-40 m-auto flex flex-col overflow-hidden",
+              "bg-panel rounded-3xl p-6 shadow-md focus:outline-none",
+              "min-w-sm h-fit w-fit max-w-lg",
+            )}
+          >
+            <Dialog.Title asChild>
+              <div className="flex flex-col items-center gap-4">
+                {showIcon && renderIcon()}
+                <p className="text-lg font-bold">{title}</p>
+              </div>
+            </Dialog.Title>
 
-          <div className="mt-[25px] flex justify-center gap-4">
-            <ActionButton
-              buttonStyle="transparent"
-              label="Cancel"
-              onClick={handleClose}
-            />
-            <ActionButton
-              buttonStyle={config.btnStyle}
-              label="Confirm"
-              onClick={handleConfirm}
-              loadOnSuccess={!autoClose}
-            />
+            <Dialog.Description asChild>
+              <div className="mt-2 w-full text-center">{description}</div>
+            </Dialog.Description>
+
+            <div className="mt-[25px] flex justify-center gap-4">
+              <ActionButton
+                buttonStyle="transparent"
+                label="Cancel"
+                onClick={handleClose}
+              />
+              <ActionButton
+                buttonStyle={config.btnStyle}
+                label="Confirm"
+                onClick={handleConfirm}
+                loadOnSuccess={!autoClose}
+              />
+            </div>
           </div>
         </Dialog.Content>
       </Dialog.Portal>

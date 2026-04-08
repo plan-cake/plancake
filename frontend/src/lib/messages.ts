@@ -1,4 +1,4 @@
-import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/settings/lib/constants";
+import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
 import {
   MAX_DURATION,
   MAX_TITLE_LENGTH,
@@ -12,6 +12,7 @@ export const MESSAGES = {
   // auth errors
   ERROR_EMAIL_MISSING: "Missing email.",
   ERROR_PASSWORD_MISSING: "Missing password.",
+  ERROR_PASSWORD_WRONG: "Incorrect password.",
   ERROR_PASSWORD_REUSE: "Cannot reuse old password.",
   ERROR_PASSWORD_WEAK: "Password is not strong enough.",
   ERROR_PASSWORD_MISMATCH: "Passwords do not match.",
@@ -34,11 +35,15 @@ export const MESSAGES = {
 
   // success messages
   SUCCESS_EMAIL_SENT: "Email resent. Please check your inbox.",
+  SUCCESS_PASSWORD_CHANGED: "Password changed successfully.",
   SUCCESS_PASSWORD_RESET: "Password has been reset successfully.",
+  SUCCESS_PASSWORD_RESET_EMAIL_SENT:
+    "Password reset email sent. Please check your inbox.",
   SUCCESS_LOGOUT: "You have been logged out.",
   SUCCESS_DEFAULT_NAME_SAVED: "Nickname saved successfully.",
   SUCCESS_DEFAULT_NAME_REMOVED: "Nickname removed successfully.",
   SUCCESS_EVENT_DELETE: "Event deleted successfully.",
+  SUCCESS_ACCOUNT_DELETE: "Account deleted successfully. Have a nice day!",
 
   // copy link messages
   COPY_LINK_SUCCESS: "Link copied to clipboard!",
@@ -48,6 +53,7 @@ export const MESSAGES = {
   INFO_NAME_AUTOFILLED:
     "You can change this behavior anytime in account settings.",
   INFO_ALREADY_LOGGED_IN: "You are already logged in.",
+  INFO_NOT_LOGGED_IN: "You are not logged in.",
   INFO_EVENT_PASSED: "All dates in this event have passed.",
   INFO_ADD_AVAILABILITY: "Add your availability by clicking the button above.",
   INFO_COPY_SHARE_LINK: "Copy and share the link so others can join!",

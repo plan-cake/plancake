@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { motion } from "framer-motion";
+
 import AccountButton from "@/features/header/components/account-button";
 import DashboardButton from "@/features/header/components/dashboard-button";
 import LogoArea from "@/features/header/components/logo-area";
@@ -15,11 +17,12 @@ const SCROLL_THRESHOLD = 50;
 
 export default function Header() {
   const [mounted, setMounted] = useState(false);
+
   const isMobile = useCheckMobile();
   const lastScrollPoint = useRef(0);
   const scrollCheckpoint = useRef(0);
 
-  const { isShrunk, heightClass, shrink, expand } = useHeaderSize();
+  const { isShrunk, heightClass, shrink, expand, activeMenu } = useHeaderSize();
 
   useEffect(() => {
     setMounted(true);
@@ -89,18 +92,34 @@ export default function Header() {
       >
         <LogoArea isShrunk={isShrunk} />
 
-        <div
+        <motion.div
+          animate={{ scale: activeMenu ? 0.95 : 1 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
           className={cn(
-            "frosted-glass flex h-fit items-center rounded-full",
+            "relative isolate flex h-fit items-center rounded-full",
             "header-transition-[gap,padding]",
             isShrunk ? "gap-1 p-1" : "gap-2 p-2",
           )}
         >
+          <div
+            className="frosted-glass pointer-events-none absolute inset-0 -z-10 rounded-full"
+            aria-hidden="true"
+          />
+
           <NewEventButton />
           <ThemeToggle />
           <DashboardButton />
           <AccountButton />
-        </div>
+
+          <div
+            className={cn(
+              "bg-violet/20 pointer-events-none absolute inset-0 rounded-full",
+              "transition-opacity duration-300 ease-in-out",
+              activeMenu ? "opacity-100" : "opacity-0",
+            )}
+            aria-hidden="true"
+          />
+        </motion.div>
       </nav>
     </header>
   );

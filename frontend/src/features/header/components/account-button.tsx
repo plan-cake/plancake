@@ -1,43 +1,60 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ExitIcon, PersonIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/navigation";
 
-import { PersonIcon } from "@radix-ui/react-icons";
-
+import KebabMenu from "@/components/kebab-menu";
 import { useAccount } from "@/features/account/context";
-import AccountSettings from "@/features/account/settings/selector";
+import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
-import { clientGet } from "@/lib/utils/api/client-fetch";
+import { useHeaderSize } from "@/features/header/context";
+import { useToast } from "@/features/system-feedback";
+import { MESSAGES } from "@/lib/messages";
+import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function AccountButton() {
-  const { loginState, login, logout } = useAccount();
+  const { activeMenu, setActiveMenu } = useHeaderSize();
+  const { loginState, logout, accountDetails } = useAccount();
+  const router = useRouter();
+  const { addToast } = useToast();
 
-  const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
+  const isMenuOpen = activeMenu === "account";
 
-  // 1. Check Login Status
-  useEffect(() => {
-    const checkLogin = async () => {
-      if (loginState === "logged_in") return;
+  const signOut = async () => {
+    try {
+      await clientPost(ROUTES.auth.logout);
+      logout();
+      router.push("/login");
+      addToast("success", MESSAGES.SUCCESS_LOGOUT);
+      return true;
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      addToast("error", error.formattedMessage);
+      return false;
+    }
+  };
 
-      // always close account settings when logging out
-      setAccountSettingsOpen(false);
+  const signOutButton = (
+    <ActionButton
+      buttonStyle="frosted glass inset"
+      icon={<ExitIcon />}
+      label="Sign Out"
+      onClick={signOut}
+      loadOnSuccess
+    />
+  );
 
-      try {
-        const data = await clientGet(ROUTES.auth.checkAccountAuth);
-        login({
-          email: data.email,
-          defaultName: data.default_display_name,
-        });
-      } catch {
-        logout();
-        setAccountSettingsOpen(false);
-      }
-    };
-    checkLogin();
-  }, [loginState, login, logout]);
+  const accountSettingsButton = (
+    <LinkButton
+      buttonStyle="frosted glass inset"
+      label="Account Settings"
+      href="/settings"
+    />
+  );
 
   if (loginState === "logged_in") {
     return (
@@ -45,16 +62,25 @@ export default function AccountButton() {
         buttonStyle="frosted glass inset"
         icon={<PersonIcon />}
       >
-        <AccountSettings
-          open={accountSettingsOpen}
-          setOpenChange={setAccountSettingsOpen}
+        <KebabMenu
+          nested
+          open={isMenuOpen}
+          onOpenChange={(isOpen) => setActiveMenu(isOpen ? "account" : null)}
+          trigger={
+            <EmptyButton
+              className="relative z-10"
+              buttonStyle="frosted glass inset"
+              icon={<PersonIcon />}
+              aria-label="Account settings"
+            />
+          }
         >
-          <EmptyButton
-            buttonStyle="frosted glass inset"
-            icon={<PersonIcon />}
-            aria-label="Account settings"
-          />
-        </AccountSettings>
+          <h2 className="text-foreground text-center font-bold">
+            {accountDetails?.email}
+          </h2>
+          {accountSettingsButton}
+          {signOutButton}
+        </KebabMenu>
       </ShrinkingHeaderButton>
     );
   }
@@ -62,10 +88,10 @@ export default function AccountButton() {
   return (
     <ShrinkingHeaderButton buttonStyle="frosted glass inset" label="Log In">
       <LinkButton
+        className="relative z-10"
         buttonStyle="frosted glass inset"
         label="Log In"
         href="/login"
-        loading={loginState === "loading"}
       />
     </ShrinkingHeaderButton>
   );
