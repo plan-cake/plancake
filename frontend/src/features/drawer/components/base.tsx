@@ -240,8 +240,12 @@ export default function BaseDrawer({
                       <ActionButton
                         buttonStyle="frosted glass"
                         icon={<Cross1Icon />}
-                        onClick={() => (onOpenChange?.(false), true)}
-                        loadOnSuccess
+                        aria-label="Close drawer"
+                        onClick={(e) => {
+                          e?.stopPropagation();
+                          onOpenChange?.(false);
+                          return true;
+                        }}
                       />
                     </div>
                   )}
