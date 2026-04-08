@@ -184,13 +184,15 @@ function MajorVersion({
             <Collapsible.Trigger asChild>
               <div className="group mt-2 flex cursor-pointer items-center gap-2">
                 <span className="font-semibold">Bug Fixes</span>
-                <ChevronRightIcon
+                <div
                   className={cn(
-                    "h-6 w-6 transition-transform duration-200",
+                    "transition-transform duration-200",
                     "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
                     bugsOpen && "rotate-90",
                   )}
-                />
+                >
+                  <ChevronRightIcon className="h-4 w-4" />
+                </div>
               </div>
             </Collapsible.Trigger>
             <Collapsible.Content className="collapsible-content">
@@ -248,13 +250,15 @@ function MinorVersion({
               <span className="text-foreground/50 italic">
                 {releaseDateString}
               </span>
-              <ChevronRightIcon
+              <div
                 className={cn(
-                  "h-6 w-6 transition-transform duration-200",
+                  "transition-transform duration-200",
                   "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
                   open && "rotate-90",
                 )}
-              />
+              >
+                <ChevronRightIcon className="h-4 w-4" />
+              </div>
             </div>
           </Collapsible.Trigger>
           <Collapsible.Content className="collapsible-content">
