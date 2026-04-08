@@ -180,11 +180,12 @@ export default function BaseDrawer({
                   (_type === "floating" || !isPill) && "h-full min-h-0 flex-1",
                 )}
               >
-                <div className="shrink-0 px-6 pb-2">
+                <div className="relative shrink-0 px-6 pb-2">
                   {showHandle && (
-                    <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
+                    <Drawer.Handle className="!bg-foreground/50 mt-2 !w-14" />
                   )}
-                  <div className={cn(showHandle && "mt-1")}>
+
+                  <div className={cn(showHandle && "mt-2")}>
                     {(title || headerContent) && (
                       <div
                         className={cn(
@@ -216,6 +217,17 @@ export default function BaseDrawer({
                       {description}
                     </Drawer.Description>
                   </div>
+
+                  {_type !== "morphing" && (
+                    <div className="absolute right-4 top-3 z-10">
+                      <ActionButton
+                        buttonStyle="frosted glass"
+                        icon={<Cross1Icon />}
+                        onClick={() => (onOpenChange?.(false), true)}
+                        loadOnSuccess
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div
