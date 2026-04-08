@@ -141,6 +141,23 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     };
 
     /**
+     * PRECOMPUTED PREVIEW RANGE
+     * Avoids recalculating start/end boundaries for every day cell.
+     */
+    const previewRange = useMemo(() => {
+      if (!localRange?.from || localRange?.to || !hoverDate) {
+        return null;
+      }
+
+      const isHoverBeforeStart = isBefore(hoverDate, localRange.from);
+
+      return {
+        start: isHoverBeforeStart ? hoverDate : localRange.from,
+        end: isHoverBeforeStart ? localRange.from : hoverDate,
+      };
+    }, [localRange?.from, localRange?.to, hoverDate]);
+
+    /**
      * MODIFIERS
      * modifiers are used to apply custom styles to groups of days:
      *  - "before_start" applies to days that are before the selected start date. There
@@ -149,26 +166,20 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
      *    currently hovered date, but only when the user is in the process of selecting
      *    an end date.
      */
-    const isSelectingEnd = localRange?.from && !localRange?.to && hoverDate;
     const modifiers = {
       range_preview_start: (date: Date) => {
-        if (!isSelectingEnd || !localRange?.from || !hoverDate) return false;
-        return isSameDay(date, localRange.from);
+        if (!previewRange) return false;
+        return isSameDay(date, previewRange.start);
       },
-      range_preview: (date: Date) => {
-        if (!isSelectingEnd || !localRange?.from || !hoverDate) return false;
-
-        const canSelectForward =
-          (isAfter(date, localRange.from) ||
-            isSameDay(date, localRange.from)) &&
-          (isBefore(date, hoverDate) || isSameDay(date, hoverDate));
-
-        const canSelectBackward =
-          (isBefore(date, localRange.from) ||
-            isSameDay(date, localRange.from)) &&
-          (isAfter(date, hoverDate) || isSameDay(date, hoverDate));
-
-        return canSelectForward || canSelectBackward;
+      range_preview_end: (date: Date) => {
+        if (!previewRange) return false;
+        return isSameDay(date, previewRange.end);
+      },
+      range_preview_middle: (date: Date) => {
+        if (!previewRange) return false;
+        return (
+          isAfter(date, previewRange.start) && isBefore(date, previewRange.end)
+        );
       },
     };
 
@@ -189,8 +200,9 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
           // modifiers + styles
           modifiers={modifiers}
           modifiersClassNames={{
-            range_preview: "rdp-range_preview",
             range_preview_start: "rdp-range_preview_start",
+            range_preview_middle: "rdp-range_preview_middle",
+            range_preview_end: "rdp-range_preview_end",
           }}
           classNames={{
             root: `${defaultClassNames.root} flex justify-center items-center`,
