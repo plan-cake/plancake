@@ -1,7 +1,7 @@
 "use client";
 
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import {

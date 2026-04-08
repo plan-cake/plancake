@@ -1,4 +1,4 @@
-import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
+import { CheckIcon, XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils/classname";
 
@@ -27,7 +27,7 @@ export default function PasswordCriteria(props: PasswordCriteriaProps) {
                 value ? "line-through opacity-50" : "",
               )}
             >
-              {value ? <CheckIcon /> : <Cross2Icon />}
+              {value ? <CheckIcon /> : <XIcon />}
               {key}
             </div>
           ))}

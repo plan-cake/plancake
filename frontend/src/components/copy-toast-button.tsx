@@ -1,6 +1,6 @@
 "use client";
 
-import { CopyIcon } from "@radix-ui/react-icons";
+import { CopyIcon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { ButtonStyle } from "@/features/button/props";

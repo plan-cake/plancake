@@ -1,9 +1,4 @@
-import {
-  CheckIcon,
-  EraserIcon,
-  ExitIcon,
-  ResetIcon,
-} from "@radix-ui/react-icons";
+import { CheckIcon, EraserIcon, LogOutIcon, Undo2Icon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { useResultsContext } from "@/features/event/results/context";
@@ -71,7 +66,7 @@ export default function PanelHeader({
         <div className="space-x-2">
           <ActionButton
             buttonStyle="semi-transparent"
-            icon={<ResetIcon />}
+            icon={<Undo2Icon />}
             onClick={() => {
               clearSelectedParticipants();
               return true;
@@ -104,7 +99,7 @@ export default function PanelHeader({
           {showSelfRemove && (
             <ActionButton
               buttonStyle="semi-transparent"
-              icon={<ExitIcon />}
+              icon={<LogOutIcon />}
               onClick={() => {
                 promptRemove(currentUser);
                 return true;

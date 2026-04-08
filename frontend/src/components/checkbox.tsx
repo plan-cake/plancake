@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-import { CheckIcon } from "@radix-ui/react-icons";
+import { CheckIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils/classname";
 

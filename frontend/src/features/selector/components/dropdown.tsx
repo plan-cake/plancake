@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 
-import { CheckIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 import * as Select from "@radix-ui/react-select";
+import { CheckIcon, ChevronDownIcon } from "lucide-react";
 
 import { DropdownProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";

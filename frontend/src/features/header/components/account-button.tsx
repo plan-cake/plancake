@@ -1,6 +1,6 @@
 "use client";
 
-import { ExitIcon, PersonIcon } from "@radix-ui/react-icons";
+import { LogOutIcon, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import KebabMenu from "@/components/kebab-menu";
@@ -41,7 +41,7 @@ export default function AccountButton() {
   const signOutButton = (
     <ActionButton
       buttonStyle="frosted glass inset"
-      icon={<ExitIcon />}
+      icon={<LogOutIcon />}
       label="Sign Out"
       onClick={signOut}
       loadOnSuccess
@@ -60,7 +60,7 @@ export default function AccountButton() {
     return (
       <ShrinkingHeaderButton
         buttonStyle="frosted glass inset"
-        icon={<PersonIcon />}
+        icon={<UserIcon />}
       >
         <KebabMenu
           nested
@@ -70,7 +70,7 @@ export default function AccountButton() {
             <EmptyButton
               className="relative z-10"
               buttonStyle="frosted glass inset"
-              icon={<PersonIcon />}
+              icon={<UserIcon />}
               aria-label="Account settings"
             />
           }

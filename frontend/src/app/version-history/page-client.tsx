@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { ChevronRightIcon } from "@radix-ui/react-icons";
+import { ChevronRightIcon } from "lucide-react";
 
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import { useHeaderSize } from "@/features/header/context";

@@ -1,13 +1,13 @@
 import {
   CheckIcon,
   CopyIcon,
-  InfoCircledIcon,
-  ExclamationTriangleIcon,
-} from "@radix-ui/react-icons";
+  InfoIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 
 export const TOAST_CONFIG = {
   error: {
-    icon: ExclamationTriangleIcon,
+    icon: TriangleAlertIcon,
     background: "error",
     textColor: "white",
     title: "ERROR",
@@ -25,7 +25,7 @@ export const TOAST_CONFIG = {
     title: "SUCCESS",
   },
   info: {
-    icon: InfoCircledIcon,
+    icon: InfoIcon,
     background: "blue",
     textColor: "white",
     title: "INFORMATION",

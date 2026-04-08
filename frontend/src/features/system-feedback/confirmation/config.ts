@@ -1,8 +1,8 @@
 import {
-  ExclamationTriangleIcon,
   CheckIcon,
-  InfoCircledIcon,
-} from "@radix-ui/react-icons";
+  InfoIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 
 export const DIALOG_CONFIG = {
   warning: {
@@ -12,7 +12,7 @@ export const DIALOG_CONFIG = {
     isTextIcon: true,
   },
   delete: {
-    icon: ExclamationTriangleIcon,
+    icon: TriangleAlertIcon,
     bgClass: "bg-error/40",
     btnStyle: "danger",
     isTextIcon: false,
@@ -24,13 +24,13 @@ export const DIALOG_CONFIG = {
     isTextIcon: false,
   },
   error: {
-    icon: ExclamationTriangleIcon,
+    icon: TriangleAlertIcon,
     bgClass: "bg-error/40",
     btnStyle: "danger",
     isTextIcon: false,
   },
   info: {
-    icon: InfoCircledIcon,
+    icon: InfoIcon,
     bgClass: "bg-blue/40",
     btnStyle: "primary",
     isTextIcon: false,

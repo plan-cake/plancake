@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
-import {
-  ChevronRightIcon,
-  ExclamationTriangleIcon,
-} from "@radix-ui/react-icons";
+import { ChevronRightIcon, TriangleAlertIcon } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
 import { useEventContext } from "@/core/event/context";
@@ -95,7 +92,7 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
       >
         {!isEditing && "Custom"} Event Code
         {errors.customCode && (
-          <ExclamationTriangleIcon className="text-error h-4 w-4" />
+          <TriangleAlertIcon className="text-error h-4 w-4" />
         )}
       </label>
       <input

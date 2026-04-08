@@ -1,6 +1,6 @@
 import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
-import { ClockIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
+import { ClockIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -129,7 +129,7 @@ export default function DashboardEvent({
                   "hover:bg-foreground/20 active:bg-foreground/10",
                 )}
               >
-                <Pencil1Icon className="h-4 w-4" />
+                <PencilIcon className="h-4 w-4" />
               </div>
             </button>
             <button
@@ -144,7 +144,7 @@ export default function DashboardEvent({
                   "active:bg-error/40",
                 )}
               >
-                <TrashIcon className="h-4 w-4" />
+                <Trash2Icon className="h-4 w-4" />
               </div>
             </button>
           </>
