@@ -65,13 +65,32 @@
 }
 
 /* RANGE PREVIEW MODIFIERS */
-.rdp-range_preview > .rdp-day_button::before {
+
+.rdp-range_preview_start,
+.rdp-range_preview_middle,
+.rdp-range_preview_end {
   background-color: var(--rdp-accent-background-color);
-  border-color: transparent;
 }
 
-.rdp-range_preview_start > .rdp-day_button::before {
+.rdp-range_preview_start {
+  border-top-left-radius: 50%;
+  border-bottom-left-radius: 50%;
+}
+
+.rdp-range_preview_end {
+  border-top-right-radius: 50%;
+  border-bottom-right-radius: 50%;
+}
+
+.rdp-range_preview_start.rdp-range_preview_end {
+  border-radius: 50%;
+}
+
+.rdp-range_preview_start > .rdp-day_button::before,
+.rdp-range_preview_end > .rdp-day_button::before {
+  background-color: transparent;
   border: 2px solid var(--rdp-accent-color);
+  border-radius: 100%;
 }
 
 /**
