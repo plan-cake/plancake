@@ -57,7 +57,10 @@ export default function PanelHeader({
           {isRemoving
             ? "Removing attendees"
             : activeCount === null
-              ? totalParticipants + " Attendees"
+              ? hasSelection
+                ? selectedParticipants.length +
+                  ` Attendee${selectedParticipants.length !== 1 ? "s" : ""} Selected`
+                : totalParticipants + " Attendees"
               : `${activeCount}/${gridNumParticipants} Available`}
         </h2>
         {gridNumParticipants > 0 && (
