@@ -9,7 +9,7 @@ export type TimeBlockProps = {
   children: React.ReactNode;
   hasPrev?: boolean;
   hasNext?: boolean;
-  onPointerLeave?: () => void;
+  onMouseLeave?: () => void;
 };
 
 type TimeSlot = {

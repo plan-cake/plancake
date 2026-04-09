@@ -11,12 +11,12 @@ export default function BaseTimeBlock({
   children,
   hasNext = false,
   hasPrev = false,
-  onPointerLeave,
+  onMouseLeave,
 }: TimeBlockProps) {
   return (
     <div
       className="relative isolate grid"
-      onPointerLeave={onPointerLeave}
+      onMouseLeave={onMouseLeave}
       style={{
         gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${hasNext ? SIDE_WIDTH : 10}px`,
       }}

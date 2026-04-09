@@ -19,7 +19,7 @@ export default function ResultsTimeBlock({
       visibleDaysCount={numVisibleDays}
       hasNext={hasNext}
       hasPrev={hasPrev}
-      onPointerLeave={() => onHoverSlot?.(null)}
+      onMouseLeave={() => onHoverSlot?.(null)}
     >
       {timeslots.map(({ iso, coords, cellClasses: baseClasses }) => {
         const { row: gridRow, column: gridColumn } = coords;
