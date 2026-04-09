@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useId, useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-import { DotsVerticalIcon } from "@radix-ui/react-icons";
-import { motion, AnimatePresence, Transition } from "framer-motion";
+import { AnimatePresence, motion, Transition } from "framer-motion";
+import { EllipsisVerticalIcon } from "lucide-react";
 
 import EmptyButton from "@/features/button/components/empty";
 import { cn } from "@/lib/utils/classname";
@@ -72,7 +72,7 @@ export default function KebabMenu({
         ) : (
           <EmptyButton
             buttonStyle="semi-transparent"
-            icon={<DotsVerticalIcon />}
+            icon={<EllipsisVerticalIcon />}
           />
         )}
       </div>
@@ -93,7 +93,7 @@ export default function KebabMenu({
             ) : (
               <EmptyButton
                 buttonStyle="semi-transparent"
-                icon={<DotsVerticalIcon />}
+                icon={<EllipsisVerticalIcon />}
               />
             )}
           </motion.div>

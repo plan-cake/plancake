@@ -1,5 +1,5 @@
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { parseISO } from "date-fns";
+import { TriangleAlertIcon } from "lucide-react";
 
 import Switch from "@/components/switch";
 import { useEventContext } from "@/core/event/context";
@@ -32,7 +32,7 @@ export default function DateRangeSelection({
         >
           Possible Dates
           {errors.dateRange && (
-            <ExclamationTriangleIcon className="text-error h-4 w-4" />
+            <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
         </p>
 

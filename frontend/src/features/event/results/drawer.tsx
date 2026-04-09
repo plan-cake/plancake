@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { GlobeIcon, Pencil2Icon } from "@radix-ui/react-icons";
+import { GlobeIcon, SquarePenIcon } from "lucide-react";
 
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
@@ -71,7 +71,7 @@ export default function ResultsDrawer({
   const paintingButton = (
     <LinkButton
       buttonStyle="primary"
-      icon={<Pencil2Icon />}
+      icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
       href={`/${eventCode}/painting`}
     />

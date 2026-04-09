@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
-import {
-  ChevronRightIcon,
-  ExclamationTriangleIcon,
-} from "@radix-ui/react-icons";
+import { ChevronRightIcon, TriangleAlertIcon } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
 import { useEventContext } from "@/core/event/context";
@@ -31,13 +28,15 @@ export default function AdvancedOptions(props: AdvancedOptionsProps) {
             "group flex w-fit min-w-[200px] cursor-pointer items-center gap-2 rounded-full",
           )}
         >
-          <ChevronRightIcon
+          <div
             className={cn(
-              "h-6 w-6 transition-transform duration-200",
+              "transition-transform duration-200",
               "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
               open && "rotate-90",
             )}
-          />
+          >
+            <ChevronRightIcon className="h-4 w-4" />
+          </div>
           <span className="text-[15px] font-semibold leading-[25px]">
             Advanced Options
           </span>
@@ -95,7 +94,7 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
       >
         {!isEditing && "Custom"} Event Code
         {errors.customCode && (
-          <ExclamationTriangleIcon className="text-error h-4 w-4" />
+          <TriangleAlertIcon className="text-error h-4 w-4" />
         )}
       </label>
       <input

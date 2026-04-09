@@ -1,6 +1,6 @@
 "use client";
 
-import { CopyIcon } from "@radix-ui/react-icons";
+import { CopyIcon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { ButtonStyle } from "@/features/button/props";
@@ -22,11 +22,9 @@ export default function CopyToastButton({
     try {
       await navigator.clipboard.writeText(currentURL);
       addToast("copy", MESSAGES.COPY_LINK_SUCCESS);
-      return true;
     } catch (err) {
       console.error("Failed to copy: ", err);
       addToast("error", MESSAGES.COPY_LINK_FAILURE);
-      return false;
     }
   };
 

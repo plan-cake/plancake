@@ -1,6 +1,6 @@
 "use client";
 
-import { PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import LinkButton from "@/features/button/components/link";

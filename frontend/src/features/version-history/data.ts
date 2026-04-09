@@ -136,7 +136,21 @@ export function getVersionHistoryData(): VersionHistoryData {
       bugFixes: [
         "Fixed an issue where an invalid custom event code would not show an error",
       ],
-      minorVersions: [],
+      minorVersions: [
+        {
+          version: "v0.4.1",
+          releaseDate: { year: 2026, month: 3, day: 9 },
+          changes: [
+            "Updated the header on the attendees panel to display more relevant information",
+            "Updated drawer components to have close buttons for accessibility",
+            "Updated all icons on the site to be more consistent",
+            "Updated the appearance of the date picker when selecting a range",
+            "Adjusted the priority of banners shown on the results page",
+            "Fixed results grid hover behavior on mouse leave",
+            "Fixed an issue where focused dropdowns would not display a focus ring",
+          ],
+        },
+      ],
     }
   ];
 }

@@ -1,4 +1,4 @@
-import { TrashIcon } from "@radix-ui/react-icons";
+import { Trash2Icon } from "lucide-react";
 
 import { cn } from "@/lib/utils/classname";
 
@@ -82,7 +82,7 @@ export default function ParticipantChip({
 
       {isRemoving && (
         <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          <TrashIcon className="h-4 w-4" />
+          <Trash2Icon className="h-4 w-4" />
         </div>
       )}
     </li>

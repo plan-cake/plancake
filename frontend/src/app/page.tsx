@@ -1,4 +1,4 @@
-import { DashboardIcon, PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon, LayoutDashboardIcon } from "lucide-react";
 
 import Logo from "@/components/logo";
 import LinkButton from "@/features/button/components/link";
@@ -32,7 +32,7 @@ export default function Home() {
             />
             <LinkButton
               buttonStyle="secondary"
-              icon={<DashboardIcon />}
+              icon={<LayoutDashboardIcon />}
               label="View Dashboard"
               href="/dashboard"
             />

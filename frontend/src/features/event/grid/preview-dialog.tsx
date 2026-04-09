@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { EnterFullScreenIcon, Cross2Icon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
+import { MaximizeIcon, XIcon } from "lucide-react";
 
 import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
@@ -78,11 +78,8 @@ export default function GridPreviewDialog({
             <div>
               <ActionButton
                 buttonStyle="transparent"
-                icon={<Cross2Icon />}
-                onClick={() => {
-                  closeDialog();
-                  return true;
-                }}
+                icon={<XIcon />}
+                onClick={closeDialog}
                 className="bg-transparent p-1.5"
                 aria-label="Close Preview"
               />
@@ -91,10 +88,9 @@ export default function GridPreviewDialog({
             <div>
               <ActionButton
                 buttonStyle="transparent"
-                icon={<EnterFullScreenIcon />}
+                icon={<MaximizeIcon />}
                 onClick={() => {
                   setIsOpen(!isOpen);
-                  return true;
                 }}
                 className="bg-transparent p-1.5"
                 aria-label="Open Preview"
