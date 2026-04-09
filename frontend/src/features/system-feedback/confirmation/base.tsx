@@ -56,7 +56,6 @@ export default function ConfirmationDialog({
 
   const handleClose = useCallback(() => {
     handleOpenChange(false);
-    return true;
   }, [handleOpenChange]);
 
   const handleConfirm = useCallback(async () => {

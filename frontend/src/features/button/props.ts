@@ -75,10 +75,11 @@ export type BaseButtonProps = {
   /**
    * The function to call when the button is clicked. Required for Action buttons.
    *
-   * The function must return a boolean or a Promise that resolves to a boolean,
-   * indicating whether the action was successful.
+   * The function should return a boolean or a Promise that resolves to a boolean if
+   * `loadOnSuccess` is `true`, indicating whether the action was successful. Otherwise,
+   * the function is always assumed to be successful.
    */
-  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => Promise<boolean> | boolean;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => Promise<void | boolean> | void | boolean;
   /**
    * If specified, the button will stay in a loading state after a successful action. This
    * behavior should be used for buttons that trigger navigation, to avoid multiple clicks
@@ -115,7 +116,7 @@ type CommonButtonProps = {
 
 export type ActionButtonProps = CommonButtonProps & {
   /** @inheritdoc BaseButtonProps */
-  onClick: (e?: React.MouseEvent<HTMLButtonElement>) => Promise<boolean> | boolean;
+  onClick: (e?: React.MouseEvent<HTMLButtonElement>) => Promise<void | boolean> | void | boolean;
   /** @inheritdoc BaseButtonProps */
   loadOnSuccess?: boolean;
 };

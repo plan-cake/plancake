@@ -79,10 +79,7 @@ export default function GridPreviewDialog({
               <ActionButton
                 buttonStyle="transparent"
                 icon={<Cross2Icon />}
-                onClick={() => {
-                  closeDialog();
-                  return true;
-                }}
+                onClick={closeDialog}
                 className="bg-transparent p-1.5"
                 aria-label="Close Preview"
               />
@@ -94,7 +91,6 @@ export default function GridPreviewDialog({
                 icon={<EnterFullScreenIcon />}
                 onClick={() => {
                   setIsOpen(!isOpen);
-                  return true;
                 }}
                 className="bg-transparent p-1.5"
                 aria-label="Open Preview"

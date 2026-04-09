@@ -28,6 +28,12 @@ export function getResultBanners(
         <p>{MESSAGES.INFO_ADD_AVAILABILITY}</p>
       </Banner>
     );
+  } else if (!hasMutualAvailability(availabilities, participants)) {
+    return (
+      <Banner type="info" subtitle="Oh dear :(" showPing>
+        <p>{MESSAGES.INFO_NO_MUTUAL_AVAILABILITY}</p>
+      </Banner>
+    );
   } else if (participated && participants.length === 1) {
     return (
       <Banner type="info" subtitle="Waiting for others..." showPing>
@@ -38,12 +44,6 @@ export function getResultBanners(
     return (
       <Banner type="info" subtitle="Don't be a stranger!" showPing>
         <p>{MESSAGES.INFO_ADD_AVAILABILITY}</p>
-      </Banner>
-    );
-  } else if (!hasMutualAvailability(availabilities, participants)) {
-    return (
-      <Banner type="info" subtitle="Oh dear :(" showPing>
-        <p>{MESSAGES.INFO_NO_MUTUAL_AVAILABILITY}</p>
       </Banner>
     );
   }
