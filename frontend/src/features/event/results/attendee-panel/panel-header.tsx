@@ -72,10 +72,7 @@ export default function PanelHeader({
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ResetIcon />}
-            onClick={() => {
-              clearSelectedParticipants();
-              return true;
-            }}
+            onClick={clearSelectedParticipants}
             disabled={!hasSelection}
             className={cn(
               "shrink-0 transition-opacity duration-200",
@@ -88,10 +85,7 @@ export default function PanelHeader({
             <ActionButton
               buttonStyle="semi-transparent"
               icon={isRemoving ? <CheckIcon /> : <EraserIcon />}
-              onClick={() => {
-                toggleRemoving();
-                return true;
-              }}
+              onClick={toggleRemoving}
               aria-label={isRemoving ? "Stop Removing" : "Remove Participants"}
               className={cn(
                 "shrink-0",
@@ -107,7 +101,6 @@ export default function PanelHeader({
               icon={<ExitIcon />}
               onClick={() => {
                 promptRemove(currentUser);
-                return true;
               }}
               aria-label="Remove Self from Event"
               className="hover:bg-error/25 hover:text-error active:bg-error/40 shrink-0"
