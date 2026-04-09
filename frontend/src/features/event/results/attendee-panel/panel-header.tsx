@@ -33,6 +33,7 @@ export default function PanelHeader({
     selectedParticipants,
     clearSelectedParticipants,
     currentUser,
+    timezone,
   } = useResultsContext();
 
   const activeCount = hoveredSlot
@@ -73,6 +74,7 @@ export default function PanelHeader({
                     day: "numeric",
                     hour: "numeric",
                     minute: "numeric",
+                    timeZone: timezone,
                   })
                 : "Hover grid for availability"}
           </span>
