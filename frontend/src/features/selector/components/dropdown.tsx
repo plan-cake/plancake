@@ -26,7 +26,7 @@ export default function Dropdown<TValue extends string | number>({
       <Select.Trigger
         id={id}
         className={cn(
-          "text-accent-text inline-flex items-center rounded-2xl text-start hover:cursor-pointer focus:outline-none",
+          "text-accent-text inline-flex items-center rounded-2xl text-start hover:cursor-pointer",
           "bg-accent/15 hover:bg-accent/25 active:bg-accent/40 px-3 py-1",
           "focus-visible:rounded-full focus-visible:outline-2",
           "focus-visible:outline-foreground focus-visible:outline-offset-2",
