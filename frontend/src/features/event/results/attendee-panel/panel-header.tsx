@@ -55,14 +55,16 @@ export default function PanelHeader({
     >
       <div className="flex flex-col items-start">
         <h2 className="text-md font-semibold">
-          {isRemoving
-            ? "Removing attendees"
-            : activeCount === null
-              ? hasSelection
-                ? selectedParticipants.length +
-                  ` Attendee${selectedParticipants.length !== 1 ? "s" : ""} Selected`
-                : totalParticipants + " Attendees"
-              : `${activeCount}/${gridNumParticipants} Available`}
+          {totalParticipants === 0
+            ? "No Attendees Yet"
+            : isRemoving
+              ? "Removing attendees"
+              : activeCount === null
+                ? hasSelection
+                  ? selectedParticipants.length +
+                    ` Attendee${selectedParticipants.length !== 1 ? "s" : ""} Selected`
+                  : totalParticipants + " Attendees"
+                : `${activeCount}/${gridNumParticipants} Available`}
         </h2>
         {gridNumParticipants > 0 && (
           <span className="text-sm opacity-75">
