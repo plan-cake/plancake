@@ -70,7 +70,8 @@ export default function PanelHeader({
               ? `Select to remove`
               : hoveredSlot !== null
                 ? new Date(hoveredSlot!).toLocaleDateString(undefined, {
-                    month: "long",
+                    weekday: "short",
+                    month: "short",
                     day: "numeric",
                     hour: "numeric",
                     minute: "numeric",
