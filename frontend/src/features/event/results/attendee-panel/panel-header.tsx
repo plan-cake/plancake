@@ -20,6 +20,7 @@ export default function PanelHeader({
   isCollapsed = false,
 }: PanelHeaderProps) {
   const {
+    eventType,
     hoveredSlot,
     participants,
     filteredAvailabilities,
@@ -40,6 +41,26 @@ export default function PanelHeader({
   const hasSelection = selectedParticipants.length > 0;
   const showSelfRemove =
     !isCreator && currentUser && participants.includes(currentUser);
+
+  const formatHoveredSlot = () => {
+    const date = new Date(hoveredSlot!);
+
+    return eventType === "weekday"
+      ? date.toLocaleString(undefined, {
+          weekday: "long",
+          hour: "numeric",
+          minute: "numeric",
+          timeZone: timezone,
+        })
+      : date.toLocaleString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          timeZone: timezone,
+        });
+  };
 
   return (
     <div
@@ -65,16 +86,9 @@ export default function PanelHeader({
           <span className="text-sm opacity-75">
             {isRemoving
               ? `Select to remove`
-              : hoveredSlot !== null
-                ? new Date(hoveredSlot).toLocaleString(undefined, {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "numeric",
-                    timeZone: timezone,
-                  })
-                : "Hover grid for availability"}
+              : hoveredSlot === null
+                ? "Hover grid for availability"
+                : formatHoveredSlot()}
           </span>
         )}
       </div>

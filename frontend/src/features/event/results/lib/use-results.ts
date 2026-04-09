@@ -165,6 +165,7 @@ export function useEventResults(initialData: ResultsInformation) {
 
   return {
     // Data
+    eventType: initialData.eventType,
     participants: optimisticParticipants,
     availabilities: optimisticAvailabilities,
     filteredAvailabilities,
