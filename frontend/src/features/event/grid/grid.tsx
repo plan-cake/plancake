@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
+import { TriangleAlertIcon } from "lucide-react";
 
 import {
   AvailabilitySet,
@@ -186,7 +186,7 @@ export default function ScheduleGrid({
 
 const GridError = ({ message }: { message: string }) => (
   <div className="flex h-full w-full items-center justify-center text-sm">
-    <ExclamationTriangleIcon className="text-error mr-2 h-5 w-5" />
+    <TriangleAlertIcon className="text-error mr-2 h-5 w-5" />
     {message}
   </div>
 );

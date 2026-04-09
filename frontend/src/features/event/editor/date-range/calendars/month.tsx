@@ -1,16 +1,16 @@
 "use client";
 
 import {
-  useState,
-  useEffect,
-  useRef,
-  useImperativeHandle,
   forwardRef,
+  useEffect,
+  useImperativeHandle,
   useMemo,
+  useRef,
+  useState,
 } from "react";
 
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
-import { isBefore, isAfter, isSameDay } from "date-fns";
+import { isAfter, isBefore, isSameDay } from "date-fns";
+import { TriangleAlertIcon } from "lucide-react";
 import {
   DateRange,
   DayEventHandler,
@@ -210,7 +210,7 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
         />
         {!isMobile && dateRangeError && (
           <div className="text-error flex items-center justify-center gap-1 font-bold">
-            <ExclamationTriangleIcon />
+            <TriangleAlertIcon />
             {dateRangeError}
           </div>
         )}

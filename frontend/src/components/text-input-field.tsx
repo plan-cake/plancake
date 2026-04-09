@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
-import {
-  EyeNoneIcon,
-  EyeOpenIcon,
-  ExclamationTriangleIcon,
-} from "@radix-ui/react-icons";
+import { EyeClosedIcon, EyeIcon, TriangleAlertIcon } from "lucide-react";
 
 import PasswordCriteria from "@/features/auth/components/password-criteria";
 import { cn } from "@/lib/utils/classname";
@@ -169,7 +165,7 @@ export default function TextInputField(props: TextInputFieldProps) {
         >
           {error ? (
             <span className="flex items-center gap-1">
-              <ExclamationTriangleIcon
+              <TriangleAlertIcon
                 className={`${className}`}
                 aria-hidden="true"
               />
@@ -188,9 +184,9 @@ export default function TextInputField(props: TextInputFieldProps) {
             className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
           >
             {showPassword ? (
-              <EyeOpenIcon className="h-5 w-5" />
+              <EyeIcon className="h-5 w-5" />
             ) : (
-              <EyeNoneIcon className="h-5 w-5" />
+              <EyeClosedIcon className="h-5 w-5" />
             )}
           </button>
         )}

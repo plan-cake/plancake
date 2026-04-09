@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { CheckIcon } from "@radix-ui/react-icons";
+import { CheckIcon } from "lucide-react";
 
 import TextInputField from "@/components/text-input-field";
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";

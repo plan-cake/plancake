@@ -1,11 +1,11 @@
 import {
   CheckIcon,
-  InfoCircledIcon,
-  ExclamationTriangleIcon,
-} from "@radix-ui/react-icons";
+  InfoIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 
 export const BANNER_CONFIG = {
   success: { icon: CheckIcon },
-  error: { icon: ExclamationTriangleIcon },
-  info: { icon: InfoCircledIcon },
+  error: { icon: TriangleAlertIcon },
+  info: { icon: InfoIcon },
 };

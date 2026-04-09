@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Pencil1Icon, Pencil2Icon } from "@radix-ui/react-icons";
+import { PencilIcon, SquarePenIcon } from "lucide-react";
 
 import CopyToastButton from "@/components/copy-toast-button";
 import KebabMenu from "@/components/kebab-menu";
@@ -91,7 +91,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   const paintingButton = (
     <LinkButton
       buttonStyle="primary"
-      icon={<Pencil2Icon />}
+      icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
       href={`/${eventCode}/painting`}
     />
@@ -100,7 +100,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   const editButton = (buttonStyle: "frosted glass inset" | "secondary") => (
     <LinkButton
       buttonStyle={buttonStyle}
-      icon={<Pencil1Icon />}
+      icon={<PencilIcon />}
       label="Edit Event"
       href={`/${eventCode}/edit`}
     />

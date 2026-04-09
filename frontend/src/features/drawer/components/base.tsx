@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 
-import { Cross1Icon } from "@radix-ui/react-icons";
+import { XIcon } from "lucide-react";
 import { Drawer } from "vaul";
 
 import ActionButton from "@/features/button/components/action";
@@ -239,7 +239,7 @@ export default function BaseDrawer({
                     <div className="absolute right-4 top-3 z-10">
                       <ActionButton
                         buttonStyle="frosted glass"
-                        icon={<Cross1Icon />}
+                        icon={<XIcon />}
                         aria-label="Close drawer"
                         onClick={(e) => {
                           e?.stopPropagation();

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { TriangleAlertIcon } from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
 import { StandardDrawer } from "@/features/drawer";
@@ -55,7 +55,7 @@ export default function DateRangeDrawer({
           Select Specific Date Range
           {errors.dateRange ? (
             <span className="text-error flex items-center gap-2 text-sm">
-              <ExclamationTriangleIcon className="h-4 w-4" />
+              <TriangleAlertIcon className="h-4 w-4" />
               {errors.dateRange}
             </span>
           ) : (

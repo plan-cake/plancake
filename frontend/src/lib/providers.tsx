@@ -1,5 +1,6 @@
 "use client";
 
+import { LucideProvider } from "lucide-react";
 import { ThemeProvider } from "next-themes";
 
 import AccountProvider from "@/features/account/provider";
@@ -16,11 +17,13 @@ export function Providers({
 }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AccountProvider accountDetails={accountDetails}>
-        <HeaderSizeProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </HeaderSizeProvider>
-      </AccountProvider>
+      <LucideProvider absoluteStrokeWidth={true} strokeWidth={1.5}>
+        <AccountProvider accountDetails={accountDetails}>
+          <HeaderSizeProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </HeaderSizeProvider>
+        </AccountProvider>
+      </LucideProvider>
     </ThemeProvider>
   );
 }
