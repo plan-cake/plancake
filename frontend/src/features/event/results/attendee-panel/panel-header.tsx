@@ -54,15 +54,24 @@ export default function PanelHeader({
     >
       <div className="flex flex-col items-start">
         <h2 className="text-md font-semibold">
-          {isRemoving ? "Removing a" : "A"}ttendees
+          {isRemoving
+            ? "Removing attendees"
+            : activeCount === null
+              ? totalParticipants + " Attendees"
+              : `${activeCount}/${gridNumParticipants} Available`}
         </h2>
         {gridNumParticipants > 0 && (
           <span className="text-sm opacity-75">
             {isRemoving
               ? `Select to remove`
-              : activeCount === null
-                ? "Hover grid for availability"
-                : `${activeCount}/${gridNumParticipants} available`}
+              : hoveredSlot !== null
+                ? new Date(hoveredSlot!).toLocaleDateString(undefined, {
+                    month: "long",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                  })
+                : "Hover grid for availability"}
           </span>
         )}
       </div>
