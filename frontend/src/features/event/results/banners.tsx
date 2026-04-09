@@ -9,6 +9,7 @@ export function getResultBanners(
   timeslots: Date[],
   isWeekEvent: boolean,
   participated: boolean,
+  isMobile: boolean,
 ) {
   if (
     !isWeekEvent &&
@@ -25,7 +26,11 @@ export function getResultBanners(
         subtitle="No one has submitted availability!"
         showPing
       >
-        <p>{MESSAGES.INFO_ADD_AVAILABILITY}</p>
+        <p>
+          {isMobile
+            ? MESSAGES.INFO_ADD_AVAILABILITY_MOBILE
+            : MESSAGES.INFO_ADD_AVAILABILITY}
+        </p>
       </Banner>
     );
   } else if (!hasMutualAvailability(availabilities, participants)) {
@@ -43,7 +48,11 @@ export function getResultBanners(
   } else if (!participated) {
     return (
       <Banner type="info" subtitle="Don't be a stranger!" showPing>
-        <p>{MESSAGES.INFO_ADD_AVAILABILITY}</p>
+        <p>
+          {isMobile
+            ? MESSAGES.INFO_ADD_AVAILABILITY_MOBILE
+            : MESSAGES.INFO_ADD_AVAILABILITY}
+        </p>
       </Banner>
     );
   }
