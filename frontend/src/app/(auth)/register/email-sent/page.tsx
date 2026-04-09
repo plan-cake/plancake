@@ -47,17 +47,15 @@ export default function Page() {
   }
 
   const handleResendEmail = async () => {
-    if (cooldown > 0) return false;
+    if (cooldown > 0) return;
 
     try {
       await clientPost(ROUTES.auth.resendRegisterEmail, { email });
       addToast("success", MESSAGES.SUCCESS_EMAIL_SENT);
       setCooldown(EMAIL_RESEND_COOLDOWN_MS / 1000);
-      return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
       addToast("error", error.formattedMessage);
-      return false;
     }
   };
 

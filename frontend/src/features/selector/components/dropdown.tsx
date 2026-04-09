@@ -26,7 +26,7 @@ export default function Dropdown<TValue extends string | number>({
       <Select.Trigger
         id={id}
         className={cn(
-          "text-accent-text inline-flex items-center rounded-2xl text-start hover:cursor-pointer focus:outline-none",
+          "text-accent-text inline-flex items-center rounded-2xl text-start hover:cursor-pointer",
           "bg-accent/15 hover:bg-accent/25 active:bg-accent/40 px-3 py-1",
           "focus-visible:rounded-full focus-visible:outline-2",
           "focus-visible:outline-foreground focus-visible:outline-offset-2",
@@ -75,7 +75,7 @@ const DropdownItem = forwardRef<HTMLDivElement, DropdownItemProps>(
         className={cn(
           "data-[highlighted]:bg-accent relative flex h-[30px] select-none items-center rounded-xl px-6 leading-none",
           "hover:outline-none data-[disabled]:pointer-events-none data-[disabled]:text-gray-400 data-[highlighted]:text-white",
-          "data-[highlighted]:outline-foreground data-[highlighted]:outline data-[highlighted]:outline-2 data-[highlighted]:outline-offset-2",
+          "data-[highlighted]:outline-foreground data-[highlighted]:outline-2 data-[highlighted]:outline-offset-2",
           "focus-visible:outline-foreground focus-visible:rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2",
         )}
       >

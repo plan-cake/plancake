@@ -27,7 +27,7 @@ export default function ParticipantList({
   if (participants.length === 0) {
     return (
       <ul className={listClassNames}>
-        <li className="text-sm italic opacity-50">No attendees yet</li>
+        <li className="text-sm italic opacity-50">Waiting for responses...</li>
       </ul>
     );
   }

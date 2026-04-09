@@ -58,7 +58,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       if (isLoading) return;
       if (!onClick) return;
       setIsLoading(true);
-      const success = await onClick!(e);
+      const success = (await onClick!(e)) ?? true; // default to successful if unspecified
       if (loadOnSuccess) {
         if (!success) {
           setIsLoading(false);

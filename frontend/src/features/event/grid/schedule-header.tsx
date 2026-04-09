@@ -64,10 +64,7 @@ export default function ScheduleHeader({
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronLeftIcon />}
-            onClick={() => {
-              onPrevPage();
-              return true;
-            }}
+            onClick={onPrevPage}
             className="ml-3 p-1.5"
             aria-label="Previous Page"
           />
@@ -118,10 +115,7 @@ export default function ScheduleHeader({
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronRightIcon />}
-            onClick={() => {
-              onNextPage();
-              return true;
-            }}
+            onClick={onNextPage}
             className="p-1.5"
             aria-label="Next Page"
           />

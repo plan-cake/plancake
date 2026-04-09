@@ -244,7 +244,6 @@ export default function BaseDrawer({
                         onClick={(e) => {
                           e?.stopPropagation();
                           onOpenChange?.(false);
-                          return true;
                         }}
                       />
                     </div>
