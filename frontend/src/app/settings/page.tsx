@@ -28,7 +28,7 @@ export default function Page() {
     defaultName !== (accountDetails?.defaultName || "");
 
   const applyDefaultName = async () => {
-    if (!isEditingDefaultName) return true;
+    if (!isEditingDefaultName) return;
     setDefaultNameError("");
     try {
       if (defaultName) {
@@ -38,11 +38,9 @@ export default function Page() {
           });
           await refreshAccount();
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_SAVED);
-          return true;
         } catch (e) {
           const error = e as ApiErrorResponse;
           addToast("error", error.formattedMessage);
-          return false;
         }
       } else {
         try {
@@ -50,17 +48,14 @@ export default function Page() {
           await refreshAccount();
           setDefaultName("");
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_REMOVED);
-          return true;
         } catch (e) {
           const error = e as ApiErrorResponse;
           addToast("error", error.formattedMessage);
-          return false;
         }
       }
     } catch (e) {
       console.error("Fetch error:", e);
       addToast("error", MESSAGES.ERROR_GENERIC);
-      return false;
     }
   };
 
