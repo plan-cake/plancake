@@ -29,6 +29,9 @@ export function useEventResults(initialData: ResultsInformation) {
   );
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
   const [showOnlyBestTimes, setShowOnlyBestTimes] = useState<boolean>(false);
+  const [timezone, setTimezone] = useState(
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+  );
 
   /* OPTIMISTIC STATES */
   const [optimisticParticipants, removeOptimisticParticipant] = useOptimistic(
@@ -175,6 +178,7 @@ export function useEventResults(initialData: ResultsInformation) {
     hoveredParticipant,
     selectedParticipants,
     showOnlyBestTimes,
+    timezone,
 
     // Actions
     clearSelectedParticipants: () => setSelectedParticipants([]),
@@ -183,5 +187,6 @@ export function useEventResults(initialData: ResultsInformation) {
     toggleParticipant,
     handleRemoveParticipant,
     setShowOnlyBestTimes,
+    setTimezone,
   };
 }

@@ -44,6 +44,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     filteredAvailabilities,
     gridNumParticipants,
     setHoveredSlot,
+    timezone,
+    setTimezone,
     currentUser,
     isCreator,
   } = useResultsContext();
@@ -56,9 +58,6 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   } = eventData;
 
   /* TIMEZONE HANDLING */
-  const [timezone, setTimezone] = useState(
-    Intl.DateTimeFormat().resolvedOptions().timeZone,
-  );
   const handleTZChange = (newTZ: string | number) => {
     setTimezone(newTZ.toString());
   };
