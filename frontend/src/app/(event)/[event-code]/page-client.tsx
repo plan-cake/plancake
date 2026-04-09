@@ -30,7 +30,12 @@ export default function ClientPage({
   initialAvailabilityData: ResultsInformation;
 }) {
   return (
-    <ResultsProvider initialData={initialAvailabilityData}>
+    <ResultsProvider
+      initialData={{
+        ...initialAvailabilityData,
+        eventType: eventData.eventRange.type,
+      }}
+    >
       <EventResults eventData={eventData} />
     </ResultsProvider>
   );
