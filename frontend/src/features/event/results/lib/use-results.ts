@@ -30,7 +30,8 @@ export function useEventResults(initialData: ResultsInformation) {
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
   const [showOnlyBestTimes, setShowOnlyBestTimes] = useState<boolean>(false);
   const [timezone, setTimezone] = useState(
-    Intl.DateTimeFormat().resolvedOptions().timeZone,
+    // Lazy initialization to avoid the lookup on every render
+    () => Intl.DateTimeFormat().resolvedOptions().timeZone,
   );
 
   /* OPTIMISTIC STATES */
