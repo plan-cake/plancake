@@ -48,14 +48,10 @@ export default function PanelHeader({
     return eventType === "weekday"
       ? date.toLocaleString(undefined, {
           weekday: "long",
+          hour: "numeric",
+          minute: "numeric",
           timeZone: timezone,
-        }) +
-          " at " +
-          date.toLocaleString(undefined, {
-            hour: "numeric",
-            minute: "numeric",
-            timeZone: timezone,
-          })
+        })
       : date.toLocaleString(undefined, {
           weekday: "short",
           month: "short",
