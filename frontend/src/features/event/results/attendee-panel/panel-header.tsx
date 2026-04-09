@@ -69,7 +69,7 @@ export default function PanelHeader({
             {isRemoving
               ? `Select to remove`
               : hoveredSlot !== null
-                ? new Date(hoveredSlot).toLocaleDateString(undefined, {
+                ? new Date(hoveredSlot).toLocaleString(undefined, {
                     weekday: "short",
                     month: "short",
                     day: "numeric",
