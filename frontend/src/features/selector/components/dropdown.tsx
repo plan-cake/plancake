@@ -75,7 +75,7 @@ const DropdownItem = forwardRef<HTMLDivElement, DropdownItemProps>(
         className={cn(
           "data-[highlighted]:bg-accent relative flex h-[30px] select-none items-center rounded-xl px-6 leading-none",
           "hover:outline-none data-[disabled]:pointer-events-none data-[disabled]:text-gray-400 data-[highlighted]:text-white",
-          "data-[highlighted]:outline-foreground data-[highlighted]:outline data-[highlighted]:outline-2 data-[highlighted]:outline-offset-2",
+          "data-[highlighted]:outline-foreground data-[highlighted]:outline-2 data-[highlighted]:outline-offset-2",
           "focus-visible:outline-foreground focus-visible:rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2",
         )}
       >
