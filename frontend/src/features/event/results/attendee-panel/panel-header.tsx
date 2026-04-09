@@ -33,6 +33,7 @@ export default function PanelHeader({
     selectedParticipants,
     clearSelectedParticipants,
     currentUser,
+    timezone,
   } = useResultsContext();
 
   const activeCount = hoveredSlot
@@ -54,15 +55,31 @@ export default function PanelHeader({
     >
       <div className="flex flex-col items-start">
         <h2 className="text-md font-semibold">
-          {isRemoving ? "Removing a" : "A"}ttendees
+          {totalParticipants === 0
+            ? "No Attendees Yet"
+            : isRemoving
+              ? "Removing attendees"
+              : activeCount === null
+                ? hasSelection
+                  ? selectedParticipants.length +
+                    ` Attendee${selectedParticipants.length !== 1 ? "s" : ""} Selected`
+                  : totalParticipants + " Attendees"
+                : `${activeCount}/${gridNumParticipants} Available`}
         </h2>
         {gridNumParticipants > 0 && (
           <span className="text-sm opacity-75">
             {isRemoving
               ? `Select to remove`
-              : activeCount === null
-                ? "Hover grid for availability"
-                : `${activeCount}/${gridNumParticipants} available`}
+              : hoveredSlot !== null
+                ? new Date(hoveredSlot).toLocaleString(undefined, {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                    timeZone: timezone,
+                  })
+                : "Hover grid for availability"}
           </span>
         )}
       </div>
