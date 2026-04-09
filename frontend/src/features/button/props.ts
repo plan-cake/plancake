@@ -76,7 +76,8 @@ export type BaseButtonProps = {
    * The function to call when the button is clicked. Required for Action buttons.
    *
    * The function should return a boolean or a Promise that resolves to a boolean if
-   * `loadOnSuccess` is `true`, indicating whether the action was successful.
+   * `loadOnSuccess` is `true`, indicating whether the action was successful. Otherwise,
+   * the function is always assumed to be successful.
    */
   onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => Promise<void | boolean> | void | boolean;
   /**
