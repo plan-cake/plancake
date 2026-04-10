@@ -150,6 +150,15 @@ export function getVersionHistoryData(): VersionHistoryData {
             "Fixed an issue where focused dropdowns would not display a focus ring",
           ],
         },
+        {
+          version: "v0.4.2",
+          releaseDate: { year: 2026, month: 3, day: 10 },
+          changes: [
+            "Fixed the formatting of hovered timeslots for weekday events",
+            "Fixed the banner message prompting users to add availability on mobile",
+            "Fixed the attendee count display when there is only one participant",
+          ],
+        },
       ],
     }
   ];
