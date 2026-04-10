@@ -56,6 +56,7 @@ export const MESSAGES = {
   INFO_NOT_LOGGED_IN: "You are not logged in.",
   INFO_EVENT_PASSED: "All dates in this event have passed.",
   INFO_ADD_AVAILABILITY: "Add your availability by clicking the button above.",
+  INFO_ADD_AVAILABILITY_MOBILE: "Add your availability by clicking the button below.",
   INFO_COPY_SHARE_LINK: "Copy and share the link so others can join!",
   INFO_NO_MUTUAL_AVAILABILITY: "There is no time where everyone is available.",
 };
