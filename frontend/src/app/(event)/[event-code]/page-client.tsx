@@ -22,6 +22,7 @@ import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import { useHeaderSize } from "@/features/header/context";
 import { useToast } from "@/features/system-feedback";
+import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -111,29 +112,33 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     />
   );
 
-  const shareButton = (buttonStyle: "frosted glass inset" | "secondary") => (
-    <ActionButton
-      buttonStyle={buttonStyle}
-      icon={<ShareIcon />}
-      label="Share Event"
-      onClick={async () => {
-        try {
-          await navigator.share({
-            title: eventTitle,
-            url: window.location.href,
-          });
-        } catch (error) {
-          // An error is thrown if sharing is cancelled, ignore that
-          if (error instanceof Error && error.name !== "AbortError") {
-            addToast(
-              "error",
-              "Sharing is not supported on this browser, sorry!",
-            );
-          }
-        }
-      }}
-    />
-  );
+  const shareButton = (buttonStyle: "frosted glass inset" | "secondary") => {
+    if (typeof navigator !== "undefined" && !navigator.share) {
+      // Don't show the button if sharing isn't supported
+      return null;
+    } else {
+      return (
+        <ActionButton
+          buttonStyle={buttonStyle}
+          icon={<ShareIcon />}
+          label="Share Event"
+          onClick={async () => {
+            try {
+              await navigator.share({
+                title: eventTitle,
+                url: window.location.href,
+              });
+            } catch (error) {
+              // An error is thrown if sharing is cancelled, ignore that
+              if (error instanceof Error && error.name !== "AbortError") {
+                addToast("error", MESSAGES.ERROR_GENERIC);
+              }
+            }
+          }}
+        />
+      );
+    }
+  };
 
   const copyButton = (buttonStyle: "frosted glass inset" | "secondary") => (
     <CopyToastButton code={eventCode} buttonStyle={buttonStyle} />
