@@ -37,7 +37,7 @@ jobs:
             set -e
 
             # Navigate to project directory
-            cd $PROJECT_DIR
+            cd "$PROJECT_DIR"
 
             # Pull changes
             git pull
