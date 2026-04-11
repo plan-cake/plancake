@@ -113,8 +113,16 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   );
 
   const shareButton = (buttonStyle: "frosted glass inset" | "secondary") => {
+    // Check if sharing is supported
     if (typeof navigator !== "undefined" && !navigator.share) {
-      // Don't show the button if sharing isn't supported
+      /* This condition means it will be rendered until mounted on the client, then it
+       * disappears if not supported. There are more browsers that support the API than
+       * don't, so this is a better trade-off than having the button appear after initial
+       * mount on supported browsers.
+       *
+       * This also won't be visible on mobile anyway, since the buttons are hidden in the
+       * kebab menu.
+       */
       return null;
     } else {
       return (
