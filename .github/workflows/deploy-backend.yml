@@ -25,6 +25,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           envs: PROJECT_DIR
           script: |
+            # If something goes wrong, exit immediately
+            set -e
+
             # Navigate to project directory
             cd $PROJECT_DIR
 
