@@ -45,7 +45,7 @@ function TimeSlot({
         cellClasses,
         "select-none",
         isHovered &&
-          "z-5 scale-y-130 scale-x-110 rounded-full border-none shadow-xl ring-1 md:scale-x-105",
+          "z-5 -inset-1 h-[calc(100%+0.5rem)] w-[calc(100%+0.5rem)] rounded-full border-none shadow-xl ring-1",
       )}
       style={{
         gridColumn,
