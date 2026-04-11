@@ -39,6 +39,8 @@ export default function ClientPage({
   );
 }
 
+type HeaderButtonStyle = "frosted glass inset" | "secondary";
+
 function EventResults({ eventData }: { eventData: EventInformation }) {
   const {
     hoveredSlot,
@@ -103,7 +105,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     />
   );
 
-  const editButton = (buttonStyle: "frosted glass inset" | "secondary") => (
+  const editButton = (buttonStyle: HeaderButtonStyle) => (
     <LinkButton
       buttonStyle={buttonStyle}
       icon={<PencilIcon />}
@@ -112,7 +114,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     />
   );
 
-  const shareButton = (buttonStyle: "frosted glass inset" | "secondary") => {
+  const shareButton = (buttonStyle: HeaderButtonStyle) => {
     // Check if sharing is supported
     if (typeof navigator !== "undefined" && !navigator.share) {
       /* This condition means it will be rendered until mounted on the client, then it
@@ -148,7 +150,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     }
   };
 
-  const copyButton = (buttonStyle: "frosted glass inset" | "secondary") => (
+  const copyButton = (buttonStyle: HeaderButtonStyle) => (
     <CopyToastButton code={eventCode} buttonStyle={buttonStyle} />
   );
 
