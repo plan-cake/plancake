@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 
-import { PencilIcon, SquarePenIcon } from "lucide-react";
+import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
 
 import CopyToastButton from "@/components/copy-toast-button";
 import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
+import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import ScheduleGrid from "@/features/event/grid/grid";
 import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
@@ -20,6 +21,7 @@ import ResultsDrawer from "@/features/event/results/drawer";
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import { useHeaderSize } from "@/features/header/context";
+import { useToast } from "@/features/system-feedback";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -56,6 +58,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     eventRange,
     timeslots,
   } = eventData;
+
+  /* TOAST PROVIDER */
+  const { addToast } = useToast();
 
   /* TIMEZONE HANDLING */
   const handleTZChange = (newTZ: string | number) => {
@@ -106,6 +111,30 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     />
   );
 
+  const shareButton = (buttonStyle: "frosted glass inset" | "secondary") => (
+    <ActionButton
+      buttonStyle={buttonStyle}
+      icon={<ShareIcon />}
+      label="Share Event"
+      onClick={async () => {
+        try {
+          await navigator.share({
+            title: eventTitle,
+            url: window.location.href,
+          });
+        } catch (error) {
+          // An error is thrown if sharing is cancelled, ignore that
+          if (error instanceof Error && error.name !== "AbortError") {
+            addToast(
+              "error",
+              "Sharing is not supported on this browser, sorry!",
+            );
+          }
+        }
+      }}
+    />
+  );
+
   const copyButton = (buttonStyle: "frosted glass inset" | "secondary") => (
     <CopyToastButton code={eventCode} buttonStyle={buttonStyle} />
   );
@@ -121,12 +150,14 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         <div className="md:hidden">
           <KebabMenu>
             {isCreator && editButton("frosted glass inset")}
+            {shareButton("frosted glass inset")}
             {copyButton("frosted glass inset")}
           </KebabMenu>
         </div>
 
         <div className="ml-auto hidden flex-wrap justify-end gap-2 md:flex">
           {isCreator && editButton("secondary")}
+          {shareButton("secondary")}
           {copyButton("secondary")}
           {paintingButton}
         </div>
