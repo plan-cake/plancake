@@ -7,7 +7,6 @@ on:
     paths:
       - "backend/**"
       - ".github/workflows/deploy-backend.yml" # Also runs if this workflow is changed
-    workflow_dispatch: # Allows manual triggering from GitHub
 
 jobs:
   deploy:
