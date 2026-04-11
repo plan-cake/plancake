@@ -40,7 +40,7 @@ jobs:
             cd "$PROJECT_DIR"
 
             # Pull changes
-            git pull
+            git pull origin main
 
             # Navigate to backend directory
             cd backend
