@@ -8,6 +8,9 @@ on:
       - "backend/**"
       - ".github/workflows/deploy-backend.yml" # Also runs if this workflow is changed
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
