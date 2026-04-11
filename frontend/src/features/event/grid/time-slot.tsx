@@ -15,6 +15,8 @@ interface TimeSlotProps {
   gridColumn: number;
   gridRow: number;
 
+  icon?: React.ReactNode;
+
   cellClasses?: string;
 
   // Event handlers
@@ -31,9 +33,22 @@ function TimeSlot({
   dynamicStyle: style,
   gridColumn,
   gridRow,
+  icon,
   cellClasses = "",
   ...eventHandlers
 }: TimeSlotProps) {
+  if (icon) {
+    icon = React.cloneElement(
+      icon as React.ReactElement<{ className: string }>,
+      {
+        className: cn(
+          (icon as React.ReactElement<{ className: string }>).props.className,
+          "h-4 w-4",
+        ),
+      },
+    );
+  }
+
   return (
     <div
       data-slot-iso={slotIso}
@@ -57,7 +72,11 @@ function TimeSlot({
         ...style,
       }}
       {...eventHandlers}
-    />
+    >
+      {icon && (
+        <div className="flex h-full items-center justify-center">{icon}</div>
+      )}
+    </div>
   );
 }
 
