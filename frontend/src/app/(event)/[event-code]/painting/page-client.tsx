@@ -17,7 +17,6 @@ import { validateAvailabilityData } from "@/features/event/availability/validate
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
 import HeaderSpacer from "@/features/header/components/header-spacer";
-import { useHeaderSize } from "@/features/header/context";
 import {
   ConfirmationDialog,
   RateLimitBanner,
@@ -28,7 +27,6 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { SelfAvailability } from "@/lib/utils/api/types";
-import { cn } from "@/lib/utils/classname";
 import { timeslotToISOString } from "@/lib/utils/date-time-format";
 
 export default function ClientPage({
@@ -45,9 +43,6 @@ export default function ClientPage({
   initialData: SelfAvailability | null;
 }) {
   const router = useRouter();
-
-  // HEADER SIZE CONTEXT
-  const { topMarginClass } = useHeaderSize();
 
   // AVAILABILITY STATE
   const { state, setDisplayName, setTimeZone, toggleSlot } = useAvailability(
