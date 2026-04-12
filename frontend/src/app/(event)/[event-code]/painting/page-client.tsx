@@ -246,7 +246,7 @@ export default function ClientPage({
   );
 
   return (
-    <div className="flex flex-col space-y-4 pl-6 pr-6">
+    <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
       <HeaderSpacer />
 
       {/* Rate Limit Error */}
@@ -264,7 +264,7 @@ export default function ClientPage({
       </div>
 
       {/* Main Content */}
-      <div className="mb-12 flex h-fit flex-col gap-4 md:mb-0 md:flex-row">
+      <div className="mb-12 flex min-h-0 flex-1 flex-col gap-4 md:mb-0 md:flex-row">
         {/* Left Panel */}
         <div
           className={cn(

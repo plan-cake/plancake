@@ -111,7 +111,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   );
 
   return (
-    <div className="flex flex-col space-y-4 pl-6 pr-6">
+    <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
       <HeaderSpacer />
 
       {/* Header */}
@@ -134,7 +134,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
       <div className="md:hidden">{banners}</div>
 
-      <div className="flex h-fit flex-col md:flex-row md:gap-4">
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-4">
         <ScheduleGrid
           mode="view"
           isWeekdayEvent={eventRange.type === "weekday"}
