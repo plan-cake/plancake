@@ -266,12 +266,7 @@ export default function ClientPage({
       {/* Main Content */}
       <div className="mb-12 flex min-h-0 flex-1 flex-col gap-4 md:mb-0 md:flex-row">
         {/* Left Panel */}
-        <div
-          className={cn(
-            topMarginClass,
-            "h-fit w-full shrink-0 space-y-4 overflow-y-auto md:sticky md:w-80",
-          )}
-        >
+        <div className="h-fit w-full shrink-0 space-y-4 overflow-y-auto md:w-80">
           <div className="space-y-2">
             <div className="w-fit">
               <p
