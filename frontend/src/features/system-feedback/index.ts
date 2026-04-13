@@ -9,5 +9,5 @@ export { useToast } from "@/features/system-feedback/toast/context";
 export type {
   BannerType,
   ToastType,
-  ConfirmationDialogType,
+  DialogType,
 } from "@/features/system-feedback/type";
