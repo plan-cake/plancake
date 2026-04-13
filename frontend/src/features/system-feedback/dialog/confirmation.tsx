@@ -81,7 +81,7 @@ export default function ConfirmationDialog({
       icon={renderIcon()}
     >
       {children}
-      <div className="flex w-full justify-center gap-4">
+      <div className="mt-4 flex w-full justify-center gap-4">
         <ActionButton
           buttonStyle="transparent"
           label="Cancel"
