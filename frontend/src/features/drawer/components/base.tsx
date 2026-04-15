@@ -172,7 +172,7 @@ export default function BaseDrawer({
               className={cn(
                 "mx-auto flex w-full flex-col transition-[max-width,border-radius,margin,padding] duration-300",
                 isPill
-                  ? "border-foreground/10 rounded-4xl mb-4 max-h-[calc(100svh-2rem)] max-w-[calc(100%-2rem)] overflow-hidden border"
+                  ? "border-foreground/10 rounded-4xl mb-4 max-h-[calc(100svh-2rem)] max-w-[calc(100%-1rem)] overflow-hidden border"
                   : "border-foreground/10 max-w-full overflow-hidden rounded-t-[32px] border",
                 frostedGlass ? "frosted-glass" : "bg-panel",
                 (_type === "floating" || !isPill) &&
