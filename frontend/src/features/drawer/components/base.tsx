@@ -146,7 +146,7 @@ export default function BaseDrawer({
           style={{ zIndex: contentZIndex }}
         >
           <div
-            className="flex w-full flex-col transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            className="flex w-full flex-col"
             style={{
               height:
                 _type === "floating"
@@ -159,7 +159,7 @@ export default function BaseDrawer({
             {/* Invisible spacer that pushes the morphing pill down */}
             {_type === "morphing" && (
               <div
-                className="pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                className="pointer-events-none"
                 style={{
                   flexGrow: isPill ? 1 : 0,
                   flexBasis: isPill ? "auto" : "0px",
