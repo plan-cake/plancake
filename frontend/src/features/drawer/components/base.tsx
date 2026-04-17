@@ -252,7 +252,7 @@ export default function BaseDrawer({
 
                 <div
                   className={cn(
-                    "transition-padding min-h-0 flex-1 px-7 duration-300",
+                    "min-h-0 flex-1 px-7 transition-[padding] duration-300",
                     scrollableBody && "overflow-y-auto",
                     bodyClassName,
                     isPill && _type === "morphing"
