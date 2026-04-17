@@ -15,7 +15,7 @@ interface TimeSlotProps {
   gridColumn: number;
   gridRow: number;
 
-  icon?: React.ReactNode;
+  icon?: React.ReactElement;
 
   cellClasses?: string;
 
