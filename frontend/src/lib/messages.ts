@@ -59,5 +59,6 @@ export const MESSAGES = {
   INFO_ADD_AVAILABILITY_MOBILE: "Add your availability by clicking the button below.",
   INFO_COPY_SHARE_LINK: "Copy and share the link so others can join!",
   INFO_NO_MUTUAL_AVAILABILITY: "There are no times with more than 1 person available. The plans are NOT making it out of the group chat...",
-  INFO_NO_IDEAL_TIMES: "There is no time where everyone is available. Times with an indicator are the best options.",
+  INFO_NO_IDEAL_TIMES: "There are no times where everyone is available.",
+  INFO_NO_IDEAL_TIMES_BANNER: "There are no times where everyone is available. Times with an indicator are the best options.",
 };

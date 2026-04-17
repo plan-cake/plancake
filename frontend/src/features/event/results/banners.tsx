@@ -42,7 +42,7 @@ export function getResultBanners(
     }
     return (
       <Banner type="info" subtitle="Oh dear :(" showPing>
-        <p>{MESSAGES.INFO_NO_IDEAL_TIMES}</p>
+        <p>{MESSAGES.INFO_NO_IDEAL_TIMES_BANNER}</p>
       </Banner>
     );
   } else if (participated && participants.length === 1) {
