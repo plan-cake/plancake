@@ -45,6 +45,7 @@ export default function BaseDialog({
         contentClassName="h-fit"
         showHandle={false}
         headerContent={<div className="h-2" />}
+        hideCloseButton
       >
         <div className="flex flex-col items-center gap-2 overflow-hidden">
           {icon}
