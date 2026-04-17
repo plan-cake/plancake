@@ -2,12 +2,6 @@ import { DialogType } from "@/features/system-feedback";
 
 type CommonDialogProps = {
   /**
-   * Type of the dialog, which determines its styling and default icon.
-   *
-   * @type {DialogType}
-   */
-  type: DialogType;
-  /**
    * Title of the dialog
    * Required for accessibility (used in Title components and aria attributes)
    *
@@ -75,11 +69,19 @@ type CommonDialogProps = {
    * @default undefined
    */
   icon?: React.ReactNode;
+  /**
+   * Additional className to apply to the dialog overlay, for further customization.
+   *
+   * @type {string}
+   * @default undefined
+   */
+  overlayClassName?: string;
 };
 
 export type BaseDialogProps = CommonDialogProps;
 
 export type ConfirmationDialogProps = Omit<CommonDialogProps, "icon"> & {
+  type: DialogType;
   /**
    * Enforced strictly as a string for semantic standard confirmations.
    */
@@ -96,6 +98,7 @@ export type ConfirmationDialogProps = Omit<CommonDialogProps, "icon"> & {
 };
 
 export type FormDialogProps = CommonDialogProps & {
+  type: DialogType;
   /** * Callback function called when the native <form> is submitted.
    * Returning true (or a Promise resolving to true) typically closes the modal.
    */

@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from "react";
 
 import ActionButton from "@/features/button/components/action";
-import { DIALOG_CONFIG } from "@/features/system-feedback/confirmation/config";
 import BaseModal from "@/features/system-feedback/dialog/base";
+import { DIALOG_CONFIG } from "@/features/system-feedback/dialog/config";
 import { ConfirmationDialogProps } from "@/features/system-feedback/dialog/props";
 import { cn } from "@/lib/utils/classname";
 
@@ -14,12 +14,13 @@ export default function ConfirmationDialog({
   children,
   trigger,
   triggerDisabled = false,
-  showIcon = false,
   autoClose = false,
   asNestedDrawer = false,
   open,
   onOpenChange,
 }: ConfirmationDialogProps) {
+  const config = DIALOG_CONFIG[type] || DIALOG_CONFIG.info;
+
   const handleConfirm = useCallback(async () => {
     if (autoClose) {
       onOpenChange?.(false);
@@ -43,34 +44,8 @@ export default function ConfirmationDialog({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleConfirm, open]);
 
-  /* ICON RENDERING */
-  const config = DIALOG_CONFIG[type] || DIALOG_CONFIG.info;
-  const Icon = config.icon;
-
-  const renderIcon = () => {
-    if (!showIcon) return null;
-    if (config.isTextIcon) {
-      return (
-        <div
-          className={cn(
-            "aspect-square rounded-full text-center",
-            config.bgClass,
-          )}
-        >
-          <div className="text-[48px]">!</div>
-        </div>
-      );
-    }
-    return (
-      <div className={cn("rounded-full p-4", config.bgClass)}>
-        {Icon && <Icon className="h-10 w-10" />}
-      </div>
-    );
-  };
-
   return (
     <BaseModal
-      type={type}
       title={title}
       description={description}
       trigger={trigger}
@@ -78,7 +53,10 @@ export default function ConfirmationDialog({
       onOpenChange={onOpenChange}
       asNestedDrawer={asNestedDrawer}
       triggerDisabled={triggerDisabled}
-      icon={renderIcon()}
+      overlayClassName={cn(
+        type === "error" &&
+          "bg-[color-mix(in_oklab,var(--color-error)_15%,black_20%)]",
+      )}
     >
       {children}
       <div className="mt-4 flex w-full justify-center gap-4">
@@ -88,7 +66,7 @@ export default function ConfirmationDialog({
           onClick={() => onOpenChange?.(false)}
         />
         <ActionButton
-          buttonStyle={config.btnStyle}
+          buttonStyle={config.buttonStyle}
           label="Confirm"
           onClick={handleConfirm}
           loadOnSuccess={!autoClose}

@@ -3,7 +3,9 @@ import { useCallback } from "react";
 import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import BaseModal from "@/features/system-feedback/dialog/base";
+import { DIALOG_CONFIG } from "@/features/system-feedback/dialog/config";
 import { FormDialogProps } from "@/features/system-feedback/dialog/props";
+import { cn } from "@/lib/utils/classname";
 
 export default function FormDialog({
   type,
@@ -19,6 +21,8 @@ export default function FormDialog({
   onOpenChange,
   icon,
 }: FormDialogProps) {
+  const config = DIALOG_CONFIG[type] || DIALOG_CONFIG.info;
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       console.log("Form submitted");
@@ -33,7 +37,6 @@ export default function FormDialog({
 
   return (
     <BaseModal
-      type={type}
       title={title}
       description={description}
       trigger={trigger}
@@ -41,6 +44,10 @@ export default function FormDialog({
       onOpenChange={onOpenChange}
       asNestedDrawer={asNestedDrawer}
       icon={icon}
+      overlayClassName={cn(
+        type === "error" &&
+          "bg-[color-mix(in_oklab,var(--color-error)_15%,black_20%)]",
+      )}
     >
       <form
         onSubmit={handleSubmit}
@@ -57,7 +64,7 @@ export default function FormDialog({
           />
           <EmptyButton
             type="submit"
-            buttonStyle="primary"
+            buttonStyle={config.buttonStyle}
             label={submitLabel}
           />
         </div>

@@ -7,7 +7,6 @@ import { BaseDialogProps } from "@/features/system-feedback/dialog/props";
 import { cn } from "@/lib/utils/classname";
 
 export default function BaseDialog({
-  type,
   title,
   description,
   trigger,
@@ -17,6 +16,7 @@ export default function BaseDialog({
   asNestedDrawer = false,
   triggerDisabled = false,
   icon,
+  overlayClassName,
 }: BaseDialogProps) {
   /* OPEN STATE MANAGEMENT */
   const [internalOpen, setInternalOpen] = useState(false);
@@ -77,15 +77,14 @@ export default function BaseDialog({
         <Dialog.Overlay
           className={cn(
             "dialog-overlay fixed inset-0 z-40 bg-gray-700/40 transition-opacity",
-            type === "error" &&
-              "bg-[color-mix(in_oklab,var(--color-error)_15%,black_20%)]",
+            overlayClassName,
           )}
         />
         <Dialog.Content asChild>
           <div
             className={cn(
               "dialog-content fixed inset-0 z-40 m-auto flex flex-col gap-2 overflow-hidden",
-              "bg-panel rounded-3xl p-8 shadow-md focus:outline-none",
+              "bg-panel rounded-3xl p-6 shadow-md focus:outline-none",
               "min-w-sm h-fit w-fit max-w-lg",
             )}
           >
