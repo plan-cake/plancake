@@ -1,4 +1,4 @@
-import { SparklesIcon, ThumbsUpIcon } from "lucide-react";
+import { CircleSmallIcon, ThumbsUpIcon } from "lucide-react";
 
 import TimeSlot from "@/features/event/grid/time-slot";
 import BaseTimeBlock from "@/features/event/grid/timeblocks/base";
@@ -50,9 +50,9 @@ export default function ResultsTimeBlock({
         const icon =
           highestMatchCount > 1 && matchCount === highestMatchCount ? (
             highestMatchCount === numParticipants ? (
-              <SparklesIcon className={iconColorClass} />
-            ) : (
               <ThumbsUpIcon className={iconColorClass} />
+            ) : (
+              <CircleSmallIcon className={iconColorClass} />
             )
           ) : undefined;
 
