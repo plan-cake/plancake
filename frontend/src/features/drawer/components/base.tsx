@@ -146,7 +146,7 @@ export default function BaseDrawer({
           style={{ zIndex: contentZIndex }}
         >
           <div
-            className="flex w-full flex-col transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            className="flex w-full flex-col"
             style={{
               height:
                 _type === "floating"
@@ -159,7 +159,7 @@ export default function BaseDrawer({
             {/* Invisible spacer that pushes the morphing pill down */}
             {_type === "morphing" && (
               <div
-                className="pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                className="pointer-events-none"
                 style={{
                   flexGrow: isPill ? 1 : 0,
                   flexBasis: isPill ? "auto" : "0px",
@@ -172,7 +172,7 @@ export default function BaseDrawer({
               className={cn(
                 "mx-auto flex w-full flex-col transition-[max-width,border-radius,margin,padding] duration-300",
                 isPill
-                  ? "border-foreground/10 rounded-4xl mb-4 max-h-[calc(100svh-2rem)] max-w-[calc(100%-2rem)] overflow-hidden border"
+                  ? "border-foreground/10 rounded-4xl mb-4 max-h-[calc(100svh-2rem)] max-w-[calc(100%-1rem)] overflow-hidden border"
                   : "border-foreground/10 max-w-full overflow-hidden rounded-t-[32px] border",
                 frostedGlass ? "frosted-glass" : "bg-panel",
                 (_type === "floating" || !isPill) &&
@@ -252,16 +252,26 @@ export default function BaseDrawer({
 
                 <div
                   className={cn(
-                    "min-h-0 flex-1 px-7 transition-opacity duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                    "min-h-0 flex-1 px-7 transition-[padding] duration-300",
                     scrollableBody && "overflow-y-auto",
                     bodyClassName,
                     isPill && _type === "morphing"
-                      ? "pointer-events-none pb-0 opacity-0"
-                      : "pb-4 opacity-100",
+                      ? "pointer-events-none pb-0 pr-3"
+                      : "pb-4",
                   )}
                   data-vaul-no-drag
                 >
-                  {(!isPill || _type !== "morphing") && children}
+                  {/* Wrap in an extra div to manage the opacity transition separately */}
+                  <div
+                    className={cn(
+                      "transition-opacity duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                      isPill && _type === "morphing"
+                        ? "opacity-0"
+                        : "opacity-100",
+                    )}
+                  >
+                    {(!isPill || _type !== "morphing") && children}
+                  </div>
                 </div>
 
                 {footerContent && (
