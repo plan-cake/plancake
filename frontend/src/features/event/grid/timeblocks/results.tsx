@@ -1,3 +1,5 @@
+import { CircleSmallIcon, ThumbsUpIcon } from "lucide-react";
+
 import TimeSlot from "@/features/event/grid/time-slot";
 import BaseTimeBlock from "@/features/event/grid/timeblocks/base";
 import { ResultsTimeBlockProps } from "@/features/event/grid/timeblocks/props";
@@ -8,6 +10,7 @@ export default function ResultsTimeBlock({
   numVisibleDays,
   availabilities,
   numParticipants,
+  highestMatchCount,
   hoveredSlot,
   onHoverSlot,
   hasNext = false,
@@ -41,6 +44,18 @@ export default function ResultsTimeBlock({
           "bg-[color-mix(in_srgb,var(--color-accent)_var(--opacity-percent),var(--color-background))]",
         );
 
+        // icon
+        const iconColorClass =
+          opacityPercent > 50 ? "text-white" : "text-foreground";
+        const icon =
+          highestMatchCount > 1 && matchCount === highestMatchCount ? (
+            highestMatchCount === numParticipants ? (
+              <ThumbsUpIcon className={iconColorClass} />
+            ) : (
+              <CircleSmallIcon className={iconColorClass} />
+            )
+          ) : undefined;
+
         return (
           <TimeSlot
             key={iso}
@@ -49,6 +64,7 @@ export default function ResultsTimeBlock({
             isHovered={isHovered}
             gridColumn={gridColumn}
             gridRow={gridRow}
+            icon={icon}
             onPointerEnter={() => {
               onHoverSlot?.(iso);
             }}

@@ -14,6 +14,7 @@ import TimeColumn from "@/features/event/grid/time-column";
 import InteractiveTimeBlock from "@/features/event/grid/timeblocks/interactive";
 import PreviewTimeBlock from "@/features/event/grid/timeblocks/preview";
 import ResultsTimeBlock from "@/features/event/grid/timeblocks/results";
+import { getHighestMatchCount } from "@/features/event/results/lib/utils";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
@@ -171,6 +172,7 @@ export default function ScheduleGrid({
                       hoveredSlot={hoveredSlot}
                       availabilities={availabilities}
                       numParticipants={numParticipants}
+                      highestMatchCount={getHighestMatchCount(availabilities)}
                       onHoverSlot={setHoveredSlot}
                     />
                   );
