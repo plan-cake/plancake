@@ -252,16 +252,26 @@ export default function BaseDrawer({
 
                 <div
                   className={cn(
-                    "min-h-0 flex-1 px-7 transition-opacity duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                    "transition-padding min-h-0 flex-1 px-7 duration-300",
                     scrollableBody && "overflow-y-auto",
                     bodyClassName,
                     isPill && _type === "morphing"
-                      ? "pointer-events-none pb-0 opacity-0"
-                      : "pb-4 opacity-100",
+                      ? "pointer-events-none pb-0 pr-3"
+                      : "pb-4",
                   )}
                   data-vaul-no-drag
                 >
-                  {(!isPill || _type !== "morphing") && children}
+                  {/* Wrap in an extra div to manage the opacity transition separately */}
+                  <div
+                    className={cn(
+                      "transition-opacity duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                      isPill && _type === "morphing"
+                        ? "opacity-0"
+                        : "opacity-100",
+                    )}
+                  >
+                    {(!isPill || _type !== "morphing") && children}
+                  </div>
                 </div>
 
                 {footerContent && (
