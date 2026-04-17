@@ -16,6 +16,7 @@ interface TimeSlotProps {
   gridRow: number;
 
   icon?: React.ReactNode;
+  number?: number;
 
   cellClasses?: string;
 
@@ -74,7 +75,7 @@ function TimeSlot({
       {...eventHandlers}
     >
       {icon && (
-        <div className="flex h-full items-center justify-center">{icon}</div>
+        <div className="flex h-full items-center justify-end pr-1">{icon}</div>
       )}
     </div>
   );
