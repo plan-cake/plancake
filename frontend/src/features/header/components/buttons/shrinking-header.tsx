@@ -18,10 +18,9 @@ export default function ShrinkingHeaderButton({
   label?: string;
   children: React.ReactNode;
 }) {
-  const [showButton, setShowButton] = useState(false);
-  const buttonShowTimeout = useRef<NodeJS.Timeout | null>(null);
-
   const { isShrunk } = useHeaderSize();
+  const [showButton, setShowButton] = useState(!isShrunk);
+  const buttonShowTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (buttonShowTimeout.current) {
