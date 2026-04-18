@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils/classname";
 export default function LogoArea({ isShrunk = false }: { isShrunk?: boolean }) {
   return (
     <div>
-      {/* Text Container */}
       <Link href="/">
         <Logo oneLine={isShrunk} />
       </Link>

@@ -1,10 +1,8 @@
-"use client";
-
 import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import ActionButton from "@/features/button/components/action";
-import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
+import ShrinkingHeaderButton from "@/features/header/components/buttons/shrinking-header";
 
 export default function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
