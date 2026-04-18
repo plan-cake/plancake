@@ -43,7 +43,7 @@ export const MESSAGES = {
   SUCCESS_DEFAULT_NAME_SAVED: "Nickname saved successfully.",
   SUCCESS_DEFAULT_NAME_REMOVED: "Nickname removed successfully.",
   SUCCESS_EVENT_DELETE: "Event deleted successfully.",
-  SUCCESS_ACCOUNT_DELETE: "Account deleted successfully. Have a nice day.",
+  SUCCESS_ACCOUNT_DELETE: "Account deleted successfully. Have a nice day!",
 
   // copy link messages
   COPY_LINK_SUCCESS: "Link copied to clipboard!",
@@ -56,6 +56,7 @@ export const MESSAGES = {
   INFO_NOT_LOGGED_IN: "You are not logged in.",
   INFO_EVENT_PASSED: "All dates in this event have passed.",
   INFO_ADD_AVAILABILITY: "Add your availability by clicking the button above.",
+  INFO_ADD_AVAILABILITY_MOBILE: "Add your availability by clicking the button below.",
   INFO_COPY_SHARE_LINK: "Copy and share the link so others can join!",
   INFO_NO_MUTUAL_AVAILABILITY: "There is no time where everyone is available.",
 };

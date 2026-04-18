@@ -1,5 +1,7 @@
-import { ExitIcon, PersonIcon } from "@radix-ui/react-icons";
-import { redirect } from "next/navigation";
+"use client";
+
+import { LogOutIcon, UserIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import KebabMenu from "@/components/kebab-menu";
 import { getSession } from "@/features/account/get-session";
@@ -7,22 +9,20 @@ import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
-// import { useToast } from "@/features/system-feedback";
-// import { MESSAGES } from "@/lib/messages";
+import { useHeaderSize } from "@/features/header/context";
+import { useToast } from "@/features/system-feedback";
+import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
-interface AccountButtonProps {
-  onMenuOpenChange?: (isOpen: boolean) => void;
-}
+export default function AccountButton() {
+  const { activeMenu, setActiveMenu } = useHeaderSize();
+  const { loginState, logout, accountDetails } = useAccount();
+  const router = useRouter();
+  const { addToast } = useToast();
 
-export default async function AccountButton({
-  onMenuOpenChange,
-}: AccountButtonProps) {
-  const accountDetails = await getSession();
-
-  // const { addToast } = useToast();
+  const isMenuOpen = activeMenu === "account";
 
   const signOut = async () => {
     try {
@@ -40,7 +40,7 @@ export default async function AccountButton({
   const signOutButton = (
     <ActionButton
       buttonStyle="frosted glass inset"
-      icon={<ExitIcon />}
+      icon={<LogOutIcon />}
       label="Sign Out"
       onClick={signOut}
       loadOnSuccess
@@ -59,16 +59,17 @@ export default async function AccountButton({
     return (
       <ShrinkingHeaderButton
         buttonStyle="frosted glass inset"
-        icon={<PersonIcon />}
+        icon={<UserIcon />}
       >
         <KebabMenu
           nested
-          onOpenChange={onMenuOpenChange}
+          open={isMenuOpen}
+          onOpenChange={(isOpen) => setActiveMenu(isOpen ? "account" : null)}
           trigger={
             <EmptyButton
               className="relative z-10"
               buttonStyle="frosted glass inset"
-              icon={<PersonIcon />}
+              icon={<UserIcon />}
               aria-label="Account settings"
             />
           }

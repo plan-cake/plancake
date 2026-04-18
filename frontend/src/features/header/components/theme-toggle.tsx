@@ -1,7 +1,7 @@
 "use client";
 
+import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
-import { FiMoon, FiSun } from "react-icons/fi";
 
 import ActionButton from "@/features/button/components/action";
 import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
@@ -11,17 +11,16 @@ export default function ThemeToggle() {
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
-    return true;
   };
 
   return (
     <ShrinkingHeaderButton
       buttonStyle="frosted glass inset"
-      icon={resolvedTheme === "dark" ? <FiMoon /> : <FiSun />}
+      icon={resolvedTheme === "dark" ? <MoonIcon /> : <SunIcon />}
     >
       <ActionButton
         buttonStyle="frosted glass inset"
-        icon={resolvedTheme === "dark" ? <FiMoon /> : <FiSun />}
+        icon={resolvedTheme === "dark" ? <MoonIcon /> : <SunIcon />}
         onClick={toggleTheme}
       />
     </ShrinkingHeaderButton>

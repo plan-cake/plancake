@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { motion } from "framer-motion";
 
 import ActionButton from "@/features/button/components/action";
 import { FloatingDrawer } from "@/features/drawer";
@@ -57,7 +56,6 @@ export default function ConfirmationDialog({
 
   const handleClose = useCallback(() => {
     handleOpenChange(false);
-    return true;
   }, [handleOpenChange]);
 
   const handleConfirm = useCallback(async () => {
@@ -86,11 +84,9 @@ export default function ConfirmationDialog({
       // Ignore key events coming from text inputs or editable elements
       const target = e.target as HTMLElement | null;
       const tagName = target?.tagName;
-      const isTextInput =
-        tagName === "INPUT" ||
-        tagName === "TEXTAREA" ||
-        target?.isContentEditable;
-      if (isTextInput) {
+      const isMultilineText =
+        tagName === "TEXTAREA" || target?.isContentEditable;
+      if (isMultilineText) {
         return;
       }
 
@@ -194,35 +190,25 @@ export default function ConfirmationDialog({
           )}
         />
         <Dialog.Content asChild>
-          <motion.div
-            layout
-            transition={{ duration: 0.25, ease: "easeInOut" }}
+          <div
             className={cn(
               "dialog-content fixed inset-0 z-40 m-auto flex flex-col overflow-hidden",
               "bg-panel rounded-3xl p-6 shadow-md focus:outline-none",
-              "h-fit w-3/4 md:w-fit md:max-w-3xl",
+              "min-w-sm h-fit w-fit max-w-lg",
             )}
           >
             <Dialog.Title asChild>
-              <motion.div
-                layout="position"
-                className="flex flex-col items-center gap-4"
-              >
+              <div className="flex flex-col items-center gap-4">
                 {showIcon && renderIcon()}
                 <p className="text-lg font-bold">{title}</p>
-              </motion.div>
+              </div>
             </Dialog.Title>
 
             <Dialog.Description asChild>
-              <motion.div layout="position" className="mt-2 w-full text-center">
-                {description}
-              </motion.div>
+              <div className="mt-2 w-full text-center">{description}</div>
             </Dialog.Description>
 
-            <motion.div
-              layout="position"
-              className="mt-[25px] flex justify-center gap-4"
-            >
+            <div className="mt-[25px] flex justify-center gap-4">
               <ActionButton
                 buttonStyle="transparent"
                 label="Cancel"
@@ -234,8 +220,8 @@ export default function ConfirmationDialog({
                 onClick={handleConfirm}
                 loadOnSuccess={!autoClose}
               />
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

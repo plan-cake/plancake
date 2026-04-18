@@ -1,7 +1,9 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 
+import { XIcon } from "lucide-react";
 import { Drawer } from "vaul";
 
+import ActionButton from "@/features/button/components/action";
 import { DrawerProps } from "@/features/drawer/props";
 import { useDrawerResize } from "@/features/drawer/useDrawerResize";
 import { useVaulStickyFooter } from "@/features/drawer/useStickyFooter";
@@ -28,13 +30,14 @@ export default function BaseDrawer({
   ...rest
 }: DrawerProps) {
   useDrawerResize();
-  const keyboardHeight = useKeyboardHeight();
-  const keyboardOffset = keyboardHeight - 100;
+  const keyboardOffset = useKeyboardHeight();
 
   const contentRef = useRef<HTMLDivElement>(null);
+  const wasDraggingRef = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  useVaulStickyFooter(contentRef, isDragging);
+  useVaulStickyFooter(contentRef, isDragging || isAnimating);
 
   /**
    * CONDITIONAL PROPS BASED ON VARIANT
@@ -108,8 +111,16 @@ export default function BaseDrawer({
       dismissible={_type === "morphing" ? !isPill : true}
       activeSnapPoint={snap}
       setActiveSnapPoint={setSnap}
-      onDrag={() => setIsDragging(true)}
-      onRelease={() => setIsDragging(false)}
+      onDrag={() => {
+        setIsDragging(true);
+        wasDraggingRef.current = true;
+      }}
+      onRelease={() => {
+        setIsDragging(false);
+        setTimeout(() => {
+          wasDraggingRef.current = false;
+        }, 50);
+      }}
     >
       {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
 
@@ -129,7 +140,7 @@ export default function BaseDrawer({
           ref={contentRef}
           className={cn(
             "fixed bottom-0 left-0 right-0 flex outline-none",
-            _type !== "floating" && "h-[100svh]",
+            _type !== "floating" && "h-[100dvh]",
             contentClassName,
           )}
           style={{ zIndex: contentZIndex }}
@@ -143,7 +154,6 @@ export default function BaseDrawer({
                   : isPill && _type === "morphing"
                     ? visibleHeight
                     : "100%",
-              paddingBottom: keyboardHeight > 0 ? `${keyboardOffset}px` : "0px",
             }}
           >
             {/* Invisible spacer that pushes the morphing pill down */}
@@ -160,23 +170,39 @@ export default function BaseDrawer({
 
             <div
               className={cn(
-                "mx-auto flex w-full flex-col overflow-hidden transition-[max-width,border-radius,margin] duration-300",
+                "mx-auto flex w-full flex-col transition-[max-width,border-radius,margin,padding] duration-300",
                 isPill
-                  ? "border-foreground/10 rounded-4xl mb-4 max-w-[calc(100%-2rem)] border"
-                  : "border-foreground/10 max-w-full rounded-t-[32px] border",
+                  ? "border-foreground/10 rounded-4xl mb-4 max-h-[calc(100svh-2rem)] max-w-[calc(100%-2rem)] overflow-hidden border"
+                  : "border-foreground/10 max-w-full overflow-hidden rounded-t-[32px] border",
                 frostedGlass ? "frosted-glass" : "bg-panel",
-                !isPill && "min-h-0 flex-1",
+                (_type === "floating" || !isPill) &&
+                  "max-h-full min-h-0 flex-1",
               )}
+              style={{
+                paddingBottom:
+                  keyboardOffset > 0 ? `${keyboardOffset}px` : "0px",
+              }}
             >
               <div
-                onClick={() => setSnap(snapPoints?.[1] ?? null)}
-                className="flex h-full min-h-0 w-full flex-1 flex-col"
+                onClick={() => {
+                  if (wasDraggingRef.current) return;
+                  if (isPill) {
+                    setIsAnimating(true);
+                    setSnap(snapPoints?.[1] ?? null);
+                    setIsAnimating(false);
+                  }
+                }}
+                className={cn(
+                  "flex w-full flex-col",
+                  (_type === "floating" || !isPill) && "h-full min-h-0 flex-1",
+                )}
               >
-                <div className="shrink-0 px-6 pb-2">
+                <div className="relative shrink-0 px-6 pb-2">
                   {showHandle && (
-                    <Drawer.Handle className="!bg-foreground/50 mx-auto mt-2 !w-14" />
+                    <Drawer.Handle className="!bg-foreground/50 mt-2 !w-14" />
                   )}
-                  <div className={cn(showHandle && "mt-1")}>
+
+                  <div className={cn(showHandle && "mt-2")}>
                     {(title || headerContent) && (
                       <div
                         className={cn(
@@ -208,6 +234,20 @@ export default function BaseDrawer({
                       {description}
                     </Drawer.Description>
                   </div>
+
+                  {_type !== "morphing" && (
+                    <div className="absolute right-4 top-3 z-10">
+                      <ActionButton
+                        buttonStyle="frosted glass"
+                        icon={<XIcon />}
+                        aria-label="Close drawer"
+                        onClick={(e) => {
+                          e?.stopPropagation();
+                          onOpenChange?.(false);
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div

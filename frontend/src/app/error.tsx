@@ -75,7 +75,6 @@ export default function EventErrorPage({
           } else {
             reset();
           }
-          return true;
         }}
       />
     </div>

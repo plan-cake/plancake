@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { CheckIcon } from "@radix-ui/react-icons";
+import { CheckIcon } from "lucide-react";
 
 import TextInputField from "@/components/text-input-field";
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
@@ -28,7 +28,7 @@ export default function Page() {
     defaultName !== (accountDetails?.defaultName || "");
 
   const applyDefaultName = async () => {
-    if (!isEditingDefaultName) return true;
+    if (!isEditingDefaultName) return;
     setDefaultNameError("");
     try {
       if (defaultName) {
@@ -37,28 +37,23 @@ export default function Page() {
             display_name: defaultName,
           });
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_SAVED);
-          return true;
         } catch (e) {
           const error = e as ApiErrorResponse;
           addToast("error", error.formattedMessage);
-          return false;
         }
       } else {
         try {
           await clientPost(ROUTES.account.removeDefaultName);
           setDefaultName("");
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_REMOVED);
-          return true;
         } catch (e) {
           const error = e as ApiErrorResponse;
           addToast("error", error.formattedMessage);
-          return false;
         }
       }
     } catch (e) {
       console.error("Fetch error:", e);
       addToast("error", MESSAGES.ERROR_GENERIC);
-      return false;
     }
   };
 
@@ -79,7 +74,7 @@ export default function Page() {
           <p className="mt-1 leading-tight opacity-75">
             Your email address is{" "}
             <span className="text-foreground font-semibold">
-              {accountDetails?.email}
+              {accountDetails?.email}.
             </span>
           </p>
         </div>

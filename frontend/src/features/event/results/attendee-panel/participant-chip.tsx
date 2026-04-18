@@ -1,4 +1,4 @@
-import { TrashIcon } from "@radix-ui/react-icons";
+import { Trash2Icon } from "lucide-react";
 
 import { cn } from "@/lib/utils/classname";
 
@@ -52,15 +52,19 @@ export default function ParticipantChip({
 
         // Availability Styling
         !isAvailable && "bg-gray-200/25 line-through opacity-50",
-        isAvailable && "bg-accent/25 text-accent-text opacity-100",
+        isAvailable && "bg-lion text-violet opacity-100",
+
+        !isAvailable && isSelected && "text-violet",
 
         // Selection Styling
         isSelected &&
-          "bg-accent ring-accent ring-offset-background text-white ring-2 ring-offset-1",
-        areSelected && !isSelected && "bg-gray-200/25",
+          "bg-lion ring-lion ring-offset-background ring-2 ring-offset-1",
+        areSelected && !isSelected && "text-foreground bg-gray-200/25",
 
         // Hover Styling
-        !isRemoving && !isSelected && "hover:bg-accent hover:text-white",
+        !isRemoving &&
+          !isSelected &&
+          "hover:ring-lion/50 hover:ring-offset-background hover:ring-2 hover:ring-offset-1",
 
         // Wiggle/Remove Styling
         isRemoving &&
@@ -82,7 +86,7 @@ export default function ParticipantChip({
 
       {isRemoving && (
         <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          <TrashIcon className="h-4 w-4" />
+          <Trash2Icon className="h-4 w-4" />
         </div>
       )}
     </li>

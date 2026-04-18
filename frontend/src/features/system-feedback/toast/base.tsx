@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
-import { Cross2Icon } from "@radix-ui/react-icons";
 import * as Toast from "@radix-ui/react-toast";
+import { XIcon } from "lucide-react";
 
 import ProgressBar from "@/features/system-feedback/toast/progress-bar";
 import { cn } from "@/lib/utils/classname";
@@ -113,7 +113,7 @@ export default function BaseToast({
               "opacity-0 focus-visible:opacity-100 group-hover:opacity-100",
           )}
         >
-          <Cross2Icon className="h-4 w-4" />
+          <XIcon className="h-4 w-4" />
         </button>
       </Toast.Close>
     </Toast.Root>

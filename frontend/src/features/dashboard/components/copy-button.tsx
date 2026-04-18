@@ -1,6 +1,6 @@
 import { MouseEvent } from "react";
 
-import { CopyIcon } from "@radix-ui/react-icons";
+import { CopyIcon } from "lucide-react";
 
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";

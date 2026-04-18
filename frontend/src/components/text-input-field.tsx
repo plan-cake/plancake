@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
-import {
-  EyeNoneIcon,
-  EyeOpenIcon,
-  ExclamationTriangleIcon,
-} from "@radix-ui/react-icons";
+import * as Collapsible from "@radix-ui/react-collapsible";
+import { EyeClosedIcon, EyeIcon, TriangleAlertIcon } from "lucide-react";
 
 import PasswordCriteria from "@/features/auth/components/password-criteria";
 import { cn } from "@/lib/utils/classname";
@@ -168,7 +165,7 @@ export default function TextInputField(props: TextInputFieldProps) {
         >
           {error ? (
             <span className="flex items-center gap-1">
-              <ExclamationTriangleIcon
+              <TriangleAlertIcon
                 className={`${className}`}
                 aria-hidden="true"
               />
@@ -187,20 +184,22 @@ export default function TextInputField(props: TextInputFieldProps) {
             className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
           >
             {showPassword ? (
-              <EyeOpenIcon className="h-5 w-5" />
+              <EyeIcon className="h-5 w-5" />
             ) : (
-              <EyeNoneIcon className="h-5 w-5" />
+              <EyeClosedIcon className="h-5 w-5" />
             )}
           </button>
         )}
       </div>
 
       {/* Password Criteria */}
-      {showPasswordCriteria && (
-        <div className="mt-2 w-full px-4">
-          <PasswordCriteria criteria={passwordCriteria} />
-        </div>
-      )}
+      <Collapsible.Root open={showPasswordCriteria}>
+        <Collapsible.Content className="collapsible-content">
+          <div className="px-4 pb-1 pt-2">
+            <PasswordCriteria criteria={passwordCriteria} />
+          </div>
+        </Collapsible.Content>
+      </Collapsible.Root>
     </div>
   );
 }

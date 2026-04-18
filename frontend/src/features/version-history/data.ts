@@ -121,6 +121,46 @@ export function getVersionHistoryData(): VersionHistoryData {
         },
       ],
     },
+    {
+      version: "v0.4",
+      releaseDate: { year: 2026, month: 3, day: 6 },
+      changes: [
+        "Added the ability to delete events on the dashboard",
+        "Added the account settings page",
+        "Updated the dark mode accent color",
+        "Updated the event results page to reduce clutter",
+        "Updated the appearance of events on the dashboard",
+        "Updated the event grid to list the ending hour on the left axis",
+        "Removed \"Intended Duration\" from events",
+      ],
+      bugFixes: [
+        "Fixed an issue where an invalid custom event code would not show an error",
+      ],
+      minorVersions: [
+        {
+          version: "v0.4.1",
+          releaseDate: { year: 2026, month: 3, day: 9 },
+          changes: [
+            "Updated the header on the attendees panel to display more relevant information",
+            "Updated drawer components to have close buttons for accessibility",
+            "Updated all icons on the site to be more consistent",
+            "Updated the appearance of the date picker when selecting a range",
+            "Adjusted the priority of banners shown on the results page",
+            "Fixed results grid hover behavior on mouse leave",
+            "Fixed an issue where focused dropdowns would not display a focus ring",
+          ],
+        },
+        {
+          version: "v0.4.2",
+          releaseDate: { year: 2026, month: 3, day: 10 },
+          changes: [
+            "Fixed the formatting of hovered timeslots for weekday events",
+            "Fixed the banner message prompting users to add availability on mobile",
+            "Fixed the attendee count display when there is only one participant",
+          ],
+        },
+      ],
+    }
   ];
 }
 

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useId, useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-import { DotsVerticalIcon } from "@radix-ui/react-icons";
-import { motion, AnimatePresence, Transition } from "framer-motion";
+import { AnimatePresence, motion, Transition } from "framer-motion";
+import { EllipsisVerticalIcon } from "lucide-react";
 
 import EmptyButton from "@/features/button/components/empty";
 import { cn } from "@/lib/utils/classname";
@@ -18,28 +18,36 @@ const morphTransition: Transition = {
 export default function KebabMenu({
   children,
   trigger,
+  open: controlledOpen,
   onOpenChange,
   nested = false,
 }: {
   children: React.ReactNode;
   trigger?: React.ReactNode;
+  open?: boolean;
   onOpenChange?: (open: boolean) => void;
   nested?: boolean;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
   const id = useId();
   const containerRef = useRef<HTMLDivElement>(null);
 
+  /* OPEN STATE MANAGEMENT */
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+
   const handleOpenChange = useCallback(
-    (open: boolean) => {
-      setIsOpen(open);
-      onOpenChange?.(open);
+    (newOpen: boolean) => {
+      if (!isControlled) {
+        setInternalOpen(newOpen);
+      }
+      onOpenChange?.(newOpen);
     },
-    [onOpenChange],
+    [isControlled, onOpenChange],
   );
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!open) return;
     const handleClickOutside = (event: MouseEvent) => {
       if (
         containerRef.current &&
@@ -50,23 +58,26 @@ export default function KebabMenu({
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [handleOpenChange, isOpen]);
+  }, [handleOpenChange, open]);
 
   return (
     <div className="relative" ref={containerRef}>
+      {/* The invisible trigger is used to reserve space in the layout for the
+      menu button, preventing layout shifts when the menu opens/closes. The
+      actual visible trigger is absolutely positioned on top of it and only
+      rendered when the menu is closed. */}
       <div className="pointer-events-none invisible" aria-hidden="true">
         {trigger ? (
           trigger
         ) : (
           <EmptyButton
             buttonStyle="semi-transparent"
-            icon={<DotsVerticalIcon />}
+            icon={<EllipsisVerticalIcon />}
           />
         )}
       </div>
-
       <AnimatePresence initial={false}>
-        {!isOpen ? (
+        {!open ? (
           <motion.div
             layout
             key="trigger"
@@ -74,7 +85,7 @@ export default function KebabMenu({
             transition={morphTransition}
             className="absolute right-0 top-0 z-10 inline-block cursor-pointer rounded-full"
             aria-haspopup="menu"
-            aria-expanded={isOpen}
+            aria-expanded={open}
             onClick={() => handleOpenChange(true)}
           >
             {trigger ? (
@@ -82,7 +93,7 @@ export default function KebabMenu({
             ) : (
               <EmptyButton
                 buttonStyle="semi-transparent"
-                icon={<DotsVerticalIcon />}
+                icon={<EllipsisVerticalIcon />}
               />
             )}
           </motion.div>
@@ -98,7 +109,17 @@ export default function KebabMenu({
               "frosted-glass overflow-hidden rounded-3xl p-4 shadow-lg",
               nested && "scale-110",
             )}
-            onClick={() => handleOpenChange(false)}
+            onClick={(e) => {
+              const target = e.target as HTMLElement;
+              if (
+                target.closest("button") ||
+                target.closest("a") ||
+                target.closest('[role="button"]') ||
+                target.closest('[role="menuitem"]')
+              ) {
+                handleOpenChange(false);
+              }
+            }}
           >
             {children}
           </motion.div>

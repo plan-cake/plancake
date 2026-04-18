@@ -32,7 +32,7 @@ export default function ChangePasswordDialog() {
 
   // Use `displayStep` instead of `flow.step` for the if/else blocks
   if (displayStep === "CHANGE") {
-    dialogTitle = "Change your password";
+    dialogTitle = "Change Your Password";
     onConfirmHandler = flow.handleChangePassword;
     dialogDescription = <ChangeStep flow={flow} />;
   } else if (displayStep === "OTP") {

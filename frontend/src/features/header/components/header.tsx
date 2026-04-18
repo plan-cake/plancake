@@ -17,13 +17,12 @@ const SCROLL_THRESHOLD = 50;
 
 export default function Header() {
   const [mounted, setMounted] = useState(false);
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   const isMobile = useCheckMobile();
   const lastScrollPoint = useRef(0);
   const scrollCheckpoint = useRef(0);
 
-  const { isShrunk, heightClass, shrink, expand } = useHeaderSize();
+  const { isShrunk, heightClass, shrink, expand, activeMenu } = useHeaderSize();
 
   useEffect(() => {
     setMounted(true);
@@ -77,16 +76,6 @@ export default function Header() {
     return null;
   }
 
-  const handleMenuChange = (menuName: string, isOpen: boolean) => {
-    if (isOpen) {
-      setActiveMenu(menuName);
-    } else if (activeMenu === menuName) {
-      setActiveMenu(null);
-    }
-  };
-
-  const isAnyMenuOpen = activeMenu !== null;
-
   return (
     <header className={cn(heightClass, "fixed top-0 z-40 w-full pt-4")}>
       <nav
@@ -104,27 +93,29 @@ export default function Header() {
         <LogoArea isShrunk={isShrunk} />
 
         <motion.div
-          layout
-          animate={{ scale: isAnyMenuOpen ? 0.95 : 1 }}
+          animate={{ scale: activeMenu ? 0.95 : 1 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className={cn(
-            "frosted-glass relative flex h-fit items-center rounded-full",
+            "relative isolate flex h-fit items-center rounded-full",
             "header-transition-[gap,padding]",
             isShrunk ? "gap-1 p-1" : "gap-2 p-2",
           )}
         >
+          <div
+            className="frosted-glass pointer-events-none absolute inset-0 -z-10 rounded-full"
+            aria-hidden="true"
+          />
+
           <NewEventButton />
           <ThemeToggle />
           <DashboardButton />
-          <AccountButton
-            onMenuOpenChange={(isOpen) => handleMenuChange("account", isOpen)}
-          />
+          <AccountButton />
 
           <div
             className={cn(
               "bg-violet/20 pointer-events-none absolute inset-0 rounded-full",
               "transition-opacity duration-300 ease-in-out",
-              isAnyMenuOpen ? "opacity-100" : "opacity-0",
+              activeMenu ? "opacity-100" : "opacity-0",
             )}
             aria-hidden="true"
           />

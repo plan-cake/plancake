@@ -14,7 +14,7 @@ export default function TimeColumn({
 }) {
   // generate hour labels for the time column
   const hoursLabel = useMemo(() => {
-    return Array.from({ length: numQuarterHours }, (_, i) => {
+    return Array.from({ length: numQuarterHours + 1 }, (_, i) => {
       const hour24 = startHour + Math.floor(i / 4);
       const hour12 = hour24 % 12 || 12;
       const period = hour24 < 12 ? "AM" : "PM";
@@ -31,7 +31,7 @@ export default function TimeColumn({
         gridTemplateRows: `repeat(${numQuarterHours}, minmax(20px, 1fr))`,
       }}
     >
-      {Array.from({ length: numQuarterHours }).map((_, i) =>
+      {Array.from({ length: numQuarterHours + 1 }).map((_, i) =>
         i % 4 === 0 ? (
           <div
             key={`label-${i}`}

@@ -35,9 +35,11 @@ export default function ChangeStep({ flow }: ChangePasswordStepProps) {
           }}
           onFocus={() => flow.setShowCriteria(true)}
           onBlur={() => {
-            if (!flow.form.newPassword || flow.passwordIsStrong) {
-              flow.setShowCriteria(false);
-            }
+            setTimeout(() => {
+              if (!flow.form.newPassword || flow.passwordIsStrong) {
+                flow.setShowCriteria(false);
+              }
+            }, 0);
           }}
           outlined
           error={flow.errors.newPassword || flow.errors.api}
@@ -58,7 +60,7 @@ export default function ChangeStep({ flow }: ChangePasswordStepProps) {
       </div>
       <div className="mt-4 flex flex-wrap justify-between gap-2 text-sm">
         <Checkbox
-          label="Logout of all other devices"
+          label="Sign out of all other devices"
           checked={flow.form.pruneSessions}
           onChange={() =>
             flow.updateForm("pruneSessions", !flow.form.pruneSessions)

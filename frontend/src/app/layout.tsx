@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Modak, Nunito } from "next/font/google";
 
@@ -78,6 +79,7 @@ export default async function RootLayout({
             <Header />
             {children}
           </Providers>
+          <Analytics />
         </div>
       </body>
     </html>

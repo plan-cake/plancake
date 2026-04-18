@@ -1,9 +1,4 @@
-import {
-  CheckIcon,
-  EraserIcon,
-  ExitIcon,
-  ResetIcon,
-} from "@radix-ui/react-icons";
+import { CheckIcon, EraserIcon, LogOutIcon, Undo2Icon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { useResultsContext } from "@/features/event/results/context";
@@ -25,6 +20,7 @@ export default function PanelHeader({
   isCollapsed = false,
 }: PanelHeaderProps) {
   const {
+    eventType,
     hoveredSlot,
     participants,
     filteredAvailabilities,
@@ -33,6 +29,7 @@ export default function PanelHeader({
     selectedParticipants,
     clearSelectedParticipants,
     currentUser,
+    timezone,
   } = useResultsContext();
 
   const activeCount = hoveredSlot
@@ -45,6 +42,26 @@ export default function PanelHeader({
   const showSelfRemove =
     !isCreator && currentUser && participants.includes(currentUser);
 
+  const formatHoveredSlot = () => {
+    const date = new Date(hoveredSlot!);
+
+    return eventType === "weekday"
+      ? date.toLocaleString(undefined, {
+          weekday: "long",
+          hour: "numeric",
+          minute: "numeric",
+          timeZone: timezone,
+        })
+      : date.toLocaleString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          timeZone: timezone,
+        });
+  };
+
   return (
     <div
       className={cn(
@@ -54,15 +71,25 @@ export default function PanelHeader({
     >
       <div className="flex flex-col items-start">
         <h2 className="text-md font-semibold">
-          {isRemoving ? "Removing a" : "A"}ttendees
+          {totalParticipants === 0
+            ? "No Attendees Yet"
+            : isRemoving
+              ? "Removing attendees"
+              : activeCount === null
+                ? hasSelection
+                  ? selectedParticipants.length +
+                    ` Attendee${selectedParticipants.length !== 1 ? "s" : ""} Selected`
+                  : totalParticipants +
+                    ` Attendee${totalParticipants !== 1 ? "s" : ""}`
+                : `${activeCount}/${gridNumParticipants} Available`}
         </h2>
         {gridNumParticipants > 0 && (
           <span className="text-sm opacity-75">
             {isRemoving
               ? `Select to remove`
-              : activeCount === null
+              : hoveredSlot === null
                 ? "Hover grid for availability"
-                : `${activeCount}/${gridNumParticipants} available`}
+                : formatHoveredSlot()}
           </span>
         )}
       </div>
@@ -71,11 +98,8 @@ export default function PanelHeader({
         <div className="space-x-2">
           <ActionButton
             buttonStyle="semi-transparent"
-            icon={<ResetIcon />}
-            onClick={() => {
-              clearSelectedParticipants();
-              return true;
-            }}
+            icon={<Undo2Icon />}
+            onClick={clearSelectedParticipants}
             disabled={!hasSelection}
             className={cn(
               "shrink-0 transition-opacity duration-200",
@@ -88,10 +112,7 @@ export default function PanelHeader({
             <ActionButton
               buttonStyle="semi-transparent"
               icon={isRemoving ? <CheckIcon /> : <EraserIcon />}
-              onClick={() => {
-                toggleRemoving();
-                return true;
-              }}
+              onClick={toggleRemoving}
               aria-label={isRemoving ? "Stop Removing" : "Remove Participants"}
               className={cn(
                 "shrink-0",
@@ -104,10 +125,9 @@ export default function PanelHeader({
           {showSelfRemove && (
             <ActionButton
               buttonStyle="semi-transparent"
-              icon={<ExitIcon />}
+              icon={<LogOutIcon />}
               onClick={() => {
                 promptRemove(currentUser);
-                return true;
               }}
               aria-label="Remove Self from Event"
               className="hover:bg-error/25 hover:text-error active:bg-error/40 shrink-0"

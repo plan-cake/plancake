@@ -1,7 +1,7 @@
 "use client";
 
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import {
@@ -64,10 +64,7 @@ export default function ScheduleHeader({
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronLeftIcon />}
-            onClick={() => {
-              onPrevPage();
-              return true;
-            }}
+            onClick={onPrevPage}
             className="ml-3 p-1.5"
             aria-label="Previous Page"
           />
@@ -118,10 +115,7 @@ export default function ScheduleHeader({
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronRightIcon />}
-            onClick={() => {
-              onNextPage();
-              return true;
-            }}
+            onClick={onNextPage}
             className="p-1.5"
             aria-label="Next Page"
           />
