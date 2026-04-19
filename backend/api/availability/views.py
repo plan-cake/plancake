@@ -136,15 +136,6 @@ def add_availability(request):
             # Update participant updated_at
             participant.save()
 
-            notify_live_update(
-                LiveUpdateData(
-                    event_code=event_code,
-                    action=LiveUpdateAction.ADD if new else LiveUpdateAction.UPDATE,
-                    display_name=display_name,
-                    availability=[time.isoformat() for time in availability],
-                )
-            )
-
     except UserEvent.DoesNotExist:
         return Response(
             {"error": {"event_code": ["Event not found."]}},
@@ -161,6 +152,15 @@ def add_availability(request):
             },
             status=400,
         )
+
+    notify_live_update(
+        LiveUpdateData(
+            event_code=event_code,
+            action=LiveUpdateAction.ADD if new else LiveUpdateAction.UPDATE,
+            display_name=display_name,
+            availability=[time.isoformat() for time in availability],
+        )
+    )
 
     logger.debug(
         f"Availability {'added' if new else 'updated'} for event with code: {event_code}"
