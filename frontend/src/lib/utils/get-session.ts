@@ -17,14 +17,12 @@ export type Session =
  * the presence of an authentication cookie and then making a server-side API call
  * to validate the session and fetch the user's account details.
  *
- * It is wrapped inReact's `cache` function to optimize performance by caching the
+ * It is wrapped in React's `cache` function to optimize performance by caching the
  * result of the session retrieval, but it is designed to bypass caching when
  * necessary to ensure that it always returns the correct session data for each user.
  */
 export const getSession = cache(async (): Promise<Session> => {
   const cookieString = await getAuthCookieString();
-  console.log("Retrieved cookie string:", cookieString);
-
   if (!cookieString.includes("account_sess_token")) {
     return { isLoggedIn: false, user: null };
   }
