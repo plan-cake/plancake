@@ -138,6 +138,18 @@ export function useEventResults(initialData: ResultsInformation) {
     [initialData],
   );
 
+  const liveRemoveParticipant = useCallback((displayName: string) => {
+    setParticipants((prev) => prev.filter((p) => p !== displayName));
+    setAvailability((prev) => {
+      const updated = { ...prev };
+      for (const slot in updated) {
+        updated[slot] = updated[slot].filter((p) => p !== displayName);
+      }
+      return updated;
+    });
+    setSelectedParticipants((prev) => prev.filter((p) => p !== displayName));
+  }, []);
+
   /* DERIVED LOGIC */
   const { filteredAvailabilities, gridNumParticipants, hasNoConsensus } =
     useMemo(() => {
@@ -234,5 +246,6 @@ export function useEventResults(initialData: ResultsInformation) {
 
     // Live Updates
     liveUpdateAvailability,
+    liveRemoveParticipant,
   };
 }

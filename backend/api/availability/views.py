@@ -417,7 +417,8 @@ def remove_self_availability(request):
     try:
         event = UserEvent.objects.get(url_code=event_code)
         # Because of the foreign key cascades, this should remove everything
-        EventParticipant.objects.get(user_event=event, user_account=user).delete()
+        participant = EventParticipant.objects.get(user_event=event, user_account=user)
+        participant.delete()
 
     except UserEvent.DoesNotExist:
         return Response(
@@ -426,6 +427,15 @@ def remove_self_availability(request):
         )
     except EventParticipant.DoesNotExist:
         return NOT_PARTICIPATED_ERROR
+
+    notify_live_update(
+        LiveUpdateData(
+            event_code=event_code,
+            action=LiveUpdateAction.REMOVE,
+            display_name=participant.display_name,
+            availability=None,
+        )
+    )
 
     return Response({"message": ["Availability removed successfully."]}, status=200)
 
@@ -470,5 +480,14 @@ def remove_availability(request):
             {"error": {"general": ["Event participant not found."]}},
             status=404,
         )
+
+    notify_live_update(
+        LiveUpdateData(
+            event_code=event_code,
+            action=LiveUpdateAction.REMOVE,
+            display_name=display_name,
+            availability=None,
+        )
+    )
 
     return Response({"message": ["Availability removed successfully."]}, status=200)

@@ -50,6 +50,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     currentUser,
     isCreator,
     liveUpdateAvailability,
+    liveRemoveParticipant,
   } = useResultsContext();
 
   const {
@@ -79,6 +80,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         } else {
           addToast("info", `${data.display_name} updated their availability.`);
         }
+      } else if (data.action === "remove") {
+        liveRemoveParticipant(data.display_name);
+        addToast("info", `${data.display_name} left the event.`);
       }
     };
 
@@ -87,7 +91,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     return () => {
       evtSource.close();
     };
-  }, [addToast, eventCode, liveUpdateAvailability]);
+  }, [addToast, eventCode, liveUpdateAvailability, liveRemoveParticipant]);
 
   /* TIMEZONE HANDLING */
   const handleTZChange = (newTZ: string | number) => {
