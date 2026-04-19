@@ -8,7 +8,15 @@ import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { serverGet } from "@/lib/utils/api/server-fetch";
 
-// 2. Wrap your entire async function in cache()
+/**
+ * This function retrieves the current user's session information by checking for
+ * the presence of an authentication cookie and then making a server-side API call
+ * to validate the session and fetch the user's account details.
+ *
+ * It is wrapped inReact's `cache` function to optimize performance by caching the
+ * result of the session retrieval, but it is designed to bypass caching when
+ * necessary to ensure that it always returns the correct session data for each user.
+ */
 export const getSession = cache(async (): Promise<AccountDetails | null> => {
   const cookieString = await getAuthCookieString();
   console.log("Retrieved cookie string:", cookieString);
@@ -19,8 +27,11 @@ export const getSession = cache(async (): Promise<AccountDetails | null> => {
 
   try {
     const data = await serverGet(ROUTES.auth.checkAccountAuth, undefined, {
-      // Keep this! It stops Next.js from aggressively caching the
-      // result across DIFFERENT users/requests.
+      // By default, Next.js may cache the result of this function and serve it to
+      // multiple users, which is a problem because this function returns
+      // user-specific data. By setting cache: "no-store", we ensure that Next.js
+      // does not cache the result and instead calls this function on every request,
+      // allowing it to return the correct session data for each user.
       cache: "no-store",
     });
     return {

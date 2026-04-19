@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { getSession } from "@/features/account/get-session";
 import { SettingsProvider } from "@/features/account/settings/context";
 import SettingsNav from "@/features/account/settings/sidebar-nav";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
+import { getSession } from "@/lib/utils/get-session";
 
 export function generateMetadata(): Metadata {
   return constructMetadata(
