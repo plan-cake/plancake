@@ -27,7 +27,13 @@ from api.models import (
     UserEvent,
 )
 from api.settings import ThrottleScopes
-from api.utils import MessageOutputSerializer, check_rate_limit
+from api.utils import (
+    LiveUpdateAction,
+    LiveUpdateData,
+    MessageOutputSerializer,
+    check_rate_limit,
+    notify_live_update,
+)
 
 logger = logging.getLogger("api")
 
@@ -129,6 +135,15 @@ def add_availability(request):
 
             # Update participant updated_at
             participant.save()
+
+            notify_live_update(
+                LiveUpdateData(
+                    event_code=event_code,
+                    action=LiveUpdateAction.ADD if new else LiveUpdateAction.UPDATE,
+                    display_name=display_name,
+                    availability=[time.isoformat() for time in availability],
+                )
+            )
 
     except UserEvent.DoesNotExist:
         return Response(

@@ -1,9 +1,12 @@
+import asyncio
 import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from django.db import transaction
 from django.db.models import Q
+from django.http import StreamingHttpResponse
+from redis.asyncio import Redis
 from rest_framework.response import Response
 
 from api.availability.utils import get_weekday_date
@@ -34,7 +37,12 @@ from api.event.utils import (
     validate_weekday_timeslots,
 )
 from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
-from api.settings import GENERIC_ERR_RESPONSE, ThrottleScopes
+from api.settings import (
+    GENERIC_ERR_RESPONSE,
+    LIVE_UPDATES_HEARTBEAT_SECONDS,
+    LIVE_UPDATES_URL,
+    ThrottleScopes,
+)
 from api.utils import MessageOutputSerializer, check_rate_limit, format_event_info
 
 logger = logging.getLogger("api")
@@ -427,3 +435,25 @@ def get_event_details(request):
         },
         status=200,
     )
+
+
+async def get_live_updates(_, event_code):
+    async def event_generator():
+        # Using async Redis client
+        client: Redis = Redis.from_url(LIVE_UPDATES_URL)
+        pubsub = client.pubsub()
+        await pubsub.subscribe(f"event_{event_code}")
+
+        try:
+            while True:
+                message = await pubsub.get_message(ignore_subscribe_messages=True)
+                if message:
+                    data = message["data"].decode("utf-8")
+                    yield f"data: {data}\n\n"
+                await asyncio.sleep(LIVE_UPDATES_HEARTBEAT_SECONDS)
+        except Exception:
+            await pubsub.unsubscribe(f"event_{event_code}")
+        finally:
+            await client.aclose()
+
+    return StreamingHttpResponse(event_generator(), content_type="text/event-stream")

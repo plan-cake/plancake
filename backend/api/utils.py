@@ -1,8 +1,11 @@
+import json
 import logging
 from datetime import datetime, timedelta
+from enum import Enum
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.db.models import Q
+from redis import Redis
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.throttling import SimpleRateThrottle
@@ -14,6 +17,7 @@ from api.settings import (
     COOKIE_DOMAIN,
     DEBUG,
     GUEST_COOKIE_NAME,
+    LIVE_UPDATES_URL,
     LONG_SESS_EXP_SECONDS,
     SESS_EXP_SECONDS,
     TEST_ENVIRONMENT,
@@ -309,3 +313,37 @@ def prune_account_sessions(request):
     UserSession.objects.filter(user_account=request.user).exclude(
         session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
     ).delete()
+
+
+class LiveUpdateAction(str, Enum):
+    ADD = "add"
+    UPDATE = "update"
+    REMOVE = "remove"
+    EVENT_EDIT = "event_edit"
+
+
+class LiveUpdateData:
+    def __init__(
+        self,
+        event_code: str,
+        action: LiveUpdateAction,
+        display_name: str | None,
+        availability: list[str] | None,
+    ):
+        self.event_code = event_code
+        self.action = action
+        self.display_name = display_name
+        self.availability = availability
+
+
+def notify_live_update(data: LiveUpdateData):
+    Redis.from_url(LIVE_UPDATES_URL).publish(
+        f"event_{data.event_code}",
+        json.dumps(
+            {
+                "action": data.action,
+                "display_name": data.display_name,
+                "availability": data.availability,
+            }
+        ),
+    )
