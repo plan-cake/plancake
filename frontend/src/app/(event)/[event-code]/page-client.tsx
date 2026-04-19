@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { PencilIcon, SquarePenIcon } from "lucide-react";
 
@@ -20,6 +20,7 @@ import ResultsDrawer from "@/features/event/results/drawer";
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import { useHeaderSize } from "@/features/header/context";
+import { useToast } from "@/features/system-feedback";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -48,6 +49,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     setTimezone,
     currentUser,
     isCreator,
+    liveUpdateAvailability,
   } = useResultsContext();
 
   const {
@@ -56,6 +58,36 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     eventRange,
     timeslots,
   } = eventData;
+
+  const { addToast } = useToast();
+
+  useEffect(() => {
+    const evtSource = new EventSource(
+      process.env.NEXT_PUBLIC_API_URL + `/event/get-updates/${eventCode}/`,
+    );
+
+    evtSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.action === "add" || data.action === "update") {
+        liveUpdateAvailability(
+          data.action,
+          data.display_name,
+          data.availability,
+        );
+        if (data.action === "add") {
+          addToast("info", `${data.display_name} joined the event!`);
+        } else {
+          addToast("info", `${data.display_name} updated their availability.`);
+        }
+      }
+    };
+
+    setTimeout(() => evtSource.close(), 1000 * 120); // Close connection after 120 seconds
+
+    return () => {
+      evtSource.close();
+    };
+  }, [addToast, eventCode, liveUpdateAvailability]);
 
   /* TIMEZONE HANDLING */
   const handleTZChange = (newTZ: string | number) => {
