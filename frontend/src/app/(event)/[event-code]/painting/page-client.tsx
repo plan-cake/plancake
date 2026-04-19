@@ -29,7 +29,7 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { SelfAvailability } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
 import { timeslotToISOString } from "@/lib/utils/date-time-format";
-import { Session } from "@/lib/utils/get-session";
+import type { Session } from "@/lib/utils/get-session";
 
 export default function ClientPage({
   session,
