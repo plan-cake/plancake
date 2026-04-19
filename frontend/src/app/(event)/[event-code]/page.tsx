@@ -74,6 +74,7 @@ export default async function Page({ params }: EventCodePageProps) {
       }}
       initialAvailabilityData={{
         eventType: eventRange.type,
+        timezone: eventRange.timezone,
         participants: availabilityData.participants,
         availability: availabilityData.availability,
         currentUser: availabilityData.user_display_name,
