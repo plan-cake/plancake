@@ -22,7 +22,7 @@ export default async function SettingsLayout({
   const session = await getSession();
 
   if (!session.isLoggedIn) {
-    redirect("/login?redirect=/settings");
+    redirect("/login?callbackUrl=/settings&unauthorized=true");
   }
 
   return (
