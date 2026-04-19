@@ -1,7 +1,7 @@
 import {
   startTransition,
-  useEffect,
   useCallback,
+  useEffect,
   useMemo,
   useOptimistic,
   useState,
@@ -13,14 +13,22 @@ import { ResultsInformation } from "@/features/event/results/lib/types";
 import { findConsensusAndConflicts } from "@/features/event/results/lib/utils";
 import { useToast } from "@/features/system-feedback/toast/context";
 import { MESSAGES } from "@/lib/messages";
+import { formatDateTime } from "@/lib/utils/date-time-format";
 
 export function useEventResults(initialData: ResultsInformation) {
   const { addToast } = useToast();
 
-  const { eventCode, isCreator, participants, availability, currentUser } =
-    initialData;
+  const { eventCode, isCreator, currentUser } = initialData;
 
   /* STATES */
+  const [participants, setParticipants] = useState(initialData.participants);
+  const [availability, setAvailability] = useState(initialData.availability);
+  useEffect(() => {
+    // Sync if initialData changes, which only happens if data is completely refetched
+    setParticipants(initialData.participants);
+    setAvailability(initialData.availability);
+  }, [initialData.participants, initialData.availability]);
+
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
     [],
   );
@@ -96,6 +104,39 @@ export function useEventResults(initialData: ResultsInformation) {
 
     return result.success;
   };
+
+  const liveUpdateAvailability = useCallback(
+    (action: "add" | "update", displayName: string, newSlots: string[]) => {
+      if (action === "add") {
+        setParticipants((prev) => [...prev, displayName]);
+      }
+
+      setAvailability((prev) => {
+        const updated = { ...prev };
+        if (action === "update") {
+          // Remove user from existing slots they are no longer in
+          for (const slot in updated) {
+            updated[slot] = updated[slot].filter((p) => p !== displayName);
+          }
+        }
+
+        // Add user to their new slots
+        newSlots.forEach((slot) => {
+          slot = formatDateTime(slot, initialData.timezone, initialData.eventType);
+
+          if (!updated[slot]) {
+            // Ignore
+            return;
+          }
+          if (action === "add" || !updated[slot].includes(displayName)) {
+            updated[slot] = [...updated[slot], displayName];
+          }
+        });
+        return updated;
+      });
+    },
+    [initialData],
+  );
 
   /* DERIVED LOGIC */
   const { filteredAvailabilities, gridNumParticipants, hasNoConsensus } =
@@ -190,5 +231,8 @@ export function useEventResults(initialData: ResultsInformation) {
     handleRemoveParticipant,
     setShowOnlyBestTimes,
     setTimezone,
+
+    // Live Updates
+    liveUpdateAvailability,
   };
 }
