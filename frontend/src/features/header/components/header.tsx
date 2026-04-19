@@ -5,12 +5,11 @@ import { getSession } from "@/lib/utils/get-session";
 
 export default async function Header() {
   const session = await getSession();
-  const isLoggedIn = session !== null;
 
   return (
     <ShrinkingHeader>
-      {isLoggedIn ? (
-        <AccountButton accountDetails={session} />
+      {session.isLoggedIn ? (
+        <AccountButton accountDetails={session.user} />
       ) : (
         <LoginButton />
       )}

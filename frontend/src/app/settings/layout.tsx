@@ -19,9 +19,9 @@ export default async function SettingsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const accountDetails = await getSession();
+  const session = await getSession();
 
-  if (!accountDetails) {
+  if (!session.isLoggedIn) {
     redirect("/login?redirect=/settings");
   }
 
@@ -42,7 +42,7 @@ export default async function SettingsLayout({
         </aside>
 
         <main className="flex max-w-2xl flex-1 flex-col gap-6">
-          <SettingsProvider accountDetails={accountDetails}>
+          <SettingsProvider accountDetails={session.user}>
             {children}
           </SettingsProvider>
         </main>

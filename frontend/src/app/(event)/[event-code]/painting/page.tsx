@@ -41,7 +41,7 @@ export default async function Page({ params }: EventCodePageProps) {
     notFound();
   }
 
-  const accountDetails = await getSession();
+  const session = await getSession();
   const [eventData, initialAvailabilityData] = await Promise.all([
     getCachedEventDetails(eventCode),
     serverGet(
@@ -63,12 +63,12 @@ export default async function Page({ params }: EventCodePageProps) {
 
   return (
     <ClientPage
+      session={session}
       eventCode={eventCode}
       eventName={eventName}
       eventRange={eventRange}
       timeslots={timeslots}
       initialData={initialAvailabilityData}
-      accountDetails={accountDetails}
     />
   );
 }

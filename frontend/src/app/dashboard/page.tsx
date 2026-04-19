@@ -17,13 +17,13 @@ export function generateMetadata(): Metadata {
 }
 
 export default async function Page() {
-  const accountDetails = await getSession();
+  const session = await getSession();
   try {
     const eventData = await serverGet(ROUTES.dashboard.get, undefined, {
       cache: "no-store",
     });
     const processedData = processDashboardData(eventData);
-    return <ClientPage {...processedData} logged_in={!!accountDetails} />;
+    return <ClientPage {...processedData} logged_in={session.isLoggedIn} />;
   } catch (e) {
     const error = e as ApiErrorResponse;
     handleErrorResponse(error.status, error.data);

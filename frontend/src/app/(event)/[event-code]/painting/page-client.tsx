@@ -10,7 +10,6 @@ import Checkbox from "@/components/checkbox";
 import MobileFooterTray from "@/components/mobile-footer-tray";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
-import { AccountDetails } from "@/features/account/type";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
@@ -30,21 +29,22 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { SelfAvailability } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
 import { timeslotToISOString } from "@/lib/utils/date-time-format";
+import { Session } from "@/lib/utils/get-session";
 
 export default function ClientPage({
+  session,
   eventCode,
   eventName,
   eventRange,
   timeslots,
   initialData,
-  accountDetails,
 }: {
+  session: Session;
   eventCode: string;
   eventName: string;
   eventRange: EventRange;
   timeslots: Date[];
   initialData: SelfAvailability | null;
-  accountDetails: AccountDetails | null;
 }) {
   const router = useRouter();
 
@@ -130,25 +130,25 @@ export default function ClientPage({
   const nameInitialized = useRef(!!initialData);
   useEffect(() => {
     // If the name is already initialized (either by user input or because we're
-    // editing), or if we don't have account details, do nothing
-    if (nameInitialized.current || !accountDetails) return;
+    // editing), or if the user is not logged in, don't try to autofill the name
+    if (nameInitialized.current || !session.isLoggedIn) return;
 
     // If the user doesn't have a default name, mark the name as initialized to
     // avoid trying to autofill on every render
-    if (!accountDetails.defaultName) {
+    if (!session.user.defaultName) {
       nameInitialized.current = true;
       return;
     }
 
     // If the user has a default name, use it to autofill the name field
-    const newName = accountDetails.defaultName;
+    const newName = session.user.defaultName;
     setDisplayName(newName);
     handleNameChange(newName);
     addToast("success", MESSAGES.INFO_NAME_AUTOFILLED, {
       title: "NAME AUTOFILLED",
     });
     nameInitialized.current = true;
-  }, [accountDetails, setDisplayName, addToast, handleNameChange]);
+  }, [session, setDisplayName, addToast, handleNameChange]);
 
   // SUBMIT AVAILABILITY
   const handleSubmitAvailability = async () => {
@@ -177,7 +177,7 @@ export default function ClientPage({
 
     // Save the default name if checkbox checked
     if (saveDefaultName) {
-      if (accountDetails) {
+      if (session.isLoggedIn) {
         try {
           await clientPost(ROUTES.account.setDefaultName, {
             display_name: displayName,
@@ -298,7 +298,7 @@ export default function ClientPage({
               <br />
               add your availabilities here
             </div>
-            {accountDetails && !accountDetails!.defaultName && (
+            {session.isLoggedIn && !session.user.defaultName && (
               <div className="text-foreground/75">
                 <Checkbox
                   label="Save as nickname for autofill"

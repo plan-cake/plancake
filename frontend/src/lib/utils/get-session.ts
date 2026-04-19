@@ -8,6 +8,10 @@ import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { serverGet } from "@/lib/utils/api/server-fetch";
 
+export type Session =
+  | { isLoggedIn: true; user: AccountDetails }
+  | { isLoggedIn: false; user: null };
+
 /**
  * This function retrieves the current user's session information by checking for
  * the presence of an authentication cookie and then making a server-side API call
@@ -17,12 +21,12 @@ import { serverGet } from "@/lib/utils/api/server-fetch";
  * result of the session retrieval, but it is designed to bypass caching when
  * necessary to ensure that it always returns the correct session data for each user.
  */
-export const getSession = cache(async (): Promise<AccountDetails | null> => {
+export const getSession = cache(async (): Promise<Session> => {
   const cookieString = await getAuthCookieString();
   console.log("Retrieved cookie string:", cookieString);
 
   if (!cookieString.includes("account_sess_token")) {
-    return null;
+    return { isLoggedIn: false, user: null };
   }
 
   try {
@@ -35,14 +39,17 @@ export const getSession = cache(async (): Promise<AccountDetails | null> => {
       cache: "no-store",
     });
     return {
-      email: data.email,
-      defaultName: data.default_display_name,
+      isLoggedIn: true,
+      user: {
+        email: data.email,
+        defaultName: data.default_display_name,
+      },
     };
   } catch (e) {
     const error = e as ApiErrorResponse;
 
     if (error.status === 401 || error.status === 403) {
-      return null;
+      return { isLoggedIn: false, user: null };
     }
 
     throw error;
