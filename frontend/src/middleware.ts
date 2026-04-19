@@ -11,9 +11,9 @@ const authRoutes = [
 const protectedRoutes = ["/settings"];
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
-  const path = request.nextUrl.pathname;
+  let response = NextResponse.next();
 
+  const path = request.nextUrl.pathname;
   const hasAccountSessToken = request.cookies.has("account_sess_token");
 
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
@@ -26,17 +26,17 @@ export function middleware(request: NextRequest) {
   if (hasAccountSessToken && isAuthRoute) {
     const dashboardUrl = new URL("/dashboard", request.nextUrl);
     dashboardUrl.searchParams.set("alreadyLoggedIn", "true");
-    return NextResponse.redirect(dashboardUrl);
+    response = NextResponse.redirect(dashboardUrl);
   }
 
   // If the user is not logged in and tries to access a protected route (like
   // settings), redirect them to the login page. A callbackUrl is included so users
   // can be redirected back after logging in.
-  if (!hasAccountSessToken && isProtectedRoute) {
+  else if (!hasAccountSessToken && isProtectedRoute) {
     const loginUrl = new URL("/login", request.nextUrl);
     loginUrl.searchParams.set("callbackUrl", path);
     loginUrl.searchParams.set("unauthorized", "true");
-    return NextResponse.redirect(loginUrl);
+    response = NextResponse.redirect(loginUrl);
   }
 
   if (process.env.NEXT_PUBLIC_DEBUG !== "true") {
