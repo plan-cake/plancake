@@ -10,6 +10,7 @@ import handleErrorResponse from "@/lib/utils/api/handle-api-error";
 import { processEventData } from "@/lib/utils/api/processors/process-event-data";
 import { serverGet } from "@/lib/utils/api/server-fetch";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
+import { getSession } from "@/lib/utils/get-session";
 
 export async function generateMetadata({
   params,
@@ -40,6 +41,7 @@ export default async function Page({ params }: EventCodePageProps) {
     notFound();
   }
 
+  const accountDetails = await getSession();
   const [eventData, initialAvailabilityData] = await Promise.all([
     getCachedEventDetails(eventCode),
     serverGet(
@@ -66,6 +68,7 @@ export default async function Page({ params }: EventCodePageProps) {
       eventRange={eventRange}
       timeslots={timeslots}
       initialData={initialAvailabilityData}
+      accountDetails={accountDetails}
     />
   );
 }
