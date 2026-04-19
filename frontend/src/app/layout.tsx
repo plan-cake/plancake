@@ -1,8 +1,11 @@
+import { Suspense } from "react";
+
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Modak, Nunito } from "next/font/google";
 
 import Header from "@/features/header/components/header";
+import ToastListener from "@/features/system-feedback/toast/listener";
 import { Providers } from "@/lib/providers";
 import "@/styles/globals.css";
 
@@ -76,6 +79,9 @@ export default async function RootLayout({
       <body className="font-sans antialiased">
         <div className="mx-auto flex min-h-dvh max-w-[1440px] flex-col">
           <Providers>
+            <Suspense fallback={null}>
+              <ToastListener />
+            </Suspense>
             <Header />
             {children}
           </Providers>

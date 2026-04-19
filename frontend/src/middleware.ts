@@ -17,22 +17,25 @@ export function middleware(request: NextRequest) {
   const hasAccountSessToken = request.cookies.has("account_sess_token");
 
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
-  const isPretectedRoute = protectedRoutes.some((route) =>
+  const isProtectedRoute = protectedRoutes.some((route) =>
     path.startsWith(route),
   );
 
   // If the user is logged in and tries to access an auth route, redirect them
-  // to the dashboard.
+  // to the dashboard and attach a flag.
   if (hasAccountSessToken && isAuthRoute) {
-    return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
+    const dashboardUrl = new URL("/dashboard", request.nextUrl);
+    dashboardUrl.searchParams.set("alreadyLoggedIn", "true");
+    return NextResponse.redirect(dashboardUrl);
   }
 
   // If the user is not logged in and tries to access a protected route (like
   // settings), redirect them to the login page. A callbackUrl is included so users
   // can be redirected back after logging in.
-  if (!hasAccountSessToken && isPretectedRoute) {
+  if (!hasAccountSessToken && isProtectedRoute) {
     const loginUrl = new URL("/login", request.nextUrl);
     loginUrl.searchParams.set("callbackUrl", path);
+    loginUrl.searchParams.set("unauthorized", "true");
     return NextResponse.redirect(loginUrl);
   }
 
