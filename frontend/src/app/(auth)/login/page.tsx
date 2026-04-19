@@ -15,6 +15,7 @@ import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
+import { getSafeRedirectUrl } from "@/lib/utils/url";
 
 export default function Page() {
   const [email, setEmail] = useState("");
@@ -23,7 +24,7 @@ export default function Page() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const callbackUrl = getSafeRedirectUrl(searchParams.get("callbackUrl"));
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
