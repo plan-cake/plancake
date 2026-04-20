@@ -136,6 +136,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       } else if (data.action === "event_edit") {
         addToast("info", `The event was edited, reload the page for updates.`, {
           isPersistent: true,
+          title: "EVENT UPDATED",
         });
         setEventEdited(true);
       } else {
