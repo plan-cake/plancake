@@ -83,6 +83,13 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       } else if (data.action === "remove") {
         liveRemoveParticipant(data.display_name);
         addToast("info", `${data.display_name} left the event.`);
+      } else if (data.action === "event_edit") {
+        addToast("info", `The event was edited, reload the page for updates.`, {
+          isPersistent: true,
+        });
+        evtSource.close();
+      } else {
+        console.warn("Unknown action received in live update:", data);
       }
     };
 

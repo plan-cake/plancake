@@ -43,7 +43,14 @@ from api.settings import (
     LIVE_UPDATES_URL,
     ThrottleScopes,
 )
-from api.utils import MessageOutputSerializer, check_rate_limit, format_event_info
+from api.utils import (
+    LiveUpdateAction,
+    LiveUpdateData,
+    MessageOutputSerializer,
+    check_rate_limit,
+    format_event_info,
+    notify_live_update,
+)
 
 logger = logging.getLogger("api")
 
@@ -292,6 +299,15 @@ def edit_date_event(request):
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
 
+    notify_live_update(
+        LiveUpdateData(
+            event_code=event_code,
+            action=LiveUpdateAction.EVENT_EDIT,
+            display_name=None,
+            availability=None,
+        )
+    )
+
     logger.debug(f"Event updated with code: {event_code}")
     return Response({"message": ["Event updated successfully."]}, status=200)
 
@@ -360,6 +376,15 @@ def edit_week_event(request):
 
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
+
+    notify_live_update(
+        LiveUpdateData(
+            event_code=event_code,
+            action=LiveUpdateAction.EVENT_EDIT,
+            display_name=None,
+            availability=None,
+        )
+    )
 
     logger.debug(f"Event updated with code: {event_code}")
     return Response({"message": ["Event updated successfully."]}, status=200)
