@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 
 from django.db import transaction
 from django.db.models import Q
-from django.http import StreamingHttpResponse
+from django.http import JsonResponse, StreamingHttpResponse
 from redis.asyncio import Redis
 from rest_framework.response import Response
 
@@ -41,6 +41,8 @@ from api.settings import (
     GENERIC_ERR_RESPONSE,
     LIVE_UPDATES_HEARTBEAT_SECONDS,
     LIVE_UPDATES_URL,
+    MAX_LIVE_CONNECTIONS_EVENT,
+    MAX_LIVE_CONNECTIONS_GLOBAL,
     ThrottleScopes,
 )
 from api.utils import (
@@ -463,14 +465,50 @@ def get_event_details(request):
 
 
 async def get_live_updates(_, event_code):
+    # Using async Redis client
+    client: Redis = Redis.from_url(LIVE_UPDATES_URL)
+
+    GLOBAL_COUNT = "live_updates_global_count"
+    EVENT_COUNT = f"live_updates_event_{event_code}_count"
+
+    # Check global limit
+    global_count = int(await client.get(GLOBAL_COUNT) or 0)
+    if global_count >= MAX_LIVE_CONNECTIONS_GLOBAL:
+        await client.aclose()
+        return JsonResponse(
+            {"error": {"general": ["Live updates are currently unavailable."]}},
+            status=503,
+        )
+
+    # Check per-event limit
+    event_count = int(await client.get(EVENT_COUNT) or 0)
+    if event_count >= MAX_LIVE_CONNECTIONS_EVENT:
+        await client.aclose()
+        return JsonResponse(
+            {
+                "error": {
+                    "general": [
+                        "Live updates for this event are currently unavailable."
+                    ]
+                }
+            },
+            status=503,
+        )
+
     async def event_generator():
-        # Using async Redis client
-        client: Redis = Redis.from_url(LIVE_UPDATES_URL)
+        # Increment counts
+        await client.incr(GLOBAL_COUNT)
+        await client.incr(EVENT_COUNT)
+
         pubsub = client.pubsub()
         await pubsub.subscribe(f"event_{event_code}")
 
         try:
             while True:
+                # Expire after 10 seconds to prevent stale counts if the server crashes
+                await client.expire(GLOBAL_COUNT, 10)
+                await client.expire(EVENT_COUNT, 10)
+
                 message = await pubsub.get_message(ignore_subscribe_messages=True)
                 if message:
                     data = message["data"].decode("utf-8")
@@ -480,5 +518,7 @@ async def get_live_updates(_, event_code):
             await pubsub.unsubscribe(f"event_{event_code}")
         finally:
             await client.aclose()
+            await client.decr(GLOBAL_COUNT)
+            await client.decr(EVENT_COUNT)
 
     return StreamingHttpResponse(event_generator(), content_type="text/event-stream")

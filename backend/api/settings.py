@@ -171,6 +171,8 @@ CELERY_BROKER_URL = "redis://localhost:6379/0"
 # Live updates
 LIVE_UPDATES_URL = "redis://localhost:6379/1"
 LIVE_UPDATES_HEARTBEAT_SECONDS = 2
+MAX_LIVE_CONNECTIONS_EVENT = 25
+MAX_LIVE_CONNECTIONS_GLOBAL = 500
 
 LOG_DIR = env("LOG_DIR")
 os.makedirs(LOG_DIR, exist_ok=True)  # Make the log directory if it doesn't exist
