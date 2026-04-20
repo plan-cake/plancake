@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { SettingsProvider } from "@/features/account/settings/context";
@@ -22,7 +23,11 @@ export default async function SettingsLayout({
   const session = await getSession();
 
   if (!session.isLoggedIn) {
-    redirect("/login?callbackUrl=/settings&unauthorized=true");
+    const headersList = await headers();
+    const currentPath = headersList.get("x-pathname") || "/settings";
+
+    const encodedCallback = encodeURIComponent(currentPath);
+    redirect(`/login?callbackUrl=${encodedCallback}&unauthorized=true`);
   }
 
   return (

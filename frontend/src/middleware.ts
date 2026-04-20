@@ -11,7 +11,17 @@ const authRoutes = [
 const protectedRoutes = ["/settings"];
 
 export function middleware(request: NextRequest) {
-  let response = NextResponse.next();
+  // Clone the request headers and inject the exact pathname into a custom header.
+  // This allows server-side code (like getSession()) to determine the user's
+  // intended destination.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
+
+  let response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 
   const path = request.nextUrl.pathname;
   const hasAccountSessToken = request.cookies.has("account_sess_token");
@@ -56,6 +66,9 @@ export function middleware(request: NextRequest) {
       // to be safe, since long session cookies have a 1 year lifetime
 
       cookieNames.forEach((name) => {
+        // Because we initialized `response` with NextResponse.next() above,
+        // we can safely append headers to it here. If response was reassigned
+        // to a redirect, appending headers still works.
         response.headers.append(
           "Set-Cookie",
           `${name}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`,
