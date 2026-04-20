@@ -13,13 +13,14 @@ export type Session =
   | { isLoggedIn: false; user: null };
 
 /**
- * This function retrieves the current user's session information by checking for
- * the presence of an authentication cookie and then making a server-side API call
- * to validate the session and fetch the user's account details.
+ * Retrieves the current user's session information by checking for the presence
+ * of an authentication cookie and validating the session against the server.
  *
- * It is wrapped in React's `cache` function to optimize performance by caching the
- * result of the session retrieval, but it is designed to bypass caching when
- * necessary to ensure that it always returns the correct session data for each user.
+ * This function is memoized using React's `cache()` to optimize performance by
+ * preventing redundant network requests during a single page render. It also
+ * uses `cache: "no-store"` for the underlying fetch request to ensure that session
+ * data is never shared across different requests or users, guaranteeing fresh
+ * authentication checks.
  */
 export const getSession = cache(async (): Promise<Session> => {
   const cookieString = await getAuthCookieString();
