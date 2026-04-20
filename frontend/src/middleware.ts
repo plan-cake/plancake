@@ -1,13 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const authRoutes = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
-  "/verify-email",
-];
-
 const protectedRoutes = ["/settings"];
 
 export function middleware(request: NextRequest) {
@@ -26,23 +18,14 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const hasAccountSessToken = request.cookies.has("account_sess_token");
 
-  const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
   const isProtectedRoute = protectedRoutes.some((route) =>
     path.startsWith(route),
   );
 
-  // If the user is logged in and tries to access an auth route, redirect them
-  // to the dashboard and attach a flag.
-  if (hasAccountSessToken && isAuthRoute) {
-    const dashboardUrl = new URL("/dashboard", request.nextUrl);
-    dashboardUrl.searchParams.set("alreadyLoggedIn", "true");
-    response = NextResponse.redirect(dashboardUrl);
-  }
-
   // If the user is not logged in and tries to access a protected route (like
   // settings), redirect them to the login page. A callbackUrl is included so users
   // can be redirected back after logging in.
-  else if (!hasAccountSessToken && isProtectedRoute) {
+  if (!hasAccountSessToken && isProtectedRoute) {
     const loginUrl = new URL("/login", request.nextUrl);
     loginUrl.searchParams.set("callbackUrl", path);
     loginUrl.searchParams.set("unauthorized", "true");
