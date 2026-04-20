@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { PencilIcon, SquarePenIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import CopyToastButton from "@/components/copy-toast-button";
 import KebabMenu from "@/components/kebab-menu";
@@ -62,7 +63,52 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
   const { addToast } = useToast();
 
+  /* LIVE UPDATES */
+  const [eventEdited, setEventEdited] = useState(false);
+  const [liveUpdatesPaused, setLiveUpdatesPaused] = useState(true);
+  const router = useRouter();
+
+  // Handle idle timeout and reconnection
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
+    const resetTimeout = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => setLiveUpdatesPaused(true), 1000 * 60 * 15);
+    };
+
+    const handleActivity = () => {
+      if (liveUpdatesPaused) {
+        setLiveUpdatesPaused(false);
+        router.refresh();
+      }
+      resetTimeout();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        resetTimeout();
+      } else {
+        handleActivity();
+      }
+    };
+
+    window.addEventListener("mousemove", handleActivity);
+    window.addEventListener("keydown", handleActivity);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("mousemove", handleActivity);
+      window.removeEventListener("keydown", handleActivity);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      clearTimeout(timeout);
+    };
+  }, [liveUpdatesPaused, router]);
+
+  useEffect(() => {
+    if (eventEdited) return;
+    if (liveUpdatesPaused) return;
+
     const evtSource = new EventSource(
       process.env.NEXT_PUBLIC_API_URL + `/event/get-updates/${eventCode}/`,
     );
@@ -87,18 +133,23 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         addToast("info", `The event was edited, reload the page for updates.`, {
           isPersistent: true,
         });
-        evtSource.close();
+        setEventEdited(true);
       } else {
         console.warn("Unknown action received in live update:", data);
       }
     };
 
-    setTimeout(() => evtSource.close(), 1000 * 120); // Close connection after 120 seconds
-
     return () => {
       evtSource.close();
     };
-  }, [addToast, eventCode, liveUpdateAvailability, liveRemoveParticipant]);
+  }, [
+    addToast,
+    eventCode,
+    liveUpdateAvailability,
+    liveRemoveParticipant,
+    eventEdited,
+    liveUpdatesPaused,
+  ]);
 
   /* TIMEZONE HANDLING */
   const handleTZChange = (newTZ: string | number) => {
