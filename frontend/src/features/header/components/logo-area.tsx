@@ -1,7 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 import Link from "next/link";
 
 import LinkText from "@/components/link-text";
@@ -10,19 +6,8 @@ import { getCurrentVersion } from "@/features/version-history/data";
 import { cn } from "@/lib/utils/classname";
 
 export default function LogoArea({ isShrunk = false }: { isShrunk?: boolean }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
-
   return (
     <div>
-      {/* Text Container */}
       <Link href="/">
         <Logo oneLine={isShrunk} />
       </Link>

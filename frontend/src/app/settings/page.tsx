@@ -6,7 +6,7 @@ import { CheckIcon } from "lucide-react";
 
 import TextInputField from "@/components/text-input-field";
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
-import { useAccount } from "@/features/account/context";
+import { useSettingsAccount } from "@/features/account/settings/context";
 import ActionButton from "@/features/button/components/action";
 import { useToast } from "@/features/system-feedback/toast/context";
 import { MESSAGES } from "@/lib/messages";
@@ -16,7 +16,7 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { cn } from "@/lib/utils/classname";
 
 export default function Page() {
-  const { refreshAccount, accountDetails } = useAccount();
+  const accountDetails = useSettingsAccount();
   const { addToast } = useToast();
 
   const [defaultName, setDefaultName] = useState(
@@ -36,7 +36,6 @@ export default function Page() {
           await clientPost(ROUTES.account.setDefaultName, {
             display_name: defaultName,
           });
-          await refreshAccount();
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_SAVED);
         } catch (e) {
           const error = e as ApiErrorResponse;
@@ -45,7 +44,6 @@ export default function Page() {
       } else {
         try {
           await clientPost(ROUTES.account.removeDefaultName);
-          await refreshAccount();
           setDefaultName("");
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_REMOVED);
         } catch (e) {

@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import TextInputField from "@/components/text-input-field";
-import { useAccount } from "@/features/account/context";
 import EmptyButton from "@/features/button/components/empty";
 import { ConfirmationDialog, useToast } from "@/features/system-feedback";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
@@ -18,7 +17,6 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 export default function DeleteAccountDialog() {
   const router = useRouter();
   const isMobile = useCheckMobile();
-  const { logout } = useAccount();
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -49,7 +47,6 @@ export default function DeleteAccountDialog() {
       await clientPost(ROUTES.auth.deleteAccount, {
         password: currentPassword,
       });
-      logout();
       router.push("/login");
       addToast("success", MESSAGES.SUCCESS_ACCOUNT_DELETE);
       return true;
