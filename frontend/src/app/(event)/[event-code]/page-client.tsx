@@ -70,6 +70,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
   // Handle idle timeout and reconnection
   useEffect(() => {
+    if (eventEdited) return;
+
     let timeout: NodeJS.Timeout;
 
     const resetTimeout = () => {
@@ -103,7 +105,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       clearTimeout(timeout);
     };
-  }, [liveUpdatesPaused, router]);
+  }, [eventEdited, liveUpdatesPaused, router]);
 
   useEffect(() => {
     if (eventEdited) return;
