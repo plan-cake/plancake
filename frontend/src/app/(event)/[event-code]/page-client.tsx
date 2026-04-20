@@ -122,7 +122,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           data.availability,
         );
         if (data.action === "add") {
-          addToast("info", `${data.display_name} joined the event!`);
+          addToast("info", `${data.display_name} joined the event!`, {
+            title: "NEW ATTENDEE",
+          });
         } else {
           addToast("info", `${data.display_name} updated their availability.`);
         }
