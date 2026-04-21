@@ -98,11 +98,15 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
     window.addEventListener("mousemove", handleActivity);
     window.addEventListener("keydown", handleActivity);
+    window.addEventListener("touchstart", handleActivity);
+    window.addEventListener("scroll", handleActivity);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.removeEventListener("mousemove", handleActivity);
       window.removeEventListener("keydown", handleActivity);
+      window.removeEventListener("touchstart", handleActivity);
+      window.removeEventListener("scroll", handleActivity);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       clearTimeout(timeout);
     };
