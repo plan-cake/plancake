@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { PencilIcon, SquarePenIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -111,50 +112,75 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     if (stopLiveUpdates) return;
     if (liveUpdatesPaused) return;
 
-    const evtSource = new EventSource(
+    const ctrl = new AbortController();
+
+    fetchEventSource(
       process.env.NEXT_PUBLIC_API_URL + `/event/get-updates/${eventCode}/`,
+      {
+        signal: ctrl.signal,
+        async onopen(response) {
+          if (!response.ok) {
+            if (response.status === 503) {
+              addToast(
+                "error",
+                "Cannot connect to live updates, the server is busy. Please try again later.",
+              );
+            }
+            setStopLiveUpdates(true);
+            ctrl.abort();
+          }
+        },
+        onmessage(msg) {
+          const data = JSON.parse(msg.data);
+          if (data.action === "add" || data.action === "update") {
+            liveUpdateAvailability(
+              data.action,
+              data.display_name,
+              data.availability,
+            );
+            if (data.action === "add") {
+              addToast("info", `${data.display_name} joined the event!`, {
+                title: "NEW ATTENDEE",
+              });
+            } else {
+              addToast(
+                "info",
+                `${data.display_name} updated their availability.`,
+              );
+            }
+          } else if (data.action === "remove") {
+            liveRemoveParticipant(data.display_name);
+            addToast("info", `${data.display_name} left the event.`);
+          } else if (data.action === "event_edit") {
+            addToast(
+              "info",
+              `The event was edited, reload the page for updates.`,
+              {
+                isPersistent: true,
+                title: "EVENT UPDATED",
+              },
+            );
+            setStopLiveUpdates(true);
+          } else {
+            console.warn("Unknown action received in live update:", data);
+          }
+        },
+        onerror(err) {
+          setStopLiveUpdates(true);
+          addToast(
+            "error",
+            "Failed to connect to live updates. Refresh the page to retry.",
+          );
+          // Prevent automatic retry
+          ctrl.abort();
+          throw err;
+        },
+        openWhenHidden: true,
+      },
     );
 
-    evtSource.onerror = () => {
-      evtSource.close();
-      setStopLiveUpdates(true);
-      addToast(
-        "error",
-        "Failed to connect to live updates. Try refreshing the page to reconnect.",
-      );
-    };
-
-    evtSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.action === "add" || data.action === "update") {
-        liveUpdateAvailability(
-          data.action,
-          data.display_name,
-          data.availability,
-        );
-        if (data.action === "add") {
-          addToast("info", `${data.display_name} joined the event!`, {
-            title: "NEW ATTENDEE",
-          });
-        } else {
-          addToast("info", `${data.display_name} updated their availability.`);
-        }
-      } else if (data.action === "remove") {
-        liveRemoveParticipant(data.display_name);
-        addToast("info", `${data.display_name} left the event.`);
-      } else if (data.action === "event_edit") {
-        addToast("info", `The event was edited, reload the page for updates.`, {
-          isPersistent: true,
-          title: "EVENT UPDATED",
-        });
-        setStopLiveUpdates(true);
-      } else {
-        console.warn("Unknown action received in live update:", data);
-      }
-    };
-
     return () => {
-      evtSource.close();
+      ctrl.abort();
     };
   }, [
     addToast,
