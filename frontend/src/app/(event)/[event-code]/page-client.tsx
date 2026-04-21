@@ -64,13 +64,13 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   const { addToast } = useToast();
 
   /* LIVE UPDATES */
-  const [eventEdited, setEventEdited] = useState(false);
+  const [stopLiveUpdates, setStopLiveUpdates] = useState(false);
   const [liveUpdatesPaused, setLiveUpdatesPaused] = useState(false);
   const router = useRouter();
 
   // Handle idle timeout and reconnection
   useEffect(() => {
-    if (eventEdited) return;
+    if (stopLiveUpdates) return;
 
     let timeout: NodeJS.Timeout;
 
@@ -105,15 +105,24 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       clearTimeout(timeout);
     };
-  }, [eventEdited, liveUpdatesPaused, router]);
+  }, [stopLiveUpdates, liveUpdatesPaused, router]);
 
   useEffect(() => {
-    if (eventEdited) return;
+    if (stopLiveUpdates) return;
     if (liveUpdatesPaused) return;
 
     const evtSource = new EventSource(
       process.env.NEXT_PUBLIC_API_URL + `/event/get-updates/${eventCode}/`,
     );
+
+    evtSource.onerror = () => {
+      evtSource.close();
+      setStopLiveUpdates(true);
+      addToast(
+        "error",
+        "Failed to connect to live updates. Try refreshing the page to reconnect.",
+      );
+    };
 
     evtSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -138,7 +147,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           isPersistent: true,
           title: "EVENT UPDATED",
         });
-        setEventEdited(true);
+        setStopLiveUpdates(true);
       } else {
         console.warn("Unknown action received in live update:", data);
       }
@@ -152,7 +161,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     eventCode,
     liveUpdateAvailability,
     liveRemoveParticipant,
-    eventEdited,
+    stopLiveUpdates,
     liveUpdatesPaused,
   ]);
 
