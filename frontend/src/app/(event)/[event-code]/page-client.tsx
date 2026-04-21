@@ -65,7 +65,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
   /* LIVE UPDATES */
   const [eventEdited, setEventEdited] = useState(false);
-  const [liveUpdatesPaused, setLiveUpdatesPaused] = useState(true);
+  const [liveUpdatesPaused, setLiveUpdatesPaused] = useState(false);
   const router = useRouter();
 
   // Handle idle timeout and reconnection
