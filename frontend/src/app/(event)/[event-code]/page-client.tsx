@@ -169,8 +169,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
               );
             }
           } else if (data.action === "remove") {
-            liveRemoveParticipant(data.display_name);
-            addToast("info", `${data.display_name} left the event.`);
+            if (liveRemoveParticipant(data.display_name)) {
+              addToast("info", `${data.display_name} left the event.`);
+            }
           } else if (data.action === "event_edit") {
             addToast(
               "info",

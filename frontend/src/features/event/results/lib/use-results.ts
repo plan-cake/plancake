@@ -138,7 +138,11 @@ export function useEventResults(initialData: ResultsInformation) {
     [initialData],
   );
 
-  const liveRemoveParticipant = useCallback((displayName: string) => {
+  const liveRemoveParticipant = useCallback((displayName: string): boolean => {
+    if (!optimisticParticipants.includes(displayName)) {
+      // Check if the current user already removed the participant
+      return false;
+    }
     setParticipants((prev) => prev.filter((p) => p !== displayName));
     setAvailability((prev) => {
       const updated = { ...prev };
@@ -148,7 +152,8 @@ export function useEventResults(initialData: ResultsInformation) {
       return updated;
     });
     setSelectedParticipants((prev) => prev.filter((p) => p !== displayName));
-  }, []);
+    return true;
+  }, [optimisticParticipants]);
 
   /* DERIVED LOGIC */
   const { filteredAvailabilities, gridNumParticipants, hasNoConsensus } =
