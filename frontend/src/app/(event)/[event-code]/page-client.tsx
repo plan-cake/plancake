@@ -138,6 +138,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       process.env.NEXT_PUBLIC_API_URL + `/event/get-updates/${eventCode}/`,
       {
         signal: ctrl.signal,
+        credentials: "include",
         async onopen(response) {
           if (!response.ok) {
             if (response.status === 503) {

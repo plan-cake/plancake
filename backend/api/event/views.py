@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from asgiref.sync import sync_to_async
 from django.db import transaction
 from django.db.models import Q
 from django.http import JsonResponse, StreamingHttpResponse
@@ -39,7 +40,9 @@ from api.event.utils import (
 )
 from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
 from api.settings import (
+    ACCOUNT_COOKIE_NAME,
     GENERIC_ERR_RESPONSE,
+    GUEST_COOKIE_NAME,
     LIVE_UPDATES_HEARTBEAT_SECONDS,
     LIVE_UPDATES_URL,
     MAX_LIVE_CONNECTIONS_EVENT,
@@ -53,6 +56,7 @@ from api.utils import (
     MessageOutputSerializer,
     check_rate_limit,
     format_event_info,
+    get_session,
     notify_live_update,
 )
 
@@ -472,6 +476,7 @@ def get_event_details(request):
     )
 
 
+async def get_live_updates(request, event_code):
     # Using async Redis client
     client: Redis = Redis.from_url(LIVE_UPDATES_URL)
 
@@ -502,6 +507,17 @@ def get_event_details(request):
             status=503,
         )
 
+    # Get current user ID from cookies
+    aget_session = sync_to_async(get_session)
+    session = None
+    user_id = -1
+    if ACCOUNT_COOKIE_NAME in request.COOKIES:
+        session = await aget_session(request.COOKIES[ACCOUNT_COOKIE_NAME])
+    if session is None and GUEST_COOKIE_NAME in request.COOKIES:
+        session = await aget_session(request.COOKIES[GUEST_COOKIE_NAME])
+    if session:
+        user_id = session.user_account_id
+
     async def event_generator():
         # Increment counts
         await client.incr(GLOBAL_COUNT)
@@ -518,8 +534,10 @@ def get_event_details(request):
 
                 message = await pubsub.get_message(ignore_subscribe_messages=True)
                 if message:
+                    # Get the payload, add the user ID, and send it to the client
                     event = json.loads(message["data"].decode("utf-8"))
                     data = event["data"]
+                    data["is_you"] = event["user_id"] == user_id
 
                     yield f"data: {json.dumps(data)}\n\n"
                 await asyncio.sleep(LIVE_UPDATES_HEARTBEAT_SECONDS)
