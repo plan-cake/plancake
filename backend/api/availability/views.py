@@ -30,6 +30,7 @@ from api.settings import ThrottleScopes
 from api.utils import (
     LiveUpdateAction,
     LiveUpdateData,
+    LiveUpdateEvent,
     MessageOutputSerializer,
     check_rate_limit,
     notify_live_update,
@@ -154,11 +155,14 @@ def add_availability(request):
         )
 
     notify_live_update(
-        LiveUpdateData(
+        LiveUpdateEvent(
+            user_id=user.user_account_id,
             event_code=event_code,
-            action=LiveUpdateAction.ADD if new else LiveUpdateAction.UPDATE,
-            display_name=display_name,
-            availability=[time.isoformat() for time in availability],
+            data=LiveUpdateData(
+                action=LiveUpdateAction.ADD if new else LiveUpdateAction.UPDATE,
+                display_name=display_name,
+                availability=[time.isoformat() for time in availability],
+            ),
         )
     )
 
@@ -429,11 +433,14 @@ def remove_self_availability(request):
         return NOT_PARTICIPATED_ERROR
 
     notify_live_update(
-        LiveUpdateData(
+        LiveUpdateEvent(
+            user_id=user.user_account_id,
             event_code=event_code,
-            action=LiveUpdateAction.REMOVE,
-            display_name=participant.display_name,
-            availability=None,
+            data=LiveUpdateData(
+                action=LiveUpdateAction.REMOVE,
+                display_name=participant.display_name,
+                availability=None,
+            ),
         )
     )
 
@@ -482,11 +489,14 @@ def remove_availability(request):
         )
 
     notify_live_update(
-        LiveUpdateData(
+        LiveUpdateEvent(
+            user_id=user.user_account_id,
             event_code=event_code,
-            action=LiveUpdateAction.REMOVE,
-            display_name=display_name,
-            availability=None,
+            data=LiveUpdateData(
+                action=LiveUpdateAction.REMOVE,
+                display_name=display_name,
+                availability=None,
+            ),
         )
     )
 

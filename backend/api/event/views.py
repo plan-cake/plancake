@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -48,6 +49,7 @@ from api.settings import (
 from api.utils import (
     LiveUpdateAction,
     LiveUpdateData,
+    LiveUpdateEvent,
     MessageOutputSerializer,
     check_rate_limit,
     format_event_info,
@@ -302,11 +304,14 @@ def edit_date_event(request):
         return EVENT_NOT_FOUND_ERROR
 
     notify_live_update(
-        LiveUpdateData(
+        LiveUpdateEvent(
+            user_id=user.user_account_id,
             event_code=event_code,
-            action=LiveUpdateAction.EVENT_EDIT,
-            display_name=None,
-            availability=None,
+            data=LiveUpdateData(
+                action=LiveUpdateAction.EVENT_EDIT,
+                display_name=None,
+                availability=None,
+            ),
         )
     )
 
@@ -380,11 +385,14 @@ def edit_week_event(request):
         return EVENT_NOT_FOUND_ERROR
 
     notify_live_update(
-        LiveUpdateData(
+        LiveUpdateEvent(
+            user_id=user.user_account_id,
             event_code=event_code,
-            action=LiveUpdateAction.EVENT_EDIT,
-            display_name=None,
-            availability=None,
+            data=LiveUpdateData(
+                action=LiveUpdateAction.EVENT_EDIT,
+                display_name=None,
+                availability=None,
+            ),
         )
     )
 
@@ -464,7 +472,6 @@ def get_event_details(request):
     )
 
 
-async def get_live_updates(_, event_code):
     # Using async Redis client
     client: Redis = Redis.from_url(LIVE_UPDATES_URL)
 
@@ -511,8 +518,10 @@ async def get_live_updates(_, event_code):
 
                 message = await pubsub.get_message(ignore_subscribe_messages=True)
                 if message:
-                    data = message["data"].decode("utf-8")
-                    yield f"data: {data}\n\n"
+                    event = json.loads(message["data"].decode("utf-8"))
+                    data = event["data"]
+
+                    yield f"data: {json.dumps(data)}\n\n"
                 await asyncio.sleep(LIVE_UPDATES_HEARTBEAT_SECONDS)
         except Exception:
             await pubsub.unsubscribe(f"event_{event_code}")

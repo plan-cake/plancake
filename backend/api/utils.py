@@ -325,25 +325,45 @@ class LiveUpdateAction(str, Enum):
 class LiveUpdateData:
     def __init__(
         self,
-        event_code: str,
         action: LiveUpdateAction,
         display_name: str | None,
         availability: list[str] | None,
     ):
-        self.event_code = event_code
         self.action = action
         self.display_name = display_name
         self.availability = availability
 
+    def to_dict(self):
+        return {
+            "action": self.action,
+            "display_name": self.display_name,
+            "availability": self.availability,
+        }
 
-def notify_live_update(data: LiveUpdateData):
-    Redis.from_url(LIVE_UPDATES_URL).publish(
-        f"event_{data.event_code}",
-        json.dumps(
+
+class LiveUpdateEvent:
+    def __init__(
+        self,
+        user_id: int,
+        event_code: str,
+        data: LiveUpdateData,
+    ):
+        self.user_id = user_id
+        self.event_code = event_code
+        self.data = data
+
+    def dumps(self):
+        return json.dumps(
             {
-                "action": data.action,
-                "display_name": data.display_name,
-                "availability": data.availability,
+                "user_id": self.user_id,
+                "event_code": self.event_code,
+                "data": self.data.to_dict(),
             }
-        ),
+        )
+
+
+def notify_live_update(event: LiveUpdateEvent):
+    Redis.from_url(LIVE_UPDATES_URL).publish(
+        f"event_{event.event_code}",
+        event.dumps(),
     )
