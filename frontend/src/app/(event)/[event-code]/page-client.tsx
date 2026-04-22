@@ -111,12 +111,14 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     resetTimeout();
 
     window.addEventListener("mousemove", handleActivity);
+    window.addEventListener("mousedown", handleActivity);
     window.addEventListener("keydown", handleActivity);
     window.addEventListener("touchstart", handleActivity);
     window.addEventListener("scroll", handleActivity);
 
     return () => {
       window.removeEventListener("mousemove", handleActivity);
+      window.removeEventListener("mousedown", handleActivity);
       window.removeEventListener("keydown", handleActivity);
       window.removeEventListener("touchstart", handleActivity);
       window.removeEventListener("scroll", handleActivity);
