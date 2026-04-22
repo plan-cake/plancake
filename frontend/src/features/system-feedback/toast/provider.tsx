@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import * as Toast from "@radix-ui/react-toast";
+import { usePathname } from "next/navigation";
 
 import BaseToast from "@/features/system-feedback/toast/base";
 import { TOAST_CONFIG } from "@/features/system-feedback/toast/config";
@@ -18,6 +19,7 @@ export default function ToastProvider({
 }) {
   const [toasts, setToasts] = useState<ToastData[]>([]);
   const [isHoveringViewport, setIsHoveringViewport] = useState(false);
+  const pathname = usePathname();
 
   // handles a keyboard height adjustment to ensure toasts are not covered
   // by the keyboard on mobile devices
@@ -44,6 +46,15 @@ export default function ToastProvider({
       window.visualViewport?.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  // Remove persistent toasts on page change
+  useEffect(() => {
+    setToasts((prev) =>
+      prev.map((t) =>
+        t.isPersistent && t.pathOrigin !== pathname ? { ...t, open: false } : t,
+      ),
+    );
+  }, [pathname]);
 
   const addToast = useCallback(
     (type: ToastType, message: string, options?: ToastOptions) => {
@@ -78,6 +89,7 @@ export default function ToastProvider({
         title: options?.title ?? TOAST_CONFIG[type].title,
         isPersistent: options?.isPersistent ?? false,
         onDismiss: handleDismiss,
+        pathOrigin: pathname,
         duration: options?.duration,
         localStorageKey: options?.localStorageKey,
       };
@@ -85,7 +97,7 @@ export default function ToastProvider({
       setToasts((prev) => [...prev, newToast]);
       return id;
     },
-    [],
+    [pathname],
   );
 
   const removeToast = useCallback((id: number) => {
