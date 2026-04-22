@@ -116,6 +116,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       }
     };
 
+    resetTimeout();
+
     window.addEventListener("mousemove", handleActivity);
     window.addEventListener("keydown", handleActivity);
     window.addEventListener("touchstart", handleActivity);
