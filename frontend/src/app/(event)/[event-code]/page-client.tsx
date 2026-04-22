@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { PencilIcon, SquarePenIcon } from "lucide-react";
@@ -62,27 +62,47 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     timeslots,
   } = eventData;
 
-  const { addToast } = useToast();
+  const { addToast, removeToast } = useToast();
 
   /* LIVE UPDATES */
   const [liveUpdatesPaused, setLiveUpdatesPaused] = useState(false);
   const [liveUpdatesStopped, setliveUpdatesStopped] = useState(false);
   const router = useRouter();
+  const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const idleToastRef = useRef<number | null>(null);
 
   // Handle idle timeout and reconnection
   useEffect(() => {
     if (liveUpdatesStopped) return;
 
-    let timeout: NodeJS.Timeout;
-
     const resetTimeout = () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => setLiveUpdatesPaused(true), 1000 * 60 * 15);
+      if (idleTimeoutRef.current) {
+        clearTimeout(idleTimeoutRef.current);
+      }
+      idleTimeoutRef.current = setTimeout(
+        () => {
+          setLiveUpdatesPaused(true);
+          if (idleToastRef.current) return; // Already showing toast
+          idleToastRef.current = addToast(
+            "info",
+            "You've been idle for a while. Interact with the page to resume live updates.",
+            {
+              isPersistent: true,
+              title: "LIVE UPDATES PAUSED",
+            },
+          );
+        },
+        1000 * 60 * 15,
+      ); // 15 minutes
     };
 
     const handleActivity = () => {
       if (liveUpdatesPaused) {
         setLiveUpdatesPaused(false);
+        if (idleToastRef.current) {
+          removeToast(idleToastRef.current);
+          idleToastRef.current = null;
+        }
         router.refresh();
       }
       resetTimeout();
@@ -108,9 +128,11 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       window.removeEventListener("touchstart", handleActivity);
       window.removeEventListener("scroll", handleActivity);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      clearTimeout(timeout);
+      if (idleTimeoutRef.current) {
+        clearTimeout(idleTimeoutRef.current);
+      }
     };
-  }, [liveUpdatesStopped, liveUpdatesPaused, router]);
+  }, [liveUpdatesStopped, liveUpdatesPaused, router, addToast, removeToast]);
 
   useEffect(() => {
     if (liveUpdatesStopped) return;
