@@ -65,13 +65,13 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   const { addToast } = useToast();
 
   /* LIVE UPDATES */
-  const [stopLiveUpdates, setStopLiveUpdates] = useState(false);
   const [liveUpdatesPaused, setLiveUpdatesPaused] = useState(false);
+  const [liveUpdatesStopped, setliveUpdatesStopped] = useState(false);
   const router = useRouter();
 
   // Handle idle timeout and reconnection
   useEffect(() => {
-    if (stopLiveUpdates) return;
+    if (liveUpdatesStopped) return;
 
     let timeout: NodeJS.Timeout;
 
@@ -110,10 +110,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       clearTimeout(timeout);
     };
-  }, [stopLiveUpdates, liveUpdatesPaused, router]);
+  }, [liveUpdatesStopped, liveUpdatesPaused, router]);
 
   useEffect(() => {
-    if (stopLiveUpdates) return;
+    if (liveUpdatesStopped) return;
     if (liveUpdatesPaused) return;
 
     const ctrl = new AbortController();
@@ -130,7 +130,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
                 "Cannot connect to live updates, the server is busy. Please try again later.",
               );
             }
-            setStopLiveUpdates(true);
+            setliveUpdatesStopped(true);
             ctrl.abort();
           }
         },
@@ -164,13 +164,13 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
                 title: "EVENT UPDATED",
               },
             );
-            setStopLiveUpdates(true);
+            setliveUpdatesStopped(true);
           } else {
             console.warn("Unknown action received in live update:", data);
           }
         },
         onerror(err) {
-          setStopLiveUpdates(true);
+          setliveUpdatesStopped(true);
           addToast(
             "error",
             "Failed to connect to live updates. Refresh the page to retry.",
@@ -191,7 +191,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     eventCode,
     liveUpdateAvailability,
     liveRemoveParticipant,
-    stopLiveUpdates,
+    liveUpdatesStopped,
     liveUpdatesPaused,
   ]);
 
