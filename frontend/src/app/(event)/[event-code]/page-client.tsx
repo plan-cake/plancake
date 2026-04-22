@@ -108,28 +108,18 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       resetTimeout();
     };
 
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        resetTimeout();
-      } else {
-        handleActivity();
-      }
-    };
-
     resetTimeout();
 
     window.addEventListener("mousemove", handleActivity);
     window.addEventListener("keydown", handleActivity);
     window.addEventListener("touchstart", handleActivity);
     window.addEventListener("scroll", handleActivity);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.removeEventListener("mousemove", handleActivity);
       window.removeEventListener("keydown", handleActivity);
       window.removeEventListener("touchstart", handleActivity);
       window.removeEventListener("scroll", handleActivity);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
       if (idleTimeoutRef.current) {
         clearTimeout(idleTimeoutRef.current);
       }
