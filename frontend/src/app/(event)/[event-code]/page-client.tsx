@@ -98,12 +98,12 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
     const handleActivity = () => {
       if (liveUpdatesPaused) {
+        router.refresh();
         setLiveUpdatesPaused(false);
         if (idleToastRef.current) {
           removeToast(idleToastRef.current);
           idleToastRef.current = null;
         }
-        router.refresh();
       }
       resetTimeout();
     };
