@@ -167,6 +167,9 @@ export function useEventResults(initialData: ResultsInformation) {
         setParticipants((prev) =>
           prev.map((p) => (p === displayName ? newDisplayName : p)),
         );
+        setSelectedParticipants((prev) =>
+          prev.map((p) => (p === displayName ? newDisplayName : p)),
+        );
         if (isYou) {
           setCurrentUser(newDisplayName);
         }
