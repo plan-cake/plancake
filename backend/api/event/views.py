@@ -534,14 +534,18 @@ async def get_live_updates(request, event_code):
                 await client.expire(GLOBAL_COUNT, 10)
                 await client.expire(EVENT_COUNT, 10)
 
-                message = await pubsub.get_message(ignore_subscribe_messages=True)
-                if message:
+                # Process all queued messages
+                while True:
+                    message = await pubsub.get_message(ignore_subscribe_messages=True)
+                    if not message:
+                        break
+
                     # Get the payload, add the user ID, and send it to the client
                     event = json.loads(message["data"].decode("utf-8"))
                     data = event["data"]
                     data["is_you"] = event["user_id"] == user_id
-
                     yield f"data: {json.dumps(data)}\n\n"
+
                 await asyncio.sleep(LIVE_UPDATES_HEARTBEAT_SECONDS)
         except Exception:
             await pubsub.unsubscribe(f"event_{event_code}")
