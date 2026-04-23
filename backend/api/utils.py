@@ -12,12 +12,12 @@ from rest_framework.throttling import SimpleRateThrottle
 
 from api.availability.utils import get_weekday_date
 from api.models import UserAccount, UserEvent, UserSession
+from api.redis_pools import sync_pool
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
     COOKIE_DOMAIN,
     DEBUG,
     GUEST_COOKIE_NAME,
-    LIVE_UPDATES_URL,
     LONG_SESS_EXP_SECONDS,
     SESS_EXP_SECONDS,
     TEST_ENVIRONMENT,
@@ -366,7 +366,7 @@ class LiveUpdateEvent:
 
 
 def notify_live_update(event: LiveUpdateEvent):
-    Redis.from_url(LIVE_UPDATES_URL).publish(
+    Redis(connection_pool=sync_pool).publish(
         f"event_{event.event_code}",
         event.dumps(),
     )

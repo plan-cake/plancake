@@ -39,12 +39,12 @@ from api.event.utils import (
     validate_weekday_timeslots,
 )
 from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
+from api.redis_pools import async_pool
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
     GENERIC_ERR_RESPONSE,
     GUEST_COOKIE_NAME,
     LIVE_UPDATES_HEARTBEAT_SECONDS,
-    LIVE_UPDATES_URL,
     MAX_LIVE_CONNECTIONS_EVENT,
     MAX_LIVE_CONNECTIONS_GLOBAL,
     ThrottleScopes,
@@ -480,7 +480,7 @@ def get_event_details(request):
 
 async def get_live_updates(request, event_code):
     # Using async Redis client
-    client: Redis = Redis.from_url(LIVE_UPDATES_URL)
+    client: Redis = Redis(connection_pool=async_pool)
 
     GLOBAL_COUNT = "live_updates_global_count"
     EVENT_COUNT = f"live_updates_event_{event_code}_count"
