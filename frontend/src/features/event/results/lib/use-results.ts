@@ -152,11 +152,41 @@ export function useEventResults(initialData: ResultsInformation) {
 
   const liveUpdateParticipant = useCallback(
     (displayName: string, newDisplayName: string, isYou: boolean, newSlots: string[]) => {
-      // Why make it more complicated? If it works it works.
-      liveRemoveParticipant(displayName, isYou);
-      liveAddParticipant(newDisplayName, isYou, newSlots);
+      const nameChanged = displayName !== newDisplayName;
+
+      if (nameChanged) {
+        setParticipants((prev) =>
+          prev.map((p) => (p === displayName ? newDisplayName : p)),
+        );
+        if (isYou) {
+          setCurrentUser(newDisplayName);
+        }
+      }
+
+      setAvailability((prev) => {
+        const updated = { ...prev };
+        for (const slot in newSlots) {
+          newSlots[slot] = formatDateTime(newSlots[slot], initialData.timezone, initialData.eventType);
+        }
+        for (const slot in updated) {
+          const hasPerson = updated[slot].includes(displayName);
+          const shouldHavePerson = newSlots.includes(slot);
+
+          if (hasPerson && !shouldHavePerson) {
+            updated[slot] = updated[slot].filter((p) => p !== displayName);
+          } else if (!hasPerson && shouldHavePerson) {
+            updated[slot] = [...updated[slot], newDisplayName];
+          } else if (hasPerson && shouldHavePerson && nameChanged) {
+            // Update the name in the slot
+            updated[slot] = updated[slot].map((p) =>
+              p === displayName ? newDisplayName : p,
+            );
+          }
+        }
+        return updated;
+      });
     },
-    [liveRemoveParticipant, liveAddParticipant],
+    [initialData],
   );
 
   /* DERIVED LOGIC */
