@@ -107,7 +107,7 @@ export function useEventResults(initialData: ResultsInformation) {
     return result.success;
   };
 
-  const liveAddAvailability = useCallback(
+  const liveAddParticipant = useCallback(
     (displayName: string, isYou: boolean, newSlots: string[]) => {
       setParticipants((prev) => [...prev, displayName]);
       if (isYou) {
@@ -150,13 +150,13 @@ export function useEventResults(initialData: ResultsInformation) {
     return true;
   }, [optimisticParticipants]);
 
-  const liveUpdateAvailability = useCallback(
+  const liveUpdateParticipant = useCallback(
     (displayName: string, newDisplayName: string, isYou: boolean, newSlots: string[]) => {
       // Why make it more complicated? If it works it works.
       liveRemoveParticipant(displayName, isYou);
-      liveAddAvailability(newDisplayName, isYou, newSlots);
+      liveAddParticipant(newDisplayName, isYou, newSlots);
     },
-    [liveRemoveParticipant, liveAddAvailability],
+    [liveRemoveParticipant, liveAddParticipant],
   );
 
   /* DERIVED LOGIC */
@@ -254,8 +254,8 @@ export function useEventResults(initialData: ResultsInformation) {
     setTimezone,
 
     // Live Updates
-    liveAddAvailability,
-    liveUpdateAvailability,
+    liveAddParticipant,
+    liveUpdateParticipant,
     liveRemoveParticipant,
   };
 }

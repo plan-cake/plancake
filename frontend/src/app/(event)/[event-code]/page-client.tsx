@@ -51,8 +51,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     setTimezone,
     currentUser,
     isCreator,
-    liveAddAvailability,
-    liveUpdateAvailability,
+    liveAddParticipant,
+    liveUpdateParticipant,
     liveRemoveParticipant,
   } = useResultsContext();
 
@@ -155,7 +155,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         onmessage(msg) {
           const data = JSON.parse(msg.data);
           if (data.action === "add") {
-            liveAddAvailability(
+            liveAddParticipant(
               data.display_name,
               data.is_you,
               data.availability,
@@ -168,7 +168,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
               });
             }
           } else if (data.action === "update") {
-            liveUpdateAvailability(
+            liveUpdateParticipant(
               data.display_name,
               data.new_display_name,
               data.is_you,
@@ -234,8 +234,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   }, [
     addToast,
     eventCode,
-    liveAddAvailability,
-    liveUpdateAvailability,
+    liveAddParticipant,
+    liveUpdateParticipant,
     liveRemoveParticipant,
     liveUpdatesStopped,
     liveUpdatesPaused,
