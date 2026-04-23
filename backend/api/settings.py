@@ -173,8 +173,11 @@ LIVE_UPDATES_URL = "redis://localhost:6379/1"
 LIVE_UPDATES_HEARTBEAT_SECONDS = 2
 MAX_LIVE_CONNECTIONS_EVENT = 25
 MAX_LIVE_CONNECTIONS_GLOBAL = 500
-REDIS_SYNC_POOL_SIZE = 20  # For publishing updates, which is fast and a one-off
-REDIS_ASYNC_POOL_SIZE = 500  # For subscribing to updates, which holds a connection open
+# For publishing updates, which is a fast and one-time operation
+REDIS_SYNC_POOL_SIZE = 20
+# For subscribing to updates, which holds a connection open
+# It's slightly higher than the max global connections to prevent hanging
+REDIS_ASYNC_POOL_SIZE = 510
 
 LOG_DIR = env("LOG_DIR")
 os.makedirs(LOG_DIR, exist_ok=True)  # Make the log directory if it doesn't exist
