@@ -151,8 +151,17 @@ export function useEventResults(initialData: ResultsInformation) {
   }, [optimisticParticipants]);
 
   const liveUpdateParticipant = useCallback(
-    (displayName: string, newDisplayName: string, isYou: boolean, newSlots: string[]) => {
+    (displayName: string, newDisplayName: string, isYou: boolean, newSlots: string[]): { nameUpdated: boolean, slotsUpdated: boolean } => {
+      // Format new slots
+      const newSlotSet = new Set(newSlots.map((slot) =>
+        formatDateTime(slot, initialData.timezone, initialData.eventType)
+      ));
+
       const nameChanged = displayName !== newDisplayName;
+      const currentSlots = Object.keys(availability).filter(s => availability[s].includes(displayName));
+
+      const slotsChanged = newSlotSet.size !== currentSlots.length ||
+        currentSlots.some(s => !newSlotSet.has(s));
 
       if (nameChanged) {
         setParticipants((prev) =>
@@ -165,12 +174,9 @@ export function useEventResults(initialData: ResultsInformation) {
 
       setAvailability((prev) => {
         const updated = { ...prev };
-        for (const slot in newSlots) {
-          newSlots[slot] = formatDateTime(newSlots[slot], initialData.timezone, initialData.eventType);
-        }
         for (const slot in updated) {
           const hasPerson = updated[slot].includes(displayName);
-          const shouldHavePerson = newSlots.includes(slot);
+          const shouldHavePerson = newSlotSet.has(slot);
 
           if (hasPerson && !shouldHavePerson) {
             updated[slot] = updated[slot].filter((p) => p !== displayName);
@@ -185,8 +191,10 @@ export function useEventResults(initialData: ResultsInformation) {
         }
         return updated;
       });
+
+      return { nameUpdated: nameChanged, slotsUpdated: slotsChanged };
     },
-    [initialData],
+    [availability, initialData],
   );
 
   /* DERIVED LOGIC */

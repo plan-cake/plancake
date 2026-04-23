@@ -168,29 +168,26 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
               });
             }
           } else if (data.action === "update") {
-            liveUpdateParticipant(
+            const result = liveUpdateParticipant(
               data.display_name,
               data.new_display_name,
               data.is_you,
               data.availability,
             );
-            const nameChanged = data.display_name !== data.new_display_name;
-            if (data.is_you) {
+            const subject = data.is_you ? "You" : data.display_name;
+            const pronoun = data.is_you ? "your" : "their";
+            if (result.nameUpdated && result.slotsUpdated) {
               addToast(
                 "info",
-                `You updated your availability` +
-                  (nameChanged ? ` and changed your name` : ``) +
-                  `.`,
+                `${subject} updated ${pronoun} availability and changed ${pronoun} name to ${data.new_display_name}.`,
               );
-            } else {
+            } else if (result.nameUpdated) {
               addToast(
                 "info",
-                `${data.display_name} updated their availability` +
-                  (nameChanged
-                    ? ` and changed their name to ${data.new_display_name}`
-                    : ``) +
-                  `.`,
+                `${subject} changed ${pronoun} name to ${data.new_display_name}.`,
               );
+            } else if (result.slotsUpdated) {
+              addToast("info", `${subject} updated ${pronoun} availability.`);
             }
           } else if (data.action === "remove") {
             if (liveRemoveParticipant(data.display_name, data.is_you)) {
