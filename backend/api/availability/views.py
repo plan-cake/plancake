@@ -478,9 +478,10 @@ def remove_availability(request):
         if event.user_account != user:
             return NOT_CREATOR_ERROR
         # Because of the foreign key cascades, this should remove everything
-        EventParticipant.objects.get(
+        participant = EventParticipant.objects.get(
             user_event=event, display_name=display_name
-        ).delete()
+        )
+        participant.delete()
 
     except UserEvent.DoesNotExist:
         return Response(
@@ -495,7 +496,7 @@ def remove_availability(request):
 
     notify_live_update(
         LiveUpdateEvent(
-            user_id=user.user_account_id,
+            user_id=participant.user_account_id,
             event_code=event_code,
             data=LiveUpdateData(
                 action=LiveUpdateAction.REMOVE,
