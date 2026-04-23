@@ -25,22 +25,30 @@ The project contains a database model that determines the structure of the conne
 - Apply these migrations with `python manage.py migrate` when you first set up the project
 - Make sure to also run this command whenever you pull changes from another branch
 
+### Redis
+
+Redis is used for automated tasks and live updates. It should be installed and ran for full functionality.
+
+```bash
+# Linux
+sudo apt update
+sudo apt install redis-server
+sudo service redis-server start
+
+# Mac (with Homebrew)
+brew install redis
+brew services start redis
+```
+
 ### Running the Server
 
-After the above steps, run the server with `python manage.py runserver`
+After the above steps, run the server with: `uvicorn api.asgi:application --reload --port 8000`
 
 ### _(Optional for Development)_ Automated Tasks
 
-This project uses Celery and Redis to automate tasks like cleaning up old sessions.
+This project uses Celery with Redis to automate tasks like cleaning up old sessions.
 
-First, Redis needs to be installed and run as a service.
-
-- `sudo apt update`
-- `sudo apt install redis-server`
-- `sudo service redis-server start`
-  - _This might need to be called any time you start your machine_
-
-To run Celery alongside the API server (in different terminals):
+To run Celery alongside the API server, run the following commands in separate terminals:
 
 - `celery -A api worker --loglevel=info`
 - `celery -A api beat --loglevel=info`
