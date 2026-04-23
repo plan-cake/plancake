@@ -157,21 +157,34 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             liveUpdateAvailability(
               data.action,
               data.display_name,
+              data.is_you,
               data.availability,
             );
             if (data.action === "add") {
-              addToast("info", `${data.display_name} joined the event!`, {
-                title: "NEW ATTENDEE",
-              });
+              if (data.is_you) {
+                addToast("info", `You joined the event!`);
+              } else {
+                addToast("info", `${data.display_name} joined the event!`, {
+                  title: "NEW ATTENDEE",
+                });
+              }
             } else {
-              addToast(
-                "info",
-                `${data.display_name} updated their availability.`,
-              );
+              if (data.is_you) {
+                addToast("info", `You updated your availability.`);
+              } else {
+                addToast(
+                  "info",
+                  `${data.display_name} updated their availability.`,
+                );
+              }
             }
           } else if (data.action === "remove") {
-            if (liveRemoveParticipant(data.display_name)) {
-              addToast("info", `${data.display_name} left the event.`);
+            if (liveRemoveParticipant(data.display_name, data.is_you)) {
+              if (data.is_you) {
+                addToast("info", `You left the event.`);
+              } else {
+                addToast("info", `${data.display_name} left the event.`);
+              }
             }
           } else if (data.action === "event_edit") {
             addToast(

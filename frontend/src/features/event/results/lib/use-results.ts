@@ -18,16 +18,18 @@ import { formatDateTime } from "@/lib/utils/date-time-format";
 export function useEventResults(initialData: ResultsInformation) {
   const { addToast } = useToast();
 
-  const { eventCode, isCreator, currentUser } = initialData;
+  const { eventCode, isCreator } = initialData;
 
   /* STATES */
   const [participants, setParticipants] = useState(initialData.participants);
   const [availability, setAvailability] = useState(initialData.availability);
+  const [currentUser, setCurrentUser] = useState(initialData.currentUser);
   useEffect(() => {
     // Sync if initialData changes, which only happens if data is completely refetched
     setParticipants(initialData.participants);
     setAvailability(initialData.availability);
-  }, [initialData.participants, initialData.availability]);
+    setCurrentUser(initialData.currentUser);
+  }, [initialData]);
 
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
     [],
@@ -106,9 +108,12 @@ export function useEventResults(initialData: ResultsInformation) {
   };
 
   const liveUpdateAvailability = useCallback(
-    (action: "add" | "update", displayName: string, newSlots: string[]) => {
+    (action: "add" | "update", displayName: string, isYou: boolean, newSlots: string[]) => {
       if (action === "add") {
         setParticipants((prev) => [...prev, displayName]);
+        if (isYou) {
+          setCurrentUser(displayName);
+        }
       }
 
       setAvailability((prev) => {
@@ -138,7 +143,7 @@ export function useEventResults(initialData: ResultsInformation) {
     [initialData],
   );
 
-  const liveRemoveParticipant = useCallback((displayName: string): boolean => {
+  const liveRemoveParticipant = useCallback((displayName: string, isYou: boolean): boolean => {
     if (!optimisticParticipants.includes(displayName)) {
       // Check if the current user already removed the participant
       return false;
@@ -152,6 +157,9 @@ export function useEventResults(initialData: ResultsInformation) {
       return updated;
     });
     setSelectedParticipants((prev) => prev.filter((p) => p !== displayName));
+    if (isYou) {
+      setCurrentUser(null);
+    }
     return true;
   }, [optimisticParticipants]);
 
