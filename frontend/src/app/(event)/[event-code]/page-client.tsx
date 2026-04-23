@@ -51,6 +51,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     setTimezone,
     currentUser,
     isCreator,
+    liveAddAvailability,
     liveUpdateAvailability,
     liveRemoveParticipant,
   } = useResultsContext();
@@ -153,30 +154,43 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         },
         onmessage(msg) {
           const data = JSON.parse(msg.data);
-          if (data.action === "add" || data.action === "update") {
-            liveUpdateAvailability(
-              data.action,
+          if (data.action === "add") {
+            liveAddAvailability(
               data.display_name,
               data.is_you,
               data.availability,
             );
-            if (data.action === "add") {
-              if (data.is_you) {
-                addToast("info", `You joined the event!`);
-              } else {
-                addToast("info", `${data.display_name} joined the event!`, {
-                  title: "NEW ATTENDEE",
-                });
-              }
+            if (data.is_you) {
+              addToast("info", `You joined the event!`);
             } else {
-              if (data.is_you) {
-                addToast("info", `You updated your availability.`);
-              } else {
-                addToast(
-                  "info",
-                  `${data.display_name} updated their availability.`,
-                );
-              }
+              addToast("info", `${data.display_name} joined the event!`, {
+                title: "NEW ATTENDEE",
+              });
+            }
+          } else if (data.action === "update") {
+            liveUpdateAvailability(
+              data.display_name,
+              data.new_display_name,
+              data.is_you,
+              data.availability,
+            );
+            const nameChanged = data.display_name !== data.new_display_name;
+            if (data.is_you) {
+              addToast(
+                "info",
+                `You updated your availability` +
+                  (nameChanged ? ` and changed your name` : ``) +
+                  `.`,
+              );
+            } else {
+              addToast(
+                "info",
+                `${data.display_name} updated their availability` +
+                  (nameChanged
+                    ? ` and changed their name to ${data.new_display_name}`
+                    : ``) +
+                  `.`,
+              );
             }
           } else if (data.action === "remove") {
             if (liveRemoveParticipant(data.display_name, data.is_you)) {
@@ -220,6 +234,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   }, [
     addToast,
     eventCode,
+    liveAddAvailability,
     liveUpdateAvailability,
     liveRemoveParticipant,
     liveUpdatesStopped,

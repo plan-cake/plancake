@@ -107,25 +107,15 @@ export function useEventResults(initialData: ResultsInformation) {
     return result.success;
   };
 
-  const liveUpdateAvailability = useCallback(
-    (action: "add" | "update", displayName: string, isYou: boolean, newSlots: string[]) => {
-      if (action === "add") {
-        setParticipants((prev) => [...prev, displayName]);
-        if (isYou) {
-          setCurrentUser(displayName);
-        }
+  const liveAddAvailability = useCallback(
+    (displayName: string, isYou: boolean, newSlots: string[]) => {
+      setParticipants((prev) => [...prev, displayName]);
+      if (isYou) {
+        setCurrentUser(displayName);
       }
 
       setAvailability((prev) => {
         const updated = { ...prev };
-        if (action === "update") {
-          // Remove user from existing slots they are no longer in
-          for (const slot in updated) {
-            updated[slot] = updated[slot].filter((p) => p !== displayName);
-          }
-        }
-
-        // Add user to their new slots
         newSlots.forEach((slot) => {
           slot = formatDateTime(slot, initialData.timezone, initialData.eventType);
 
@@ -133,14 +123,11 @@ export function useEventResults(initialData: ResultsInformation) {
             // Ignore
             return;
           }
-          if (action === "add" || !updated[slot].includes(displayName)) {
-            updated[slot] = [...updated[slot], displayName];
-          }
+          updated[slot] = [...updated[slot], displayName];
         });
         return updated;
       });
-    },
-    [initialData],
+    }, [initialData],
   );
 
   const liveRemoveParticipant = useCallback((displayName: string, isYou: boolean): boolean => {
@@ -162,6 +149,15 @@ export function useEventResults(initialData: ResultsInformation) {
     }
     return true;
   }, [optimisticParticipants]);
+
+  const liveUpdateAvailability = useCallback(
+    (displayName: string, newDisplayName: string, isYou: boolean, newSlots: string[]) => {
+      // Why make it more complicated? If it works it works.
+      liveRemoveParticipant(displayName, isYou);
+      liveAddAvailability(newDisplayName, isYou, newSlots);
+    },
+    [liveRemoveParticipant, liveAddAvailability],
+  );
 
   /* DERIVED LOGIC */
   const { filteredAvailabilities, gridNumParticipants, hasNoConsensus } =
@@ -258,6 +254,7 @@ export function useEventResults(initialData: ResultsInformation) {
     setTimezone,
 
     // Live Updates
+    liveAddAvailability,
     liveUpdateAvailability,
     liveRemoveParticipant,
   };
