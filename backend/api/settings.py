@@ -170,7 +170,7 @@ CELERY_BROKER_URL = "redis://localhost:6379/0"
 
 # Live updates
 LIVE_UPDATES_URL = "redis://localhost:6379/1"
-LIVE_UPDATES_HEARTBEAT_SECONDS = 2
+LIVE_UPDATES_HEARTBEAT_SECONDS = 1
 MAX_LIVE_CONNECTIONS_EVENT = 25
 MAX_LIVE_CONNECTIONS_GLOBAL = 500
 # For publishing updates, which is a fast and one-time operation
