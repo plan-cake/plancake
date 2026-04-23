@@ -546,8 +546,8 @@ async def get_live_updates(request, event_code):
         except Exception:
             await pubsub.unsubscribe(f"event_{event_code}")
         finally:
-            await client.aclose()
             await client.decr(GLOBAL_COUNT)
             await client.decr(EVENT_COUNT)
+            await client.aclose()
 
     return StreamingHttpResponse(event_generator(), content_type="text/event-stream")
