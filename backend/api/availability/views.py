@@ -64,6 +64,8 @@ def add_availability(request):
     availability = request.validated_data.get("availability")
     time_zone = request.validated_data.get("time_zone")
 
+    old_display_name = None
+
     try:
         with transaction.atomic():
             user_event = UserEvent.objects.get(url_code=event_code)
@@ -88,6 +90,7 @@ def add_availability(request):
                 defaults={"time_zone": time_zone, "display_name": display_name},
             )
             if not new:
+                old_display_name = participant.display_name
                 participant.time_zone = time_zone
                 participant.display_name = display_name
                 participant.save()
@@ -160,7 +163,8 @@ def add_availability(request):
             event_code=event_code,
             data=LiveUpdateData(
                 action=LiveUpdateAction.ADD if new else LiveUpdateAction.UPDATE,
-                display_name=display_name,
+                display_name=old_display_name if old_display_name else display_name,
+                new_display_name=display_name if old_display_name else None,
                 availability=[time.isoformat() for time in availability],
             ),
         )
@@ -439,6 +443,7 @@ def remove_self_availability(request):
             data=LiveUpdateData(
                 action=LiveUpdateAction.REMOVE,
                 display_name=participant.display_name,
+                new_display_name=None,
                 availability=None,
             ),
         )
@@ -495,6 +500,7 @@ def remove_availability(request):
             data=LiveUpdateData(
                 action=LiveUpdateAction.REMOVE,
                 display_name=display_name,
+                new_display_name=None,
                 availability=None,
             ),
         )

@@ -327,16 +327,19 @@ class LiveUpdateData:
         self,
         action: LiveUpdateAction,
         display_name: str | None,
+        new_display_name: str | None,
         availability: list[str] | None,
     ):
         self.action = action
         self.display_name = display_name
+        self.new_display_name = new_display_name
         self.availability = availability
 
     def to_dict(self):
         return {
             "action": self.action,
             "display_name": self.display_name,
+            "new_display_name": self.new_display_name,
             "availability": self.availability,
         }
 

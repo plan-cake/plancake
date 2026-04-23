@@ -314,6 +314,7 @@ def edit_date_event(request):
             data=LiveUpdateData(
                 action=LiveUpdateAction.EVENT_EDIT,
                 display_name=None,
+                new_display_name=None,
                 availability=None,
             ),
         )
@@ -395,6 +396,7 @@ def edit_week_event(request):
             data=LiveUpdateData(
                 action=LiveUpdateAction.EVENT_EDIT,
                 display_name=None,
+                new_display_name=None,
                 availability=None,
             ),
         )
