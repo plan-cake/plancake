@@ -1,6 +1,7 @@
+import { AnimatePresence } from "framer-motion";
+
 import ParticipantChip from "@/features/event/results/attendee-panel/participant-chip";
 import { useResultsContext } from "@/features/event/results/context";
-import { AnimatePresence } from "framer-motion";
 
 export default function ParticipantList({
   isRemoving,
