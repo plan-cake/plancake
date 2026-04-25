@@ -1,5 +1,6 @@
 import ParticipantChip from "@/features/event/results/attendee-panel/participant-chip";
 import { useResultsContext } from "@/features/event/results/context";
+import { AnimatePresence } from "framer-motion";
 
 export default function ParticipantList({
   isRemoving,
@@ -34,24 +35,26 @@ export default function ParticipantList({
 
   return (
     <ul className={listClassNames}>
-      {participants.map((person: string, index: number) => (
-        <ParticipantChip
-          key={person}
-          index={index}
-          person={person}
-          isAvailable={
-            !hoveredSlot || availabilities[hoveredSlot]?.includes(person)
-          }
-          isSelected={selectedParticipants.includes(person)}
-          areSelected={selectedParticipants.length > 0}
-          isRemoving={isRemoving && isCreator}
-          onRemove={() => promptRemove(person)}
-          onHoverChange={(isHovering) =>
-            !isRemoving && setHoveredParticipant(isHovering ? person : null)
-          }
-          onClick={() => !isRemoving && onParticipantToggle(person)}
-        />
-      ))}
+      <AnimatePresence initial={false}>
+        {participants.map((person: string, index: number) => (
+          <ParticipantChip
+            key={person}
+            index={index}
+            person={person}
+            isAvailable={
+              !hoveredSlot || availabilities[hoveredSlot]?.includes(person)
+            }
+            isSelected={selectedParticipants.includes(person)}
+            areSelected={selectedParticipants.length > 0}
+            isRemoving={isRemoving && isCreator}
+            onRemove={() => promptRemove(person)}
+            onHoverChange={(isHovering) =>
+              !isRemoving && setHoveredParticipant(isHovering ? person : null)
+            }
+            onClick={() => !isRemoving && onParticipantToggle(person)}
+          />
+        ))}
+      </AnimatePresence>
     </ul>
   );
 }
