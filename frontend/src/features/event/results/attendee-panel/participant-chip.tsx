@@ -97,15 +97,19 @@ export default function ParticipantChip({
 
           // Availability Styling
           !isAvailable && "bg-gray-200/25 line-through opacity-50",
-          isAvailable && "bg-accent/25 text-accent-text opacity-100",
+          isAvailable && "bg-lion text-violet opacity-100",
+
+          !isAvailable && isSelected && "text-violet",
 
           // Selection Styling
           isSelected &&
-            "bg-accent ring-accent ring-offset-background text-white ring-2 ring-offset-1",
-          areSelected && !isSelected && "bg-gray-200/25",
+            "bg-lion ring-lion ring-offset-background ring-2 ring-offset-1",
+          areSelected && !isSelected && "text-foreground bg-gray-200/25",
 
           // Hover Styling
-          !isRemoving && !isSelected && "hover:bg-accent hover:text-white",
+          !isRemoving &&
+            !isSelected &&
+            "hover:ring-lion/50 hover:ring-offset-background hover:ring-2 hover:ring-offset-1",
 
           // Wiggle/Remove Styling
           isRemoving &&
