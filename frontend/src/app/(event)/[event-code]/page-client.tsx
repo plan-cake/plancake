@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { PencilIcon, SquarePenIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -271,6 +272,57 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     currentUser !== null,
   );
 
+  const bannerElement = () => {
+    const variants: Variants = {
+      enter: {
+        height: "auto",
+        marginBottom: "1rem",
+        opacity: 1,
+        x: "0%",
+        transition: {
+          // Delayed extra to match with the exit animation of the banner
+          height: { duration: 0.3, delay: 0.4, ease: "easeOut" },
+          marginBottom: { duration: 0.3, delay: 0.4, ease: "easeOut" },
+          opacity: { duration: 0.4, delay: 0.7, ease: "backOut" },
+          x: { duration: 0.4, delay: 0.7, ease: "backOut" },
+        },
+      },
+      exit: {
+        height: 0,
+        marginBottom: 0,
+        opacity: 0,
+        x: "-2rem",
+        transition: {
+          opacity: { duration: 0.4, ease: "backIn" },
+          x: { duration: 0.4, ease: "backIn" },
+          height: { duration: 0.3, delay: 0.4, ease: "easeOut" },
+          marginBottom: { duration: 0.3, delay: 0.4, ease: "easeOut" },
+        },
+      },
+    };
+
+    return (
+      <AnimatePresence initial={false} mode="sync">
+        {banners && (
+          <motion.div
+            key={banners?.props.children}
+            initial={{
+              height: 0,
+              opacity: 0,
+              x: "5%",
+              marginBottom: 0,
+            }}
+            animate="enter"
+            exit="exit"
+            variants={variants}
+          >
+            {banners}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  };
+
   /* BUTTONS */
   const paintingButton = (
     <LinkButton
@@ -316,7 +368,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         </div>
       </div>
 
-      <div className="md:hidden">{banners}</div>
+      <div className="-mb-2 md:hidden">{bannerElement()}</div>
 
       <div className="flex h-fit flex-col md:flex-row md:gap-4">
         <ScheduleGrid
@@ -345,26 +397,28 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         </div>
 
         {/* Desktop Sidebar */}
-        <div
-          className={cn(
-            "hidden md:block",
-            "fixed bottom-1 left-0 z-10 w-full shrink-0 px-6",
-            "relative bottom-auto left-auto w-80 space-y-4 px-0",
-          )}
-        >
-          {banners}
+        <div className="hidden md:block">
+          {bannerElement()}
           <div
             className={cn(
-              "sticky flex max-h-[calc(100vh-8rem)] flex-col gap-y-4",
-              topMarginClass,
+              "hidden md:block",
+              "fixed bottom-1 left-0 z-10 w-full shrink-0 px-6",
+              "relative bottom-auto left-auto w-80 px-0",
             )}
           >
-            <AttendeesPanel />
-            <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
-              <DisplaySettings
-                timezone={timezone}
-                onTimezoneChange={handleTZChange}
-              />
+            <div
+              className={cn(
+                "sticky flex max-h-[calc(100vh-8rem)] flex-col gap-y-4",
+                topMarginClass,
+              )}
+            >
+              <AttendeesPanel />
+              <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
+                <DisplaySettings
+                  timezone={timezone}
+                  onTimezoneChange={handleTZChange}
+                />
+              </div>
             </div>
           </div>
         </div>
