@@ -214,8 +214,11 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         onerror(err) {
           setliveUpdatesStopped(true);
           addToast(
-            "error",
+            "info",
             "Failed to connect to live updates. Refresh the page to retry.",
+            {
+              isPersistent: true,
+            },
           );
           // Prevent automatic retry
           ctrl.abort();
