@@ -27,12 +27,36 @@ export default function ParticipantChip({
   //  delay based on index
   const delay = (index % 4) * -0.1;
 
+  const variants = {
+    enter: {
+      height: "auto",
+      opacity: 1,
+      y: 0,
+      transition: {
+        height: { duration: 0.2 }, // Grow first
+        opacity: { duration: 0.2, delay: 0.4 },
+        y: { duration: 0.2, delay: 0.4 },
+      },
+    },
+    exit: {
+      height: 0,
+      opacity: 0,
+      y: "40%",
+      transition: {
+        opacity: { duration: 0.2 }, // Fade first
+        y: { duration: 0.2 },
+        height: { duration: 0.2, delay: 0.4 }, // Shrink last
+      },
+    },
+  };
+
   const ChipContent = (
     <motion.li
-      initial={{ y: "40%", opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: "40%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 350, damping: 25 }}
+      initial={{ height: 0, opacity: 0, y: "40%" }}
+      animate="enter"
+      exit="exit"
+      variants={variants}
+      layout
     >
       <div
         style={{ animationDelay: `${delay}s` }}
