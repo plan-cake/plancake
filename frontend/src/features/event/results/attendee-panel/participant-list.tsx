@@ -23,13 +23,15 @@ export default function ParticipantList({
   } = useResultsContext();
 
   const listClassNames = mobile
-    ? "flex flex-wrap gap-3 pt-1"
-    : "flex min-h-0 shrink flex-wrap content-start gap-2.5 overflow-y-auto px-6 pb-6 pt-1";
+    ? "flex flex-wrap pt-1 -mr-2.5"
+    : "flex min-h-0 shrink flex-wrap content-start overflow-y-auto pr-3.5 pl-6 pb-3.5";
 
   if (participants.length === 0) {
     return (
       <ul className={listClassNames}>
-        <li className="text-sm italic opacity-50">Waiting for responses...</li>
+        <li className="pb-2.5 text-sm italic opacity-50">
+          Waiting for responses...
+        </li>
       </ul>
     );
   }

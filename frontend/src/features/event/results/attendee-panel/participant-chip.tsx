@@ -30,29 +30,47 @@ export default function ParticipantChip({
   const variants = {
     enter: {
       height: "auto",
+      marginBottom: "0.625rem",
+      marginRight: "0.625rem",
       opacity: 1,
       y: 0,
       transition: {
-        height: { duration: 0.2 }, // Grow first
+        // Grow first
+        height: { duration: 0.2 },
+        marginBottom: { duration: 0.2 },
+        marginRight: { duration: 0.2 },
+        // Fade in last
         opacity: { duration: 0.2, delay: 0.4 },
         y: { duration: 0.2, delay: 0.4 },
       },
     },
     exit: {
       height: 0,
+      marginBottom: 0,
+      marginRight: 0,
       opacity: 0,
       y: "40%",
       transition: {
-        opacity: { duration: 0.2 }, // Fade first
+        // Fade out first
+        opacity: { duration: 0.2 },
         y: { duration: 0.2 },
-        height: { duration: 0.2, delay: 0.4 }, // Shrink last
+        // Shrink last
+        height: { duration: 0.2, delay: 0.4 },
+        marginBottom: { duration: 0.2, delay: 0.4 },
+        marginRight: { duration: 0.2, delay: 0.4 },
       },
     },
   };
 
   const ChipContent = (
     <motion.li
-      initial={{ height: 0, opacity: 0, y: "40%" }}
+      initial={{
+        height: 0,
+        marginBottom: 0,
+        marginRight: 0,
+        opacity: 0,
+        y: "40%",
+      }}
       animate="enter"
       exit="exit"
       variants={variants}
