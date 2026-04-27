@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 
 import ParticipantChip from "@/features/event/results/attendee-panel/participant-chip";
 import { useResultsContext } from "@/features/event/results/context";
@@ -38,7 +38,7 @@ export default function ParticipantList({
   }
 
   return (
-    <motion.ul layout className={listClassNames}>
+    <ul className={listClassNames}>
       <AnimatePresence initial={false}>
         {participants.map((person: ParticipantData[number], index: number) => (
           <ParticipantChip
@@ -63,6 +63,6 @@ export default function ParticipantList({
           />
         ))}
       </AnimatePresence>
-    </motion.ul>
+    </ul>
   );
 }
