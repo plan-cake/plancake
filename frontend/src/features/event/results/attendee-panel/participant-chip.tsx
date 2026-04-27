@@ -24,8 +24,8 @@ export default function ParticipantChip({
   isSelected: boolean;
   areSelected: boolean;
 }) {
-  //  delay based on index
-  const delay = (index % 4) * -0.1;
+  // wiggle animation delay based on index
+  const wiggleDelay = (index % 4) * -0.1;
 
   const variants = {
     enter: {
@@ -77,7 +77,7 @@ export default function ParticipantChip({
       layout
     >
       <div
-        style={{ animationDelay: `${delay}s` }}
+        style={{ animationDelay: `${wiggleDelay}s` }}
         onMouseEnter={() => {
           if (window.matchMedia("(hover: hover)").matches) {
             onHoverChange(true);
