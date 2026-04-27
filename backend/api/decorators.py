@@ -496,3 +496,17 @@ def validate_output(serializer_class):
         return wrapper
 
     return decorator
+
+
+def sse_endpoint(method):
+    """
+    A decorator just used for documentation on endpoints that use SSE.
+    """
+
+    def decorator(func):
+        metadata = get_metadata(func)
+        metadata.method = method
+        func.metadata = metadata
+        return func
+
+    return decorator

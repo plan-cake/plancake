@@ -16,6 +16,7 @@ from api.decorators import (
     api_endpoint,
     check_auth,
     require_auth,
+    sse_endpoint,
     validate_json_input,
     validate_output,
     validate_query_param_input,
@@ -478,6 +479,7 @@ def get_event_details(request):
     )
 
 
+@sse_endpoint("GET")
 async def get_live_updates(request, event_code):
     # Using async Redis client
     client: Redis = Redis(connection_pool=async_pool)
