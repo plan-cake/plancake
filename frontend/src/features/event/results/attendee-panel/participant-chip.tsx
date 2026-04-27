@@ -64,6 +64,7 @@ export default function ParticipantChip({
 
   const ChipContent = (
     <motion.li
+      className="self-start" // prevents framer motion issue with row height on enter
       initial={{
         height: 0,
         marginBottom: 0,
