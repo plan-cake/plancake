@@ -31,14 +31,12 @@ export default function ParticipantChip({
     enter: {
       height: "auto",
       marginBottom: "0.625rem",
-      marginRight: "0.625rem",
       opacity: 1,
       y: 0,
       transition: {
         // Grow first
         height: { duration: 0.3, ease: "easeOut" },
         marginBottom: { duration: 0.3, ease: "easeOut" },
-        marginRight: { duration: 0.3, ease: "easeOut" },
         // Fade in last
         opacity: { duration: 0.4, delay: 0.4, ease: "backOut" },
         y: { duration: 0.4, delay: 0.4, ease: "backOut" },
@@ -47,7 +45,6 @@ export default function ParticipantChip({
     exit: {
       height: 0,
       marginBottom: 0,
-      marginRight: 0,
       opacity: 0,
       y: "40%",
       transition: {
@@ -57,7 +54,6 @@ export default function ParticipantChip({
         // Shrink last
         height: { duration: 0.3, delay: 0.4, ease: "easeOut" },
         marginBottom: { duration: 0.3, delay: 0.4, ease: "easeOut" },
-        marginRight: { duration: 0.3, delay: 0.4, ease: "easeOut" },
       },
     },
   };
@@ -68,7 +64,6 @@ export default function ParticipantChip({
       initial={{
         height: 0,
         marginBottom: 0,
-        marginRight: 0,
         opacity: 0,
         y: "40%",
       }}
