@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Trash2Icon } from "lucide-react";
 
 import { cn } from "@/lib/utils/classname";
@@ -27,7 +27,7 @@ export default function ParticipantChip({
   // wiggle animation delay based on index
   const wiggleDelay = (index % 4) * -0.1;
 
-  const variants = {
+  const variants: Variants = {
     enter: {
       height: "auto",
       marginBottom: "0.625rem",
@@ -36,12 +36,12 @@ export default function ParticipantChip({
       y: 0,
       transition: {
         // Grow first
-        height: { duration: 0.2 },
-        marginBottom: { duration: 0.2 },
-        marginRight: { duration: 0.2 },
+        height: { duration: 0.3, ease: "easeOut" },
+        marginBottom: { duration: 0.3, ease: "easeOut" },
+        marginRight: { duration: 0.3, ease: "easeOut" },
         // Fade in last
-        opacity: { duration: 0.2, delay: 0.4 },
-        y: { duration: 0.2, delay: 0.4 },
+        opacity: { duration: 0.4, delay: 0.4, ease: "backOut" },
+        y: { duration: 0.4, delay: 0.4, ease: "backOut" },
       },
     },
     exit: {
@@ -52,12 +52,12 @@ export default function ParticipantChip({
       y: "40%",
       transition: {
         // Fade out first
-        opacity: { duration: 0.2 },
-        y: { duration: 0.2 },
+        opacity: { duration: 0.4, ease: "backIn" },
+        y: { duration: 0.4, ease: "backIn" },
         // Shrink last
-        height: { duration: 0.2, delay: 0.4 },
-        marginBottom: { duration: 0.2, delay: 0.4 },
-        marginRight: { duration: 0.2, delay: 0.4 },
+        height: { duration: 0.3, delay: 0.4, ease: "easeOut" },
+        marginBottom: { duration: 0.3, delay: 0.4, ease: "easeOut" },
+        marginRight: { duration: 0.3, delay: 0.4, ease: "easeOut" },
       },
     },
   };
