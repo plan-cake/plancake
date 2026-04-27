@@ -97,7 +97,9 @@ export type SelfAvailability = {
 
 export type AllAvailability = {
   user_display_name: string | null;
-  participants: string[];
+  participants: {
+    display_name: string;
+  }[];
   availability: {
     [timeslot: string]: string[];
   }

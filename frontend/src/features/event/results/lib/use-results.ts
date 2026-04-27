@@ -48,7 +48,7 @@ export function useEventResults(initialData: ResultsInformation) {
   const [optimisticParticipants, removeOptimisticParticipant] = useOptimistic(
     participants || [],
     (state, personToRemove: string) => {
-      return state.filter((p) => p !== personToRemove);
+      return state.filter((p) => p.display_name !== personToRemove);
     },
   );
 
@@ -109,7 +109,7 @@ export function useEventResults(initialData: ResultsInformation) {
 
   const liveAddParticipant = useCallback(
     (displayName: string, isYou: boolean, newSlots: string[]) => {
-      setParticipants((prev) => [...prev, displayName]);
+      setParticipants((prev) => [...prev, { id: prev.length, display_name: displayName }]);
       if (isYou) {
         setCurrentUser(displayName);
       }
@@ -131,11 +131,11 @@ export function useEventResults(initialData: ResultsInformation) {
   );
 
   const liveRemoveParticipant = useCallback((displayName: string, isYou: boolean): boolean => {
-    if (!optimisticParticipants.includes(displayName)) {
+    if (optimisticParticipants.every((p) => p.display_name !== displayName)) {
       // Check if the current user already removed the participant
       return false;
     }
-    setParticipants((prev) => prev.filter((p) => p !== displayName));
+    setParticipants((prev) => prev.filter((p) => p.display_name !== displayName));
     setAvailability((prev) => {
       const updated = { ...prev };
       for (const slot in updated) {
@@ -165,7 +165,7 @@ export function useEventResults(initialData: ResultsInformation) {
 
       if (nameChanged) {
         setParticipants((prev) =>
-          prev.map((p) => (p === displayName ? newDisplayName : p)),
+          prev.map((p) => (p.display_name === displayName ? { ...p, display_name: newDisplayName } : p)),
         );
         setSelectedParticipants((prev) =>
           prev.map((p) => (p === displayName ? newDisplayName : p)),

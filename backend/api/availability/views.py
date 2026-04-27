@@ -361,7 +361,9 @@ def get_all_availability(request):
             return Response(
                 {
                     "user_display_name": user_display_name,
-                    "participants": [p.display_name for p in participants],
+                    "participants": [
+                        {"display_name": p.display_name} for p in participants
+                    ],
                     "availability": availability_dict,
                 },
                 status=200,
@@ -393,7 +395,9 @@ def get_all_availability(request):
             return Response(
                 {
                     "user_display_name": user_display_name,
-                    "participants": [p.display_name for p in participants],
+                    "participants": [
+                        {"display_name": p.display_name} for p in participants
+                    ],
                     "availability": availability_dict,
                 },
                 status=200,

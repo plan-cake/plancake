@@ -36,12 +36,16 @@ class AvailableDatesSerializer(DisplayNameSerializer):
     time_zone = TimeZoneField(required=True)
 
 
+class ParticipantSerializer(DisplayNameSerializer):
+    pass
+
+
 class EventAvailabilitySerializer(serializers.Serializer):
     user_display_name = serializers.CharField(
         allow_null=True, max_length=25, required=True
     )
     participants = serializers.ListField(
-        child=serializers.CharField(required=True, max_length=25),
+        child=ParticipantSerializer(),
         required=True,
     )
     availability = serializers.DictField(

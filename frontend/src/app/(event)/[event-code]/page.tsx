@@ -64,6 +64,11 @@ export default async function Page({ params }: EventCodePageProps) {
     eventRange.timezone,
   );
 
+  const participantData = availabilityData.participants.map((p, index) => ({
+    id: index,
+    display_name: p.display_name,
+  }));
+
   return (
     <ClientPage
       eventData={{
@@ -75,7 +80,7 @@ export default async function Page({ params }: EventCodePageProps) {
       initialAvailabilityData={{
         eventType: eventRange.type,
         timezone: eventRange.timezone,
-        participants: availabilityData.participants,
+        participants: participantData,
         availability: availabilityData.availability,
         currentUser: availabilityData.user_display_name,
         eventCode: eventCode,

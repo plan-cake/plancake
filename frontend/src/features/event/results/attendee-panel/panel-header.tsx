@@ -43,7 +43,9 @@ export default function PanelHeader({
   const totalParticipants = participants.length;
   const hasSelection = selectedParticipants.length > 0;
   const showSelfRemove =
-    !isCreator && currentUser && participants.includes(currentUser);
+    !isCreator &&
+    currentUser &&
+    participants.some((p) => p.display_name === currentUser);
 
   const formatHoveredSlot = () => {
     const date = new Date(hoveredSlot!);
