@@ -24,7 +24,7 @@ export default function ParticipantList({
 
   const listClassNames = mobile
     ? "flex flex-wrap pt-1 gap-x-2.5"
-    : "flex min-h-0 shrink flex-wrap content-start overflow-y-auto px-6 gap-x-2.5 pb-3.5";
+    : "flex min-h-0 shrink flex-wrap content-start overflow-y-auto px-6 gap-x-2.5 pb-3.5 pt-1";
 
   if (participants.length === 0) {
     return (
