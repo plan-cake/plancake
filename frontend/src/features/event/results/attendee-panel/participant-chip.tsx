@@ -1,4 +1,4 @@
-import { motion, Variants } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { Trash2Icon } from "lucide-react";
 
 import { cn } from "@/lib/utils/classname";
@@ -70,7 +70,7 @@ export default function ParticipantChip({
       animate="enter"
       exit="exit"
       variants={variants}
-      layout
+      layout="position"
     >
       <div
         style={{ animationDelay: `${wiggleDelay}s` }}
@@ -122,7 +122,7 @@ export default function ParticipantChip({
             isRemoving && "group-hover:opacity-0",
           )}
         >
-          {person}
+          <TransitioningDisplayName displayName={person} />
         </span>
 
         {isRemoving && (
@@ -135,4 +135,21 @@ export default function ParticipantChip({
   );
 
   return ChipContent;
+}
+
+function TransitioningDisplayName({ displayName }: { displayName: string }) {
+  return (
+    <AnimatePresence mode="popLayout" initial={false}>
+      <motion.span
+        key={displayName}
+        initial={{ y: "50%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "-50%", opacity: 0 }}
+        transition={{ type: "spring", stiffness: 350, damping: 25 }}
+        className="inline-block"
+      >
+        {displayName}
+      </motion.span>
+    </AnimatePresence>
+  );
 }
