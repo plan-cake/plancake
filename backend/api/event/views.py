@@ -481,6 +481,22 @@ def get_event_details(request):
 
 @sse_endpoint("GET")
 async def get_live_updates(request, event_code):
+    """
+    Creates an SSE connection that streams live updates for an event, identified by its
+    URL code.
+
+    The updates include:
+    - New participants
+    - Participants changing their availability and/or display name
+    - Removed participants (either by choice or by the creator removing them)
+    - Event edits (title, timeslots, time zone changes)
+
+    These updates are polled on a heartbeat interval, meaning that multiple events can be
+    sent to the client at once if they happen in quick succession.
+
+    The connection can fail if there are too many concurrent connections, either globally
+    or for the specific event. In that case, a 503 response is returned.
+    """
     # Using async Redis client
     client: Redis = Redis(connection_pool=async_pool)
 
