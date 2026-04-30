@@ -362,7 +362,13 @@ def get_all_availability(request):
                 {
                     "user_display_name": user_display_name,
                     "participants": [
-                        {"display_name": p.display_name} for p in participants
+                        {
+                            "public_id": str(p.public_id),
+                            "display_name": p.display_name,
+                            "joined_at": p.created_at.isoformat(),
+                            "time_zone": p.time_zone,
+                        }
+                        for p in participants
                     ],
                     "availability": availability_dict,
                 },
@@ -396,7 +402,13 @@ def get_all_availability(request):
                 {
                     "user_display_name": user_display_name,
                     "participants": [
-                        {"display_name": p.display_name} for p in participants
+                        {
+                            "public_id": str(p.public_id),
+                            "display_name": p.display_name,
+                            "joined_at": p.created_at.isoformat(),
+                            "time_zone": p.time_zone,
+                        }
+                        for p in participants
                     ],
                     "availability": availability_dict,
                 },
