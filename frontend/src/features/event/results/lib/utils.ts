@@ -1,5 +1,5 @@
 import { ResultsAvailabilityMap } from "@/core/availability/types";
-import { ParticipantData } from "@/features/event/results/lib/types";
+import { AllAvailability } from "@/lib/utils/api/types";
 
 /**
  * Determines if there is at least one timeslot where all participants are
@@ -10,7 +10,7 @@ import { ParticipantData } from "@/features/event/results/lib/types";
  */
 export function hasMutualAvailability(
   availabilities: ResultsAvailabilityMap,
-  participants: ParticipantData,
+  participants: AllAvailability["participants"],
 ): boolean {
   for (const slot in availabilities) {
     if (availabilities[slot].length === participants.length) {
@@ -30,7 +30,7 @@ export function hasMutualAvailability(
  */
 export function findConsensusAndConflicts(
   availabilities: ResultsAvailabilityMap,
-  participants: ParticipantData,
+  participants: AllAvailability["participants"],
 ): {
   allAvailableSlots: string[];
   noOneAvailableSlots: string[];

@@ -2,7 +2,7 @@ import { AnimatePresence } from "framer-motion";
 
 import ParticipantChip from "@/features/event/results/attendee-panel/participant-chip";
 import { useResultsContext } from "@/features/event/results/context";
-import { ParticipantData } from "@/features/event/results/lib/types";
+import { AllAvailability } from "@/lib/utils/api/types";
 
 export default function ParticipantList({
   isRemoving,
@@ -40,28 +40,30 @@ export default function ParticipantList({
   return (
     <ul className={listClassNames}>
       <AnimatePresence initial={false}>
-        {participants.map((person: ParticipantData[number], index: number) => (
-          <ParticipantChip
-            key={person.public_id}
-            index={index}
-            person={person.display_name}
-            isAvailable={
-              !hoveredSlot ||
-              availabilities[hoveredSlot]?.includes(person.display_name)
-            }
-            isSelected={selectedParticipants.includes(person.display_name)}
-            areSelected={selectedParticipants.length > 0}
-            isRemoving={isRemoving && isCreator}
-            onRemove={() => promptRemove(person.display_name)}
-            onHoverChange={(isHovering) =>
-              !isRemoving &&
-              setHoveredParticipant(isHovering ? person.display_name : null)
-            }
-            onClick={() =>
-              !isRemoving && onParticipantToggle(person.display_name)
-            }
-          />
-        ))}
+        {participants.map(
+          (person: AllAvailability["participants"][number], index: number) => (
+            <ParticipantChip
+              key={person.public_id}
+              index={index}
+              person={person.display_name}
+              isAvailable={
+                !hoveredSlot ||
+                availabilities[hoveredSlot]?.includes(person.display_name)
+              }
+              isSelected={selectedParticipants.includes(person.display_name)}
+              areSelected={selectedParticipants.length > 0}
+              isRemoving={isRemoving && isCreator}
+              onRemove={() => promptRemove(person.display_name)}
+              onHoverChange={(isHovering) =>
+                !isRemoving &&
+                setHoveredParticipant(isHovering ? person.display_name : null)
+              }
+              onClick={() =>
+                !isRemoving && onParticipantToggle(person.display_name)
+              }
+            />
+          ),
+        )}
       </AnimatePresence>
     </ul>
   );

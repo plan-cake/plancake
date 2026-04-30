@@ -1,12 +1,12 @@
 import { ResultsAvailabilityMap } from "@/core/availability/types";
-import { ParticipantData } from "@/features/event/results/lib/types";
 import { hasMutualAvailability } from "@/features/event/results/lib/utils";
 import { Banner } from "@/features/system-feedback/banner/base";
 import { MESSAGES } from "@/lib/messages";
+import { AllAvailability } from "@/lib/utils/api/types";
 
 export function getResultBanners(
   availabilities: ResultsAvailabilityMap,
-  participants: ParticipantData,
+  participants: AllAvailability["participants"],
   timeslots: Date[],
   isWeekEvent: boolean,
   participated: boolean,
