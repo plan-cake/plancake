@@ -98,7 +98,10 @@ export type SelfAvailability = {
 export type AllAvailability = {
   user_display_name: string | null;
   participants: {
+    public_id: string;
     display_name: string;
+    joined_at: string;
+    time_zone: string;
   }[];
   availability: {
     [timeslot: string]: string[];

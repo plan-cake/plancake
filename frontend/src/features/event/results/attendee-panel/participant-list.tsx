@@ -42,7 +42,7 @@ export default function ParticipantList({
       <AnimatePresence initial={false}>
         {participants.map((person: ParticipantData[number], index: number) => (
           <ParticipantChip
-            key={person.id}
+            key={person.public_id}
             index={index}
             person={person.display_name}
             isAvailable={
