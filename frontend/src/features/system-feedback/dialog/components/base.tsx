@@ -15,7 +15,6 @@ export default function BaseDialog({
   onOpenChange,
   asNestedDrawer = false,
   triggerDisabled = false,
-  icon,
   overlayClassName,
 }: BaseDialogProps) {
   /* OPEN STATE MANAGEMENT */
@@ -48,7 +47,6 @@ export default function BaseDialog({
         hideCloseButton
       >
         <div className="flex flex-col items-center gap-2 overflow-hidden">
-          {icon}
           <p className="text-lg font-bold">{title}</p>
           {children}
         </div>
@@ -91,7 +89,6 @@ export default function BaseDialog({
           >
             <Dialog.Title asChild>
               <div className="flex flex-col items-center gap-4">
-                {icon}
                 <p className="text-lg font-bold">{title}</p>
               </div>
             </Dialog.Title>

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
@@ -17,21 +17,34 @@ export default function FormDialog({
   children,
   trigger,
   asNestedDrawer = false,
-  open,
+  open: controlledOpen,
   onOpenChange,
-  icon,
 }: FormDialogProps) {
   const config = DIALOG_CONFIG[type] || DIALOG_CONFIG.info;
+
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+
+  const handleOpenChange = useCallback(
+    (newOpen: boolean) => {
+      if (!isControlled) {
+        setUncontrolledOpen(newOpen);
+      }
+      onOpenChange?.(newOpen);
+    },
+    [isControlled, onOpenChange],
+  );
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       const success = await onSubmit();
       if (success) {
-        onOpenChange?.(false);
+        handleOpenChange(false);
       }
     },
-    [onSubmit, onOpenChange],
+    [onSubmit, handleOpenChange],
   );
 
   return (
@@ -40,9 +53,8 @@ export default function FormDialog({
       description={description}
       trigger={trigger}
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
       asNestedDrawer={asNestedDrawer}
-      icon={icon}
       overlayClassName={cn(
         type === "error" &&
           "bg-[color-mix(in_oklab,var(--color-error)_15%,black_20%)]",
@@ -59,7 +71,7 @@ export default function FormDialog({
             type="button"
             buttonStyle="transparent"
             label={cancelLabel}
-            onClick={() => onOpenChange?.(false)}
+            onClick={() => handleOpenChange(false)}
           />
           <EmptyButton
             type="submit"

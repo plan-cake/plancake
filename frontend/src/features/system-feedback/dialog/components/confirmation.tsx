@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import ActionButton from "@/features/button/components/action";
 import BaseModal from "@/features/system-feedback/dialog/components/base";
@@ -16,36 +16,48 @@ export default function ConfirmationDialog({
   triggerDisabled = false,
   autoClose = false,
   asNestedDrawer = false,
-  open,
+  open: controlledOpen,
   onOpenChange,
 }: ConfirmationDialogProps) {
   const config = DIALOG_CONFIG[type] || DIALOG_CONFIG.info;
 
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+
+  const handleOpenChange = useCallback(
+    (newOpen: boolean) => {
+      if (!isControlled) {
+        setUncontrolledOpen(newOpen);
+      }
+      onOpenChange?.(newOpen);
+    },
+    [isControlled, onOpenChange],
+  );
+
   const handleConfirm = useCallback(async () => {
     if (autoClose) {
-      onOpenChange?.(false);
+      handleOpenChange(false);
       onConfirm();
       return true;
     }
     const success = await onConfirm();
     if (success) {
-      onOpenChange?.(false);
+      handleOpenChange(false);
     }
     return success;
-  }, [autoClose, onConfirm, onOpenChange]);
+  }, [autoClose, onConfirm, handleOpenChange]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === "Enter") {
         const target = e.target as HTMLElement;
 
-        // Ignore if focus is inside an input, textarea, or contentEditable
         const isTextInput =
           target.tagName === "INPUT" ||
           target.tagName === "TEXTAREA" ||
           target.isContentEditable;
 
-        // Ignore if focus is on a button or link (native click handles it)
         const isActionable =
           target.tagName === "BUTTON" || target.tagName === "A";
 
@@ -66,7 +78,7 @@ export default function ConfirmationDialog({
       description={description}
       trigger={trigger}
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
       asNestedDrawer={asNestedDrawer}
       triggerDisabled={triggerDisabled}
       overlayClassName={cn(
@@ -75,12 +87,19 @@ export default function ConfirmationDialog({
       )}
     >
       <div onKeyDown={handleKeyDown}>
+        {description && !children && (
+          <p className="text-muted-foreground mb-4 text-center text-sm">
+            {description}
+          </p>
+        )}
+
         {children}
+
         <div className="mt-4 flex w-full justify-center gap-4">
           <ActionButton
             buttonStyle="transparent"
             label="Cancel"
-            onClick={() => onOpenChange?.(false)}
+            onClick={() => handleOpenChange(false)}
           />
           <ActionButton
             buttonStyle={config.buttonStyle}

@@ -63,13 +63,6 @@ type CommonDialogProps = {
    */
   asNestedDrawer?: boolean;
   /**
-   * Optional icon to display in the dialog header, next to the title.
-   *
-   * @type {React.ReactNode}
-   * @default undefined
-   */
-  icon?: React.ReactNode;
-  /**
    * Additional className to apply to the dialog overlay, for further customization.
    *
    * @type {string}
@@ -80,7 +73,7 @@ type CommonDialogProps = {
 
 export type BaseDialogProps = CommonDialogProps;
 
-export type ConfirmationDialogProps = Omit<CommonDialogProps, "icon"> & {
+export type ConfirmationDialogProps = CommonDialogProps & {
   type: DialogType;
   /**
    * Enforced strictly as a string for semantic standard confirmations.
@@ -89,9 +82,6 @@ export type ConfirmationDialogProps = Omit<CommonDialogProps, "icon"> & {
 
   /** Callback function that is called when the user confirms the action */
   onConfirm: () => boolean | Promise<boolean>;
-
-  /** Whether to display the default icon associated with the dialog 'type' */
-  showIcon?: boolean;
 
   /** Whether to automatically close the dialog after confirming */
   autoClose?: boolean;
