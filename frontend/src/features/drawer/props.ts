@@ -65,6 +65,12 @@ type BaseDrawerProps = {
    * @default false
    */
   nested?: boolean | number;
+  /**
+   * Whether to hide the default close button.
+   *
+   * @default false
+   */
+  hideCloseButton?: boolean;
 };
 
 export type StandardDrawerProps = BaseDrawerProps & {

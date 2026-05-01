@@ -7,7 +7,7 @@ import OtpStep from "@/features/account/setting-dialogs/change-password/steps/ot
 import ResetStep from "@/features/account/setting-dialogs/change-password/steps/reset";
 import { useChangePasswordFlow } from "@/features/account/setting-dialogs/change-password/use-change-password";
 import EmptyButton from "@/features/button/components/empty";
-import { ConfirmationDialog } from "@/features/system-feedback";
+import { FormDialog } from "@/features/system-feedback";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 export default function ChangePasswordDialog() {
@@ -27,35 +27,45 @@ export default function ChangePasswordDialog() {
   const displayStep = flow.open ? flow.step : renderedStep;
 
   let dialogTitle = "";
-  let dialogDescription = null;
+  let dialogDescriptionText = "";
+  let submitLabel = "Save";
   let onConfirmHandler = async () => false;
+  let dialogContent = null;
 
-  // Use `displayStep` instead of `flow.step` for the if/else blocks
+  // Configure dynamic content based on the current step
   if (displayStep === "CHANGE") {
     dialogTitle = "Change Your Password";
+    dialogDescriptionText = "Secure your account with a new password.";
+    submitLabel = "Change Password";
     onConfirmHandler = flow.handleChangePassword;
-    dialogDescription = <ChangeStep flow={flow} />;
+    dialogContent = <ChangeStep flow={flow} />;
   } else if (displayStep === "OTP") {
     dialogTitle = "Enter Reset Code";
-    onConfirmHandler = flow.handleVerifyOTP;
-    dialogDescription = <OtpStep flow={flow} />;
+    dialogDescriptionText = "Please enter the code sent to your email.";
+    submitLabel = "Verify Code";
+    onConfirmHandler = () => flow.handleVerifyOTP();
+    dialogContent = <OtpStep flow={flow} />;
   } else if (displayStep === "RESET") {
     dialogTitle = "Reset Password";
+    dialogDescriptionText = "Create a new secure password.";
+    submitLabel = "Reset Password";
     onConfirmHandler = flow.handleAuthedReset;
-    dialogDescription = <ResetStep flow={flow} />;
+    dialogContent = <ResetStep flow={flow} />;
   }
 
   return (
-    <ConfirmationDialog
+    <FormDialog
       type="info"
       asNestedDrawer={isMobile}
       title={dialogTitle}
-      description={dialogDescription}
+      description={dialogDescriptionText}
+      submitLabel={submitLabel}
+      trigger={<EmptyButton buttonStyle="primary" label="Change Password" />}
       open={flow.open}
       onOpenChange={flow.handleOpenChange}
-      onConfirm={onConfirmHandler}
+      onSubmit={onConfirmHandler}
     >
-      <EmptyButton buttonStyle="primary" label="Change Password" />
-    </ConfirmationDialog>
+      {dialogContent}
+    </FormDialog>
   );
 }
