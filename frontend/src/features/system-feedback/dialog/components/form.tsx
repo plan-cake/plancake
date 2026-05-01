@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
-import BaseModal from "@/features/system-feedback/dialog/base";
+import BaseModal from "@/features/system-feedback/dialog/components/base";
 import { DIALOG_CONFIG } from "@/features/system-feedback/dialog/config";
 import { FormDialogProps } from "@/features/system-feedback/dialog/props";
 import { cn } from "@/lib/utils/classname";

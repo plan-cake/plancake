@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 
 import ActionButton from "@/features/button/components/action";
-import BaseModal from "@/features/system-feedback/dialog/base";
+import BaseModal from "@/features/system-feedback/dialog/components/base";
 import { DIALOG_CONFIG } from "@/features/system-feedback/dialog/config";
 import { ConfirmationDialogProps } from "@/features/system-feedback/dialog/props";
 import { cn } from "@/lib/utils/classname";
