@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils/classname";
 
 type DialogIconProps = {
   dialogConfig: {
-    icon: React.ComponentType<{ className?: string }>;
+    icon: React.ComponentType<{ className?: string }> | null;
     iconStyle: string;
   };
   type?: DialogType;

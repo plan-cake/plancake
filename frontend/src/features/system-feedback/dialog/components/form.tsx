@@ -25,7 +25,6 @@ export default function FormDialog({
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
-      console.log("Form submitted");
       e.preventDefault();
       const success = await onSubmit();
       if (success) {
