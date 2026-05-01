@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 
 import ActionButton from "@/features/button/components/action";
 import BaseModal from "@/features/system-feedback/dialog/components/base";
@@ -34,15 +34,31 @@ export default function ConfirmationDialog({
     return success;
   }, [autoClose, onConfirm, onOpenChange]);
 
-  /* KEY LISTENERS */
-  useEffect(() => {
-    if (!open) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter") handleConfirm();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleConfirm, open]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter") {
+        const target = e.target as HTMLElement;
+
+        // Ignore if focus is inside an input, textarea, or contentEditable
+        const isTextInput =
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable;
+
+        // Ignore if focus is on a button or link (native click handles it)
+        const isActionable =
+          target.tagName === "BUTTON" || target.tagName === "A";
+
+        if (isTextInput || isActionable) {
+          return;
+        }
+
+        e.preventDefault();
+        handleConfirm();
+      }
+    },
+    [handleConfirm],
+  );
 
   return (
     <BaseModal
@@ -58,19 +74,21 @@ export default function ConfirmationDialog({
           "bg-[color-mix(in_oklab,var(--color-error)_15%,black_20%)]",
       )}
     >
-      {children}
-      <div className="mt-4 flex w-full justify-center gap-4">
-        <ActionButton
-          buttonStyle="transparent"
-          label="Cancel"
-          onClick={() => onOpenChange?.(false)}
-        />
-        <ActionButton
-          buttonStyle={config.buttonStyle}
-          label="Confirm"
-          onClick={handleConfirm}
-          loadOnSuccess={!autoClose}
-        />
+      <div onKeyDown={handleKeyDown}>
+        {children}
+        <div className="mt-4 flex w-full justify-center gap-4">
+          <ActionButton
+            buttonStyle="transparent"
+            label="Cancel"
+            onClick={() => onOpenChange?.(false)}
+          />
+          <ActionButton
+            buttonStyle={config.buttonStyle}
+            label="Confirm"
+            onClick={handleConfirm}
+            loadOnSuccess={!autoClose}
+          />
+        </div>
       </div>
     </BaseModal>
   );
