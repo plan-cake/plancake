@@ -16,7 +16,6 @@ import { MESSAGES } from "@/lib/messages";
 
 export function useEventResults(initialData: ResultsInformation) {
   const { addToast } = useToast();
-
   const { eventCode, isCreator, participants, availability, currentUser } =
     initialData;
 
@@ -29,17 +28,17 @@ export function useEventResults(initialData: ResultsInformation) {
   );
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
   const [showOnlyBestTimes, setShowOnlyBestTimes] = useState<boolean>(false);
+  const [minAvailability, setMinAvailability] = useState<number>(1);
+
   const [timezone, setTimezone] = useState(
-    // Lazy initialization to avoid the lookup on every render
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
   );
 
   /* OPTIMISTIC STATES */
   const [optimisticParticipants, removeOptimisticParticipant] = useOptimistic(
     participants || [],
-    (state, personToRemove: string) => {
-      return state.filter((p) => p !== personToRemove);
-    },
+    (state, personToRemove: string) =>
+      state.filter((p) => p !== personToRemove),
   );
 
   const [optimisticAvailabilities, updateOptimisticAvailabilities] =
@@ -54,9 +53,7 @@ export function useEventResults(initialData: ResultsInformation) {
   /* ACTIONS */
   const handleSetHoveredParticipant = useCallback((person: string | null) => {
     setHoveredParticipant(person);
-    if (person) {
-      setHoveredSlot(null);
-    }
+    if (person) setHoveredSlot(null);
   }, []);
 
   const toggleParticipant = (person: string) => {
@@ -70,7 +67,6 @@ export function useEventResults(initialData: ResultsInformation) {
   const handleRemoveParticipant = async (person: string) => {
     const isRemovingSelf = currentUser === person;
 
-    // Immediate UI update
     if (selectedParticipants.includes(person)) {
       setSelectedParticipants((prev) => prev.filter((p) => p !== person));
     }
@@ -80,88 +76,124 @@ export function useEventResults(initialData: ResultsInformation) {
       updateOptimisticAvailabilities(person);
     });
 
-    // Server Action
     const result = await removePerson(eventCode, person, isCreator);
-
     if (!result.success) {
       addToast("error", result.error || "Error removing participant");
     } else {
       addToast(
         "success",
-        isRemovingSelf
-          ? "You have been removed from the event."
-          : `${person} has been removed from the event.`,
+        isRemovingSelf ? "You have been removed." : `${person} removed.`,
       );
     }
-
     return result.success;
   };
 
-  /* DERIVED LOGIC */
-  const { filteredAvailabilities, gridNumParticipants, hasNoConsensus } =
-    useMemo(() => {
-      if (showOnlyBestTimes) {
-        const { allAvailableSlots } = findConsensusAndConflicts(
-          optimisticAvailabilities,
-          optimisticParticipants,
-        );
+  /* FILTERING LOGIC */
 
-        const noConsensus = allAvailableSlots.length === 0;
-
-        const filtered: ResultsAvailabilityMap = {};
-        for (const slot of allAvailableSlots) {
-          filtered[slot] = optimisticAvailabilities[slot];
-        }
-
-        return {
-          filteredAvailabilities: filtered,
-          gridNumParticipants: optimisticParticipants.length,
-          hasNoConsensus: noConsensus,
-        };
-      }
-
-      let activeParticipants: string[] = [];
-
-      if (selectedParticipants.length > 0) {
-        activeParticipants = selectedParticipants;
-      } else if (hoveredParticipant) {
-        activeParticipants = [hoveredParticipant];
-      } else {
-        return {
-          filteredAvailabilities: optimisticAvailabilities,
-          gridNumParticipants: optimisticParticipants.length,
-        };
-      }
-
-      const filtered: ResultsAvailabilityMap = {};
-      for (const slot in optimisticAvailabilities) {
-        const availablePeople = optimisticAvailabilities[slot];
-        const intersection = availablePeople.filter((p) =>
-          activeParticipants.includes(p),
-        );
-        if (intersection.length > 0) {
-          filtered[slot] = intersection;
-        }
-      }
-
-      return {
-        filteredAvailabilities: filtered,
-        gridNumParticipants: activeParticipants.length,
-        hasNoConsensus: false,
-      };
-    }, [
-      showOnlyBestTimes,
+  /**
+   * Returns a cache of the best timeslots where all participants are available.
+   * Since this can be an expensive computation, it is memoized and only recalcuated
+   * when availabilities or participants change
+   */
+  const bestTimesCache = useMemo(() => {
+    const { allAvailableSlots } = findConsensusAndConflicts(
       optimisticAvailabilities,
-      optimisticParticipants,
-      selectedParticipants,
-      hoveredParticipant,
-    ]);
+      optimisticParticipants.length,
+    );
+    return {
+      slotsSet: new Set(allAvailableSlots),
+      hasNoConsensus: allAvailableSlots.length === 0,
+    };
+  }, [optimisticAvailabilities, optimisticParticipants]);
+
+  /**
+   * Determines the "target participants" based in order of priority:
+   *  - selected participants (via click)
+   *  - hovered participant (via mouseover)
+   *  - all participants (if no selection or hover, show everyone)
+   *
+   * @returns An object containing:
+   *  - list: the array of participants to show in the grid (based on priority)
+   *  - set: a Set version of the above list for O(1) lookups
+   *  - isFiltering: boolean indicating if we are currently filtering (i.e. not showing everyone)
+   */
+  const targetParticipants = useMemo(() => {
+    const active =
+      selectedParticipants.length > 0
+        ? selectedParticipants
+        : hoveredParticipant
+          ? [hoveredParticipant]
+          : [];
+
+    return {
+      list: active.length > 0 ? active : optimisticParticipants,
+      set: new Set(active),
+      isFiltering: active.length > 0,
+    };
+  }, [selectedParticipants, hoveredParticipant, optimisticParticipants]);
+
+  /**
+   * Filters the results map to only include participants that are in the "target
+   * participants" list. This is to ensure that the results grid and participant list
+   * are always in sync.
+   */
+  const participantFilteredMap = useMemo(() => {
+    if (!targetParticipants.isFiltering) return optimisticAvailabilities;
+
+    const resultMap: ResultsAvailabilityMap = {};
+    for (const [slot, availablePeople] of Object.entries(
+      optimisticAvailabilities,
+    )) {
+      const relevantPeople = availablePeople.filter((p) =>
+        targetParticipants.set.has(p),
+      );
+      if (relevantPeople.length > 0) resultMap[slot] = relevantPeople;
+    }
+    return resultMap;
+  }, [optimisticAvailabilities, targetParticipants]);
+
+  /**
+   * This is the final filtered availabilities map that is used for rendering the
+   * grid. It applies the following filters before rendering:
+   *  - slider filter (based on min availability)
+   *  - best times filter (if showOnlyBestTimes is true)
+   *
+   * @returns The filtered availabilities map and the list of valid participants to
+   *          show in the participant list.
+   */
+  const { filteredAvailabilities, validParticipantsForList } = useMemo(() => {
+    const finalMap: ResultsAvailabilityMap = {};
+    const validParticipants = new Set<string>();
+
+    for (const [slot, availablePeople] of Object.entries(
+      participantFilteredMap,
+    )) {
+      // Apply Slider Filter
+      if (availablePeople.length < minAvailability) continue;
+
+      // Apply Best Times Filter (using the O(1) cache)
+      if (showOnlyBestTimes && !bestTimesCache.slotsSet.has(slot)) continue;
+
+      finalMap[slot] = availablePeople;
+      availablePeople.forEach((p) => validParticipants.add(p));
+    }
+
+    return {
+      filteredAvailabilities: finalMap,
+      validParticipantsForList: Array.from(validParticipants),
+    };
+  }, [
+    participantFilteredMap,
+    minAvailability,
+    showOnlyBestTimes,
+    bestTimesCache,
+  ]);
 
   useEffect(() => {
-    if (showOnlyBestTimes && hasNoConsensus) {
+    if (showOnlyBestTimes && bestTimesCache.hasNoConsensus) {
       addToast("info", MESSAGES.INFO_NO_MUTUAL_AVAILABILITY);
     }
-  }, [hasNoConsensus, showOnlyBestTimes, addToast]);
+  }, [bestTimesCache.hasNoConsensus, showOnlyBestTimes, addToast]);
 
   return {
     // Data
@@ -169,7 +201,8 @@ export function useEventResults(initialData: ResultsInformation) {
     participants: optimisticParticipants,
     availabilities: optimisticAvailabilities,
     filteredAvailabilities,
-    gridNumParticipants,
+    gridNumParticipants: targetParticipants.list.length,
+    validParticipantsForList,
 
     // User Info
     currentUser,
@@ -181,6 +214,7 @@ export function useEventResults(initialData: ResultsInformation) {
     selectedParticipants,
     showOnlyBestTimes,
     timezone,
+    minAvailability,
 
     // Actions
     clearSelectedParticipants: () => setSelectedParticipants([]),
@@ -190,5 +224,6 @@ export function useEventResults(initialData: ResultsInformation) {
     handleRemoveParticipant,
     setShowOnlyBestTimes,
     setTimezone,
+    setMinAvailability,
   };
 }

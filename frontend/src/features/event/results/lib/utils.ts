@@ -9,10 +9,12 @@ import { ResultsAvailabilityMap } from "@/core/availability/types";
  */
 export function hasMutualAvailability(
   availabilities: ResultsAvailabilityMap,
-  participants: string[],
+  participantCount: number,
 ): boolean {
+  if (participantCount === 0) return false;
+
   for (const slot in availabilities) {
-    if (availabilities[slot].length === participants.length) {
+    if (availabilities[slot].length === participantCount) {
       return true;
     }
   }
@@ -29,7 +31,7 @@ export function hasMutualAvailability(
  */
 export function findConsensusAndConflicts(
   availabilities: ResultsAvailabilityMap,
-  participants: string[],
+  participantCount: number,
 ): {
   allAvailableSlots: string[];
   noOneAvailableSlots: string[];
@@ -37,14 +39,17 @@ export function findConsensusAndConflicts(
   const allAvailableSlots: string[] = [];
   const noOneAvailableSlots: string[] = [];
 
-  for (const slot in availabilities) {
-    const availableParticipants = availabilities[slot];
+  // early return for no participants
+  if (participantCount === 0) {
+    return { allAvailableSlots, noOneAvailableSlots };
+  }
 
-    if (availableParticipants.length === participants.length) {
+  for (const [slot, availableParticipants] of Object.entries(availabilities)) {
+    const count = availableParticipants.length;
+
+    if (count === participantCount) {
       allAvailableSlots.push(slot);
-    }
-
-    if (availableParticipants.length === 0) {
+    } else if (count === 0) {
       noOneAvailableSlots.push(slot);
     }
   }
