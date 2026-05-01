@@ -26,6 +26,7 @@ import HeaderSpacer from "@/features/header/components/header-spacer";
 import { useHeaderSize } from "@/features/header/context";
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
+import { LiveUpdateEvent } from "@/lib/utils/api/live-updates/types";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -158,62 +159,36 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           }
         },
         onmessage(msg) {
-          const data = JSON.parse(msg.data);
-          if (data.action === "add") {
-            liveAddParticipant(
-              data.display_name,
-              data.is_you,
-              data.availability,
-            );
-            if (data.is_you) {
-              addToast("info", `You joined the event!`);
-            } else {
-              addToast("info", `${data.display_name} joined the event!`, {
-                title: "NEW ATTENDEE",
-              });
-            }
-          } else if (data.action === "update") {
-            const result = liveUpdateParticipant(
-              data.display_name,
-              data.new_display_name,
-              data.is_you,
-              data.availability,
-            );
-            const subject = data.is_you ? "You" : data.display_name;
-            const pronoun = data.is_you ? "your" : "their";
-            if (result.nameUpdated && result.slotsUpdated) {
-              addToast(
-                "info",
-                `${subject} updated ${pronoun} availability and changed ${pronoun} name to ${data.new_display_name}.`,
-              );
-            } else if (result.nameUpdated) {
-              addToast(
-                "info",
-                `${subject} changed ${pronoun} name to ${data.new_display_name}.`,
-              );
-            } else if (result.slotsUpdated) {
-              addToast("info", `${subject} updated ${pronoun} availability.`);
-            }
-          } else if (data.action === "remove") {
-            if (liveRemoveParticipant(data.display_name, data.is_you)) {
-              if (data.is_you) {
-                addToast("info", `You left the event.`);
-              } else {
-                addToast("info", `${data.display_name} left the event.`);
+          const data = JSON.parse(msg.data) as LiveUpdateEvent;
+          switch (data.action) {
+            case "add":
+              liveAddParticipant(data);
+              break;
+            case "update":
+              const result = liveUpdateParticipant(data);
+              const subject = data.is_you ? "You" : data.display_name;
+              const pronoun = data.is_you ? "your" : "their";
+              if (result.slotsUpdated) {
+                addToast("info", `${subject} updated ${pronoun} availability.`);
               }
-            }
-          } else if (data.action === "event_edit") {
-            addToast(
-              "info",
-              `The event was edited, reload the page for updates.`,
-              {
-                isPersistent: true,
-                title: "EVENT UPDATED",
-              },
-            );
-            setliveUpdatesStopped(true);
-          } else {
-            console.warn("Unknown action received in live update:", data);
+              break;
+            case "remove":
+              liveRemoveParticipant(data);
+              break;
+            case "event_edit":
+              addToast(
+                "info",
+                `The event was edited, reload the page for updates.`,
+                {
+                  isPersistent: true,
+                  title: "EVENT UPDATED",
+                },
+              );
+              setliveUpdatesStopped(true);
+              break;
+            default:
+              console.warn("Unknown action received in live update:", data);
+              return;
           }
         },
         onerror(err) {
