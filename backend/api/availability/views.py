@@ -29,8 +29,9 @@ from api.models import (
 from api.settings import ThrottleScopes
 from api.utils import (
     LiveUpdateAction,
-    LiveUpdateData,
+    LiveUpdateAddUpdateData,
     LiveUpdateEvent,
+    LiveUpdateRemoveData,
     MessageOutputSerializer,
     check_rate_limit,
     notify_live_update,
@@ -64,8 +65,6 @@ def add_availability(request):
     availability = request.validated_data.get("availability")
     time_zone = request.validated_data.get("time_zone")
 
-    old_display_name = None
-
     try:
         with transaction.atomic():
             user_event = UserEvent.objects.get(url_code=event_code)
@@ -90,7 +89,6 @@ def add_availability(request):
                 defaults={"time_zone": time_zone, "display_name": display_name},
             )
             if not new:
-                old_display_name = participant.display_name
                 participant.time_zone = time_zone
                 participant.display_name = display_name
                 participant.save()
@@ -161,10 +159,13 @@ def add_availability(request):
         LiveUpdateEvent(
             user_id=user.user_account_id,
             event_code=event_code,
-            data=LiveUpdateData(
+            data=LiveUpdateAddUpdateData(
                 action=LiveUpdateAction.ADD if new else LiveUpdateAction.UPDATE,
-                display_name=old_display_name if old_display_name else display_name,
-                new_display_name=display_name if old_display_name else None,
+                public_id=str(participant.public_id),
+                display_name=display_name,
+                joined_at=participant.created_at.isoformat(),
+                updated_at=participant.updated_at.isoformat(),
+                time_zone=participant.time_zone,
                 availability=[time.isoformat() for time in availability],
             ),
         )
@@ -456,11 +457,8 @@ def remove_self_availability(request):
         LiveUpdateEvent(
             user_id=user.user_account_id,
             event_code=event_code,
-            data=LiveUpdateData(
-                action=LiveUpdateAction.REMOVE,
-                display_name=participant.display_name,
-                new_display_name=None,
-                availability=None,
+            data=LiveUpdateRemoveData(
+                public_id=str(participant.public_id),
             ),
         )
     )
@@ -514,11 +512,8 @@ def remove_availability(request):
         LiveUpdateEvent(
             user_id=participant.user_account_id,
             event_code=event_code,
-            data=LiveUpdateData(
-                action=LiveUpdateAction.REMOVE,
-                display_name=display_name,
-                new_display_name=None,
-                availability=None,
+            data=LiveUpdateRemoveData(
+                public_id=str(participant.public_id),
             ),
         )
     )

@@ -51,9 +51,8 @@ from api.settings import (
     ThrottleScopes,
 )
 from api.utils import (
-    LiveUpdateAction,
-    LiveUpdateData,
     LiveUpdateEvent,
+    LiveUpdateEventEditData,
     MessageOutputSerializer,
     check_rate_limit,
     format_event_info,
@@ -312,12 +311,7 @@ def edit_date_event(request):
         LiveUpdateEvent(
             user_id=user.user_account_id,
             event_code=event_code,
-            data=LiveUpdateData(
-                action=LiveUpdateAction.EVENT_EDIT,
-                display_name=None,
-                new_display_name=None,
-                availability=None,
-            ),
+            data=LiveUpdateEventEditData(),
         )
     )
 
@@ -394,12 +388,7 @@ def edit_week_event(request):
         LiveUpdateEvent(
             user_id=user.user_account_id,
             event_code=event_code,
-            data=LiveUpdateData(
-                action=LiveUpdateAction.EVENT_EDIT,
-                display_name=None,
-                new_display_name=None,
-                availability=None,
-            ),
+            data=LiveUpdateEventEditData(),
         )
     )
 
