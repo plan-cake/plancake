@@ -18,6 +18,7 @@ export default function ParticipantList({
     isCreator,
     setHoveredParticipant,
     toggleParticipant: onParticipantToggle,
+    validParticipantsForList,
   } = useResultsContext();
 
   const listClassNames = mobile
@@ -42,8 +43,14 @@ export default function ParticipantList({
           isAvailable={
             !hoveredSlot || availabilities[hoveredSlot]?.includes(person)
           }
-          isSelected={selectedParticipants.includes(person)}
-          areSelected={selectedParticipants.length > 0}
+          isSelected={
+            selectedParticipants.includes(person) ||
+            validParticipantsForList.includes(person)
+          }
+          areSelected={
+            selectedParticipants.length > 0 ||
+            validParticipantsForList.length > 0
+          }
           isRemoving={isRemoving && isCreator}
           onRemove={() => promptRemove(person)}
           onHoverChange={(isHovering) =>
