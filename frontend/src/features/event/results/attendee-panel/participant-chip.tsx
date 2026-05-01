@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils/classname";
 export default function ParticipantChip({
   person,
   index,
+  includedInSlider,
   isAvailable,
   isRemoving,
   onRemove,
@@ -15,6 +16,7 @@ export default function ParticipantChip({
 }: {
   person: string;
   index: number;
+  includedInSlider: boolean;
   isAvailable: boolean;
   isRemoving: boolean;
   onRemove: () => void;
@@ -55,6 +57,9 @@ export default function ParticipantChip({
         isAvailable && "bg-lion text-violet opacity-100",
 
         !isAvailable && isSelected && "text-violet",
+
+        // Slider Inclusion Styling
+        !includedInSlider && "opacity-50",
 
         // Selection Styling
         isSelected &&

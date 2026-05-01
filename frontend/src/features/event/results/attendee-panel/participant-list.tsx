@@ -40,17 +40,12 @@ export default function ParticipantList({
           key={person}
           index={index}
           person={person}
+          includedInSlider={validParticipantsForList.includes(person)}
           isAvailable={
             !hoveredSlot || availabilities[hoveredSlot]?.includes(person)
           }
-          isSelected={
-            selectedParticipants.includes(person) ||
-            validParticipantsForList.includes(person)
-          }
-          areSelected={
-            selectedParticipants.length > 0 ||
-            validParticipantsForList.length > 0
-          }
+          isSelected={selectedParticipants.includes(person)}
+          areSelected={selectedParticipants.length > 0}
           isRemoving={isRemoving && isCreator}
           onRemove={() => promptRemove(person)}
           onHoverChange={(isHovering) =>
