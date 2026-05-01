@@ -39,6 +39,7 @@ class AvailableDatesSerializer(DisplayNameSerializer):
 class ParticipantSerializer(DisplayNameSerializer):
     public_id = serializers.CharField(required=True)
     joined_at = serializers.DateTimeField(required=True)
+    updated_at = serializers.DateTimeField(required=True)
     time_zone = TimeZoneField(required=True)
 
 

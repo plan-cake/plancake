@@ -367,6 +367,7 @@ def get_all_availability(request):
                             "public_id": str(p.public_id),
                             "display_name": p.display_name,
                             "joined_at": p.created_at.isoformat(),
+                            "updated_at": p.updated_at.isoformat(),
                             "time_zone": p.time_zone,
                         }
                         for p in participants
@@ -407,6 +408,7 @@ def get_all_availability(request):
                             "public_id": str(p.public_id),
                             "display_name": p.display_name,
                             "joined_at": p.created_at.isoformat(),
+                            "updated_at": p.updated_at.isoformat(),
                             "time_zone": p.time_zone,
                         }
                         for p in participants
