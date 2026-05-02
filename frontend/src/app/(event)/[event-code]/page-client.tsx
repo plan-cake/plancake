@@ -149,9 +149,15 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         async onopen(response) {
           if (!response.ok) {
             if (response.status === 503) {
+              const errorData = await response.json();
               addToast(
-                "error",
-                "Cannot connect to live updates, the server is busy. Please try again later.",
+                "info",
+                (errorData?.error?.general?.[0] ||
+                  "Live updates are currently unavailable.") +
+                  " Refresh the page to retry.",
+                {
+                  isPersistent: true,
+                },
               );
             }
             setliveUpdatesStopped(true);
