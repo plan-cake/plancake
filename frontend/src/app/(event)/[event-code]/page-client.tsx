@@ -170,7 +170,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             case "add":
               liveAddParticipant(data);
               break;
-            case "update":
+            case "update": {
               const updated = liveUpdateParticipant(data);
               const subject = data.is_you ? "You" : data.display_name;
               const pronoun = data.is_you ? "your" : "their";
@@ -178,6 +178,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
                 addToast("info", `${subject} updated ${pronoun} availability.`);
               }
               break;
+            }
             case "remove":
               liveRemoveParticipant(data);
               break;
