@@ -75,7 +75,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   const [liveUpdatesPaused, setLiveUpdatesPaused] = useState(false);
   const [liveUpdatesStopped, setliveUpdatesStopped] = useState(false);
   const router = useRouter();
-  const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const idleToastRef = useRef<number | null>(null);
 
   // Handle idle timeout and reconnection
