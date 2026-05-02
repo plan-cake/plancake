@@ -165,6 +165,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           }
         },
         onmessage(msg) {
+          if (!msg.data) return; // Ignore pings
+
           const data = JSON.parse(msg.data) as LiveUpdateEvent;
           switch (data.action) {
             case "add":
