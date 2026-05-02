@@ -171,10 +171,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
               liveAddParticipant(data);
               break;
             case "update":
-              const result = liveUpdateParticipant(data);
+              const updated = liveUpdateParticipant(data);
               const subject = data.is_you ? "You" : data.display_name;
               const pronoun = data.is_you ? "your" : "their";
-              if (result.slotsUpdated) {
+              if (updated) {
                 addToast("info", `${subject} updated ${pronoun} availability.`);
               }
               break;

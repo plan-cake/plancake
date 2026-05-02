@@ -190,9 +190,7 @@ export function useEventResults(initialData: ResultsInformation) {
   );
 
   const liveUpdateParticipant = useCallback(
-    (
-      eventData: LiveUpdateAddUpdateEvent,
-    ): { nameUpdated: boolean; slotsUpdated: boolean } => {
+    (eventData: LiveUpdateAddUpdateEvent): boolean => {
       const {
         public_id,
         display_name,
@@ -216,7 +214,7 @@ export function useEventResults(initialData: ResultsInformation) {
       )?.display_name;
       if (!participant) {
         // Participant not found, ignore the update
-        return { nameUpdated: false, slotsUpdated: false };
+        return false;
       }
 
       const nameChanged = participant !== display_name;
@@ -270,7 +268,7 @@ export function useEventResults(initialData: ResultsInformation) {
         return updated;
       });
 
-      return { nameUpdated: nameChanged, slotsUpdated: slotsChanged };
+      return slotsChanged;
     },
     [optimisticParticipants, optimisticAvailabilities, initialData],
   );
