@@ -493,8 +493,9 @@ async def get_live_updates(request, event_code):
     EVENT_COUNT = f"live_updates_event_{event_code}_count"
 
     # Check global limit
-    global_count = int(await client.get(GLOBAL_COUNT) or 0)
-    if global_count >= MAX_LIVE_CONNECTIONS_GLOBAL:
+    global_count = await client.incr(GLOBAL_COUNT)
+    if global_count > MAX_LIVE_CONNECTIONS_GLOBAL:
+        await client.decr(GLOBAL_COUNT)
         await client.aclose()
         return JsonResponse(
             {"error": {"general": ["Live updates are currently unavailable."]}},
@@ -502,8 +503,10 @@ async def get_live_updates(request, event_code):
         )
 
     # Check per-event limit
-    event_count = int(await client.get(EVENT_COUNT) or 0)
-    if event_count >= MAX_LIVE_CONNECTIONS_EVENT:
+    event_count = await client.incr(EVENT_COUNT)
+    if event_count > MAX_LIVE_CONNECTIONS_EVENT:
+        await client.decr(GLOBAL_COUNT)
+        await client.decr(EVENT_COUNT)
         await client.aclose()
         return JsonResponse(
             {
@@ -528,10 +531,6 @@ async def get_live_updates(request, event_code):
         user_id = session.user_account_id
 
     async def event_generator():
-        # Increment counts
-        await client.incr(GLOBAL_COUNT)
-        await client.incr(EVENT_COUNT)
-
         pubsub = client.pubsub()
         await pubsub.subscribe(f"event_{event_code}")
 
