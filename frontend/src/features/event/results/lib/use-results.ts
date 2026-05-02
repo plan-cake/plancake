@@ -112,6 +112,12 @@ export function useEventResults(initialData: ResultsInformation) {
   };
 
   const liveAddParticipant = useCallback(
+    /**
+     * Given data from a live update event, adds a participant with their availability to
+     * the participant list and availability map.
+     *
+     * @param eventData Data from the live update event.
+     */
     (eventData: LiveUpdateAddUpdateEvent) => {
       const {
         public_id,
@@ -159,6 +165,12 @@ export function useEventResults(initialData: ResultsInformation) {
   );
 
   const liveRemoveParticipant = useCallback(
+    /**
+     * Given data from a live update event, removes a participant from the results.
+     *
+     * @param eventData Data from the live update event.
+     * @returns `true` if the participant was removed, `false` otherwise.
+     */
     (eventData: LiveUpdateRemoveEvent): boolean => {
       const { public_id, is_you } = eventData;
 
@@ -190,6 +202,13 @@ export function useEventResults(initialData: ResultsInformation) {
   );
 
   const liveUpdateParticipant = useCallback(
+    /**
+     * Given data from a live update event, updates a participant's display name and/or
+     * availability slots.
+     *
+     * @param eventData Data from the live update event.
+     * @returns `true` if the availability slots were updated, `false` otherwise.
+     */
     (eventData: LiveUpdateAddUpdateEvent): boolean => {
       const {
         public_id,
