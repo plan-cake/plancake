@@ -14,7 +14,7 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import ScheduleGrid from "@/features/event/grid/grid";
 import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
-import { getResultBanners } from "@/features/event/results/banners";
+import { getResultBanner } from "@/features/event/results/banners";
 import {
   ResultsProvider,
   useResultsContext,
@@ -249,8 +249,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   /* HEADER SPACING */
   const { topMarginClass } = useHeaderSize();
 
-  /* BANNERS */
-  const banners = getResultBanners(
+  /* BANNER */
+  const { element: banner, id: bannerId } = getResultBanner(
     availabilities,
     participants,
     timeslots,
@@ -289,9 +289,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
     return (
       <AnimatePresence initial={false} mode="sync">
-        {banners && (
+        {banner && (
           <motion.div
-            key={banners?.props.children}
+            key={bannerId}
             initial={{
               height: 0,
               opacity: 0,
@@ -302,7 +302,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             exit="exit"
             variants={variants}
           >
-            {banners}
+            {banner}
           </motion.div>
         )}
       </AnimatePresence>
