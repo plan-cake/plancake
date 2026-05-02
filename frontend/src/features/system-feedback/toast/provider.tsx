@@ -47,15 +47,6 @@ export default function ToastProvider({
     };
   }, []);
 
-  // Remove persistent toasts on page change
-  useEffect(() => {
-    setToasts((prev) =>
-      prev.map((t) =>
-        t.isPersistent && t.pathOrigin !== pathname ? { ...t, open: false } : t,
-      ),
-    );
-  }, [pathname]);
-
   const addToast = useCallback(
     (type: ToastType, message: string, options?: ToastOptions) => {
       // check the local storage key to see if we should show the toast
@@ -111,6 +102,18 @@ export default function ToastProvider({
       setToasts((prevToasts) => prevToasts.filter((t) => t.id !== id));
     }, 400);
   }, []);
+
+  // Remove persistent toasts on page change
+  useEffect(() => {
+    setToasts((prev) => {
+      prev.map((t) => {
+        if (t.isPersistent && t.pathOrigin !== pathname) {
+          removeToast(t.id);
+        }
+      });
+      return prev;
+    });
+  }, [pathname, removeToast]);
 
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>
