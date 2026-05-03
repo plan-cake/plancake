@@ -21,12 +21,14 @@ export default function KebabMenu({
   open: controlledOpen,
   onOpenChange,
   nested = false,
+  closeOnClick = true,
 }: {
   children: React.ReactNode;
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   nested?: boolean;
+  closeOnClick?: boolean;
 }) {
   const id = useId();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -112,10 +114,11 @@ export default function KebabMenu({
             onClick={(e) => {
               const target = e.target as HTMLElement;
               if (
-                target.closest("button") ||
-                target.closest("a") ||
-                target.closest('[role="button"]') ||
-                target.closest('[role="menuitem"]')
+                (target.closest("button") ||
+                  target.closest("a") ||
+                  target.closest('[role="button"]') ||
+                  target.closest('[role="menuitem"]')) &&
+                closeOnClick
               ) {
                 handleOpenChange(false);
               }
