@@ -165,7 +165,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           )}
         >
           {banners}
-          <div className="flex max-h-[calc(100vh-8rem)] flex-col gap-y-4">
+          <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4">
             <AttendeesPanel />
             <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
               <DisplaySettings
