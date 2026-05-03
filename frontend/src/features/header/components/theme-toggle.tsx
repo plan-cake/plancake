@@ -7,9 +7,13 @@ import KebabMenu from "@/components/kebab-menu";
 import SegmentedControl from "@/components/segmented-control";
 import EmptyButton from "@/features/button/components/empty";
 import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
+import { useHeaderSize } from "@/features/header/context";
 
 export default function ThemeToggle() {
+  const { activeMenu, setActiveMenu } = useHeaderSize();
   const { theme = "system", setTheme } = useTheme();
+
+  const isMenuOpen = activeMenu === "theme";
 
   return (
     <ShrinkingHeaderButton
@@ -17,6 +21,9 @@ export default function ThemeToggle() {
       icon={<SunMoonIcon />}
     >
       <KebabMenu
+        nested
+        open={isMenuOpen}
+        onOpenChange={(isOpen) => setActiveMenu(isOpen ? "theme" : null)}
         trigger={
           <EmptyButton
             buttonStyle="frosted glass inset"
