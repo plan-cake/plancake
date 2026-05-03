@@ -160,7 +160,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         <div
           className={cn(
             "hidden md:block",
-            "fixed bottom-1 left-0 z-10 w-full shrink-0 px-6",
+            "z-10 w-full shrink-0",
             "relative bottom-auto left-auto w-80 space-y-4 px-0",
           )}
         >
