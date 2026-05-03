@@ -30,6 +30,7 @@ export default function ThemeToggle() {
             icon={<SunMoonIcon />}
           />
         }
+        closeOnClick={false}
       >
         <SegmentedControl
           options={[
