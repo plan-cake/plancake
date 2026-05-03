@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 
-import { PencilIcon, SquarePenIcon } from "lucide-react";
+import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
 
 import CopyToastButton from "@/components/copy-toast-button";
 import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
+import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import ScheduleGrid from "@/features/event/grid/grid";
 import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
@@ -19,6 +20,8 @@ import DisplaySettings from "@/features/event/results/display-settings";
 import ResultsDrawer from "@/features/event/results/drawer";
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
+import { useToast } from "@/features/system-feedback";
+import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -34,6 +37,8 @@ export default function ClientPage({
     </ResultsProvider>
   );
 }
+
+type HeaderButtonStyle = "frosted glass inset" | "secondary";
 
 function EventResults({ eventData }: { eventData: EventInformation }) {
   const {
@@ -55,6 +60,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     eventRange,
     timeslots,
   } = eventData;
+
+  /* TOAST PROVIDER */
+  const { addToast } = useToast();
 
   /* TIMEZONE HANDLING */
   const handleTZChange = (newTZ: string | number) => {
@@ -93,7 +101,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     />
   );
 
-  const editButton = (buttonStyle: "frosted glass inset" | "secondary") => (
+  const editButton = (buttonStyle: HeaderButtonStyle) => (
     <LinkButton
       buttonStyle={buttonStyle}
       icon={<PencilIcon />}
@@ -102,7 +110,43 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     />
   );
 
-  const copyButton = (buttonStyle: "frosted glass inset" | "secondary") => (
+  const shareButton = (buttonStyle: HeaderButtonStyle) => {
+    // Check if sharing is supported
+    if (typeof navigator !== "undefined" && !navigator.share) {
+      /* This condition means it will be rendered until mounted on the client, then it
+       * disappears if not supported. There are more browsers that support the API than
+       * don't, so this is a better trade-off than having the button appear after initial
+       * mount on supported browsers.
+       *
+       * This also won't be visible on mobile anyway, since the buttons are hidden in the
+       * kebab menu.
+       */
+      return null;
+    } else {
+      return (
+        <ActionButton
+          buttonStyle={buttonStyle}
+          icon={<ShareIcon />}
+          label="Share Event"
+          onClick={async () => {
+            try {
+              await navigator.share({
+                title: eventTitle,
+                url: window.location.href,
+              });
+            } catch (error) {
+              // An error is thrown if sharing is cancelled, ignore that
+              if (error instanceof Error && error.name !== "AbortError") {
+                addToast("error", MESSAGES.ERROR_GENERIC);
+              }
+            }
+          }}
+        />
+      );
+    }
+  };
+
+  const copyButton = (buttonStyle: HeaderButtonStyle) => (
     <CopyToastButton code={eventCode} buttonStyle={buttonStyle} />
   );
 
@@ -117,12 +161,14 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         <div className="md:hidden">
           <KebabMenu>
             {isCreator && editButton("frosted glass inset")}
+            {shareButton("frosted glass inset")}
             {copyButton("frosted glass inset")}
           </KebabMenu>
         </div>
 
         <div className="ml-auto hidden flex-wrap justify-end gap-2 md:flex">
           {isCreator && editButton("secondary")}
+          {shareButton("secondary")}
           {copyButton("secondary")}
           {paintingButton}
         </div>
