@@ -24,12 +24,14 @@ export default function SegmentedControl<T extends string>({
 
   // Calculate dynamic style for the sliding pill
   const pillStyle = useMemo(() => {
-    const pillWidth = `(100% - ${hidePadding ? "0px" : "16px"}) / ${count}`;
-    const leftOffset = `calc(${hidePadding ? "0px" : "8px"} + (${pillWidth}) * ${activeIndex})`;
+    const baseOffset = hidePadding ? 0 : 8;
+
+    const pillWidth = `(100% - ${baseOffset * 2}px) / ${count}`;
+    const leftOffset = `calc(${baseOffset}px + (${pillWidth}) * ${activeIndex})`;
 
     return {
       width: `calc(${pillWidth})`,
-      left: activeIndex === -1 ? (hidePadding ? "0px" : "8px") : leftOffset,
+      left: activeIndex === -1 ? `${baseOffset}px` : leftOffset,
     };
   }, [hidePadding, activeIndex, count]);
 
