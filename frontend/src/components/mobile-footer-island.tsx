@@ -28,7 +28,7 @@ export default function MobileFooterIsland({
   }, []);
 
   return (
-    <>
+    <div className="md:hidden">
       {/* Placeholder div to avoid content overlap */}
       <div style={{ height: islandHeight }} />
       <div
@@ -55,6 +55,6 @@ export default function MobileFooterIsland({
             ))}
         </div>
       </div>
-    </>
+    </div>
   );
 }
