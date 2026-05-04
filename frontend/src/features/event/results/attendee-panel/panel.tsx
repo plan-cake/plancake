@@ -61,7 +61,7 @@ export default function AttendeesPanel() {
           personToRemove === currentUser ? "Leave Event" : "Remove Participant"
         }
         description={
-          personToRemove == currentUser ? (
+          personToRemove === currentUser ? (
             "Are you sure you want to leave this event?"
           ) : (
             <span>
