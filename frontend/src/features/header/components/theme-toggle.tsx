@@ -29,6 +29,7 @@ export default function ThemeToggle() {
           <EmptyButton
             buttonStyle="frosted glass inset"
             icon={<SunMoonIcon />}
+            aria-label="Choose Site Theme"
           />
         }
         closeOnClick={false}
