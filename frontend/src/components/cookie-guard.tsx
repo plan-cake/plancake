@@ -38,6 +38,8 @@ export function CookieGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Still checking or enabled
+  // Show while still checking or enabled
+  // We prioritize the experience of users who have cookies enabled rather than strictly
+  // enforcing the guard while checking
   return <>{children}</>;
 }
