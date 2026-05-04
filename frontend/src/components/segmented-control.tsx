@@ -29,7 +29,7 @@ export default function SegmentedControl<T extends string>({
 
     return {
       width: `calc(${pillWidth})`,
-      left: activeIndex === -1 ? "8px" : leftOffset,
+      left: activeIndex === -1 ? (hidePadding ? "0px" : "8px") : leftOffset,
     };
   }, [hidePadding, activeIndex, count]);
 
