@@ -8,6 +8,7 @@ type SegmentedControlProps<T extends string> = {
   options: { label: React.ReactNode; value: T }[];
   value: T;
   onChange: (value: T) => void;
+  hidePadding?: boolean;
   className?: string;
 };
 
@@ -15,6 +16,7 @@ export default function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
+  hidePadding = false,
   className,
 }: SegmentedControlProps<T>) {
   const activeIndex = options.findIndex((opt) => opt.value === value);
@@ -22,19 +24,20 @@ export default function SegmentedControl<T extends string>({
 
   // Calculate dynamic style for the sliding pill
   const pillStyle = useMemo(() => {
-    const pillWidth = `(100% - 16px) / ${count}`;
-    const leftOffset = `calc(8px + (${pillWidth}) * ${activeIndex})`;
+    const pillWidth = `(100% - ${hidePadding ? "0px" : "16px"}) / ${count}`;
+    const leftOffset = `calc(${hidePadding ? "0px" : "8px"} + (${pillWidth}) * ${activeIndex})`;
 
     return {
       width: `calc(${pillWidth})`,
       left: activeIndex === -1 ? "8px" : leftOffset,
     };
-  }, [activeIndex, count]);
+  }, [hidePadding, activeIndex, count]);
 
   return (
     <div
       className={cn(
-        "bg-panel relative isolate grid w-full rounded-full p-2",
+        "bg-panel relative isolate grid w-full rounded-full",
+        !hidePadding && "p-2",
         className,
       )}
       style={{
@@ -42,7 +45,10 @@ export default function SegmentedControl<T extends string>({
       }}
     >
       <div
-        className="bg-accent absolute bottom-2 top-2 rounded-full transition-[left,width] duration-300 ease-out"
+        className={cn(
+          "bg-accent absolute rounded-full transition-[left,width] duration-300 ease-out",
+          hidePadding ? "bottom-0 top-0" : "bottom-2 top-2",
+        )}
         style={pillStyle}
       />
 
