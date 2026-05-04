@@ -46,7 +46,7 @@ export default function SegmentedControl<T extends string>({
     >
       <div
         className={cn(
-          "bg-accent absolute rounded-full transition-[left,width] duration-300 ease-out",
+          "bg-accent/25 absolute rounded-full transition-[left,width] duration-300 ease-out",
           hidePadding ? "bottom-0 top-0" : "bottom-2 top-2",
         )}
         style={pillStyle}
@@ -60,10 +60,10 @@ export default function SegmentedControl<T extends string>({
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              "z-10 flex w-full items-center justify-center rounded-full py-2 text-sm font-medium transition-colors duration-300 focus:outline-none",
+              "z-10 flex w-full items-center justify-center rounded-full py-2 text-sm font-medium focus:outline-none",
               isSelected
-                ? "text-white"
-                : "text-foreground hover:bg-accent/25 cursor-pointer",
+                ? "text-accent-text font-bold"
+                : "text-foreground hover:bg-accent/15 cursor-pointer",
             )}
           >
             {option.label}
