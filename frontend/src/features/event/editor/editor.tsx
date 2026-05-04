@@ -5,7 +5,7 @@ import { memo, useState } from "react";
 import { TriangleAlertIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import MobileFooterTray from "@/components/mobile-footer-tray";
+import MobileFooterIsland from "@/components/mobile-footer-island";
 import SegmentedControl from "@/components/segmented-control";
 import TextInputField from "@/components/text-input-field";
 import { EventProvider, useEventContext } from "@/core/event/context";
@@ -130,17 +130,6 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         </div>
       </div>
 
-      <div className="md:hidden">
-        <SegmentedControl
-          value={mobileTab}
-          onChange={setMobileTab}
-          options={[
-            { label: "Event Details", value: "details" },
-            { label: "Grid Preview", value: "preview" },
-          ]}
-        />
-      </div>
-
       <div
         className={cn(
           "w-full grid-cols-1 gap-y-2",
@@ -201,11 +190,21 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
       {/* This z-index is necessary to avoid the time column overlapping */}
       <div className="z-10">
-        <MobileFooterTray
-          buttons={
-            type === "edit" ? [cancelButton, submitButton] : [submitButton]
-          }
-        />
+        <MobileFooterIsland
+          leftButtons={type === "edit" ? [cancelButton] : undefined}
+          rightButtons={[submitButton]}
+        >
+          <SegmentedControl
+            value={mobileTab}
+            onChange={setMobileTab}
+            options={[
+              { label: "Event Details", value: "details" },
+              { label: "Grid Preview", value: "preview" },
+            ]}
+            hidePadding
+            className=""
+          />
+        </MobileFooterIsland>
       </div>
     </div>
   );
