@@ -37,9 +37,13 @@ export default function ThemePicker() {
         <div className="text-center font-bold">Theme</div>
         <SegmentedControl
           options={[
-            { value: "system", label: <MonitorIcon /> },
-            { value: "light", label: <SunIcon /> },
-            { value: "dark", label: <MoonIcon /> },
+            {
+              value: "system",
+              label: <MonitorIcon />,
+              ariaLabel: "Match System Theme",
+            },
+            { value: "light", label: <SunIcon />, ariaLabel: "Light Theme" },
+            { value: "dark", label: <MoonIcon />, ariaLabel: "Dark Theme" },
           ]}
           value={theme}
           onChange={setTheme}
