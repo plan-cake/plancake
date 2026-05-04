@@ -11,7 +11,9 @@ export function CookieGuard({ children }: { children: React.ReactNode }) {
     const testKey = "plancake_test";
     try {
       document.cookie = `${testKey}=1; SameSite=Lax`;
-      const exists = document.cookie.includes(testKey);
+      const exists = document.cookie
+        .split(";")
+        .some((item) => item.trim().startsWith(`${testKey}=`));
       document.cookie = `${testKey}=; Max-Age=0; SameSite=Lax`;
       setCookiesEnabled(exists);
     } catch {
