@@ -202,7 +202,6 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
               { label: "Grid Preview", value: "preview" },
             ]}
             hidePadding
-            className=""
           />
         </MobileFooterIsland>
       </div>
