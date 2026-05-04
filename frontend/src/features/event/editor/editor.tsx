@@ -186,7 +186,6 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           timeslots={timeslots}
         />
       </div>
-      <div className="h-16 md:hidden" />
 
       {/* This z-index is necessary to avoid the time column overlapping */}
       <div className="z-10">
