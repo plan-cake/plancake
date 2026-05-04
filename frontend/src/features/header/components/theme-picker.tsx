@@ -9,7 +9,7 @@ import EmptyButton from "@/features/button/components/empty";
 import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
 import { useHeaderSize } from "@/features/header/context";
 
-export default function ThemeToggle() {
+export default function ThemePicker() {
   const { activeMenu, setActiveMenu } = useHeaderSize();
   const { theme = "system", setTheme } = useTheme();
 
