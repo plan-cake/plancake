@@ -58,13 +58,11 @@ export default function AttendeesPanel() {
         type="delete"
         autoClose={true}
         title={
-          personToRemove === currentUser
-            ? "Remove Yourself"
-            : "Remove Participant"
+          personToRemove === currentUser ? "Leave Event" : "Remove Participant"
         }
         description={
-          personToRemove == currentUser ? (
-            "Are you sure you want to remove yourself from this event?"
+          personToRemove === currentUser ? (
+            "Are you sure you want to leave this event?"
           ) : (
             <span>
               Are you sure you want to remove{" "}
