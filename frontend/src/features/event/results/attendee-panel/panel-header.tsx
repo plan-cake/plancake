@@ -129,7 +129,7 @@ export default function PanelHeader({
               onClick={() => {
                 promptRemove(currentUser);
               }}
-              aria-label="Remove Self from Event"
+              aria-label="Leave Event"
               className="hover:bg-error/25 hover:text-error active:bg-error/40 shrink-0"
             />
           )}
