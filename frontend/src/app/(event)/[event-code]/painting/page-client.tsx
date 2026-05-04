@@ -11,7 +11,7 @@ import MobileFooterIsland from "@/components/mobile-footer-island";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
 import { useAccount } from "@/features/account/context";
-import { AccountDetails } from "@/features/account/type";
+import { AccountDetails, LoginState } from "@/features/account/type";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
@@ -378,7 +378,7 @@ function DisplayNameInput({
   displayName: string;
   setDisplayName: (name: string) => void;
   handleNameChange: (name: string) => void;
-  loginState: string;
+  loginState: LoginState;
   accountDetails: AccountDetails | null;
   saveDefaultName: boolean;
   setSaveDefaultName: (save: boolean) => void;
@@ -410,7 +410,7 @@ function DisplayNameInput({
         <br />
         add your availabilities here
       </div>
-      {loginState === "logged_in" && !accountDetails!.defaultName && (
+      {loginState === "logged_in" && !accountDetails?.defaultName && (
         <div className="text-foreground/75">
           <Checkbox
             label="Save as nickname for autofill"
