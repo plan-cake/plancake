@@ -24,6 +24,7 @@ export default function ThemeToggle() {
         nested
         open={isMenuOpen}
         onOpenChange={(isOpen) => setActiveMenu(isOpen ? "theme" : null)}
+        anchorPoint="top-center"
         trigger={
           <EmptyButton
             buttonStyle="frosted glass inset"
