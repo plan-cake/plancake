@@ -30,7 +30,7 @@ export function CookieGuard({ children }: { children: React.ReactNode }) {
         )}
       >
         <h1 className="text-2xl font-bold">Cookies Required</h1>
-        <p className="text-foreground">
+        <p>
           Plancake requires cookies for the site to work properly. Please
           enable/unblock them in your browser settings and refresh.
         </p>
