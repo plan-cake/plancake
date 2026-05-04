@@ -33,6 +33,7 @@ export default function ThemeToggle() {
         }
         closeOnClick={false}
       >
+        <div className="text-center font-bold">Theme</div>
         <SegmentedControl
           options={[
             { value: "system", label: <MonitorIcon /> },
@@ -43,6 +44,13 @@ export default function ThemeToggle() {
           onChange={setTheme}
           className="frosted-glass-inset"
         />
+        <div className="text-center text-sm opacity-75">
+          {theme === "system"
+            ? "Match System"
+            : theme === "light"
+              ? "Light"
+              : "Dark"}
+        </div>
       </KebabMenu>
     </ShrinkingHeaderButton>
   );
