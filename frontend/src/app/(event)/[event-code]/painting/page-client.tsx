@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
 import Checkbox from "@/components/checkbox";
-import MobileFooterTray from "@/components/mobile-footer-tray";
+import MobileFooterIsland from "@/components/mobile-footer-island";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
 import { useAccount } from "@/features/account/context";
+import { AccountDetails } from "@/features/account/type";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
@@ -272,41 +273,17 @@ export default function ClientPage({
             "h-fit w-full shrink-0 space-y-4 overflow-y-auto md:sticky md:w-80",
           )}
         >
-          <div className="space-y-2">
-            <div className="w-fit">
-              <p
-                className={`text-error text-right text-xs ${errors.displayName ? "visible" : "invisible"}`}
-              >
-                {errors.displayName ? errors.displayName : "Error Placeholder"}
-              </p>
-              Hi,{" "}
-              <input
-                required
-                type="text"
-                value={displayName}
-                onChange={(e) => {
-                  setDisplayName(e.target.value);
-                  handleNameChange(e.target.value);
-                }}
-                placeholder="add your name"
-                className={`inline-block w-auto border-b bg-transparent px-1 focus:outline-none ${
-                  errors.displayName
-                    ? "border-error placeholder:text-error"
-                    : "border-gray-400"
-                }`}
-              />
-              <br />
-              add your availabilities here
-            </div>
-            {loginState === "logged_in" && !accountDetails!.defaultName && (
-              <div className="text-foreground/75">
-                <Checkbox
-                  label="Save as nickname for autofill"
-                  checked={saveDefaultName}
-                  onChange={(checked) => setSaveDefaultName(checked)}
-                ></Checkbox>
-              </div>
-            )}
+          <div className="hidden md:block">
+            <DisplayNameInput
+              errors={errors}
+              displayName={displayName}
+              setDisplayName={setDisplayName}
+              handleNameChange={handleNameChange}
+              loginState={loginState}
+              accountDetails={accountDetails}
+              saveDefaultName={saveDefaultName}
+              setSaveDefaultName={setSaveDefaultName}
+            />
           </div>
 
           <div className="bg-panel rounded-3xl p-6 text-sm">
@@ -338,7 +315,23 @@ export default function ClientPage({
 
       {/* This z-index is necessary to avoid the time column overlapping */}
       <div className="z-10">
-        <MobileFooterTray buttons={[cancelButton, submitButton]} />
+        <MobileFooterIsland
+          leftButtons={[cancelButton]}
+          rightButtons={[submitButton]}
+        >
+          <div className="mx-3 -mt-2">
+            <DisplayNameInput
+              errors={errors}
+              displayName={displayName}
+              setDisplayName={setDisplayName}
+              handleNameChange={handleNameChange}
+              loginState={loginState}
+              accountDetails={accountDetails}
+              saveDefaultName={saveDefaultName}
+              setSaveDefaultName={setSaveDefaultName}
+            />
+          </div>
+        </MobileFooterIsland>
       </div>
 
       <ConfirmationDialog
@@ -367,6 +360,65 @@ export default function ClientPage({
           return true;
         }}
       />
+    </div>
+  );
+}
+
+function DisplayNameInput({
+  errors,
+  displayName,
+  setDisplayName,
+  handleNameChange,
+  loginState,
+  accountDetails,
+  saveDefaultName,
+  setSaveDefaultName,
+}: {
+  errors: Record<string, string>;
+  displayName: string;
+  setDisplayName: (name: string) => void;
+  handleNameChange: (name: string) => void;
+  loginState: string;
+  accountDetails: AccountDetails | null;
+  saveDefaultName: boolean;
+  setSaveDefaultName: (save: boolean) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="w-fit">
+        <p
+          className={`text-error text-right text-xs ${errors.displayName ? "visible" : "invisible"}`}
+        >
+          {errors.displayName ? errors.displayName : "Error Placeholder"}
+        </p>
+        Hi,{" "}
+        <input
+          required
+          type="text"
+          value={displayName}
+          onChange={(e) => {
+            setDisplayName(e.target.value);
+            handleNameChange(e.target.value);
+          }}
+          placeholder="add your name"
+          className={`inline-block w-auto border-b bg-transparent px-1 focus:outline-none ${
+            errors.displayName
+              ? "border-error placeholder:text-error"
+              : "border-gray-400"
+          }`}
+        />
+        <br />
+        add your availabilities here
+      </div>
+      {loginState === "logged_in" && !accountDetails!.defaultName && (
+        <div className="text-foreground/75">
+          <Checkbox
+            label="Save as nickname for autofill"
+            checked={saveDefaultName}
+            onChange={(checked) => setSaveDefaultName(checked)}
+          ></Checkbox>
+        </div>
+      )}
     </div>
   );
 }
