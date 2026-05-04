@@ -8,6 +8,7 @@ type SegmentedControlProps<T extends string> = {
   options: { label: React.ReactNode; value: T }[];
   value: T;
   onChange: (value: T) => void;
+  hidePadding?: boolean;
   className?: string;
 };
 
@@ -15,6 +16,7 @@ export default function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
+  hidePadding = false,
   className,
 }: SegmentedControlProps<T>) {
   const activeIndex = options.findIndex((opt) => opt.value === value);
@@ -22,19 +24,22 @@ export default function SegmentedControl<T extends string>({
 
   // Calculate dynamic style for the sliding pill
   const pillStyle = useMemo(() => {
-    const pillWidth = `(100% - 16px) / ${count}`;
-    const leftOffset = `calc(8px + (${pillWidth}) * ${activeIndex})`;
+    const baseOffset = hidePadding ? 0 : 8;
+
+    const pillWidth = `(100% - ${baseOffset * 2}px) / ${count}`;
+    const leftOffset = `calc(${baseOffset}px + (${pillWidth}) * ${activeIndex})`;
 
     return {
       width: `calc(${pillWidth})`,
-      left: activeIndex === -1 ? "8px" : leftOffset,
+      left: activeIndex === -1 ? `${baseOffset}px` : leftOffset,
     };
-  }, [activeIndex, count]);
+  }, [hidePadding, activeIndex, count]);
 
   return (
     <div
       className={cn(
-        "bg-panel relative isolate grid w-full rounded-full p-2",
+        "bg-panel relative isolate grid w-full rounded-full",
+        !hidePadding && "p-2",
         className,
       )}
       style={{
@@ -42,7 +47,10 @@ export default function SegmentedControl<T extends string>({
       }}
     >
       <div
-        className="bg-accent absolute bottom-2 top-2 rounded-full transition-[left,width] duration-300 ease-out"
+        className={cn(
+          "bg-accent/25 absolute rounded-full transition-[left,width] duration-300 ease-out",
+          hidePadding ? "bottom-0 top-0" : "bottom-2 top-2",
+        )}
         style={pillStyle}
       />
 
@@ -54,10 +62,10 @@ export default function SegmentedControl<T extends string>({
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              "z-10 flex w-full items-center justify-center rounded-full py-2 text-sm font-medium transition-colors duration-300 focus:outline-none",
+              "z-10 flex w-full items-center justify-center rounded-full py-2 text-sm font-medium focus:outline-none",
               isSelected
-                ? "text-white"
-                : "text-foreground hover:bg-accent/25 cursor-pointer",
+                ? "text-accent-text font-bold"
+                : "text-foreground hover:bg-accent/15 cursor-pointer",
             )}
           >
             {option.label}
