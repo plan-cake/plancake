@@ -45,6 +45,8 @@ class UserSession(models.Model):
         UserAccount, on_delete=models.CASCADE, related_name="session_tokens"
     )
     is_extended = models.BooleanField(default=False)
+    ip_address = models.GenericIPAddressField(null=True)
+    user_agent_raw = models.TextField(null=True)
     created_at = DateTimeNoTZField(auto_now_add=True)
     last_used = DateTimeNoTZField(auto_now=True)
 
@@ -76,6 +78,8 @@ class UserLogin(models.Model):
     user_account = models.ForeignKey(
         UserAccount, on_delete=models.CASCADE, related_name="logins"
     )
+    ip_address = models.GenericIPAddressField(null=True)
+    user_agent_raw = models.TextField(null=True)
     login_time = DateTimeNoTZField(auto_now_add=True)
 
 
