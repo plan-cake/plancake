@@ -20,7 +20,7 @@ from api.utils import (
     RateLimitError,
     check_rate_limit,
     delete_session_cookie,
-    get_client_ip,
+    get_client_ip_address,
     get_client_user_agent,
     get_metadata,
     get_session,
@@ -84,7 +84,7 @@ def check_auth(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-        ip_address = get_client_ip(request)
+        ip_address = get_client_ip_address(request)
         user_agent = get_client_user_agent(request)
 
         acct_sess_expired = False
@@ -182,7 +182,7 @@ def require_auth(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-        ip_address = get_client_ip(request)
+        ip_address = get_client_ip_address(request)
         user_agent = get_client_user_agent(request)
 
         acct_sess_expired = False
@@ -316,7 +316,7 @@ def require_account_auth(func):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
         logger.debug("Account session token: %s", acct_token)
 
-        ip_address = get_client_ip(request)
+        ip_address = get_client_ip_address(request)
         user_agent = get_client_user_agent(request)
 
         BAD_AUTH_RESPONSE = Response(

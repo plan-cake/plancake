@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.db.models import Q
+from ipware import get_client_ip
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.throttling import SimpleRateThrottle
@@ -311,19 +312,12 @@ def prune_account_sessions(request):
     ).delete()
 
 
-def get_client_ip(request) -> str | None:
+def get_client_ip_address(request) -> str | None:
     """
     Extracts the client's IP address, accounting for possible proxy headers.
     """
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-        # If there are multiple, the first is the original client
-        ip = x_forwarded_for.split(",")[0].strip()
-    else:
-        # Direct connection
-        ip = request.META.get("REMOTE_ADDR")
-
-    return ip if ip else None
+    client_ip, _ = get_client_ip(request)
+    return client_ip if client_ip else None
 
 
 def get_client_user_agent(request) -> str | None:
