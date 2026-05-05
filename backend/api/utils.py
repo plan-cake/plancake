@@ -309,3 +309,25 @@ def prune_account_sessions(request):
     UserSession.objects.filter(user_account=request.user).exclude(
         session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
     ).delete()
+
+
+def get_client_ip(request) -> str | None:
+    """
+    Extracts the client's IP address, accounting for possible proxy headers.
+    """
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        # If there are multiple, the first is the original client
+        ip = x_forwarded_for.split(",")[0].strip()
+    else:
+        # Direct connection
+        ip = request.META.get("REMOTE_ADDR")
+
+    return ip if ip else None
+
+
+def get_client_user_agent(request) -> str | None:
+    """
+    Extracts the client's user agent string.
+    """
+    return request.META.get("HTTP_USER_AGENT", None)
