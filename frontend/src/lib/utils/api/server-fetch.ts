@@ -1,6 +1,24 @@
+import { headers } from "next/headers";
+
 import { getAuthCookieString } from "@/lib/utils/api/cookie-utils";
 import { InferReq, InferRes } from "@/lib/utils/api/endpoints";
 import { fetchJson } from "@/lib/utils/api/fetch-wrapper";
+
+/**
+ * Extracts headers for User-Agent and X-Forwarded-For from the incoming request
+ */
+async function getForwardedHeaders(): Promise<Record<string, string>> {
+  const headerList = await headers();
+  const forwarded: Record<string, string> = {};
+
+  const userAgent = headerList.get("user-agent");
+  if (userAgent) forwarded["User-Agent"] = userAgent;
+
+  const xForwardedFor = headerList.get("x-forwarded-for");
+  if (xForwardedFor) forwarded["X-Forwarded-For"] = xForwardedFor;
+
+  return forwarded;
+}
 
 /**
  * Performs a GET request to the specified API endpoint from the server.
@@ -24,12 +42,14 @@ export async function serverGet<T extends { url: string }>(
   const url = `${baseUrl}${endpoint.url}${queryString}`;
 
   const cookieString = await getAuthCookieString();
+  const forwardedHeaders = await getForwardedHeaders();
 
   const requestOptions: RequestInit = {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       Cookie: cookieString,
+      ...forwardedHeaders,
     },
     ...options,
   };
@@ -52,12 +72,14 @@ export async function serverPost<T extends { url: string }>(
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const url = `${baseUrl}${endpoint.url}`;
   const cookieString = await getAuthCookieString();
+  const forwardedHeaders = await getForwardedHeaders();
 
   const requestOptions: RequestInit = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Cookie: cookieString,
+      ...forwardedHeaders,
     },
     body: body ? JSON.stringify(body) : undefined,
     ...options,
