@@ -43,6 +43,8 @@ from api.utils import (
     MessageOutputSerializer,
     check_rate_limit,
     delete_session_cookie,
+    get_client_ip,
+    get_client_user_agent,
     get_session,
     prune_account_sessions,
     set_session_cookie,
@@ -258,9 +260,15 @@ def login(request):
             return BAD_AUTH_RESPONSE
 
         session_token = str(uuid.uuid4())
+        ip_address = get_client_ip(request)
+        user_agent = get_client_user_agent(request)
         with transaction.atomic():
             UserSession.objects.create(
-                session_token=session_token, user_account=user, is_extended=remember_me
+                session_token=session_token,
+                user_account=user,
+                is_extended=remember_me,
+                ip_address=ip_address,
+                user_agent_raw=user_agent,
             )
             UserLogin.objects.create(user_account=user)
         logger.debug("Session token for %s: %s", email, session_token)
