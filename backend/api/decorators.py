@@ -20,6 +20,8 @@ from api.utils import (
     RateLimitError,
     check_rate_limit,
     delete_session_cookie,
+    get_client_ip,
+    get_client_user_agent,
     get_metadata,
     get_session,
     set_session_cookie,
@@ -82,6 +84,9 @@ def check_auth(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+        ip_address = get_client_ip(request)
+        user_agent = get_client_user_agent(request)
+
         acct_sess_expired = False
         if acct_token:
             logger.debug("Account session token: %s", acct_token)
@@ -91,7 +96,11 @@ def check_auth(func):
                     if not session:
                         # To break out of the rest of the logic
                         raise UserSession.DoesNotExist
-                    session.save()  # To update last_used to now
+
+                    # Update the session access info
+                    session.ip_address = ip_address
+                    session.user_agent_raw = user_agent
+                    session.save()  # Also updates last_used
 
                 # At this point the account is authenticated
                 request.user = session.user_account
@@ -120,7 +129,11 @@ def check_auth(func):
                     session = get_session(guest_token)
                     if not session:
                         raise UserSession.DoesNotExist
-                    session.save()  # Update last_used
+
+                    # Update the session access info
+                    session.ip_address = ip_address
+                    session.user_agent_raw = user_agent
+                    session.save()  # Also updates last_used
 
                 request.user = session.user_account
                 # Run the function
@@ -169,6 +182,9 @@ def require_auth(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+        ip_address = get_client_ip(request)
+        user_agent = get_client_user_agent(request)
+
         acct_sess_expired = False
         if acct_token:
             logger.debug("Account session token: %s", acct_token)
@@ -178,7 +194,11 @@ def require_auth(func):
                     if not session:
                         # To break out of the rest of the logic
                         raise UserSession.DoesNotExist
-                    session.save()  # To update last_used to now
+
+                    # Update the session access info
+                    session.ip_address = ip_address
+                    session.user_agent_raw = user_agent
+                    session.save()  # Also updates last_used
 
                 # At this point the account is authenticated
                 request.user = session.user_account
@@ -207,7 +227,11 @@ def require_auth(func):
                     session = get_session(guest_token)
                     if not session:
                         raise UserSession.DoesNotExist
-                    session.save()  # Update last_used
+
+                    # Update the session access info
+                    session.ip_address = ip_address
+                    session.user_agent_raw = user_agent
+                    session.save()  # Also updates last_used
 
                 request.user = session.user_account
                 # Run the function
@@ -292,6 +316,9 @@ def require_account_auth(func):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
         logger.debug("Account session token: %s", acct_token)
 
+        ip_address = get_client_ip(request)
+        user_agent = get_client_user_agent(request)
+
         BAD_AUTH_RESPONSE = Response(
             {"error": {"general": ["Account required."]}}, status=401
         )
@@ -302,7 +329,11 @@ def require_account_auth(func):
                     session = get_session(acct_token)
                     if not session:
                         raise UserSession.DoesNotExist
-                    session.save()  # To update last_used to now
+
+                    # Update the session access info
+                    session.ip_address = ip_address
+                    session.user_agent_raw = user_agent
+                    session.save()  # Also updates last_used
 
                 # At this point the account is authenticated
                 request.user = session.user_account
