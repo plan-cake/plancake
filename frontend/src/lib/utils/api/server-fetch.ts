@@ -12,7 +12,7 @@ import { fetchJson } from "@/lib/utils/api/fetch-wrapper";
 export async function serverGet<T extends { url: string }>(
   endpoint: T,
   params?: InferReq<T>,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<InferRes<T>> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -34,7 +34,7 @@ export async function serverGet<T extends { url: string }>(
     ...options,
   };
 
-  return (await fetchJson(url, requestOptions) as InferRes<T>);
+  return (await fetchJson(url, requestOptions)) as InferRes<T>;
 }
 
 /**
@@ -47,7 +47,7 @@ export async function serverGet<T extends { url: string }>(
 export async function serverPost<T extends { url: string }>(
   endpoint: T,
   body?: InferReq<T>,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<InferRes<T>> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const url = `${baseUrl}${endpoint.url}`;
@@ -63,5 +63,5 @@ export async function serverPost<T extends { url: string }>(
     ...options,
   };
 
-  return (await fetchJson(url, requestOptions) as InferRes<T>);
+  return (await fetchJson(url, requestOptions)) as InferRes<T>;
 }
