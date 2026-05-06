@@ -155,6 +155,18 @@ def terminate_session(request):
 
 @api_endpoint("POST")
 @require_account_auth
+@validate_output(MessageOutputSerializer)
+def prune_sessions(request):
+    """
+    Terminates all sessions for the authenticated user account except the current one.
+    """
+    prune_account_sessions(request)
+
+    return Response({"message": ["Sessions pruned successfully."]}, status=200)
+
+
+@api_endpoint("POST")
+@require_account_auth
 @validate_json_input(PasswordChangeSerializer)
 @validate_output(MessageOutputSerializer)
 def change_password(request):
