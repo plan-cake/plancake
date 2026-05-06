@@ -6,9 +6,13 @@ from datetime import datetime, timedelta
 import bcrypt
 from django.core.mail import send_mail
 from django.db import transaction
-from rest_framework import serializers
 from rest_framework.response import Response
 
+from api.account.serializers import (
+    AuthedPasswordResetCodeSerializer,
+    AuthedPasswordResetSerializer,
+)
+from api.auth.serializers import PasswordChangeSerializer
 from api.auth.utils import list_failed_criteria, validate_password
 from api.availability.serializers import DisplayNameSerializer
 from api.decorators import (
@@ -99,15 +103,6 @@ def start_authed_password_reset(request):
     )
 
 
-class AuthedPasswordResetCodeSerializer(serializers.Serializer):
-    reset_code = serializers.RegexField(
-        regex=r"^\d{6}$",
-        required=True,
-        min_length=6,
-        max_length=6,
-    )
-
-
 @api_endpoint("POST")
 @require_account_auth
 @validate_json_input(AuthedPasswordResetCodeSerializer)
@@ -138,11 +133,6 @@ def check_authed_password_reset_code(request):
         {"message": ["Reset code is valid."]},
         status=200,
     )
-
-
-class AuthedPasswordResetSerializer(AuthedPasswordResetCodeSerializer):
-    new_password = serializers.CharField(required=True)
-    prune_sessions = serializers.BooleanField(default=False, required=False)
 
 
 @api_endpoint("POST")
