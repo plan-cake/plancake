@@ -7,7 +7,7 @@ from django.db import migrations
 
 def gen_uuid(apps, _):
     EventParticipant = apps.get_model("api", "EventParticipant")
-    for participant in EventParticipant.objects.all():
+    for participant in EventParticipant.objects.iterator():
         participant.public_id = uuid.uuid4()
         participant.save(update_fields=["public_id"])
 
