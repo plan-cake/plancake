@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.db.models.functions import Lower
 
@@ -41,6 +43,7 @@ class UnverifiedUserAccount(models.Model):
 
 class UserSession(models.Model):
     session_token = models.CharField(max_length=255, primary_key=True)
+    public_id = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
     user_account = models.ForeignKey(
         UserAccount, on_delete=models.CASCADE, related_name="session_tokens"
     )
