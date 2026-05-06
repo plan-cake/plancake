@@ -14,6 +14,7 @@ from api.account.serializers import (
     ActiveSessionListSerializer,
     AuthedPasswordResetCodeSerializer,
     AuthedPasswordResetSerializer,
+    SessionIdSerializer,
 )
 from api.auth.serializers import PasswordChangeSerializer, PasswordSerializer
 from api.auth.utils import list_failed_criteria, validate_password
@@ -125,6 +126,31 @@ def get_active_sessions(request):
         active_sessions.append(session_data)
 
     return Response({"sessions": active_sessions}, status=200)
+
+
+@api_endpoint("POST")
+@require_account_auth
+@validate_json_input(SessionIdSerializer)
+@validate_output(MessageOutputSerializer)
+def terminate_session(request):
+    """
+    Terminates a specific session for the authenticated user account, identified by its
+    public session ID.
+    """
+    user = request.user
+    public_id = request.validated_data["session_id"]
+
+    try:
+        session = UserSession.objects.get(user_account=user, public_id=public_id)
+        if session.session_token == request.COOKIES.get(ACCOUNT_COOKIE_NAME):
+            return Response(
+                {"error": {"session_id": ["Cannot terminate the current session."]}},
+                status=400,
+            )
+        session.delete()
+        return Response({"message": ["Session terminated successfully."]}, status=200)
+    except UserSession.DoesNotExist:
+        return Response({"error": {"session_id": ["Session not found."]}}, status=404)
 
 
 @api_endpoint("POST")

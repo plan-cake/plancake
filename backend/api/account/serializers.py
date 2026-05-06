@@ -32,3 +32,7 @@ class ActiveSessionListSerializer(serializers.Serializer):
     sessions = serializers.ListField(
         child=ActiveSessionSerializer(), required=True, allow_empty=False
     )
+
+
+class SessionIdSerializer(serializers.Serializer):
+    session_id = serializers.UUIDField(required=True)
