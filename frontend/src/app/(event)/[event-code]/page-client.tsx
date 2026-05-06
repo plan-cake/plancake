@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import CopyToastButton from "@/components/copy-toast-button";
 import KebabMenu from "@/components/kebab-menu";
@@ -11,7 +14,7 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import ScheduleGrid from "@/features/event/grid/grid";
 import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
-import { getResultBanners } from "@/features/event/results/banners";
+import { getResultBanner } from "@/features/event/results/banners";
 import {
   ResultsProvider,
   useResultsContext,
@@ -23,6 +26,7 @@ import HeaderSpacer from "@/features/header/components/header-spacer";
 import { useHeaderSize } from "@/features/header/context";
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
+import { LiveUpdateEvent } from "@/lib/utils/api/live-updates/types";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -53,6 +57,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     setTimezone,
     currentUser,
     isCreator,
+    liveAddParticipant,
+    liveUpdateParticipant,
+    liveRemoveParticipant,
   } = useResultsContext();
 
   const {
@@ -62,8 +69,166 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     timeslots,
   } = eventData;
 
-  /* TOAST PROVIDER */
-  const { addToast } = useToast();
+  const { addToast, removeToast } = useToast();
+
+  /* LIVE UPDATES */
+  const [liveUpdatesPaused, setLiveUpdatesPaused] = useState(false);
+  const [liveUpdatesStopped, setliveUpdatesStopped] = useState(false);
+  const router = useRouter();
+  const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleToastRef = useRef<number | null>(null);
+
+  // Handle idle timeout and reconnection
+  useEffect(() => {
+    if (liveUpdatesStopped) return;
+
+    const resetTimeout = () => {
+      if (idleTimeoutRef.current) {
+        clearTimeout(idleTimeoutRef.current);
+      }
+      idleTimeoutRef.current = setTimeout(
+        () => {
+          setLiveUpdatesPaused(true);
+          if (idleToastRef.current) return; // Already showing toast
+          idleToastRef.current = addToast(
+            "info",
+            "You've been idle for a while. Interact with the page to resume live updates.",
+            {
+              isPersistent: true,
+              title: "LIVE UPDATES PAUSED",
+            },
+          );
+        },
+        1000 * 60 * 10,
+      ); // 10 minutes
+    };
+
+    const handleActivity = () => {
+      if (liveUpdatesPaused) {
+        router.refresh();
+        setLiveUpdatesPaused(false);
+        if (idleToastRef.current) {
+          removeToast(idleToastRef.current);
+          idleToastRef.current = null;
+        }
+      }
+      resetTimeout();
+    };
+
+    resetTimeout();
+
+    window.addEventListener("mousemove", handleActivity);
+    window.addEventListener("mousedown", handleActivity);
+    window.addEventListener("keydown", handleActivity);
+    window.addEventListener("touchstart", handleActivity);
+    window.addEventListener("scroll", handleActivity);
+
+    return () => {
+      window.removeEventListener("mousemove", handleActivity);
+      window.removeEventListener("mousedown", handleActivity);
+      window.removeEventListener("keydown", handleActivity);
+      window.removeEventListener("touchstart", handleActivity);
+      window.removeEventListener("scroll", handleActivity);
+      if (idleTimeoutRef.current) {
+        clearTimeout(idleTimeoutRef.current);
+      }
+    };
+  }, [liveUpdatesStopped, liveUpdatesPaused, router, addToast, removeToast]);
+
+  useEffect(() => {
+    if (liveUpdatesStopped) return;
+    if (liveUpdatesPaused) return;
+
+    const ctrl = new AbortController();
+
+    fetchEventSource(
+      process.env.NEXT_PUBLIC_API_URL + `/event/get-updates/${eventCode}/`,
+      {
+        signal: ctrl.signal,
+        credentials: "include",
+        async onopen(response) {
+          if (!response.ok) {
+            if (response.status === 503) {
+              const errorData = await response.json();
+              addToast(
+                "info",
+                (errorData?.error?.general?.[0] ||
+                  "Live updates are currently unavailable.") +
+                  " Refresh the page to retry.",
+                {
+                  isPersistent: true,
+                },
+              );
+            }
+            setliveUpdatesStopped(true);
+            ctrl.abort();
+          }
+        },
+        onmessage(msg) {
+          if (!msg.data) return; // Ignore pings
+
+          const data = JSON.parse(msg.data) as LiveUpdateEvent;
+          switch (data.action) {
+            case "add":
+              liveAddParticipant(data);
+              break;
+            case "update": {
+              const updated = liveUpdateParticipant(data);
+              const subject = data.is_you ? "You" : data.display_name;
+              const pronoun = data.is_you ? "your" : "their";
+              if (updated) {
+                addToast("info", `${subject} updated ${pronoun} availability.`);
+              }
+              break;
+            }
+            case "remove":
+              liveRemoveParticipant(data);
+              break;
+            case "event_edit":
+              addToast(
+                "info",
+                `The event was edited, reload the page for updates.`,
+                {
+                  isPersistent: true,
+                  title: "EVENT UPDATED",
+                },
+              );
+              setliveUpdatesStopped(true);
+              break;
+            default:
+              console.warn("Unknown action received in live update:", data);
+              return;
+          }
+        },
+        onerror(err) {
+          setliveUpdatesStopped(true);
+          addToast(
+            "info",
+            "Failed to connect to live updates. Refresh the page to retry.",
+            {
+              isPersistent: true,
+            },
+          );
+          // Prevent automatic retry
+          ctrl.abort();
+          throw err;
+        },
+        openWhenHidden: true,
+      },
+    );
+
+    return () => {
+      ctrl.abort();
+    };
+  }, [
+    addToast,
+    eventCode,
+    liveAddParticipant,
+    liveUpdateParticipant,
+    liveRemoveParticipant,
+    liveUpdatesStopped,
+    liveUpdatesPaused,
+  ]);
 
   /* TIMEZONE HANDLING */
   const handleTZChange = (newTZ: string | number) => {
@@ -86,14 +251,65 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   /* HEADER SPACING */
   const { topMarginClass } = useHeaderSize();
 
-  /* BANNERS */
-  const banners = getResultBanners(
+  /* BANNER */
+  const { element: banner, id: bannerId } = getResultBanner(
     availabilities,
     participants,
     timeslots,
     eventRange.type === "weekday",
     currentUser !== null,
   );
+
+  const bannerElement = () => {
+    const variants: Variants = {
+      enter: {
+        height: "auto",
+        marginBottom: "1rem",
+        opacity: 1,
+        x: "0%",
+        transition: {
+          // Delayed extra to match with the exit animation of the banner
+          height: { duration: 0.3, delay: 0.4, ease: "easeOut" },
+          marginBottom: { duration: 0.3, delay: 0.4, ease: "easeOut" },
+          opacity: { duration: 0.4, delay: 0.7, ease: "backOut" },
+          x: { duration: 0.4, delay: 0.7, ease: "backOut" },
+        },
+      },
+      exit: {
+        height: 0,
+        marginBottom: 0,
+        opacity: 0,
+        x: "-2rem",
+        transition: {
+          opacity: { duration: 0.4, ease: "backIn" },
+          x: { duration: 0.4, ease: "backIn" },
+          height: { duration: 0.3, delay: 0.4, ease: "easeOut" },
+          marginBottom: { duration: 0.3, delay: 0.4, ease: "easeOut" },
+        },
+      },
+    };
+
+    return (
+      <AnimatePresence initial={false} mode="sync">
+        {banner && (
+          <motion.div
+            key={bannerId}
+            initial={{
+              height: 0,
+              opacity: 0,
+              x: "5%",
+              marginBottom: 0,
+            }}
+            animate="enter"
+            exit="exit"
+            variants={variants}
+          >
+            {banner}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  };
 
   /* BUTTONS */
   const paintingButton = (
@@ -178,7 +394,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         </div>
       </div>
 
-      <div className="md:hidden">{banners}</div>
+      <div className="-mb-2 md:hidden">{bannerElement()}</div>
 
       <div className="flex h-fit flex-col md:flex-row md:gap-4">
         <ScheduleGrid
@@ -207,26 +423,28 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         </div>
 
         {/* Desktop Sidebar */}
-        <div
-          className={cn(
-            "hidden md:block",
-            "fixed bottom-1 left-0 z-10 w-full shrink-0 px-6",
-            "relative bottom-auto left-auto w-80 space-y-4 px-0",
-          )}
-        >
-          {banners}
+        <div className="hidden md:block">
+          {bannerElement()}
           <div
             className={cn(
-              "sticky flex max-h-[calc(100vh-8rem)] flex-col gap-y-4",
-              topMarginClass,
+              "hidden md:block",
+              "fixed bottom-1 left-0 z-10 w-full shrink-0 px-6",
+              "relative bottom-auto left-auto w-80 px-0",
             )}
           >
-            <AttendeesPanel />
-            <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
-              <DisplaySettings
-                timezone={timezone}
-                onTimezoneChange={handleTZChange}
-              />
+            <div
+              className={cn(
+                "sticky flex max-h-[calc(100vh-8rem)] flex-col gap-y-4",
+                topMarginClass,
+              )}
+            >
+              <AttendeesPanel />
+              <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
+                <DisplaySettings
+                  timezone={timezone}
+                  onTimezoneChange={handleTZChange}
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import {
   startTransition,
-  useEffect,
   useCallback,
+  useEffect,
   useMemo,
   useOptimistic,
   useState,
@@ -13,14 +13,28 @@ import { ResultsInformation } from "@/features/event/results/lib/types";
 import { findConsensusAndConflicts } from "@/features/event/results/lib/utils";
 import { useToast } from "@/features/system-feedback/toast/context";
 import { MESSAGES } from "@/lib/messages";
+import {
+  LiveUpdateAddUpdateEvent,
+  LiveUpdateRemoveEvent,
+} from "@/lib/utils/api/live-updates/types";
+import { formatDateTime } from "@/lib/utils/date-time-format";
 
 export function useEventResults(initialData: ResultsInformation) {
   const { addToast } = useToast();
 
-  const { eventCode, isCreator, participants, availability, currentUser } =
-    initialData;
+  const { eventCode, isCreator } = initialData;
 
   /* STATES */
+  const [participants, setParticipants] = useState(initialData.participants);
+  const [availability, setAvailability] = useState(initialData.availability);
+  const [currentUser, setCurrentUser] = useState(initialData.currentUser);
+  useEffect(() => {
+    // Sync if initialData changes, which only happens if data is completely refetched
+    setParticipants(initialData.participants);
+    setAvailability(initialData.availability);
+    setCurrentUser(initialData.currentUser);
+  }, [initialData]);
+
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
     [],
   );
@@ -38,7 +52,7 @@ export function useEventResults(initialData: ResultsInformation) {
   const [optimisticParticipants, removeOptimisticParticipant] = useOptimistic(
     participants || [],
     (state, personToRemove: string) => {
-      return state.filter((p) => p !== personToRemove);
+      return state.filter((p) => p.display_name !== personToRemove);
     },
   );
 
@@ -96,6 +110,187 @@ export function useEventResults(initialData: ResultsInformation) {
 
     return result.success;
   };
+
+  const liveAddParticipant = useCallback(
+    /**
+     * Given data from a live update event, adds a participant with their availability to
+     * the participant list and availability map.
+     *
+     * @param eventData Data from the live update event.
+     */
+    (eventData: LiveUpdateAddUpdateEvent) => {
+      const {
+        public_id,
+        display_name,
+        joined_at,
+        updated_at,
+        time_zone,
+        availability,
+        is_you,
+      } = eventData;
+
+      setParticipants((prev) => [
+        ...prev,
+        {
+          public_id: public_id,
+          display_name: display_name,
+          joined_at: joined_at,
+          updated_at: updated_at,
+          time_zone: time_zone,
+        },
+      ]);
+      if (is_you) {
+        setCurrentUser(display_name);
+      }
+
+      setAvailability((prev) => {
+        const updated = { ...prev };
+        availability.forEach((slot) => {
+          slot = formatDateTime(
+            slot,
+            initialData.timezone,
+            initialData.eventType,
+          );
+
+          if (!updated[slot]) {
+            // Ignore
+            return;
+          }
+          updated[slot] = [...updated[slot], display_name];
+        });
+        return updated;
+      });
+    },
+    [initialData],
+  );
+
+  const liveRemoveParticipant = useCallback(
+    /**
+     * Given data from a live update event, removes a participant from the results.
+     *
+     * @param eventData Data from the live update event.
+     * @returns `true` if the participant was removed, `false` otherwise.
+     */
+    (eventData: LiveUpdateRemoveEvent): boolean => {
+      const { public_id, is_you } = eventData;
+
+      const participant = optimisticParticipants.find(
+        (p) => p.public_id === public_id,
+      )?.display_name;
+
+      if (optimisticParticipants.every((p) => p.display_name !== participant)) {
+        // Check if the current user already removed the participant
+        return false;
+      }
+      setParticipants((prev) =>
+        prev.filter((p) => p.display_name !== participant),
+      );
+      setAvailability((prev) => {
+        const updated = { ...prev };
+        for (const slot in updated) {
+          updated[slot] = updated[slot].filter((p) => p !== participant);
+        }
+        return updated;
+      });
+      setSelectedParticipants((prev) => prev.filter((p) => p !== participant));
+      if (is_you) {
+        setCurrentUser(null);
+      }
+      return true;
+    },
+    [optimisticParticipants],
+  );
+
+  const liveUpdateParticipant = useCallback(
+    /**
+     * Given data from a live update event, updates a participant's display name and/or
+     * availability slots.
+     *
+     * @param eventData Data from the live update event.
+     * @returns `true` if the availability slots were updated, `false` otherwise.
+     */
+    (eventData: LiveUpdateAddUpdateEvent): boolean => {
+      const {
+        public_id,
+        display_name,
+        joined_at,
+        updated_at,
+        time_zone,
+        availability,
+        is_you,
+      } = eventData;
+
+      // Format new slots
+      const newSlotSet = new Set(
+        availability.map((slot) =>
+          formatDateTime(slot, initialData.timezone, initialData.eventType),
+        ),
+      );
+
+      // Get existing participant display name
+      const participant = optimisticParticipants.find(
+        (p) => p.public_id === public_id,
+      )?.display_name;
+      if (!participant) {
+        // Participant not found, ignore the update
+        return false;
+      }
+
+      const nameChanged = participant !== display_name;
+      const currentSlots = Object.keys(optimisticAvailabilities).filter((s) =>
+        optimisticAvailabilities[s].includes(participant),
+      );
+
+      const slotsChanged =
+        newSlotSet.size !== currentSlots.length ||
+        currentSlots.some((s) => !newSlotSet.has(s));
+
+      if (nameChanged) {
+        setParticipants((prev) =>
+          prev.map((p) =>
+            p.display_name === participant
+              ? {
+                  public_id: public_id,
+                  display_name: display_name,
+                  joined_at: joined_at,
+                  updated_at: updated_at,
+                  time_zone: time_zone,
+                }
+              : p,
+          ),
+        );
+        setSelectedParticipants((prev) =>
+          prev.map((p) => (p === participant ? display_name : p)),
+        );
+        if (is_you) {
+          setCurrentUser(display_name);
+        }
+      }
+
+      setAvailability((prev) => {
+        const updated = { ...prev };
+        for (const slot in updated) {
+          const hasPerson = updated[slot].includes(participant);
+          const shouldHavePerson = newSlotSet.has(slot);
+
+          if (hasPerson && !shouldHavePerson) {
+            updated[slot] = updated[slot].filter((p) => p !== participant);
+          } else if (!hasPerson && shouldHavePerson) {
+            updated[slot] = [...updated[slot], display_name];
+          } else if (hasPerson && shouldHavePerson && nameChanged) {
+            // Update the name in the slot
+            updated[slot] = updated[slot].map((p) =>
+              p === participant ? display_name : p,
+            );
+          }
+        }
+        return updated;
+      });
+
+      return slotsChanged;
+    },
+    [optimisticParticipants, optimisticAvailabilities, initialData],
+  );
 
   /* DERIVED LOGIC */
   const { filteredAvailabilities, gridNumParticipants, hasNoConsensus } =
@@ -190,5 +385,10 @@ export function useEventResults(initialData: ResultsInformation) {
     handleRemoveParticipant,
     setShowOnlyBestTimes,
     setTimezone,
+
+    // Live Updates
+    liveAddParticipant,
+    liveUpdateParticipant,
+    liveRemoveParticipant,
   };
 }

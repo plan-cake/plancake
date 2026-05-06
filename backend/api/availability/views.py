@@ -27,7 +27,15 @@ from api.models import (
     UserEvent,
 )
 from api.settings import ThrottleScopes
-from api.utils import MessageOutputSerializer, check_rate_limit
+from api.utils import (
+    LiveUpdateAction,
+    LiveUpdateAddUpdateData,
+    LiveUpdateEvent,
+    LiveUpdateRemoveData,
+    MessageOutputSerializer,
+    check_rate_limit,
+    notify_live_update,
+)
 
 logger = logging.getLogger("api")
 
@@ -146,6 +154,22 @@ def add_availability(request):
             },
             status=400,
         )
+
+    notify_live_update(
+        LiveUpdateEvent(
+            user_id=user.user_account_id,
+            event_code=event_code,
+            data=LiveUpdateAddUpdateData(
+                action=LiveUpdateAction.ADD if new else LiveUpdateAction.UPDATE,
+                public_id=str(participant.public_id),
+                display_name=display_name,
+                joined_at=participant.created_at.isoformat(),
+                updated_at=participant.updated_at.isoformat(),
+                time_zone=participant.time_zone,
+                availability=[time.isoformat() for time in availability],
+            ),
+        )
+    )
 
     logger.debug(
         f"Availability {'added' if new else 'updated'} for event with code: {event_code}"
@@ -338,7 +362,16 @@ def get_all_availability(request):
             return Response(
                 {
                     "user_display_name": user_display_name,
-                    "participants": [p.display_name for p in participants],
+                    "participants": [
+                        {
+                            "public_id": str(p.public_id),
+                            "display_name": p.display_name,
+                            "joined_at": p.created_at.isoformat(),
+                            "updated_at": p.updated_at.isoformat(),
+                            "time_zone": p.time_zone,
+                        }
+                        for p in participants
+                    ],
                     "availability": availability_dict,
                 },
                 status=200,
@@ -370,7 +403,16 @@ def get_all_availability(request):
             return Response(
                 {
                     "user_display_name": user_display_name,
-                    "participants": [p.display_name for p in participants],
+                    "participants": [
+                        {
+                            "public_id": str(p.public_id),
+                            "display_name": p.display_name,
+                            "joined_at": p.created_at.isoformat(),
+                            "updated_at": p.updated_at.isoformat(),
+                            "time_zone": p.time_zone,
+                        }
+                        for p in participants
+                    ],
                     "availability": availability_dict,
                 },
                 status=200,
@@ -402,7 +444,8 @@ def remove_self_availability(request):
     try:
         event = UserEvent.objects.get(url_code=event_code)
         # Because of the foreign key cascades, this should remove everything
-        EventParticipant.objects.get(user_event=event, user_account=user).delete()
+        participant = EventParticipant.objects.get(user_event=event, user_account=user)
+        participant.delete()
 
     except UserEvent.DoesNotExist:
         return Response(
@@ -411,6 +454,16 @@ def remove_self_availability(request):
         )
     except EventParticipant.DoesNotExist:
         return NOT_PARTICIPATED_ERROR
+
+    notify_live_update(
+        LiveUpdateEvent(
+            user_id=user.user_account_id,
+            event_code=event_code,
+            data=LiveUpdateRemoveData(
+                public_id=str(participant.public_id),
+            ),
+        )
+    )
 
     return Response({"message": ["Availability removed successfully."]}, status=200)
 
@@ -441,9 +494,10 @@ def remove_availability(request):
         if event.user_account != user:
             return NOT_CREATOR_ERROR
         # Because of the foreign key cascades, this should remove everything
-        EventParticipant.objects.get(
+        participant = EventParticipant.objects.get(
             user_event=event, display_name=display_name
-        ).delete()
+        )
+        participant.delete()
 
     except UserEvent.DoesNotExist:
         return Response(
@@ -455,5 +509,15 @@ def remove_availability(request):
             {"error": {"general": ["Event participant not found."]}},
             status=404,
         )
+
+    notify_live_update(
+        LiveUpdateEvent(
+            user_id=participant.user_account_id,
+            event_code=event_code,
+            data=LiveUpdateRemoveData(
+                public_id=str(participant.public_id),
+            ),
+        )
+    )
 
     return Response({"message": ["Availability removed successfully."]}, status=200)
