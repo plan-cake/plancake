@@ -4,11 +4,14 @@ import string
 from datetime import datetime, timedelta
 
 import bcrypt
+from device_detector import DeviceDetector
 from django.core.mail import send_mail
 from django.db import transaction
+from django.db.models import Q
 from rest_framework.response import Response
 
 from api.account.serializers import (
+    ActiveSessionListSerializer,
     AuthedPasswordResetCodeSerializer,
     AuthedPasswordResetSerializer,
 )
@@ -21,11 +24,13 @@ from api.decorators import (
     validate_json_input,
     validate_output,
 )
-from api.models import AuthedPasswordResetCode
+from api.models import AuthedPasswordResetCode, UserSession
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
     AUTHED_PWD_RESET_EXP_SECONDS,
+    LONG_SESS_EXP_SECONDS,
     SEND_EMAILS,
+    SESS_EXP_SECONDS,
     ThrottleScopes,
 )
 from api.utils import (
@@ -74,6 +79,52 @@ def remove_default_name(request):
         {"message": ["Default name removed successfully."]},
         status=200,
     )
+
+
+@api_endpoint("GET")
+@require_account_auth
+@validate_output(ActiveSessionListSerializer)
+def get_active_sessions(request):
+    """
+    Retrieves all active sessions for the authenticated user account, with device and
+    client info when available.
+
+    The current session is included and marked with `is_current` set to `true`.
+    """
+    user = request.user
+    sessions = UserSession.objects.filter(
+        (
+            Q(is_extended=True)
+            & Q(
+                last_used__gte=datetime.now() - timedelta(seconds=LONG_SESS_EXP_SECONDS)
+            )
+        )
+        | (
+            Q(is_extended=False)
+            & Q(last_used__gte=datetime.now() - timedelta(seconds=SESS_EXP_SECONDS))
+        ),
+        user_account=user,
+    ).order_by("-last_used")
+
+    active_sessions = []
+
+    for session in sessions:
+        session_data = {
+            "public_id": session.public_id,
+            "last_used": session.last_used,
+            "is_current": session.session_token
+            == request.COOKIES.get(ACCOUNT_COOKIE_NAME),
+        }
+        if session.user_agent_raw is not None:
+            device = DeviceDetector(session.user_agent_raw).parse()
+            session_data["device_type"] = device.device_type() or None
+            session_data["os_name"] = device.os_name() or None
+            session_data["os_version"] = device.os_version() or None
+            session_data["client_name"] = device.client_name() or None
+            session_data["client_version"] = device.client_version() or None
+        active_sessions.append(session_data)
+
+    return Response({"sessions": active_sessions}, status=200)
 
 
 @api_endpoint("POST")
