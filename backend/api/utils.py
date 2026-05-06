@@ -306,6 +306,9 @@ def check_rate_limit(request, throttle_scope: ThrottleScope) -> None:
 def prune_account_sessions(request):
     """
     Deletes all of the current account's sessions except for the current one.
+
+    This function depends on the user being authenticated and existing in the request
+    object.
     """
     UserSession.objects.filter(user_account=request.user).exclude(
         session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
