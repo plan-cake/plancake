@@ -1,6 +1,6 @@
 import { useEventContext } from "@/core/event/context";
 import { EventType } from "@/core/event/types";
-import Dropdown from "@/features/selector/components/dropdown";
+import Selector from "@/features/selector/components/selector";
 
 type EventTypeSelectProps = {
   id: string;
@@ -15,12 +15,14 @@ export default function EventTypeSelect({
   const rangeType = state.eventRange?.type || "specific";
 
   return (
-    <Dropdown
+    <Selector
       id={id}
       options={[
         { label: "Specific Dates", value: "specific" },
         { label: "Days of the Week", value: "weekday" },
       ]}
+      dialogTitle="Select Event Type"
+      dialogDescription="Select a type from the list"
       value={rangeType}
       disabled={disabled}
       onChange={(value: EventType) => setEventType(value)}

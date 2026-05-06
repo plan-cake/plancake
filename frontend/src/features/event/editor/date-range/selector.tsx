@@ -1,7 +1,6 @@
 import { parseISO } from "date-fns";
 import { TriangleAlertIcon } from "lucide-react";
 
-import Switch from "@/components/switch";
 import { useEventContext } from "@/core/event/context";
 import { SpecificDateRange } from "@/core/event/types";
 import WeekdayCalendar from "@/features/event/editor/date-range/calendars/weekday";
@@ -9,24 +8,23 @@ import { DateRangeProps } from "@/features/event/editor/date-range/date-range-pr
 import DateRangeDrawer from "@/features/event/editor/date-range/drawer";
 import EventTypeSelect from "@/features/event/editor/date-range/event-type-select";
 import DateRangePopover from "@/features/event/editor/date-range/popover";
-import FormSelectorField from "@/features/selector/components/selector-field";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 export default function DateRangeSelection({
   editing = false,
 }: DateRangeProps) {
-  const { state, setWeekdayRange, setEventType, errors } = useEventContext();
+  const { state, setWeekdayRange, errors } = useEventContext();
   const { eventRange, originalEventRange } = state;
 
   const rangeType = eventRange?.type ?? "specific";
 
   return (
     <div className="contents">
-      <div className="hidden flex-col md:flex">
+      <div className="flex w-fit flex-col gap-2">
         <label htmlFor="event-type-select">Type</label>
         <EventTypeSelect id="event-type-select" disabled={editing} />
       </div>
-      <div className="flex w-full flex-col justify-center">
+      <div className="flex w-full flex-col justify-center gap-2">
         <p
           className={`flex items-center gap-2 ${errors.dateRange ? "text-error" : ""}`}
         >
@@ -35,21 +33,6 @@ export default function DateRangeSelection({
             <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
         </p>
-
-        <FormSelectorField
-          label="Choose Days of the Week"
-          htmlFor="event-type"
-          classname="md:hidden mb-2"
-        >
-          <Switch
-            id="event-type"
-            checked={rangeType === "weekday"}
-            onCheckedChange={(checked) =>
-              setEventType(checked ? "weekday" : "specific")
-            }
-            disabled={editing}
-          />
-        </FormSelectorField>
 
         {eventRange?.type === "specific" ? (
           <SpecificDateRangeDisplay
