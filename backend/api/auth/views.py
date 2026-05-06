@@ -270,7 +270,9 @@ def login(request):
                 ip_address=ip_address,
                 user_agent_raw=user_agent,
             )
-            UserLogin.objects.create(user_account=user)
+            UserLogin.objects.create(
+                user_account=user, ip_address=ip_address, user_agent_raw=user_agent
+            )
         logger.debug("Session token for %s: %s", email, session_token)
 
     except UserAccount.DoesNotExist:
