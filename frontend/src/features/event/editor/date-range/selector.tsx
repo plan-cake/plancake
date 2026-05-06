@@ -20,11 +20,11 @@ export default function DateRangeSelection({
 
   return (
     <div className="contents">
-      <div className="flex w-fit flex-col gap-2">
+      <div className="flex w-fit flex-col gap-1">
         <label htmlFor="event-type-select">Type</label>
         <EventTypeSelect id="event-type-select" disabled={editing} />
       </div>
-      <div className="flex w-full flex-col justify-center gap-2">
+      <div className="flex w-full flex-col justify-center gap-1">
         <p
           className={`flex items-center gap-2 ${errors.dateRange ? "text-error" : ""}`}
         >

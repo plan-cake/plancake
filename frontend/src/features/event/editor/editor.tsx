@@ -150,28 +150,30 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       >
         <DateRangeSelection editing={type === "edit"} />
 
-        <p
-          className={`flex items-center gap-2 md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
-        >
-          Possible Times
-          {errors.timeRange && <TriangleAlertIcon className="h-4 w-4" />}
-        </p>
-        <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
-          <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
-            <TimeSelector
-              id="from-time-dropdown"
-              value={eventRange.timeRange.from}
-              onChange={setStartTime}
-            />
-          </FormSelectorField>
+        <div className="flex flex-col gap-1">
+          <p
+            className={`flex items-center gap-2 md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
+          >
+            Possible Times
+            {errors.timeRange && <TriangleAlertIcon className="h-4 w-4" />}
+          </p>
+          <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
+            <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
+              <TimeSelector
+                id="from-time-dropdown"
+                value={eventRange.timeRange.from}
+                onChange={setStartTime}
+              />
+            </FormSelectorField>
 
-          <FormSelectorField label="UNTIL" htmlFor="to-time-dropdown">
-            <TimeSelector
-              id="to-time-dropdown"
-              value={eventRange.timeRange.to}
-              onChange={setEndTime}
-            />
-          </FormSelectorField>
+            <FormSelectorField label="UNTIL" htmlFor="to-time-dropdown">
+              <TimeSelector
+                id="to-time-dropdown"
+                value={eventRange.timeRange.to}
+                onChange={setEndTime}
+              />
+            </FormSelectorField>
+          </div>
         </div>
 
         <div className="md:content md:col-start-1 md:row-start-10 md:flex md:max-w-[250px] md:items-end">
