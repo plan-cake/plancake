@@ -126,11 +126,11 @@ export type DisplayName = {
 
 export type ActiveSession = {
   public_id: string;
-  device_type: string;
-  os_name: string;
-  os_version: string;
-  client_name: string;
-  client_version: string;
+  device_type: string | null;
+  os_name: string | null;
+  os_version: string | null;
+  client_name: string | null;
+  client_version: string | null;
   last_used: string;
   is_current: boolean;
 }
