@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.db.models.functions import Lower
 
@@ -41,10 +43,13 @@ class UnverifiedUserAccount(models.Model):
 
 class UserSession(models.Model):
     session_token = models.CharField(max_length=255, primary_key=True)
+    public_id = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
     user_account = models.ForeignKey(
         UserAccount, on_delete=models.CASCADE, related_name="session_tokens"
     )
     is_extended = models.BooleanField(default=False)
+    ip_address = models.GenericIPAddressField(null=True)
+    user_agent_raw = models.TextField(null=True)
     created_at = DateTimeNoTZField(auto_now_add=True)
     last_used = DateTimeNoTZField(auto_now=True)
 
@@ -76,6 +81,8 @@ class UserLogin(models.Model):
     user_account = models.ForeignKey(
         UserAccount, on_delete=models.CASCADE, related_name="logins"
     )
+    ip_address = models.GenericIPAddressField(null=True)
+    user_agent_raw = models.TextField(null=True)
     login_time = DateTimeNoTZField(auto_now_add=True)
 
 

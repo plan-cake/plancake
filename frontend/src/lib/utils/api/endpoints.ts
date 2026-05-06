@@ -20,7 +20,9 @@ import {
   PasswordResetData,
   RegisterData,
   SelfAvailability,
-  VerificationCode
+  VerificationCode,
+  ActiveSessionList,
+  SessionId,
 } from "@/lib/utils/api/types";
 
 /**
@@ -88,26 +90,10 @@ export const ROUTES = {
      */
     resetPassword: route<MessageResponse, PasswordResetData>("/auth/reset-password/"),
     /**
-     * Changes the password for the current user account. If `prune_sessions` is true, all
-     * other sessions for the user will be removed.
-     * @method POST
-     * @throws 400 - If the current password is incorrect.
-     * @throws 400 - If the new password is not strong enough.
-     * @throws 400 - If the new password is the same as the old password.
-     */
-    changePassword: route<MessageResponse, PasswordChangeData>("/auth/change-password/"),
-    /**
      * Logs out the current user.
      * @method POST
      */
     logout: route<MessageResponse>("/auth/logout/"),
-    /**
-     * Deletes the current user account, including all created events and participation
-     * data.
-     * @method POST
-     * @throws 400 - If the password is incorrect.
-     */
-    deleteAccount: route<MessageResponse, Password>("/auth/delete-account/"),
   },
   event: {
     /**
@@ -222,6 +208,32 @@ export const ROUTES = {
      */
     removeDefaultName: route<MessageResponse>("/account/remove-default-name/"),
     /**
+     * Gets a list of the current user's active sessions, including the current session.
+     * @method GET
+     */
+    getActiveSessions: route<ActiveSessionList>("/account/active-sessions/"),
+    /**
+     * Terminates an active session for the current user.
+     * @method POST
+     * @throws 400 - If the session ID is for the current session.
+     * @throws 404 - If the session ID is invalid.
+     */
+    terminateSession: route<MessageResponse, SessionId>("/account/terminate-session/"),
+    /**
+     * Terminates all active sessions for the current user except the current session.
+     * @method POST
+     */
+    pruneSessions: route<MessageResponse>("/account/prune-sessions/"),
+    /**
+     * Changes the password for the current user account. If `prune_sessions` is true, all
+     * other sessions for the user will be removed.
+     * @method POST
+     * @throws 400 - If the current password is incorrect.
+     * @throws 400 - If the new password is not strong enough.
+     * @throws 400 - If the new password is the same as the old password.
+     */
+    changePassword: route<MessageResponse, PasswordChangeData>("/account/change-password/"),
+    /**
      * Starts the password reset process for a logged-in user by sending an email.
      * @method POST
      * @throws 401 - If the user is not logged in.
@@ -243,5 +255,12 @@ export const ROUTES = {
      * @throws 400 - If the new password is the same as the old password.
      */
     authedPasswordReset: route<MessageResponse, AuthedPasswordResetData>("/account/authed-password-reset/"),
+    /**
+     * Deletes the current user account, including all created events and participation
+     * data.
+     * @method POST
+     * @throws 400 - If the password is incorrect.
+     */
+    deleteAccount: route<MessageResponse, Password>("/account/delete-account/"),
   },
 } as const;

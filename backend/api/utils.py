@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.db.models import Q
+from ipware import get_client_ip
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.throttling import SimpleRateThrottle
@@ -305,7 +306,38 @@ def check_rate_limit(request, throttle_scope: ThrottleScope) -> None:
 def prune_account_sessions(request):
     """
     Deletes all of the current account's sessions except for the current one.
+
+    This function depends on the user being authenticated and existing in the request
+    object.
     """
     UserSession.objects.filter(user_account=request.user).exclude(
         session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
     ).delete()
+
+
+def get_client_ip_address(request) -> str | None:
+    """
+    Extracts the client's IP address, accounting for possible proxy headers.
+    """
+    client_ip, _ = get_client_ip(request)
+    return client_ip if client_ip else None
+
+
+def get_client_user_agent(request) -> str | None:
+    """
+    Extracts the client's user agent string.
+    """
+    return request.META.get("HTTP_USER_AGENT", None)
+
+
+def update_session_metadata(request, session: UserSession):
+    """
+    Updates the session's metadata (IP address, user agent, and last used time) based on
+    the incoming request.
+    """
+    # Since the session is being updated anyway, we don't have to check if the metadata
+    # has changed before updating it
+    session.ip_address = get_client_ip_address(request)
+    session.user_agent_raw = get_client_user_agent(request)
+    # Auto-updates last_used
+    session.save()
