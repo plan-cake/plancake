@@ -8,7 +8,6 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 
-from api.availability.utils import get_weekday_date
 from api.models import UserAccount, UserSession
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
@@ -20,8 +19,6 @@ from api.utils import (
     RateLimitError,
     check_rate_limit,
     delete_session_cookie,
-    get_client_ip_address,
-    get_client_user_agent,
     get_metadata,
     get_session,
     set_session_cookie,
@@ -175,8 +172,6 @@ def require_auth(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-        ip_address = get_client_ip_address(request)
-        user_agent = get_client_user_agent(request)
 
         acct_sess_expired = False
         if acct_token:
@@ -302,9 +297,6 @@ def require_account_auth(func):
     def wrapper(request, *args, **kwargs):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
         logger.debug("Account session token: %s", acct_token)
-
-        ip_address = get_client_ip_address(request)
-        user_agent = get_client_user_agent(request)
 
         BAD_AUTH_RESPONSE = Response(
             {"error": {"general": ["Account required."]}}, status=401
