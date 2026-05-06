@@ -135,7 +135,9 @@ export type ActiveSession = {
   is_current: boolean;
 }
 
-export type ActiveSessionList = ActiveSession[];
+export type ActiveSessionList = {
+  sessions: ActiveSession[];
+}
 
 export type SessionId = {
   session_id: string;
