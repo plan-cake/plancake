@@ -7,7 +7,7 @@ from django.db import migrations
 
 def gen_uuid(apps, _):
     UserSession = apps.get_model("api", "UserSession")
-    for row in UserSession.objects.all():
+    for row in UserSession.objects.iterator():
         row.public_id = uuid.uuid4()
         row.save(update_fields=["public_id"])
 
