@@ -68,6 +68,63 @@ def remove_default_name(request):
 
 @api_endpoint("POST")
 @require_account_auth
+@validate_json_input(PasswordChangeSerializer)
+@validate_output(MessageOutputSerializer)
+def change_password(request):
+    """
+    Changes the password for the currently-authenticated user account after verifying the
+    current password.
+
+    If `prune_sessions` is true, all active sessions for this account EXCEPT the current
+    one will be removed for security.
+    """
+    password = request.validated_data.get("password")
+    new_password = request.validated_data.get("new_password")
+    prune_sessions = request.validated_data.get("prune_sessions")
+
+    user = request.user
+
+    if not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
+        logger.info(
+            "Password change failed for %s: Incorrect current password.", user.email
+        )
+        return Response({"error": {"password": ["Incorrect password."]}}, status=400)
+
+    # Check if the new password is actually new
+    if password == new_password:
+        logger.info("Password change failed: New password was not new.")
+        return Response(
+            {
+                "error": {
+                    "new_password": [
+                        "New password must be different from current password."
+                    ]
+                }
+            },
+            status=400,
+        )
+
+    is_strong, criteria = validate_password(new_password)
+    if not is_strong:
+        logger.info("Password change failed for %s: Invalid new password.", user.email)
+        return Response(
+            {"error": {"new_password": list_failed_criteria(criteria)}}, status=400
+        )
+
+    with transaction.atomic():
+        user.password_hash = bcrypt.hashpw(
+            new_password.encode(), bcrypt.gensalt()
+        ).decode()
+        user.save()
+
+        if prune_sessions:
+            prune_account_sessions(request)
+
+    return Response({"message": ["Password changed successfully."]}, status=200)
+
+
+@api_endpoint("POST")
+@require_account_auth
 @validate_output(MessageOutputSerializer)
 def start_authed_password_reset(request):
     """

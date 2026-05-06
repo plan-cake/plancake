@@ -88,15 +88,6 @@ export const ROUTES = {
      */
     resetPassword: route<MessageResponse, PasswordResetData>("/auth/reset-password/"),
     /**
-     * Changes the password for the current user account. If `prune_sessions` is true, all
-     * other sessions for the user will be removed.
-     * @method POST
-     * @throws 400 - If the current password is incorrect.
-     * @throws 400 - If the new password is not strong enough.
-     * @throws 400 - If the new password is the same as the old password.
-     */
-    changePassword: route<MessageResponse, PasswordChangeData>("/auth/change-password/"),
-    /**
      * Logs out the current user.
      * @method POST
      */
@@ -221,6 +212,15 @@ export const ROUTES = {
      * @method POST
      */
     removeDefaultName: route<MessageResponse>("/account/remove-default-name/"),
+    /**
+     * Changes the password for the current user account. If `prune_sessions` is true, all
+     * other sessions for the user will be removed.
+     * @method POST
+     * @throws 400 - If the current password is incorrect.
+     * @throws 400 - If the new password is not strong enough.
+     * @throws 400 - If the new password is the same as the old password.
+     */
+    changePassword: route<MessageResponse, PasswordChangeData>("/account/change-password/"),
     /**
      * Starts the password reset process for a logged-in user by sending an email.
      * @method POST
