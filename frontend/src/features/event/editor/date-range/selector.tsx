@@ -30,7 +30,7 @@ export default function DateRangeSelection({
         <p
           className={`flex items-center gap-2 ${errors.dateRange ? "text-error" : ""}`}
         >
-          Possible Dates
+          {rangeType === "specific" ? "Possible Dates" : "Possible Days"}
           {errors.dateRange && (
             <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
