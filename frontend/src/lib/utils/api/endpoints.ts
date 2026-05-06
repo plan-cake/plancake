@@ -92,13 +92,6 @@ export const ROUTES = {
      * @method POST
      */
     logout: route<MessageResponse>("/auth/logout/"),
-    /**
-     * Deletes the current user account, including all created events and participation
-     * data.
-     * @method POST
-     * @throws 400 - If the password is incorrect.
-     */
-    deleteAccount: route<MessageResponse, Password>("/auth/delete-account/"),
   },
   event: {
     /**
@@ -243,5 +236,12 @@ export const ROUTES = {
      * @throws 400 - If the new password is the same as the old password.
      */
     authedPasswordReset: route<MessageResponse, AuthedPasswordResetData>("/account/authed-password-reset/"),
+    /**
+     * Deletes the current user account, including all created events and participation
+     * data.
+     * @method POST
+     * @throws 400 - If the password is incorrect.
+     */
+    deleteAccount: route<MessageResponse, Password>("/account/delete-account/"),
   },
 } as const;

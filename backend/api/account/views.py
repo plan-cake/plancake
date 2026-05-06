@@ -12,7 +12,7 @@ from api.account.serializers import (
     AuthedPasswordResetCodeSerializer,
     AuthedPasswordResetSerializer,
 )
-from api.auth.serializers import PasswordChangeSerializer
+from api.auth.serializers import PasswordChangeSerializer, PasswordSerializer
 from api.auth.utils import list_failed_criteria, validate_password
 from api.availability.serializers import DisplayNameSerializer
 from api.decorators import (
@@ -22,8 +22,18 @@ from api.decorators import (
     validate_output,
 )
 from api.models import AuthedPasswordResetCode
-from api.settings import AUTHED_PWD_RESET_EXP_SECONDS, SEND_EMAILS, ThrottleScopes
-from api.utils import MessageOutputSerializer, check_rate_limit, prune_account_sessions
+from api.settings import (
+    ACCOUNT_COOKIE_NAME,
+    AUTHED_PWD_RESET_EXP_SECONDS,
+    SEND_EMAILS,
+    ThrottleScopes,
+)
+from api.utils import (
+    MessageOutputSerializer,
+    check_rate_limit,
+    delete_session_cookie,
+    prune_account_sessions,
+)
 
 logger = logging.getLogger("api")
 
@@ -254,3 +264,25 @@ def authed_password_reset(request):
         )
 
     return Response({"message": ["Password reset successfully."]}, status=200)
+
+
+@api_endpoint("POST")
+@require_account_auth
+@validate_json_input(PasswordSerializer)
+@validate_output(MessageOutputSerializer)
+def delete_account(request):
+    """
+    Deletes the currently-authenticated user account after verifying the password.
+    """
+    password = request.validated_data.get("password")
+    user = request.user
+
+    if not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
+        logger.info("Account deletion failed for %s: Incorrect password.", user.email)
+        return Response({"error": {"password": ["Incorrect password."]}}, status=400)
+
+    user.delete()
+
+    response = Response({"message": ["Account deleted successfully."]}, status=200)
+    delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
+    return response

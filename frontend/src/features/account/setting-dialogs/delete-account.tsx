@@ -46,7 +46,7 @@ export default function DeleteAccountDialog() {
     }
 
     try {
-      await clientPost(ROUTES.auth.deleteAccount, {
+      await clientPost(ROUTES.account.deleteAccount, {
         password: currentPassword,
       });
       logout();

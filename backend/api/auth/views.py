@@ -12,9 +12,7 @@ from api.auth.serializers import (
     EmailSerializer,
     EmailVerifySerializer,
     LoginSerializer,
-    PasswordChangeSerializer,
     PasswordResetSerializer,
-    PasswordSerializer,
     RegisterAccountSerializer,
 )
 from api.auth.utils import list_failed_criteria, validate_password
@@ -46,7 +44,6 @@ from api.utils import (
     get_client_ip_address,
     get_client_user_agent,
     get_session,
-    prune_account_sessions,
     set_session_cookie,
 )
 
@@ -434,27 +431,5 @@ def logout(request):
         logger.info("User already logged out.")
 
     response = Response({"message": ["Logged out successfully."]}, status=200)
-    delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
-    return response
-
-
-@api_endpoint("POST")
-@require_account_auth
-@validate_json_input(PasswordSerializer)
-@validate_output(MessageOutputSerializer)
-def delete_account(request):
-    """
-    Deletes the currently-authenticated user account after verifying the password.
-    """
-    password = request.validated_data.get("password")
-    user = request.user
-
-    if not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
-        logger.info("Account deletion failed for %s: Incorrect password.", user.email)
-        return Response({"error": {"password": ["Incorrect password."]}}, status=400)
-
-    user.delete()
-
-    response = Response({"message": ["Account deleted successfully."]}, status=200)
     delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
     return response
