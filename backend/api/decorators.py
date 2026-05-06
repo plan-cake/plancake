@@ -25,6 +25,7 @@ from api.utils import (
     get_metadata,
     get_session,
     set_session_cookie,
+    update_session_metadata,
 )
 
 logger = logging.getLogger("api")
@@ -84,8 +85,6 @@ def check_auth(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-        ip_address = get_client_ip_address(request)
-        user_agent = get_client_user_agent(request)
 
         acct_sess_expired = False
         if acct_token:
@@ -97,10 +96,7 @@ def check_auth(func):
                         # To break out of the rest of the logic
                         raise UserSession.DoesNotExist
 
-                    # Update the session access info
-                    session.ip_address = ip_address
-                    session.user_agent_raw = user_agent
-                    session.save()  # Also updates last_used
+                    update_session_metadata(request, session)
 
                 # At this point the account is authenticated
                 request.user = session.user_account
@@ -130,10 +126,7 @@ def check_auth(func):
                     if not session:
                         raise UserSession.DoesNotExist
 
-                    # Update the session access info
-                    session.ip_address = ip_address
-                    session.user_agent_raw = user_agent
-                    session.save()  # Also updates last_used
+                    update_session_metadata(request, session)
 
                 request.user = session.user_account
                 # Run the function
@@ -195,10 +188,7 @@ def require_auth(func):
                         # To break out of the rest of the logic
                         raise UserSession.DoesNotExist
 
-                    # Update the session access info
-                    session.ip_address = ip_address
-                    session.user_agent_raw = user_agent
-                    session.save()  # Also updates last_used
+                    update_session_metadata(request, session)
 
                 # At this point the account is authenticated
                 request.user = session.user_account
@@ -228,10 +218,7 @@ def require_auth(func):
                     if not session:
                         raise UserSession.DoesNotExist
 
-                    # Update the session access info
-                    session.ip_address = ip_address
-                    session.user_agent_raw = user_agent
-                    session.save()  # Also updates last_used
+                    update_session_metadata(request, session)
 
                 request.user = session.user_account
                 # Run the function
@@ -330,10 +317,7 @@ def require_account_auth(func):
                     if not session:
                         raise UserSession.DoesNotExist
 
-                    # Update the session access info
-                    session.ip_address = ip_address
-                    session.user_agent_raw = user_agent
-                    session.save()  # Also updates last_used
+                    update_session_metadata(request, session)
 
                 # At this point the account is authenticated
                 request.user = session.user_account

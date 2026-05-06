@@ -325,3 +325,16 @@ def get_client_user_agent(request) -> str | None:
     Extracts the client's user agent string.
     """
     return request.META.get("HTTP_USER_AGENT", None)
+
+
+def update_session_metadata(request, session: UserSession):
+    """
+    Updates the session's metadata (IP address, user agent, and last used time) based on
+    the incoming request.
+    """
+    # Since the session is being updated anyway, we don't have to check if the metadata
+    # has changed before updating it
+    session.ip_address = get_client_ip_address(request)
+    session.user_agent_raw = get_client_user_agent(request)
+    # Auto-updates last_used
+    session.save()
