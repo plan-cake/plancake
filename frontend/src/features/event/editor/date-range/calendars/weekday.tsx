@@ -62,10 +62,6 @@ export default function WeekdayCalendar({
               // Contiguous Rounding Logic
               isActive && isRangeStart && "rounded-l-full",
               isActive && isRangeEnd && "rounded-r-full",
-              isActive && !isRangeStart && !isRangeEnd && "rounded-none",
-
-              // Single Day Case (Start == End)
-              isActive && isRangeStart && isRangeEnd && "rounded-full",
             )}
           >
             {day}
