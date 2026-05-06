@@ -20,7 +20,9 @@ import {
   PasswordResetData,
   RegisterData,
   SelfAvailability,
-  VerificationCode
+  VerificationCode,
+  ActiveSessionList,
+  SessionId,
 } from "@/lib/utils/api/types";
 
 /**
@@ -205,6 +207,23 @@ export const ROUTES = {
      * @method POST
      */
     removeDefaultName: route<MessageResponse>("/account/remove-default-name/"),
+    /**
+     * Gets a list of the current user's active sessions, including the current session.
+     * @method GET
+     */
+    getActiveSessions: route<ActiveSessionList>("/account/active-sessions/"),
+    /**
+     * Terminates an active session for the current user.
+     * @method POST
+     * @throws 400 - If the session ID is for the current session.
+     * @throws 404 - If the session ID is invalid.
+     */
+    terminateSession: route<MessageResponse, SessionId>("/account/terminate-session/"),
+    /**
+     * Terminates all active sessions for the current user except the current session.
+     * @method POST
+     */
+    pruneSessions: route<MessageResponse>("/account/prune-sessions/"),
     /**
      * Changes the password for the current user account. If `prune_sessions` is true, all
      * other sessions for the user will be removed.
