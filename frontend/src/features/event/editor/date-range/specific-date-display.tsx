@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils/classname";
 
@@ -47,18 +48,21 @@ function SpecificDateDisplay({
 }) {
   const displayDate = format(date, "EEE MMMM d, yyyy");
 
-  const displayStyle =
-    "text-accent-text bg-accent/15 hover:bg-accent/25 active:bg-accent/40 rounded-2xl px-3 py-1 focus:outline-none";
-
   return (
     <div className="flex w-fit items-center space-x-4">
       <p className="text-gray-400 md:hidden">{mobileLabel}</p>
-      <span
-        className={cn(displayStyle, open && "ring-accent ring-1")}
+      <div
+        className={cn(
+          "text-accent-text bg-accent/15 hover:bg-accent/25 active:bg-accent/40",
+          "rounded-2xl px-3 py-1 focus:outline-none",
+          "flex items-center gap-2",
+          open && "ring-accent ring-1",
+        )}
         aria-label={ariaLabel}
       >
-        {displayDate}
-      </span>
+        <span>{displayDate}</span>
+        <ChevronDown className="h-4 w-4 flex-shrink-0" />
+      </div>
     </div>
   );
 }

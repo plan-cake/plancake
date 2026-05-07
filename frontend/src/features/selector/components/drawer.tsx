@@ -1,5 +1,7 @@
 import { cloneElement, useEffect, useRef, useState } from "react";
 
+import { ChevronDownIcon } from "lucide-react";
+
 import { FloatingDrawer, StandardDrawer } from "@/features/drawer";
 import { DrawerProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
@@ -78,7 +80,7 @@ export default function SelectorDrawer<TValue extends string | number>({
             aria-disabled={disabled}
             className={cn(
               "relative flex items-center rounded-2xl text-start focus:outline-none",
-              "bg-accent/15 text-accent-text px-3 py-1",
+              "bg-accent/15 text-accent-text gap-2 px-3 py-1",
               open && !disabled && "ring-accent ring-1",
               // Interactive states only when enabled
               !disabled &&
@@ -89,6 +91,7 @@ export default function SelectorDrawer<TValue extends string | number>({
             )}
           >
             <span className="text-wrap">{selectLabel}</span>
+            <ChevronDownIcon className="h-4 w-4 flex-shrink-0" />
           </button>
         )
       }
