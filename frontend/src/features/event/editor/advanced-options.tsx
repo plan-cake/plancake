@@ -6,7 +6,6 @@ import { useDebouncedCallback } from "use-debounce";
 
 import { useEventContext } from "@/core/event/context";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
-import FormSelectorField from "@/features/selector/components/selector-field";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -37,9 +36,7 @@ export default function AdvancedOptions(props: AdvancedOptionsProps) {
           >
             <ChevronRightIcon className="h-4 w-4" />
           </div>
-          <span className="text-[15px] font-semibold leading-[25px]">
-            Advanced Options
-          </span>
+          <span>Advanced Options</span>
         </div>
       </Collapsible.Trigger>
 
@@ -80,37 +77,44 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
 
   return (
     <>
-      <FormSelectorField label="Timezone" htmlFor="timezone-select" isVertical>
-        <TimeZoneSelector
-          id="timezone-select"
-          value={eventRange.timezone}
-          onChange={setTimezone}
-        />
-      </FormSelectorField>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="timezone-select" className="font-bold">
+          Timezone
+        </label>
+        <div>
+          <TimeZoneSelector
+            id="timezone-select"
+            value={eventRange.timezone}
+            onChange={setTimezone}
+          />
+        </div>
+      </div>
 
-      <label
-        htmlFor="custom-code-input"
-        className="mt-2 flex justify-between text-gray-400"
-      >
-        {!isEditing && "Custom"} Event Code
-        {errors.customCode && (
-          <TriangleAlertIcon className="text-error h-4 w-4" />
-        )}
-      </label>
-      <input
-        id="custom-code-input"
-        type="text"
-        value={customCode}
-        onChange={handleCustomCodeChange}
-        placeholder="optional"
-        disabled={isEditing}
-        className={cn(
-          "border-b-1 w-full border-gray-400 focus:outline-none",
-          !isEditing && "text-accent",
-          isEditing && "cursor-not-allowed opacity-50",
-          errors.customCode ? "border-error placeholder:text-error" : "",
-        )}
-      />
+      <div className="flex flex-col gap-1">
+        <label
+          htmlFor="custom-code-input"
+          className="mt-2 flex justify-between font-bold"
+        >
+          {!isEditing && "Custom"} Event Code
+          {errors.customCode && (
+            <TriangleAlertIcon className="text-error h-4 w-4" />
+          )}
+        </label>
+        <input
+          id="custom-code-input"
+          type="text"
+          value={customCode}
+          onChange={handleCustomCodeChange}
+          placeholder="optional"
+          disabled={isEditing}
+          className={cn(
+            "border-b-1 border-foreground/60 w-full focus:outline-none",
+            !isEditing && "text-accent",
+            isEditing && "cursor-not-allowed opacity-50",
+            errors.customCode ? "border-error placeholder:text-error" : "",
+          )}
+        />
+      </div>
     </>
   );
 }

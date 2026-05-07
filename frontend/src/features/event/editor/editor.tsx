@@ -152,7 +152,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
         <div className="flex flex-col gap-1">
           <p
-            className={`flex items-center gap-2 md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
+            className={`flex items-center gap-2 font-bold md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
           >
             Possible Times
             {errors.timeRange && <TriangleAlertIcon className="h-4 w-4" />}

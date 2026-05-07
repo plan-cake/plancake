@@ -23,7 +23,7 @@ export default function SpecificDateRangeDisplay({
         open={open}
       />
 
-      <span className="hidden w-fit py-1 text-gray-400 md:block">TO</span>
+      <span className="text-foreground/60 hidden w-fit py-1 md:block">TO</span>
 
       <SpecificDateDisplay
         mobileLabel="UNTIL"
@@ -50,7 +50,7 @@ function SpecificDateDisplay({
 
   return (
     <div className="flex w-fit items-center space-x-4">
-      <p className="text-gray-400 md:hidden">{mobileLabel}</p>
+      <p className="text-foreground/60 md:hidden">{mobileLabel}</p>
       <div
         className={cn(
           "text-accent-text bg-accent/15 hover:bg-accent/25 active:bg-accent/40",

@@ -23,7 +23,7 @@ export default function FormSelectorField({
         classname,
       )}
     >
-      <label htmlFor={htmlFor} className="text-gray-400">
+      <label htmlFor={htmlFor} className="text-foreground/60">
         {label}
       </label>
       {children}
