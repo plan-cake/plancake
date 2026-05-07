@@ -72,7 +72,7 @@ export default function WeekdayCalendar({
                 "active:bg-accent/40 text-foreground/50",
 
                 // Inactive State
-                !isHighlighted && "rounded-full",
+                !isHighlighted && "hover:bg-accent/15 rounded-full",
 
                 // Active State
                 isHighlighted &&
