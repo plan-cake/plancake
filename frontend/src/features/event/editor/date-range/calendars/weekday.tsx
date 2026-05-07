@@ -36,7 +36,7 @@ export default function WeekdayCalendar({
     .map((d) => ALL_WEEKDAYS.indexOf(d))
     .filter((i) => i !== -1);
 
-  let highlightState = selectedIndices.length > 0 ? "active" : "inactive";
+  let highlightState = "inactive";
   let highlightStart = -1;
   let highlightEnd = -1;
   if (selectedIndices.length > 0 && anchorIndex === null) {
@@ -82,9 +82,11 @@ export default function WeekdayCalendar({
                 // Hovered state
                 isHighlighted &&
                   highlightState === "hover" &&
-                  "border-foreground/75 border-b-2 border-t-2 border-dashed" +
-                    (isRangeStart ? " pl-5.5 border-l-2" : "") +
-                    (isRangeEnd ? " pr-5.5 border-r-2" : ""),
+                  cn(
+                    "border-foreground/75 border-b-2 border-t-2 border-dashed",
+                    isRangeStart ? "pl-5.5 border-l-2" : "",
+                    isRangeEnd ? "pr-5.5 border-r-2" : "",
+                  ),
 
                 // Contiguous Rounding Logic
                 isRangeStart && "rounded-l-full",
