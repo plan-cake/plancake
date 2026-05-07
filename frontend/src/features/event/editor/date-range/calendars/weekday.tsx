@@ -69,7 +69,7 @@ export default function WeekdayCalendar({
             <button
               className={cn(
                 "flex h-8 w-10 items-center justify-center px-6",
-                "active:bg-accent/40 text-foreground/50",
+                "active:bg-accent/40 text-foreground/50 cursor-pointer",
 
                 // Inactive State
                 !isHighlighted && "hover:bg-accent/15 rounded-full",
