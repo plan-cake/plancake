@@ -26,7 +26,7 @@ export async function validateEventData(
   // Validate event range
   if (eventRange.type === "specific") {
     if (!eventRange.dateRange?.from || !eventRange.dateRange?.to) {
-      errors.dateRange = MESSAGES.ERROR_EVENT_RANGE_INVALID;
+      errors.dateRange = MESSAGES.ERROR_EVENT_DATES_MISSING;
     } else {
       // check if the date range is more than 64 days
       const fromDate = new Date(eventRange.dateRange.from);
@@ -42,13 +42,17 @@ export async function validateEventData(
       (data.eventRange as WeekdayRange).weekdays,
     );
     if (weekdayRange.startDay === null || weekdayRange.endDay === null) {
-      errors.weekdayRange = MESSAGES.ERROR_EVENT_RANGE_INVALID;
+      errors.weekdayRange = MESSAGES.ERROR_EVENT_DATES_MISSING;
     }
   }
 
   // Validate time range
-  if (!checkTimeRange(eventRange.timeRange.from, eventRange.timeRange.to)) {
-    errors.timeRange = MESSAGES.ERROR_EVENT_RANGE_INVALID;
+  if (
+    !eventRange.timeRange.from ||
+    !eventRange.timeRange.to ||
+    !checkTimeRange(eventRange.timeRange.from, eventRange.timeRange.to)
+  ) {
+    errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_MISSING;
   }
 
   return errors;

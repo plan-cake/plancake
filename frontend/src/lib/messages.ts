@@ -27,6 +27,8 @@ export const MESSAGES = {
   ERROR_EVENT_NAME_MISSING: "Missing event name.",
   ERROR_EVENT_NAME_LENGTH: `Event name must be under ${MAX_TITLE_LENGTH} characters.`,
   ERROR_EVENT_CODE_TAKEN: "This code is unavailable. Please choose another.",
+  ERROR_EVENT_DATES_MISSING: "Please select possible dates for this event.",
+  ERROR_EVENT_TIMES_MISSING: "Please select possible times for this event.",
   ERROR_EVENT_RANGE_INVALID: "Please select a valid date/time range.",
   ERROR_EVENT_RANGE_TOO_LONG: `Too many days selected. Max is ${MAX_DURATION}.`,
 
@@ -56,7 +58,8 @@ export const MESSAGES = {
   INFO_NOT_LOGGED_IN: "You are not logged in.",
   INFO_EVENT_PASSED: "All dates in this event have passed.",
   INFO_ADD_AVAILABILITY: "Add your availability by clicking the button above.",
-  INFO_ADD_AVAILABILITY_MOBILE: "Add your availability by clicking the button below.",
+  INFO_ADD_AVAILABILITY_MOBILE:
+    "Add your availability by clicking the button below.",
   INFO_COPY_SHARE_LINK: "Copy and share the link so others can join!",
   INFO_NO_MUTUAL_AVAILABILITY: "There is no time where everyone is available.",
 };
