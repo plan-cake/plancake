@@ -113,7 +113,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       )}
 
       <div className="-mb-1 flex w-full items-center justify-between">
-        <div className="mb-4 md:w-1/2">
+        <div className="mb-4 w-full md:w-1/2">
           <TextInputField
             id={"event-name"}
             type="text"
