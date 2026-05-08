@@ -12,10 +12,10 @@ type BaseEventRange = {
   type: EventType;
   timezone: string;
   timeRange: {
-    from: string;
-    to: string;
-  }
-}
+    from: string | null;
+    to: string | null;
+  };
+};
 
 // discriminated union for event ranges - this is your single source of truth
 export type EventRange = SpecificDateRange | WeekdayRange;
@@ -37,8 +37,8 @@ export const ALL_WEEKDAYS: Weekday[] = [
 export type SpecificDateRange = BaseEventRange & {
   type: "specific";
   dateRange: {
-    from: string;
-    to: string;
+    from: string | null;
+    to: string | null;
   };
 };
 

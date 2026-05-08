@@ -163,6 +163,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
                 id="from-time-dropdown"
                 value={eventRange.timeRange.from}
                 onChange={setStartTime}
+                placeholder="Start Time"
               />
             </FormSelectorField>
 
@@ -171,6 +172,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
                 id="to-time-dropdown"
                 value={eventRange.timeRange.to}
                 onChange={setEndTime}
+                placeholder="End Time"
               />
             </FormSelectorField>
           </div>

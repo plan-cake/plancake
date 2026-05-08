@@ -10,9 +10,12 @@ import { EventRange, EventType, Weekday } from "@/core/event/types";
 export type EventRangeAction =
   | { type: "SET_RANGE_INFO"; payload: EventRange }
   | { type: "SET_RANGE_TYPE"; payload: EventType }
-  | { type: "SET_DATE_RANGE"; payload: { from: string; to: string } }
-  | { type: "SET_START_TIME"; payload: string }
-  | { type: "SET_END_TIME"; payload: string }
+  | {
+      type: "SET_DATE_RANGE";
+      payload: { from: string | null; to: string | null };
+    }
+  | { type: "SET_START_TIME"; payload: string | null }
+  | { type: "SET_END_TIME"; payload: string | null }
   | { type: "SET_WEEKDAYS"; payload: Weekday[] }
   | { type: "SET_TIMEZONE"; payload: string }
   | { type: "RESET" };

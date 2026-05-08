@@ -64,11 +64,16 @@ function SpecificDateRangeDisplay({
 }) {
   const isMobile = useCheckMobile();
 
-  const earliestDate = editing
-    ? parseISO(originalEventRange?.dateRange.from || eventRange.dateRange.from)
-    : parseISO(eventRange.dateRange.from);
-  const startDate = parseISO(eventRange.dateRange.from);
-  const endDate = parseISO(eventRange.dateRange.to);
+  const earliestDate =
+    editing && originalEventRange?.dateRange.from
+      ? parseISO(originalEventRange.dateRange.from)
+      : new Date();
+  const startDate = eventRange.dateRange.from
+    ? parseISO(eventRange.dateRange.from)
+    : null;
+  const endDate = eventRange.dateRange.to
+    ? parseISO(eventRange.dateRange.to)
+    : null;
 
   if (isMobile) {
     return (
