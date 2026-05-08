@@ -103,8 +103,8 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
      * range. Otherwise, it continues the current range.
      */
     const handleSelect = (range: DateRange | undefined, selectedDay: Date) => {
-      // full range already exists, start new range
-      if (localRange?.from && localRange?.to) {
+      // full range already exists or nothing selected, start new range
+      if ((localRange?.from && localRange?.to) || !localRange?.from) {
         const newRange = { from: selectedDay, to: undefined };
         setLocalRange(newRange);
         return;
