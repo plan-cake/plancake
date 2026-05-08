@@ -4,8 +4,8 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils/classname";
 
 type SpecificDateRangeDisplayProps = {
-  startDate: Date;
-  endDate: Date;
+  startDate: Date | null;
+  endDate: Date | null;
   open?: boolean;
 };
 
@@ -19,6 +19,7 @@ export default function SpecificDateRangeDisplay({
       <SpecificDateDisplay
         mobileLabel="FROM"
         date={startDate}
+        placeholder="Start Date"
         ariaLabel="Start date"
         open={open}
       />
@@ -28,6 +29,7 @@ export default function SpecificDateRangeDisplay({
       <SpecificDateDisplay
         mobileLabel="UNTIL"
         date={endDate}
+        placeholder="End Date"
         ariaLabel="End date"
         open={open}
       />
@@ -38,15 +40,17 @@ export default function SpecificDateRangeDisplay({
 function SpecificDateDisplay({
   mobileLabel,
   date,
+  placeholder,
   ariaLabel,
   open = false,
 }: {
   mobileLabel: string;
-  date: Date;
+  date: Date | null;
+  placeholder: string;
   ariaLabel: string;
   open?: boolean;
 }) {
-  const displayDate = format(date, "EEE MMMM d, yyyy");
+  const displayDate = date ? format(date, "EEE MMMM d, yyyy") : placeholder;
 
   return (
     <div className="flex w-fit items-center space-x-4">
@@ -60,7 +64,9 @@ function SpecificDateDisplay({
         )}
         aria-label={ariaLabel}
       >
-        <span>{displayDate}</span>
+        <span className={!date ? "text-foreground/60" : undefined}>
+          {displayDate}
+        </span>
         <ChevronDown className="h-4 w-4 flex-shrink-0" />
       </div>
     </div>
