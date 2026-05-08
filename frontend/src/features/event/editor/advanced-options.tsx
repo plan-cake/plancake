@@ -40,7 +40,7 @@ export default function AdvancedOptions(props: AdvancedOptionsProps) {
         </div>
       </Collapsible.Trigger>
 
-      <Collapsible.Content className="collapsible-content mt-2 flex flex-col gap-1">
+      <Collapsible.Content className="collapsible-content mt-2 flex flex-col gap-2">
         <Options {...props} />
       </Collapsible.Content>
     </Collapsible.Root>
@@ -93,7 +93,7 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
       <div className="flex flex-col gap-1">
         <label
           htmlFor="custom-code-input"
-          className="mt-2 flex justify-between font-bold"
+          className="flex justify-between font-bold"
         >
           {!isEditing && "Custom"} Event Code
           {errors.customCode && (
