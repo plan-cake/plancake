@@ -83,7 +83,6 @@ export default function SelectorDrawer<TValue extends string | number | null>({
               "relative flex items-center rounded-2xl text-start focus:outline-none",
               "bg-accent/15 text-accent-text gap-2 px-3 py-1",
               open && !disabled && "ring-accent ring-1",
-              !selectLabel && "text-foreground/60",
               // Interactive states only when enabled
               !disabled &&
                 "hover:bg-accent/25 active:bg-accent/40 hover:cursor-pointer",
@@ -92,7 +91,11 @@ export default function SelectorDrawer<TValue extends string | number | null>({
                 "bg-foreground/20 text-foreground hover:bg-foreground/20 active:bg-foreground/20 cursor-not-allowed opacity-50 hover:cursor-not-allowed",
             )}
           >
-            <span className="text-wrap">{selectLabel || placeholder}</span>
+            <span
+              className={cn("text-wrap", !selectLabel && "text-foreground/60")}
+            >
+              {selectLabel || placeholder}
+            </span>
             <ChevronDownIcon className="h-4 w-4 flex-shrink-0" />
           </button>
         )

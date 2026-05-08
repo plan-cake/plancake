@@ -32,7 +32,6 @@ export default function Dropdown<TValue extends string | number | null>({
           "bg-accent/15 hover:bg-accent/25 active:bg-accent/40 px-3 py-1",
           "focus-visible:rounded-full focus-visible:outline-2",
           "focus-visible:outline-foreground focus-visible:outline-offset-2",
-          !value && "text-foreground/60",
           disabled &&
             "bg-foreground/20 text-foreground hover:bg-foreground/20 active:bg-foreground/20 cursor-not-allowed opacity-50 hover:cursor-not-allowed",
           className,
@@ -40,7 +39,12 @@ export default function Dropdown<TValue extends string | number | null>({
         aria-label="Custom select"
         disabled={disabled}
       >
-        <span className="flex-1 truncate text-wrap pr-2">
+        <span
+          className={cn(
+            "flex-1 truncate text-wrap pr-2",
+            !value && "text-foreground/60",
+          )}
+        >
           <Select.Value placeholder={placeholder} />
         </span>
 
