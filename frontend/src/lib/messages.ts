@@ -28,6 +28,7 @@ export const MESSAGES = {
   ERROR_EVENT_NAME_LENGTH: `Event name must be under ${MAX_TITLE_LENGTH} characters.`,
   ERROR_EVENT_CODE_TAKEN: "This code is unavailable. Please choose another.",
   ERROR_EVENT_DATES_MISSING: "Please select possible dates for this event.",
+  ERROR_EVENT_WEEKDAYS_MISSING: "Please select possible days for this event.",
   ERROR_EVENT_TIMES_MISSING: "Please select possible times for this event.",
   ERROR_EVENT_TIMES_INVALID: "Please select a valid time range.",
   ERROR_EVENT_RANGE_TOO_LONG: `Too many days selected. Max is ${MAX_DURATION}.`,

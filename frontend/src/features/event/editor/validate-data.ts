@@ -42,7 +42,7 @@ export async function validateEventData(
       (data.eventRange as WeekdayRange).weekdays,
     );
     if (weekdayRange.startDay === null || weekdayRange.endDay === null) {
-      errors.weekdayRange = MESSAGES.ERROR_EVENT_DATES_MISSING;
+      errors.weekdayRange = MESSAGES.ERROR_EVENT_WEEKDAYS_MISSING;
     }
   }
 
