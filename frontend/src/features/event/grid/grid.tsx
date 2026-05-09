@@ -15,6 +15,7 @@ import InteractiveTimeBlock from "@/features/event/grid/timeblocks/interactive";
 import PreviewTimeBlock from "@/features/event/grid/timeblocks/preview";
 import ResultsTimeBlock from "@/features/event/grid/timeblocks/results";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
 interface ScheduleGridProps {
@@ -24,6 +25,8 @@ interface ScheduleGridProps {
   isWeekdayEvent?: boolean;
 
   disableSelect?: boolean;
+
+  unselectedRange?: boolean;
 
   // for "view" mode
   availabilities?: ResultsAvailabilityMap;
@@ -61,6 +64,7 @@ export default function ScheduleGrid({
   timezone,
   mode = "preview",
   isWeekdayEvent = false,
+  unselectedRange = false,
   availabilities = {},
   numParticipants = 0,
   hoveredSlot,
@@ -93,6 +97,17 @@ export default function ScheduleGrid({
 
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < totalPages - 1;
+
+  if (unselectedRange)
+    return (
+      <GridError
+        message={
+          isWeekdayEvent
+            ? MESSAGES.INFO_UNSELECTED_WEEK_RANGE
+            : MESSAGES.INFO_UNSELECTED_DATE_RANGE
+        }
+      />
+    );
 
   if (error) return <GridError message={error} />;
 

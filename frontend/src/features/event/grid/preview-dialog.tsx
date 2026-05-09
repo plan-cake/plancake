@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { MaximizeIcon, XIcon } from "lucide-react";
 
+import checkUnselectedRange from "@/core/event/lib/unselected-range";
 import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
@@ -48,6 +49,8 @@ export default function GridPreviewDialog({
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isOpen, eventRange.timezone, closeDialog]);
+
+  const unselectedRange = checkUnselectedRange(eventRange);
 
   return (
     <div className="relative h-screen grow md:h-full md:w-full">
@@ -104,6 +107,7 @@ export default function GridPreviewDialog({
               <ScheduleGrid
                 mode="preview"
                 disableSelect
+                unselectedRange={unselectedRange}
                 isWeekdayEvent={eventRange.type === "weekday"}
                 timezone={timezone}
                 timeslots={timeslots}
@@ -134,6 +138,7 @@ export default function GridPreviewDialog({
             <ScheduleGrid
               mode="preview"
               disableSelect
+              unselectedRange={unselectedRange}
               isWeekdayEvent={eventRange.type === "weekday"}
               timezone={eventRange.timezone}
               timeslots={timeslots}

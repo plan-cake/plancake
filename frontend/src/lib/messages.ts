@@ -62,4 +62,8 @@ export const MESSAGES = {
     "Add your availability by clicking the button below.",
   INFO_COPY_SHARE_LINK: "Copy and share the link so others can join!",
   INFO_NO_MUTUAL_AVAILABILITY: "There is no time where everyone is available.",
+  INFO_UNSELECTED_DATE_RANGE:
+    "Select dates and times to see a preview of the event grid.",
+  INFO_UNSELECTED_WEEK_RANGE:
+    "Select days and times to see a preview of the event grid.",
 };

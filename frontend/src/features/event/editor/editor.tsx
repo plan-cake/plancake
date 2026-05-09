@@ -9,6 +9,7 @@ import MobileFooterTray from "@/components/mobile-footer-tray";
 import SegmentedControl from "@/components/segmented-control";
 import TextInputField from "@/components/text-input-field";
 import { EventProvider, useEventContext } from "@/core/event/context";
+import checkUnselectedRange from "@/core/event/lib/unselected-range";
 import { EventInformation } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
@@ -197,6 +198,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           mode="preview"
           isWeekdayEvent={eventRange.type === "weekday"}
           disableSelect={true}
+          unselectedRange={checkUnselectedRange(eventRange)}
           timezone={eventRange.timezone}
           timeslots={timeslots}
         />

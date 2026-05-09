@@ -76,7 +76,12 @@ export function expandEventRange(range: EventRange): Date[] {
 }
 
 function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
-  if (!range.dateRange.from || !range.dateRange.to) {
+  if (
+    !range.dateRange.from ||
+    !range.dateRange.to ||
+    !range.timeRange.from ||
+    !range.timeRange.to
+  ) {
     return [];
   }
 
