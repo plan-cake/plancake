@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { TriangleAlertIcon } from "lucide-react";
@@ -14,6 +14,7 @@ import TimeColumn from "@/features/event/grid/time-column";
 import InteractiveTimeBlock from "@/features/event/grid/timeblocks/interactive";
 import PreviewTimeBlock from "@/features/event/grid/timeblocks/preview";
 import ResultsTimeBlock from "@/features/event/grid/timeblocks/results";
+import { getHighestMatchCount } from "@/features/event/results/lib/utils";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
@@ -98,6 +99,23 @@ export default function ScheduleGrid({
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < totalPages - 1;
 
+  // Check if the scrollbar is present to pass to the header
+  const [scrollbarPresent, setScrollbarPresent] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const checkScrollbar = () =>
+      // Include mobile check because it will report true even if the scrollbar is hidden
+      setScrollbarPresent(el.scrollHeight > el.clientHeight && !isMobile);
+    const resizeObserver = new ResizeObserver(checkScrollbar);
+    resizeObserver.observe(el);
+    checkScrollbar();
+
+    return () => resizeObserver.disconnect();
+  });
+
   if (unselectedRange)
     return (
       <GridMessage
@@ -124,6 +142,7 @@ export default function ScheduleGrid({
         visibleDays={visibleDays}
         currentPage={currentPage}
         totalPages={totalPages}
+        scrollbarPresent={scrollbarPresent}
         isWeekdayEvent={isWeekdayEvent}
         onPrevPage={() => paginate(-1)}
         onNextPage={() => paginate(1)}
@@ -131,9 +150,11 @@ export default function ScheduleGrid({
       />
 
       <div
+        ref={scrollRef}
         className={cn(
-          "relative flex-grow select-none overflow-x-hidden pb-1 pt-2",
-          mode === "preview" ? "overflow-y-auto" : "overflow-y-hidden",
+          "relative flex-grow select-none overflow-x-hidden pt-2",
+          !isMobile ? "overflow-y-auto" : "overflow-y-hidden",
+          mode === "preview" ? "pb-1" : "pb-6",
         )}
       >
         <div className="z-5 pointer-events-none absolute left-0 top-2 flex w-full flex-col gap-4">
@@ -187,6 +208,7 @@ export default function ScheduleGrid({
                       hoveredSlot={hoveredSlot}
                       availabilities={availabilities}
                       numParticipants={numParticipants}
+                      highestMatchCount={getHighestMatchCount(availabilities)}
                       onHoverSlot={setHoveredSlot}
                     />
                   );

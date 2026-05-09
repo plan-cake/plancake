@@ -51,3 +51,19 @@ export function findConsensusAndConflicts(
 
   return { allAvailableSlots, noOneAvailableSlots };
 }
+
+/**
+ * Finds the highest number of participants available for any single timeslot.
+ * 
+ * @returns The maximum count of participants available in any timeslot.
+ */
+export function getHighestMatchCount(availabilities: ResultsAvailabilityMap): number {
+  let highestCount = 0;
+  for (const slot in availabilities) {
+    const count = availabilities[slot].length;
+    if (count > highestCount) {
+      highestCount = count;
+    }
+  }
+  return highestCount;
+}
