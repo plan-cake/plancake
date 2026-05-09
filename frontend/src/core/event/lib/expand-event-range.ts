@@ -2,15 +2,16 @@ import {
   addDays,
   addMinutes,
   eachDayOfInterval,
+  endOfWeek,
+  format,
+  getDay,
   isBefore,
   parseISO,
-  format,
   startOfWeek,
-  endOfWeek,
-  getDay,
 } from "date-fns";
 import { fromZonedTime } from "date-fns-tz";
 
+import checkUnselectedRange from "@/core/event/lib/unselected-range";
 import {
   ALL_WEEKDAYS,
   EventRange,
@@ -76,18 +77,11 @@ export function expandEventRange(range: EventRange): Date[] {
 }
 
 function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
-  if (
-    !range.dateRange.from ||
-    !range.dateRange.to ||
-    !range.timeRange.from ||
-    !range.timeRange.to
-  ) {
-    return [];
-  }
+  if (checkUnselectedRange(range)) return [];
 
   // Validate Duration
-  const startDate = parseISO(range.dateRange.from.split("T")[0]);
-  const endDate = parseISO(range.dateRange.to.split("T")[0]);
+  const startDate = parseISO(range.dateRange.from!.split("T")[0]);
+  const endDate = parseISO(range.dateRange.to!.split("T")[0]);
 
   if (checkDateRange(startDate, endDate)) {
     return [];
@@ -122,6 +116,7 @@ function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
 
 function generateSlotsForWeekdayRange(range: WeekdayRange): Date[] {
   if (range.type !== "weekday") return [];
+  if (checkUnselectedRange(range)) return [];
 
   const slots: Date[] = [];
   const referenceDate = new Date();
