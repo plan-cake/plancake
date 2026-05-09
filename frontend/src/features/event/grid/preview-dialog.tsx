@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { MaximizeIcon, XIcon } from "lucide-react";
 
+import checkUnselectedRange from "@/core/event/lib/unselected-range";
 import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
@@ -49,6 +50,8 @@ export default function GridPreviewDialog({
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isOpen, eventRange.timezone, closeDialog]);
 
+  const unselectedRange = checkUnselectedRange(eventRange);
+
   return (
     <div className="relative h-screen grow md:h-full md:w-full">
       {isOpen && (
@@ -69,41 +72,44 @@ export default function GridPreviewDialog({
             : "absolute inset-0 h-full w-full pb-4 pl-2 pr-4 pt-4",
         )}
       >
-        <motion.div
-          layout
-          className="flex shrink-0 items-center justify-end space-x-2 px-4"
-        >
-          <p>Grid Preview</p>
-          {isOpen ? (
-            <div>
-              <ActionButton
-                buttonStyle="transparent"
-                icon={<XIcon />}
-                onClick={closeDialog}
-                className="bg-transparent p-1.5"
-                aria-label="Close Preview"
-              />
-            </div>
-          ) : (
-            <div>
-              <ActionButton
-                buttonStyle="transparent"
-                icon={<MaximizeIcon />}
-                onClick={() => {
-                  setIsOpen(!isOpen);
-                }}
-                className="bg-transparent p-1.5"
-                aria-label="Open Preview"
-              />
-            </div>
-          )}
-        </motion.div>
+        {timeslots.length > 0 && (
+          <motion.div
+            layout
+            className="flex shrink-0 items-center justify-end space-x-2 px-4"
+          >
+            <p>Grid Preview</p>
+            {isOpen ? (
+              <div>
+                <ActionButton
+                  buttonStyle="transparent"
+                  icon={<XIcon />}
+                  onClick={closeDialog}
+                  className="bg-transparent p-1.5"
+                  aria-label="Close Preview"
+                />
+              </div>
+            ) : (
+              <div>
+                <ActionButton
+                  buttonStyle="transparent"
+                  icon={<MaximizeIcon />}
+                  onClick={() => {
+                    setIsOpen(!isOpen);
+                  }}
+                  className="bg-transparent p-1.5"
+                  aria-label="Open Preview"
+                />
+              </div>
+            )}
+          </motion.div>
+        )}
         {isOpen ? (
           <motion.div className="flex min-h-0 flex-1 flex-col gap-4">
             <div className="min-h-0 w-full flex-1">
               <ScheduleGrid
                 mode="preview"
                 disableSelect
+                unselectedRange={unselectedRange}
                 isWeekdayEvent={eventRange.type === "weekday"}
                 timezone={timezone}
                 timeslots={timeslots}
@@ -134,6 +140,7 @@ export default function GridPreviewDialog({
             <ScheduleGrid
               mode="preview"
               disableSelect
+              unselectedRange={unselectedRange}
               isWeekdayEvent={eventRange.type === "weekday"}
               timezone={eventRange.timezone}
               timeslots={timeslots}

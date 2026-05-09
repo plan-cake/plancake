@@ -2,15 +2,16 @@ import {
   addDays,
   addMinutes,
   eachDayOfInterval,
+  endOfWeek,
+  format,
+  getDay,
   isBefore,
   parseISO,
-  format,
   startOfWeek,
-  endOfWeek,
-  getDay,
 } from "date-fns";
 import { fromZonedTime } from "date-fns-tz";
 
+import checkUnselectedRange from "@/core/event/lib/unselected-range";
 import {
   ALL_WEEKDAYS,
   EventRange,
@@ -76,13 +77,11 @@ export function expandEventRange(range: EventRange): Date[] {
 }
 
 function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
-  if (!range.dateRange.from || !range.dateRange.to) {
-    return [];
-  }
+  if (checkUnselectedRange(range)) return [];
 
   // Validate Duration
-  const startDate = parseISO(range.dateRange.from.split("T")[0]);
-  const endDate = parseISO(range.dateRange.to.split("T")[0]);
+  const startDate = parseISO(range.dateRange.from!.split("T")[0]);
+  const endDate = parseISO(range.dateRange.to!.split("T")[0]);
 
   if (checkDateRange(startDate, endDate)) {
     return [];
@@ -95,13 +94,18 @@ function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
     end: endDate,
   });
 
+  const nonNullTimeRange = {
+    from: range.timeRange.from!,
+    to: range.timeRange.to!,
+  };
+
   for (const day of days) {
     const dayStr = format(day, "yyyy-MM-dd");
 
     const { startUTC, endUTC } = getDailyBoundariesInUTC(
       dayStr,
       range.timezone,
-      range.timeRange,
+      nonNullTimeRange,
     );
 
     slots.push(...generateSlotsBetween(startUTC, endUTC));
@@ -112,6 +116,7 @@ function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
 
 function generateSlotsForWeekdayRange(range: WeekdayRange): Date[] {
   if (range.type !== "weekday") return [];
+  if (checkUnselectedRange(range)) return [];
 
   const slots: Date[] = [];
   const referenceDate = new Date();
@@ -124,6 +129,11 @@ function generateSlotsForWeekdayRange(range: WeekdayRange): Date[] {
     end: endOfCurrentWeek,
   });
 
+  const nonNullTimeRange = {
+    from: range.timeRange.from!,
+    to: range.timeRange.to!,
+  };
+
   for (const currentDay of days) {
     const currentDayIndex = getDay(currentDay);
     const dayName = ALL_WEEKDAYS[currentDayIndex];
@@ -134,7 +144,7 @@ function generateSlotsForWeekdayRange(range: WeekdayRange): Date[] {
       const { startUTC, endUTC } = getDailyBoundariesInUTC(
         dayStr,
         range.timezone,
-        range.timeRange,
+        nonNullTimeRange,
       );
 
       slots.push(...generateSlotsBetween(startUTC, endUTC));

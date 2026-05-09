@@ -16,6 +16,7 @@ import PreviewTimeBlock from "@/features/event/grid/timeblocks/preview";
 import ResultsTimeBlock from "@/features/event/grid/timeblocks/results";
 import { getHighestMatchCount } from "@/features/event/results/lib/utils";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
 interface ScheduleGridProps {
@@ -25,6 +26,8 @@ interface ScheduleGridProps {
   isWeekdayEvent?: boolean;
 
   disableSelect?: boolean;
+
+  unselectedRange?: boolean;
 
   // for "view" mode
   availabilities?: ResultsAvailabilityMap;
@@ -62,6 +65,7 @@ export default function ScheduleGrid({
   timezone,
   mode = "preview",
   isWeekdayEvent = false,
+  unselectedRange = false,
   availabilities = {},
   numParticipants = 0,
   hoveredSlot,
@@ -112,7 +116,19 @@ export default function ScheduleGrid({
     return () => resizeObserver.disconnect();
   });
 
-  if (error) return <GridError message={error} />;
+  if (unselectedRange)
+    return (
+      <GridMessage
+        error={false}
+        message={
+          isWeekdayEvent
+            ? MESSAGES.INFO_UNSELECTED_WEEK_RANGE
+            : MESSAGES.INFO_UNSELECTED_DATE_RANGE
+        }
+      />
+    );
+
+  if (error) return <GridMessage error={true} message={error} />;
 
   return (
     <div
@@ -206,9 +222,20 @@ export default function ScheduleGrid({
   );
 }
 
-const GridError = ({ message }: { message: string }) => (
-  <div className="flex h-full w-full items-center justify-center text-sm">
-    <TriangleAlertIcon className="text-error mr-2 h-5 w-5" />
+const GridMessage = ({
+  error,
+  message,
+}: {
+  error: boolean;
+  message: string;
+}) => (
+  <div
+    className={cn(
+      "flex h-full w-full items-center justify-center gap-2 text-center text-sm",
+      !error && "opacity-75",
+    )}
+  >
+    {error && <TriangleAlertIcon className="text-error h-5 w-5" />}
     {message}
   </div>
 );

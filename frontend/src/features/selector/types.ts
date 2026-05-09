@@ -1,9 +1,9 @@
-export type Option<TValue extends string | number> = {
+export type Option<TValue extends string | number | null> = {
   label: string;
   value: TValue;
 };
 
-export type BaseSelectorProps<TValue extends string | number> = {
+export type BaseSelectorProps<TValue extends string | number | null> = {
   /**
    * Unique identifier for the selector, used for accessibility and testing purposes
    *
@@ -19,7 +19,7 @@ export type BaseSelectorProps<TValue extends string | number> = {
   /**
    * The currently selected value.
    *
-   * @type string | number
+   * @type string | number | null
    */
   value: TValue;
   /**
@@ -29,6 +29,12 @@ export type BaseSelectorProps<TValue extends string | number> = {
    * @example [{ label: "Option 1", value: "option1" }, { label: "Option 2", value: "option2" }]
    */
   options: Option<TValue>[];
+  /**
+   * Placeholder text to display when no value is selected.
+   *
+   * @type string
+   */
+  placeholder?: string;
   /**
    * Whether the selector is disabled.
    *
@@ -43,10 +49,10 @@ export type BaseSelectorProps<TValue extends string | number> = {
 
 /* EXTENDED FROM BASE PROPS */
 
-export type DropdownProps<TValue extends string | number> =
+export type DropdownProps<TValue extends string | number | null> =
   BaseSelectorProps<TValue>;
 
-export type DrawerProps<TValue extends string | number> =
+export type DrawerProps<TValue extends string | number | null> =
   BaseSelectorProps<TValue> & {
     /**
      * Title to display at the top of the drawer when the selector is open.
@@ -87,7 +93,7 @@ export type DrawerProps<TValue extends string | number> =
     onOpenChange?: (open: boolean) => void;
     /**
      * Optional custom trigger element to open the drawer.
-     * 
+     *
      * If not provided, the default will be used.
      */
     trigger?: React.ReactElement;
@@ -100,7 +106,8 @@ export type DrawerProps<TValue extends string | number> =
  * same core functionality and only differ in presentation. Based off of DrawerProps
  * since it is the more complex variant.
  */
-export type SelectorProps<TValue extends string | number> = DrawerProps<TValue>;
+export type SelectorProps<TValue extends string | number | null> =
+  DrawerProps<TValue>;
 
 /**
  * Base props for the selector components.
@@ -108,7 +115,5 @@ export type SelectorProps<TValue extends string | number> = DrawerProps<TValue>;
  * This type omits options, dialogTitle, and dialogDescription since they should be
  * provided by the parent component (e.g. TimeZoneSelector).
  */
-export type BaseSelectorWrapperProps<TValue extends string | number> = Omit<
-  SelectorProps<TValue>,
-  "options" | "dialogTitle" | "dialogDescription"
->;
+export type BaseSelectorWrapperProps<TValue extends string | number | null> =
+  Omit<SelectorProps<TValue>, "options" | "dialogTitle" | "dialogDescription">;
