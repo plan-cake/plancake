@@ -100,13 +100,18 @@ function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
     end: endDate,
   });
 
+  const nonNullTimeRange = {
+    from: range.timeRange.from!,
+    to: range.timeRange.to!,
+  };
+
   for (const day of days) {
     const dayStr = format(day, "yyyy-MM-dd");
 
     const { startUTC, endUTC } = getDailyBoundariesInUTC(
       dayStr,
       range.timezone,
-      range.timeRange,
+      nonNullTimeRange,
     );
 
     slots.push(...generateSlotsBetween(startUTC, endUTC));
@@ -129,6 +134,11 @@ function generateSlotsForWeekdayRange(range: WeekdayRange): Date[] {
     end: endOfCurrentWeek,
   });
 
+  const nonNullTimeRange = {
+    from: range.timeRange.from!,
+    to: range.timeRange.to!,
+  };
+
   for (const currentDay of days) {
     const currentDayIndex = getDay(currentDay);
     const dayName = ALL_WEEKDAYS[currentDayIndex];
@@ -139,7 +149,7 @@ function generateSlotsForWeekdayRange(range: WeekdayRange): Date[] {
       const { startUTC, endUTC } = getDailyBoundariesInUTC(
         dayStr,
         range.timezone,
-        range.timeRange,
+        nonNullTimeRange,
       );
 
       slots.push(...generateSlotsBetween(startUTC, endUTC));
