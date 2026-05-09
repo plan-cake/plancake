@@ -190,7 +190,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
       <div
         className={cn(
-          "bg-panel rounded-3xl p-4 md:hidden",
+          "md:hidden",
           mobileTab === "details" ? "hidden" : "block",
         )}
       >
