@@ -42,7 +42,7 @@ export default function Dropdown<TValue extends string | number | null>({
         <span
           className={cn(
             "flex-1 truncate text-wrap pr-2",
-            !value && "text-foreground/60",
+            value === null && "text-foreground/60",
           )}
         >
           <Select.Value placeholder={placeholder} />
