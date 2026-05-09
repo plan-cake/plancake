@@ -86,7 +86,9 @@ export function useEventInfo(initialData?: EventInformation) {
         handleError("timeRange", "");
       } else if (checkTimeRange(time, state.eventRange.timeRange.to)) {
         handleError("timeRange", "");
-      } else handleError("timeRange", MESSAGES.ERROR_EVENT_RANGE_INVALID);
+      } else {
+        handleError("timeRange", MESSAGES.ERROR_EVENT_TIMES_INVALID);
+      }
 
       dispatch({ type: "SET_START_TIME", payload: time });
     },
@@ -101,7 +103,7 @@ export function useEventInfo(initialData?: EventInformation) {
       } else if (checkTimeRange(state.eventRange.timeRange.from, time)) {
         handleError("timeRange", "");
       } else {
-        handleError("timeRange", MESSAGES.ERROR_EVENT_RANGE_INVALID);
+        handleError("timeRange", MESSAGES.ERROR_EVENT_TIMES_INVALID);
       }
 
       dispatch({ type: "SET_END_TIME", payload: time });
