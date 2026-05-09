@@ -47,12 +47,12 @@ export async function validateEventData(
   }
 
   // Validate time range
-  if (
-    !eventRange.timeRange.from ||
-    !eventRange.timeRange.to ||
+  if (!eventRange.timeRange.from || !eventRange.timeRange.to) {
+    errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_MISSING;
+  } else if (
     !checkTimeRange(eventRange.timeRange.from, eventRange.timeRange.to)
   ) {
-    errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_MISSING;
+    errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_INVALID;
   }
 
   return errors;

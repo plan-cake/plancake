@@ -29,7 +29,7 @@ export const MESSAGES = {
   ERROR_EVENT_CODE_TAKEN: "This code is unavailable. Please choose another.",
   ERROR_EVENT_DATES_MISSING: "Please select possible dates for this event.",
   ERROR_EVENT_TIMES_MISSING: "Please select possible times for this event.",
-  ERROR_EVENT_RANGE_INVALID: "Please select a valid date/time range.",
+  ERROR_EVENT_TIMES_INVALID: "Please select a valid time range.",
   ERROR_EVENT_RANGE_TOO_LONG: `Too many days selected. Max is ${MAX_DURATION}.`,
 
   // default name errors
