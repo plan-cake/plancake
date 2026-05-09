@@ -15,18 +15,24 @@ const morphTransition: Transition = {
   mass: 0.8,
 };
 
+export type AnchorPoint = "top-left" | "top-center" | "top-right";
+
 export default function KebabMenu({
   children,
   trigger,
   open: controlledOpen,
   onOpenChange,
+  anchorPoint = "top-right",
   nested = false,
+  closeOnClick = true,
 }: {
   children: React.ReactNode;
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  anchorPoint?: AnchorPoint;
   nested?: boolean;
+  closeOnClick?: boolean;
 }) {
   const id = useId();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -83,7 +89,12 @@ export default function KebabMenu({
             key="trigger"
             layoutId={"popover-morph-" + id}
             transition={morphTransition}
-            className="absolute right-0 top-0 z-10 inline-block cursor-pointer rounded-full"
+            className={cn(
+              "absolute top-0 z-10 inline-block cursor-pointer rounded-full",
+              anchorPoint === "top-right" && "right-0",
+              anchorPoint === "top-left" && "left-0",
+              anchorPoint === "top-center" && "left-1/2 -translate-x-1/2",
+            )}
             aria-haspopup="menu"
             aria-expanded={open}
             onClick={() => handleOpenChange(true)}
@@ -104,18 +115,23 @@ export default function KebabMenu({
             layoutId={"popover-morph-" + id}
             transition={morphTransition}
             className={cn(
-              "absolute right-2 top-1 z-[100]",
-              "flex min-w-[200px] origin-top-right flex-col gap-2",
+              "absolute top-1 z-[100]",
+              anchorPoint === "top-right" && "right-2 origin-top-right",
+              anchorPoint === "top-left" && "left-2 origin-top-left",
+              anchorPoint === "top-center" &&
+                "left-1/2 origin-top -translate-x-1/2",
+              "flex min-w-[200px] flex-col gap-2",
               "frosted-glass overflow-hidden rounded-3xl p-4 shadow-lg",
               nested && "scale-110",
             )}
             onClick={(e) => {
               const target = e.target as HTMLElement;
               if (
-                target.closest("button") ||
-                target.closest("a") ||
-                target.closest('[role="button"]') ||
-                target.closest('[role="menuitem"]')
+                (target.closest("button") ||
+                  target.closest("a") ||
+                  target.closest('[role="button"]') ||
+                  target.closest('[role="menuitem"]')) &&
+                closeOnClick
               ) {
                 handleOpenChange(false);
               }

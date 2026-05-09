@@ -8,7 +8,7 @@ import AccountButton from "@/features/header/components/account-button";
 import DashboardButton from "@/features/header/components/dashboard-button";
 import LogoArea from "@/features/header/components/logo-area";
 import NewEventButton from "@/features/header/components/new-event-button";
-import ThemeToggle from "@/features/header/components/theme-toggle";
+import ThemePicker from "@/features/header/components/theme-picker";
 import { useHeaderSize } from "@/features/header/context";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
@@ -107,7 +107,7 @@ export default function Header() {
           />
 
           <NewEventButton />
-          <ThemeToggle />
+          <ThemePicker />
           <DashboardButton />
           <AccountButton />
 
