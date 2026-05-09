@@ -20,7 +20,6 @@ import DisplaySettings from "@/features/event/results/display-settings";
 import ResultsDrawer from "@/features/event/results/drawer";
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
-import { useHeaderSize } from "@/features/header/context";
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
@@ -82,9 +81,6 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
     return drawerSnap;
   };
-
-  /* HEADER SPACING */
-  const { topMarginClass } = useHeaderSize();
 
   /* BANNERS */
   const banners = getResultBanners(
@@ -155,7 +151,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   );
 
   return (
-    <div className="flex flex-col space-y-4 pl-6 pr-6">
+    <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
       <HeaderSpacer />
 
       {/* Header */}
@@ -180,7 +176,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
       <div className="md:hidden">{banners}</div>
 
-      <div className="flex h-fit flex-col md:flex-row md:gap-4">
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-4">
         <ScheduleGrid
           mode="view"
           isWeekdayEvent={eventRange.type === "weekday"}
@@ -210,17 +206,12 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         <div
           className={cn(
             "hidden md:block",
-            "fixed bottom-1 left-0 z-10 w-full shrink-0 px-6",
+            "z-10 w-full shrink-0",
             "relative bottom-auto left-auto w-80 space-y-4 px-0",
           )}
         >
           {banners}
-          <div
-            className={cn(
-              "sticky flex max-h-[calc(100vh-8rem)] flex-col gap-y-4",
-              topMarginClass,
-            )}
-          >
+          <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4">
             <AttendeesPanel />
             <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
               <DisplaySettings

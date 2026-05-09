@@ -35,7 +35,7 @@ export function getVersionHistoryData(): VersionHistoryData {
         "Added a version history page",
         "Updated error handling across the site",
         "Updated certain parts of the event editor",
-        'Improved readability of transparent components',
+        "Improved readability of transparent components",
         "Temporarily disabled weekday events for fixes",
       ],
       bugFixes: ["Fixed the theme transition on the landing page"],
@@ -131,7 +131,7 @@ export function getVersionHistoryData(): VersionHistoryData {
         "Updated the event results page to reduce clutter",
         "Updated the appearance of events on the dashboard",
         "Updated the event grid to list the ending hour on the left axis",
-        "Removed \"Intended Duration\" from events",
+        'Removed "Intended Duration" from events',
       ],
       bugFixes: [
         "Fixed an issue where an invalid custom event code would not show an error",
@@ -159,8 +159,21 @@ export function getVersionHistoryData(): VersionHistoryData {
             "Fixed the attendee count display when there is only one participant",
           ],
         },
+        {
+          version: "v0.4.3",
+          releaseDate: { year: 2026, month: 4, day: 9 },
+          changes: [
+            "Added icons to the results grid to indicate the best times",
+            "Added a share button to the results page",
+            'Added a new theme picker, which includes a "Match System" option',
+            'Updated the "Leave Event" button icon',
+            "Adjusted the scroll functionality of the event grid",
+            "Changed the color of event attendees on the results page",
+            "Fixed the drawer transition on the mobile results page",
+          ],
+        },
       ],
-    }
+    },
   ];
 }
 
