@@ -100,7 +100,8 @@ export default function ScheduleGrid({
 
   if (unselectedRange)
     return (
-      <GridError
+      <GridMessage
+        error={false}
         message={
           isWeekdayEvent
             ? MESSAGES.INFO_UNSELECTED_WEEK_RANGE
@@ -109,7 +110,7 @@ export default function ScheduleGrid({
       />
     );
 
-  if (error) return <GridError message={error} />;
+  if (error) return <GridMessage error={true} message={error} />;
 
   return (
     <div
@@ -199,9 +200,20 @@ export default function ScheduleGrid({
   );
 }
 
-const GridError = ({ message }: { message: string }) => (
-  <div className="flex h-full w-full items-center justify-center text-sm">
-    <TriangleAlertIcon className="text-error mr-2 h-5 w-5" />
+const GridMessage = ({
+  error,
+  message,
+}: {
+  error: boolean;
+  message: string;
+}) => (
+  <div
+    className={cn(
+      "flex h-full w-full items-center justify-center gap-2 text-center text-sm",
+      !error && "opacity-75",
+    )}
+  >
+    {error && <TriangleAlertIcon className="text-error h-5 w-5" />}
     {message}
   </div>
 );
