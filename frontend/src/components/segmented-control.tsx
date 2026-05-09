@@ -63,7 +63,7 @@ export default function SegmentedControl<T extends string>({
             onClick={() => onChange(option.value)}
             aria-label={option.ariaLabel}
             className={cn(
-              "z-10 flex w-full items-center justify-center rounded-full py-2 text-sm font-medium focus:outline-none",
+              "z-10 flex w-full items-center justify-center rounded-full py-2 focus:outline-none",
               isSelected
                 ? "text-accent-text font-bold"
                 : "text-foreground hover:bg-accent/15 cursor-pointer",
