@@ -130,9 +130,13 @@ export function useEventInfo(initialData?: EventInformation) {
     [handleError],
   );
 
-  const setWeekdayRange = useCallback((weekdays: Weekday[]) => {
-    dispatch({ type: "SET_WEEKDAYS", payload: weekdays });
-  }, []);
+  const setWeekdayRange = useCallback(
+    (weekdays: Weekday[]) => {
+      handleError("weekdayRange", "");
+      dispatch({ type: "SET_WEEKDAYS", payload: weekdays });
+    },
+    [handleError],
+  );
 
   const resetEventInfo = useCallback(() => {
     dispatch({ type: "RESET" });

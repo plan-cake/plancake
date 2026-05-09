@@ -28,10 +28,10 @@ export default function DateRangeSelection({
       </div>
       <div className="flex w-full flex-col justify-center gap-1">
         <p
-          className={`flex items-center gap-2 font-bold ${errors.dateRange ? "text-error" : ""}`}
+          className={`flex items-center gap-2 font-bold ${errors.dateRange || errors.weekdayRange ? "text-error" : ""}`}
         >
           {rangeType === "specific" ? "Possible Dates" : "Possible Days"}
-          {errors.dateRange && (
+          {(errors.dateRange || errors.weekdayRange) && (
             <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
         </p>
