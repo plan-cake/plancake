@@ -1,25 +1,20 @@
 import { useEffect, useState } from "react";
 
-import { GlobeIcon, SquarePenIcon } from "lucide-react";
+import { ShareIcon, SquarePenIcon } from "lucide-react";
 
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
-import { MorphingDrawer } from "@/features/drawer";
-import TimeZoneSelector from "@/features/event/components/selectors/timezone";
+import { FloatingDrawer, MorphingDrawer } from "@/features/drawer";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
 import { useResultsContext } from "@/features/event/results/context";
+import ShareMenu from "@/features/event/results/share-menu";
 import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
-import { tzEqual } from "@/lib/utils/date-time-format";
 
 export default function ResultsDrawer({
-  timezone,
-  onTimezoneChange,
   onSnapChange,
   eventCode,
 }: {
-  timezone: string;
-  onTimezoneChange: (newTZ: string) => void;
   onSnapChange: (snap: number | string | null) => void;
   eventCode: string;
 }) {
@@ -61,12 +56,6 @@ export default function ResultsDrawer({
     clearSelectedParticipants();
   };
 
-  /* TIMEZONE HANDLING */
-  const tzChanged = !tzEqual(
-    timezone,
-    Intl.DateTimeFormat().resolvedOptions().timeZone,
-  );
-
   /* BUTTONS */
   const paintingButton = (
     <LinkButton
@@ -76,6 +65,9 @@ export default function ResultsDrawer({
       href={`/${eventCode}/painting`}
     />
   );
+
+  /* SHARE MENU */
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
   return (
     <MorphingDrawer
@@ -101,21 +93,21 @@ export default function ResultsDrawer({
       }
       footerContent={
         <div className="mx-1 flex grow justify-between gap-2">
-          <TimeZoneSelector
-            id="timezone-select"
-            value={timezone}
-            onChange={onTimezoneChange}
-            drawerNesting={1}
+          <FloatingDrawer
+            title="Share Event"
+            description="Share this event with others"
+            open={shareMenuOpen}
+            onOpenChange={setShareMenuOpen}
             trigger={
               <EmptyButton
-                buttonStyle={
-                  tzChanged ? "bordered semi-transparent" : "semi-transparent"
-                }
-                icon={<GlobeIcon />}
-                aria-label="Change Timezone"
+                buttonStyle="semi-transparent"
+                icon={<ShareIcon />}
               />
             }
-          />
+            nested={true}
+          >
+            <ShareMenu eventCode={eventCode} />
+          </FloatingDrawer>
           {paintingButton}
         </div>
       }

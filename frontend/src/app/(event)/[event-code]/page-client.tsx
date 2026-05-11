@@ -158,13 +158,11 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       <div className="flex flex-row justify-between gap-2 md:flex-wrap">
         <h1 className="text-2xl font-bold">{eventTitle}</h1>
 
-        <div className="md:hidden">
-          <KebabMenu>
-            {isCreator && editButton("frosted glass inset")}
-            {shareButton("frosted glass inset")}
-            {copyButton("frosted glass inset")}
-          </KebabMenu>
-        </div>
+        {isCreator && (
+          <div className="md:hidden">
+            <KebabMenu>{editButton("frosted glass inset")}</KebabMenu>
+          </div>
+        )}
 
         <div className="ml-auto hidden flex-wrap justify-end gap-2 md:flex">
           {isCreator && editButton("secondary")}
@@ -194,12 +192,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           style={{ height: getSpacerHeight() }}
         />
         <div className="md:hidden">
-          <ResultsDrawer
-            timezone={timezone}
-            onTimezoneChange={handleTZChange}
-            onSnapChange={setDrawerSnap}
-            eventCode={eventCode}
-          />
+          <ResultsDrawer onSnapChange={setDrawerSnap} eventCode={eventCode} />
         </div>
 
         {/* Desktop Sidebar */}
