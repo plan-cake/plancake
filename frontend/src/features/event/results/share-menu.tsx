@@ -48,7 +48,7 @@ export default function ShareMenu({
     shareButton = null;
   }
 
-  const copyButton = () => (
+  const copyButton = (
     <CopyToastButton code={eventCode} buttonStyle="secondary" />
   );
 
@@ -66,7 +66,7 @@ export default function ShareMenu({
           shareButton && "justify-between",
         )}
       >
-        {copyButton()}
+        {copyButton}
         {shareButton}
       </div>
     </div>
