@@ -1,4 +1,7 @@
+import { useEffect, useMemo, useRef } from "react";
+
 import { ShareIcon } from "lucide-react";
+import QRCodeStyling from "qr-code-styling";
 
 import CopyToastButton from "@/components/copy-toast-button";
 import ActionButton from "@/features/button/components/action";
@@ -69,6 +72,7 @@ export default function ShareMenu({
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
+      <QRCode url={currentURL} />
       <div
         className={cn(
           "w-full min-w-0 text-center text-xl font-bold",
@@ -90,4 +94,44 @@ export default function ShareMenu({
       </div>
     </div>
   );
+}
+
+function QRCode({ url }: { url: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const qrCode = useMemo(() => {
+    return new QRCodeStyling({
+      width: 256,
+      height: 256,
+      type: "svg",
+      data: url,
+      dotsOptions: {
+        color: "var(--color-foreground)",
+        type: "rounded",
+      },
+      cornersSquareOptions: {
+        type: "extra-rounded",
+      },
+      cornersDotOptions: {
+        type: "extra-rounded",
+      },
+      backgroundOptions: {
+        color: "var(--color-panel)",
+      },
+    });
+  }, [url]);
+
+  useEffect(() => {
+    if (ref.current) {
+      qrCode.append(ref.current);
+    }
+  }, [qrCode]);
+
+  useEffect(() => {
+    qrCode.update({
+      data: url,
+    });
+  }, [qrCode, url]);
+
+  return <div ref={ref} className="[&>svg]:aspect-square [&>svg]:w-full" />;
 }
