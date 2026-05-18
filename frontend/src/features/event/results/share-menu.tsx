@@ -47,10 +47,12 @@ export default function ShareMenu({ eventCode }: { eventCode: string }) {
   );
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="text-lg">
-        {window.location.host}/
-        <span className="text-2xl font-bold">{eventCode}</span>
+    <div className="flex w-full flex-col items-center gap-4">
+      <div
+        className="w-full min-w-0 text-center text-xl font-bold"
+        style={{ wordBreak: "break-word" }} // Wrap long event codes
+      >
+        {window.location.host}/{eventCode}
       </div>
       <div
         className={cn(
