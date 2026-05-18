@@ -6,7 +6,13 @@ import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
-export default function ShareMenu({ eventCode }: { eventCode: string }) {
+export default function ShareMenu({
+  eventTitle,
+  eventCode,
+}: {
+  eventTitle: string;
+  eventCode: string;
+}) {
   const { addToast } = useToast();
 
   let shareButton: React.ReactNode = (
@@ -17,7 +23,7 @@ export default function ShareMenu({ eventCode }: { eventCode: string }) {
       onClick={async () => {
         try {
           await navigator.share({
-            title: "heheheha",
+            title: eventTitle,
             url: window.location.href,
           });
         } catch (error) {

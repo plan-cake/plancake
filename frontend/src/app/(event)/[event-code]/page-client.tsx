@@ -192,7 +192,11 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           style={{ height: getSpacerHeight() }}
         />
         <div className="md:hidden">
-          <ResultsDrawer onSnapChange={setDrawerSnap} eventCode={eventCode} />
+          <ResultsDrawer
+            onSnapChange={setDrawerSnap}
+            eventTitle={eventTitle}
+            eventCode={eventCode}
+          />
         </div>
 
         {/* Desktop Sidebar */}

@@ -13,9 +13,11 @@ import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
 
 export default function ResultsDrawer({
   onSnapChange,
+  eventTitle,
   eventCode,
 }: {
   onSnapChange: (snap: number | string | null) => void;
+  eventTitle: string;
   eventCode: string;
 }) {
   const {
@@ -106,7 +108,7 @@ export default function ResultsDrawer({
             }
             nested={true}
           >
-            <ShareMenu eventCode={eventCode} />
+            <ShareMenu eventTitle={eventTitle} eventCode={eventCode} />
           </FloatingDrawer>
           {paintingButton}
         </div>
