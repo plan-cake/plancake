@@ -52,11 +52,30 @@ export default function ShareMenu({
     <CopyToastButton code={eventCode} buttonStyle="secondary" />
   );
 
+  const currentURL =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/${eventCode}`
+      : "";
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(currentURL);
+      addToast("copy", MESSAGES.COPY_LINK_SUCCESS);
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+      addToast("error", MESSAGES.COPY_LINK_FAILURE);
+    }
+  };
+
   return (
     <div className="flex w-full flex-col items-center gap-4">
       <div
-        className="w-full min-w-0 text-center text-xl font-bold"
+        className={cn(
+          "w-full min-w-0 text-center text-xl font-bold",
+          "hover:text-accent active:text-accent/75 cursor-pointer",
+        )}
         style={{ wordBreak: "break-word" }} // Wrap long event codes
+        onClick={copyToClipboard}
       >
         {window.location.host}/{eventCode}
       </div>
