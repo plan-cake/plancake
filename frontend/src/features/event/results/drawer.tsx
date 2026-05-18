@@ -9,7 +9,7 @@ import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
 import { useResultsContext } from "@/features/event/results/context";
 import ShareMenu from "@/features/event/results/share-menu";
-import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
+import { ConfirmationDialog } from "@/features/system-feedback";
 
 export default function ResultsDrawer({
   onSnapChange,
@@ -128,14 +128,9 @@ export default function ResultsDrawer({
           personToRemove === currentUser ? "Leave Event" : "Remove Participant"
         }
         description={
-          personToRemove == currentUser ? (
-            "Are you sure you want to leave this event?"
-          ) : (
-            <span>
-              Are you sure you want to remove{" "}
-              <span className="font-bold">{personToRemove}</span>?
-            </span>
-          )
+          personToRemove == currentUser
+            ? "Are you sure you want to leave this event?"
+            : "Are you sure you want to remove " + personToRemove + "?"
         }
         open={isConfirmationOpen}
         onOpenChange={setIsConfirmationOpen}
@@ -147,7 +142,18 @@ export default function ResultsDrawer({
           }
           return success;
         }}
-      />
+      >
+        <div className="text-center">
+          {personToRemove === currentUser ? (
+            "Are you sure you want to leave this event?"
+          ) : (
+            <span>
+              Are you sure you want to remove{" "}
+              <span className="font-bold">{personToRemove}</span>?
+            </span>
+          )}
+        </div>
+      </ConfirmationDialog>
     </MorphingDrawer>
   );
 }

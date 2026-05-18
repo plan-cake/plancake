@@ -61,16 +61,10 @@ export default function AttendeesPanel() {
           personToRemove === currentUser ? "Leave Event" : "Remove Participant"
         }
         description={
-          personToRemove === currentUser ? (
-            "Are you sure you want to leave this event?"
-          ) : (
-            <span>
-              Are you sure you want to remove{" "}
-              <span className="font-bold">{personToRemove}</span>?
-            </span>
-          )
+          personToRemove === currentUser
+            ? "Are you sure you want to leave this event?"
+            : "Are you sure you want to remove " + personToRemove + "?"
         }
-        // Controlled Props
         open={isConfirmationOpen}
         onOpenChange={setIsConfirmationOpen}
         onConfirm={async () => {
@@ -81,7 +75,18 @@ export default function AttendeesPanel() {
           }
           return success;
         }}
-      />
+      >
+        <div className="text-center">
+          {personToRemove === currentUser ? (
+            "Are you sure you want to leave this event?"
+          ) : (
+            <span>
+              Are you sure you want to remove{" "}
+              <span className="font-bold">{personToRemove}</span>?
+            </span>
+          )}
+        </div>
+      </ConfirmationDialog>
     </div>
   );
 }
