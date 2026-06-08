@@ -16,6 +16,7 @@ interface ScheduleHeaderProps {
   visibleDays: { dayKey: string; dayDisplay: string }[];
   currentPage: number;
   totalPages: number;
+  scrollbarPresent?: boolean;
   isWeekdayEvent?: boolean;
   onPrevPage: () => void;
   onNextPage: () => void;
@@ -42,6 +43,7 @@ export default function ScheduleHeader({
   visibleDays,
   currentPage,
   totalPages,
+  scrollbarPresent = false,
   isWeekdayEvent = false,
   onPrevPage,
   onNextPage,
@@ -52,7 +54,8 @@ export default function ScheduleHeader({
   return (
     <div
       className={cn(
-        preview ? "bg-panel top-0 pr-4" : cn(topMarginClass, "bg-background"),
+        preview ? "bg-panel top-0" : cn(topMarginClass, "bg-background"),
+        scrollbarPresent && "pr-4",
         "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
       )}
       style={{
