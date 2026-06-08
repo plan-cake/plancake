@@ -8,7 +8,6 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 
-from api.availability.utils import get_weekday_date
 from api.models import UserAccount, UserSession
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
@@ -23,6 +22,7 @@ from api.utils import (
     get_metadata,
     get_session,
     set_session_cookie,
+    update_session_metadata,
 )
 
 logger = logging.getLogger("api")
@@ -82,6 +82,7 @@ def check_auth(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+
         acct_sess_expired = False
         if acct_token:
             logger.debug("Account session token: %s", acct_token)
@@ -91,7 +92,8 @@ def check_auth(func):
                     if not session:
                         # To break out of the rest of the logic
                         raise UserSession.DoesNotExist
-                    session.save()  # To update last_used to now
+
+                    update_session_metadata(request, session)
 
                 # At this point the account is authenticated
                 request.user = session.user_account
@@ -120,7 +122,8 @@ def check_auth(func):
                     session = get_session(guest_token)
                     if not session:
                         raise UserSession.DoesNotExist
-                    session.save()  # Update last_used
+
+                    update_session_metadata(request, session)
 
                 request.user = session.user_account
                 # Run the function
@@ -169,6 +172,7 @@ def require_auth(func):
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
         acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+
         acct_sess_expired = False
         if acct_token:
             logger.debug("Account session token: %s", acct_token)
@@ -178,7 +182,8 @@ def require_auth(func):
                     if not session:
                         # To break out of the rest of the logic
                         raise UserSession.DoesNotExist
-                    session.save()  # To update last_used to now
+
+                    update_session_metadata(request, session)
 
                 # At this point the account is authenticated
                 request.user = session.user_account
@@ -207,7 +212,8 @@ def require_auth(func):
                     session = get_session(guest_token)
                     if not session:
                         raise UserSession.DoesNotExist
-                    session.save()  # Update last_used
+
+                    update_session_metadata(request, session)
 
                 request.user = session.user_account
                 # Run the function
@@ -302,7 +308,8 @@ def require_account_auth(func):
                     session = get_session(acct_token)
                     if not session:
                         raise UserSession.DoesNotExist
-                    session.save()  # To update last_used to now
+
+                    update_session_metadata(request, session)
 
                 # At this point the account is authenticated
                 request.user = session.user_account

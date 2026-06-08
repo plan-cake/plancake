@@ -124,6 +124,25 @@ export type DisplayName = {
   display_name: string;
 }
 
+export type ActiveSession = {
+  public_id: string;
+  device_type: string | null;
+  os_name: string | null;
+  os_version: string | null;
+  client_name: string | null;
+  client_version: string | null;
+  last_used: string;
+  is_current: boolean;
+}
+
+export type ActiveSessionList = {
+  sessions: ActiveSession[];
+}
+
+export type SessionId = {
+  session_id: string;
+}
+
 export type AuthedPasswordResetCode = {
   reset_code: string;
 }
