@@ -47,7 +47,7 @@ export default function BaseDialog({
         contentClassName="h-fit"
         showHandle={false}
         headerContent={<div className="h-2" />}
-        hideCloseButton
+        hideCloseButton={!showCloseButton}
       >
         <div className="flex flex-col items-center gap-2 overflow-hidden">
           <p className="text-lg font-bold">{title}</p>
