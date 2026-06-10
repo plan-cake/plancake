@@ -26,16 +26,14 @@ export default function DisplaySettings({
       /> */}
       {/* <div className="mt-3"> */}
       Displaying event in
-      <span className="text-accent font-bold">
-        <TimeZoneSelector
-          id="timezone-select"
-          value={timezone}
-          onChange={onTimezoneChange}
-          drawerNesting={drawerNesting}
-          open={open}
-          onOpenChange={setOpen}
-        />
-      </span>
+      <TimeZoneSelector
+        id="timezone-select"
+        value={timezone}
+        onChange={onTimezoneChange}
+        drawerNesting={drawerNesting}
+        open={open}
+        onOpenChange={setOpen}
+      />
       {/* </div> */}
     </>
   );
