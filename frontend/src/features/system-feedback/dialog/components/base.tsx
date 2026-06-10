@@ -1,7 +1,9 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { XIcon } from "lucide-react";
 
+import ActionButton from "@/features/button/components/action";
 import { FloatingDrawer } from "@/features/drawer";
 import { BaseDialogProps } from "@/features/system-feedback/dialog/props";
 import { cn } from "@/lib/utils/classname";
@@ -16,6 +18,7 @@ export default function BaseDialog({
   asNestedDrawer = false,
   triggerDisabled = false,
   overlayClassName,
+  showCloseButton = false,
 }: BaseDialogProps) {
   /* OPEN STATE MANAGEMENT */
   const [internalOpen, setInternalOpen] = useState(false);
@@ -98,6 +101,20 @@ export default function BaseDialog({
             </Dialog.Description>
 
             {children}
+
+            {showCloseButton && (
+              <div className="absolute right-4 top-3 z-10">
+                <ActionButton
+                  buttonStyle="frosted glass"
+                  icon={<XIcon />}
+                  aria-label="Close drawer"
+                  onClick={(e) => {
+                    e?.stopPropagation();
+                    handleOpenChange(false);
+                  }}
+                />
+              </div>
+            )}
           </div>
         </Dialog.Content>
       </Dialog.Portal>
