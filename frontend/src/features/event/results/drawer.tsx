@@ -104,6 +104,7 @@ export default function ResultsDrawer({
               <EmptyButton
                 buttonStyle="semi-transparent"
                 icon={<ShareIcon />}
+                aria-label="Share Event"
               />
             }
             nested={true}
