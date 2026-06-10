@@ -74,7 +74,8 @@ export default function ShareMenu({
     <div className="flex w-full flex-col items-center gap-4">
       <QRCode url={currentURL} />
       <div className="flex flex-col items-center gap-1">
-        <div
+        <button
+          type="button"
           className={cn(
             "w-full min-w-0 text-center text-xl font-bold",
             "hover:text-accent active:text-accent/75 cursor-pointer",
@@ -82,8 +83,8 @@ export default function ShareMenu({
           style={{ wordBreak: "break-word" }} // Wrap long event codes
           onClick={copyToClipboard}
         >
-          {window.location.host}/{eventCode}
-        </div>
+          {currentURL ? currentURL.replace(/^https?:\/\//, "") : "Loading..."}
+        </button>
         <div className="text-center text-sm opacity-60">
           Anyone can join the event using this link
         </div>
