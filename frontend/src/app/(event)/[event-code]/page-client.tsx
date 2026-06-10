@@ -117,6 +117,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           label="Share Event"
         />
       }
+      showCloseButton
     >
       <ShareMenu eventTitle={eventTitle} eventCode={eventCode} />
     </BaseDialog>
