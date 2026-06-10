@@ -158,6 +158,13 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           timeslots={timeslots}
         />
 
+        <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm md:hidden">
+          <DisplaySettings
+            timezone={timezone}
+            onTimezoneChange={handleTZChange}
+          />
+        </div>
+
         {/* Mobile Spacer & Drawer */}
         <div
           className="w-full md:hidden"
