@@ -6,7 +6,12 @@ import { DateRange } from "react-day-picker";
 import { DEFAULT_RANGE_SPECIFIC } from "@/core/event/lib/default-range";
 import { expandEventRange } from "@/core/event/lib/expand-event-range";
 import { EventInfoReducer } from "@/core/event/reducers/info-reducer";
-import { EventInformation, EventRange, EventType, Weekday } from "@/core/event/types";
+import {
+  EventInformation,
+  EventRange,
+  EventType,
+  Weekday,
+} from "@/core/event/types";
 import {
   checkDateRange,
   checkTimeRange,
@@ -75,10 +80,15 @@ export function useEventInfo(initialData?: EventInformation) {
   }, []);
 
   const setStartTime = useCallback(
-    (time: string) => {
-      if (checkTimeRange(time, state.eventRange.timeRange.to)) {
+    (time: string | null) => {
+      if (!time || !state.eventRange.timeRange.to) {
+        // Don't compare and clear errors if either of the times are missing
         handleError("timeRange", "");
-      } else handleError("timeRange", MESSAGES.ERROR_EVENT_RANGE_INVALID);
+      } else if (checkTimeRange(time, state.eventRange.timeRange.to)) {
+        handleError("timeRange", "");
+      } else {
+        handleError("timeRange", MESSAGES.ERROR_EVENT_TIMES_INVALID);
+      }
 
       dispatch({ type: "SET_START_TIME", payload: time });
     },
@@ -86,11 +96,14 @@ export function useEventInfo(initialData?: EventInformation) {
   );
 
   const setEndTime = useCallback(
-    (time: string) => {
-      if (checkTimeRange(state.eventRange.timeRange.from, time)) {
+    (time: string | null) => {
+      if (!time || !state.eventRange.timeRange.from) {
+        // Don't compare and clear errors if either of the times are missing
+        handleError("timeRange", "");
+      } else if (checkTimeRange(state.eventRange.timeRange.from, time)) {
         handleError("timeRange", "");
       } else {
-        handleError("timeRange", MESSAGES.ERROR_EVENT_RANGE_INVALID);
+        handleError("timeRange", MESSAGES.ERROR_EVENT_TIMES_INVALID);
       }
 
       dispatch({ type: "SET_END_TIME", payload: time });
@@ -119,9 +132,13 @@ export function useEventInfo(initialData?: EventInformation) {
     [handleError],
   );
 
-  const setWeekdayRange = useCallback((weekdays: Weekday[]) => {
-    dispatch({ type: "SET_WEEKDAYS", payload: weekdays });
-  }, []);
+  const setWeekdayRange = useCallback(
+    (weekdays: Weekday[]) => {
+      handleError("weekdayRange", "");
+      dispatch({ type: "SET_WEEKDAYS", payload: weekdays });
+    },
+    [handleError],
+  );
 
   const resetEventInfo = useCallback(() => {
     dispatch({ type: "RESET" });
