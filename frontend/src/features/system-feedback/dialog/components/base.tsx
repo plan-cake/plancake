@@ -107,7 +107,7 @@ export default function BaseDialog({
                 <ActionButton
                   buttonStyle="frosted glass"
                   icon={<XIcon />}
-                  aria-label="Close drawer"
+                  aria-label="Close dialog"
                   onClick={(e) => {
                     e?.stopPropagation();
                     handleOpenChange(false);
