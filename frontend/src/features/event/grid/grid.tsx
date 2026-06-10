@@ -115,12 +115,7 @@ export default function ScheduleGrid({
   if (error) return <GridError message={error} />;
 
   return (
-    <div
-      className={cn(
-        "relative mb-8 grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]",
-        mode === "preview" && "mb-0",
-      )}
-    >
+    <div className="relative grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]">
       <ScheduleHeader
         preview={mode === "preview"}
         visibleDays={visibleDays}
