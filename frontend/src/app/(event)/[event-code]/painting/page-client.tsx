@@ -260,21 +260,19 @@ export default function ClientPage({
       </div>
 
       {/* Main Content */}
-      <div className="flex min-h-0 flex-1 flex-col gap-4 md:mb-0 md:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col gap-x-4 md:mb-0 md:flex-row">
         {/* Left Panel */}
-        <div className="h-fit w-full shrink-0 space-y-4 overflow-y-auto md:sticky md:w-80">
-          <div className="hidden md:block">
-            <DisplayNameInput
-              errors={errors}
-              displayName={displayName}
-              setDisplayName={setDisplayName}
-              handleNameChange={handleNameChange}
-              loginState={loginState}
-              accountDetails={accountDetails}
-              saveDefaultName={saveDefaultName}
-              setSaveDefaultName={setSaveDefaultName}
-            />
-          </div>
+        <div className="hidden w-80 shrink-0 space-y-4 md:block">
+          <DisplayNameInput
+            errors={errors}
+            displayName={displayName}
+            setDisplayName={setDisplayName}
+            handleNameChange={handleNameChange}
+            loginState={loginState}
+            accountDetails={accountDetails}
+            saveDefaultName={saveDefaultName}
+            setSaveDefaultName={setSaveDefaultName}
+          />
 
           <div className="bg-panel rounded-3xl p-6 text-sm">
             Displaying event in
@@ -301,6 +299,15 @@ export default function ClientPage({
             }
           }}
         />
+
+        <div className="bg-panel rounded-3xl p-6 text-sm md:hidden">
+          Displaying event in
+          <TimeZoneSelector
+            id="timezone-select"
+            value={timeZone}
+            onChange={setTimeZone}
+          />
+        </div>
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}
