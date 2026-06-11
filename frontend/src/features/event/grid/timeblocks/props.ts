@@ -37,5 +37,6 @@ export type ResultsTimeBlockProps = CommonBlockProps & {
   hoveredSlot: string | null | undefined;
   availabilities: ResultsAvailabilityMap;
   numParticipants: number;
+  highestMatchCount: number;
   onHoverSlot?: (iso: string | null) => void;
 };

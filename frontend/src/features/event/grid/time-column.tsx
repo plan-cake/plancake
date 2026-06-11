@@ -40,7 +40,7 @@ export default function TimeColumn({
             <span
               className={cn(
                 "bg-background absolute -top-2 rounded-full px-1 text-xs",
-                isPreview && "bg-panel",
+                isPreview && "md:bg-panel",
               )}
             >
               {hoursLabel[i]}
