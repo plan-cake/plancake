@@ -19,6 +19,7 @@ django-ipware==7.0.1
 django-ses==4.4.0
 djangorestframework==3.16.0
 h11==0.16.0
+isort==8.0.1
 jmespath==1.0.1
 kombu==5.5.4
 packaging==25.0

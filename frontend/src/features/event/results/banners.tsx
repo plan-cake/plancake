@@ -1,5 +1,8 @@
 import { ResultsAvailabilityMap } from "@/core/availability/types";
-import { hasMutualAvailability } from "@/features/event/results/lib/utils";
+import {
+  getHighestMatchCount,
+  hasMutualAvailability,
+} from "@/features/event/results/lib/utils";
 import { Banner } from "@/features/system-feedback/banner/base";
 import { MESSAGES } from "@/lib/messages";
 import { AllAvailability } from "@/lib/utils/api/types";
@@ -37,13 +40,23 @@ export function getResultBanner(
       id: "no-participants",
     };
   } else if (!hasMutualAvailability(availabilities, participants)) {
+    if (getHighestMatchCount(availabilities) <= 1) {
+      return {
+        element: (
+          <Banner type="info" subtitle="Yikes..." showPing>
+            <p>{MESSAGES.INFO_NO_MUTUAL_AVAILABILITY}</p>
+          </Banner>
+        ),
+        id: "no-mutual-availability",
+      };
+    }
     return {
       element: (
         <Banner type="info" subtitle="Oh dear :(" showPing>
-          <p>{MESSAGES.INFO_NO_MUTUAL_AVAILABILITY}</p>
+          <p>{MESSAGES.INFO_NO_IDEAL_TIMES_BANNER}</p>
         </Banner>
       ),
-      id: "no-mutual-availability",
+      id: "no-ideal-times",
     };
   } else if (participated && participants.length === 1) {
     return {

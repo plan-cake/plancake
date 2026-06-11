@@ -15,6 +15,7 @@ export default function WeekdayCalendar({
   onChange,
 }: WeekdayCalendarProps) {
   const [anchorIndex, setAnchorIndex] = useState<number | null>(null);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   const handleDayClick = (index: number) => {
     if (anchorIndex === null) {
@@ -35,41 +36,50 @@ export default function WeekdayCalendar({
     .map((d) => ALL_WEEKDAYS.indexOf(d))
     .filter((i) => i !== -1);
 
-  const start = selectedIndices.length > 0 ? Math.min(...selectedIndices) : -1;
-  const end = selectedIndices.length > 0 ? Math.max(...selectedIndices) : -1;
+  let highlightStart = -1;
+  let highlightEnd = -1;
+  if (selectedIndices.length > 0 && anchorIndex === null) {
+    highlightStart = Math.min(...selectedIndices);
+    highlightEnd = Math.max(...selectedIndices);
+  } else if (anchorIndex !== null) {
+    highlightStart = Math.min(anchorIndex, hoverIndex ?? anchorIndex);
+    highlightEnd = Math.max(anchorIndex, hoverIndex ?? anchorIndex);
+  }
 
   return (
     <div className="flex w-full select-none flex-row flex-wrap">
       {ALL_WEEKDAYS.map((day, index) => {
-        const isActive = index >= start && index <= end;
-        const isRangeStart = index === start;
-        const isRangeEnd = index === end;
+        const isHighlighted = index >= highlightStart && index <= highlightEnd;
+        const isRangeStart = index === highlightStart;
+        const isRangeEnd = index === highlightEnd;
 
         return (
-          <button
+          <div
             key={day}
             onClick={() => handleDayClick(index)}
-            className={cn(
-              "flex h-8 w-10 items-center justify-center px-6",
-              "hover:bg-accent/25 active:bg-accent/40",
-
-              // Inactive State
-              !isActive && "text-foreground/50 rounded-full",
-
-              // Active State
-              isActive && "bg-accent/15 text-accent-text",
-
-              // Contiguous Rounding Logic
-              isActive && isRangeStart && "rounded-l-full",
-              isActive && isRangeEnd && "rounded-r-full",
-              isActive && !isRangeStart && !isRangeEnd && "rounded-none",
-
-              // Single Day Case (Start == End)
-              isActive && isRangeStart && isRangeEnd && "rounded-full",
-            )}
+            onPointerEnter={() => setHoverIndex(index)}
+            onPointerLeave={() => setHoverIndex(null)}
           >
-            {day}
-          </button>
+            <button
+              className={cn(
+                "flex h-8 w-10 items-center justify-center px-6",
+                "active:bg-accent/40 text-foreground/50 cursor-pointer",
+
+                // Inactive State
+                !isHighlighted && "hover:bg-accent/15 rounded-full",
+
+                // Highlighted State
+                isHighlighted &&
+                  "bg-accent/15 text-accent-text hover:bg-accent/30",
+
+                // Contiguous Rounding Logic
+                isRangeStart && "rounded-l-full",
+                isRangeEnd && "rounded-r-full",
+              )}
+            >
+              {day}
+            </button>
+          </div>
         );
       })}
     </div>
