@@ -3,8 +3,18 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cn } from "@/lib/utils/classname";
 
 type TooltipProps = {
+  /**
+   * The side the tooltip should appear on. Defaults to "bottom".
+   */
   side?: "top" | "bottom";
+  /**
+   * The content to be displayed in the tooltip. For most cases, this will just be a
+   * string, but it can be any content for a more detailed tooltip.
+   */
   content: React.ReactNode;
+  /**
+   * The element that triggers the tooltip when hovered.
+   */
   children: React.ReactNode;
 };
 
