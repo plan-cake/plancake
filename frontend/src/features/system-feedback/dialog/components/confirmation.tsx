@@ -16,6 +16,7 @@ export default function ConfirmationDialog({
   triggerDisabled = false,
   autoClose = false,
   asNestedDrawer = false,
+  showCloseButton = false,
   open: controlledOpen,
   onOpenChange,
 }: ConfirmationDialogProps) {
@@ -81,6 +82,7 @@ export default function ConfirmationDialog({
       onOpenChange={handleOpenChange}
       asNestedDrawer={asNestedDrawer}
       triggerDisabled={triggerDisabled}
+      showCloseButton={showCloseButton}
       overlayClassName={cn(
         type === "error" &&
           "bg-[color-mix(in_oklab,var(--color-error)_15%,black_20%)]",

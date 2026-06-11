@@ -17,6 +17,7 @@ export default function FormDialog({
   children,
   trigger,
   asNestedDrawer = false,
+  showCloseButton = false,
   open: controlledOpen,
   onOpenChange,
 }: FormDialogProps) {
@@ -55,6 +56,7 @@ export default function FormDialog({
       open={open}
       onOpenChange={handleOpenChange}
       asNestedDrawer={asNestedDrawer}
+      showCloseButton={showCloseButton}
       overlayClassName={cn(
         type === "error" &&
           "bg-[color-mix(in_oklab,var(--color-error)_15%,black_20%)]",
