@@ -187,31 +187,35 @@ export default function DashboardEvent({
         <DashboardCopyButton code={code} />
         {myEvent && (
           <>
-            <button className="cursor-pointer" onClick={navigateToEdit}>
-              <div
-                className={cn(
-                  "border-foreground w-fit rounded-full border p-1.5",
-                  "hover:bg-foreground/20 active:bg-foreground/10",
-                )}
+            <Tooltip content="Edit Event">
+              <button className="cursor-pointer" onClick={navigateToEdit}>
+                <div
+                  className={cn(
+                    "border-foreground w-fit rounded-full border p-1.5",
+                    "hover:bg-foreground/20 active:bg-foreground/10",
+                  )}
+                >
+                  <PencilIcon className="h-4 w-4" />
+                </div>
+              </button>
+            </Tooltip>
+            <Tooltip content="Delete Event">
+              <button
+                className="cursor-pointer"
+                onClick={handleDelete}
+                aria-label="Delete Event"
               >
-                <PencilIcon className="h-4 w-4" />
-              </div>
-            </button>
-            <button
-              className="cursor-pointer"
-              onClick={handleDelete}
-              aria-label="Delete Event"
-            >
-              <div
-                className={cn(
-                  "border-foreground w-fit rounded-full border p-1.5",
-                  "hover:bg-error/20 hover:text-error hover:border-error",
-                  "active:bg-error/40",
-                )}
-              >
-                <Trash2Icon className="h-4 w-4" />
-              </div>
-            </button>
+                <div
+                  className={cn(
+                    "border-foreground w-fit rounded-full border p-1.5",
+                    "hover:bg-error/20 hover:text-error hover:border-error",
+                    "active:bg-error/40",
+                  )}
+                >
+                  <Trash2Icon className="h-4 w-4" />
+                </div>
+              </button>
+            </Tooltip>
           </>
         )}
       </div>
