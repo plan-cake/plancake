@@ -5,6 +5,36 @@ import { CircleQuestionMarkIcon } from "lucide-react";
 import { FloatingDrawer } from "@/features/drawer";
 import Tooltip, { TooltipSide } from "@/features/system-feedback/tooltip/base";
 
+type InfoPointProps = {
+  /**
+   * The side the tooltip should appear on when hovering.
+   *
+   * @default "top"
+   */
+  tooltipSide?: TooltipSide;
+  /**
+   * The title displayed on the drawer when tapping the info point on mobile.
+   */
+  drawerTitle: string;
+  /**
+   * Hidden description for the drawer shown on mobile, to aid with accessibility.
+   */
+  drawerDescription: string;
+  /**
+   * The content to be displayed on desktop when hovering the info point.
+   */
+  tooltipContent: React.ReactNode;
+  /**
+   * The content to be displayed on mobile when tapping the info point.
+   */
+  drawerContent: React.ReactNode;
+  /**
+   * Optional styling for the info point icon. Does not affect the content in the tooltip
+   * or drawer.
+   */
+  className?: string;
+};
+
 export default function InfoPoint({
   tooltipSide = "top",
   drawerTitle,
@@ -12,14 +42,7 @@ export default function InfoPoint({
   tooltipContent,
   drawerContent,
   className,
-}: {
-  tooltipSide?: TooltipSide;
-  drawerTitle: string;
-  drawerDescription: string;
-  tooltipContent: React.ReactNode;
-  drawerContent: React.ReactNode;
-  className?: string;
-}) {
+}: InfoPointProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   useEffect(() => {
