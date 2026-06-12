@@ -86,7 +86,8 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
         For the code <span className="font-bold">abcd1234</span>, the link would
         be:{" "}
         <span className="underline">
-          {window.location.host}/<span className="font-bold">abcd1234</span>
+          {typeof window === "undefined" ? "" : window.location.host}/
+          <span className="font-bold">abcd1234</span>
         </span>
       </div>
       {isEditing ? (
