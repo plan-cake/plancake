@@ -6,15 +6,15 @@ import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import { MorphingDrawer } from "@/features/drawer";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
-import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
-import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
+import PanelHeader from "@/features/event/results/attendees/panel-header";
+import ParticipantList from "@/features/event/results/attendees/participant-list";
 import {
   useParticipantRemoval,
   RemoveParticipantDialog,
-} from "@/features/event/results/remove-participant";
+} from "@/features/event/results/attendees/remove-participant";
 import { tzEqual } from "@/lib/utils/date-time-format";
 
-export default function ResultsDrawer({
+export default function AttendeesDrawer({
   timezone,
   onTimezoneChange,
   onSnapChange,

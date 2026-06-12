@@ -10,14 +10,14 @@ import { EventInformation } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import ScheduleGrid from "@/features/event/grid/grid";
-import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
-import { getResultBanners } from "@/features/event/results/banners";
+import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
+import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
+import { getResultBanners } from "@/features/event/results/components/banners";
+import DisplaySettings from "@/features/event/results/components/display-settings";
 import {
   ResultsProvider,
   useResultsContext,
 } from "@/features/event/results/context";
-import DisplaySettings from "@/features/event/results/display-settings";
-import ResultsDrawer from "@/features/event/results/drawer";
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import { useToast } from "@/features/system-feedback";
@@ -194,7 +194,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           style={{ height: getSpacerHeight() }}
         />
         <div className="md:hidden">
-          <ResultsDrawer
+          <AttendeesDrawer
             timezone={timezone}
             onTimezoneChange={handleTZChange}
             onSnapChange={setDrawerSnap}
