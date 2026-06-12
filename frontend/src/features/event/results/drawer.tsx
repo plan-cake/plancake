@@ -8,8 +8,10 @@ import { MorphingDrawer } from "@/features/drawer";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
-import { useResultsContext } from "@/features/event/results/context";
-import { ConfirmationDialog } from "@/features/system-feedback";
+import {
+  useParticipantRemoval,
+  RemoveParticipantDialog,
+} from "@/features/event/results/remove-participant";
 import { tzEqual } from "@/lib/utils/date-time-format";
 
 export default function ResultsDrawer({
@@ -24,21 +26,17 @@ export default function ResultsDrawer({
   eventCode: string;
 }) {
   const {
-    participants,
+    isRemoving,
+    setIsRemoving,
+    personToRemove,
+    isConfirmationOpen,
+    setIsConfirmationOpen,
+    promptRemove,
+    toggleRemoving,
+    confirmRemove,
     currentUser,
     clearSelectedParticipants,
-    handleRemoveParticipant: onRemoveParticipant,
-  } = useResultsContext();
-
-  const promptRemove = (person: string) => {
-    setPersonToRemove(person);
-    setIsConfirmationOpen(true);
-  };
-
-  /* REMOVING STATES */
-  const [isRemoving, setIsRemoving] = useState(false);
-  const [personToRemove, setPersonToRemove] = useState<string | null>(null);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  } = useParticipantRemoval();
 
   /* TABS */
   const [activeSnap, setActiveSnap] = useState<number | string | null>(0.22);
@@ -54,12 +52,7 @@ export default function ResultsDrawer({
       setIsRemoving(false);
       clearSelectedParticipants();
     }
-  }, [isCollapsed, isRemoving, clearSelectedParticipants]);
-
-  const toggleRemoving = () => {
-    setIsRemoving(!isRemoving);
-    clearSelectedParticipants();
-  };
+  }, [isCollapsed, isRemoving, clearSelectedParticipants, setIsRemoving]);
 
   /* TIMEZONE HANDLING */
   const tzChanged = !tzEqual(
@@ -126,45 +119,14 @@ export default function ResultsDrawer({
         mobile
       />
 
-      <ConfirmationDialog
+      <RemoveParticipantDialog
         asNestedDrawer
-        type="delete"
-        autoClose={true}
-        title={
-          personToRemove === currentUser ? "Leave Event" : "Remove Participant"
-        }
-        description={
-          personToRemove == currentUser ? (
-            "Are you sure you want to leave this event?"
-          ) : (
-            <span>
-              Are you sure you want to remove{" "}
-              <span className="font-bold">{personToRemove}</span>?
-            </span>
-          )
-        }
-        open={isConfirmationOpen}
+        personToRemove={personToRemove}
+        currentUser={currentUser}
+        isOpen={isConfirmationOpen}
         onOpenChange={setIsConfirmationOpen}
-        onConfirm={async () => {
-          if (!personToRemove) return false;
-          const success = await onRemoveParticipant(personToRemove);
-          if (success) {
-            if (participants.length === 1) setIsRemoving(false);
-          }
-          return success;
-        }}
-      >
-        <div className="text-center">
-          {personToRemove === currentUser ? (
-            "Are you sure you want to remove yourself from this event?"
-          ) : (
-            <span>
-              Are you sure you want to remove{" "}
-              <span className="font-bold">{personToRemove}</span>?
-            </span>
-          )}
-        </div>
-      </ConfirmationDialog>
+        onConfirm={confirmRemove}
+      />
     </MorphingDrawer>
   );
 }
