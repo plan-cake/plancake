@@ -1,5 +1,5 @@
 import { ButtonStyle } from "@/features/button/props";
-import { DialogType } from "@/features/system-feedback/type"; // Assuming path
+import { DialogType } from "@/features/system-feedback/type";
 
 export type DialogConfig = {
   buttonStyle: ButtonStyle;
