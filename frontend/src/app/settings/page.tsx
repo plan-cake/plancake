@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { CheckIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import TextInputField from "@/components/text-input-field";
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
@@ -16,6 +17,7 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { cn } from "@/lib/utils/classname";
 
 export default function Page() {
+  const router = useRouter();
   const accountDetails = useSettingsAccount();
   const { addToast } = useToast();
 
@@ -37,6 +39,7 @@ export default function Page() {
             display_name: defaultName,
           });
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_SAVED);
+          router.refresh();
         } catch (e) {
           const error = e as ApiErrorResponse;
           addToast("error", error.formattedMessage);
@@ -46,6 +49,7 @@ export default function Page() {
           await clientPost(ROUTES.account.removeDefaultName);
           setDefaultName("");
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_REMOVED);
+          router.refresh();
         } catch (e) {
           const error = e as ApiErrorResponse;
           addToast("error", error.formattedMessage);
