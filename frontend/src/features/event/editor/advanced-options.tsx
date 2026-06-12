@@ -104,6 +104,8 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
               </div>
             </label>
             <InfoPoint
+              title="Custom Event Codes"
+              description="More information about custom event codes"
               content={
                 <div className="flex max-w-64 flex-col gap-2 p-1">
                   <div>
