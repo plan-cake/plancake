@@ -10,8 +10,6 @@ import Checkbox from "@/components/checkbox";
 import MobileFooterIsland from "@/components/mobile-footer-island";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
-import { useAccount } from "@/features/account/context";
-import { AccountDetails, LoginState } from "@/features/account/type";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
@@ -29,14 +27,17 @@ import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { SelfAvailability } from "@/lib/utils/api/types";
 import { timeslotToISOString } from "@/lib/utils/date-time-format";
+import type { Session } from "@/lib/utils/get-session";
 
 export default function ClientPage({
+  session,
   eventCode,
   eventName,
   eventRange,
   timeslots,
   initialData,
 }: {
+  session: Session;
   eventCode: string;
   eventName: string;
   eventRange: EventRange;
@@ -120,27 +121,29 @@ export default function ClientPage({
   const [saveDefaultName, setSaveDefaultName] = useState(false);
 
   // DEFAULT NAME APPLICATION
-  // This also accounts for the situation where a user directly opens the painting page
-  // instead of coming from the results page.
-  const { loginState, accountDetails, login } = useAccount();
   // If editing, don't try to autofill the name
   const nameInitialized = useRef(!!initialData);
   useEffect(() => {
-    if (nameInitialized.current) return;
-    if (loginState !== "logged_in") return;
-    if (!accountDetails || !accountDetails.defaultName) {
-      nameInitialized.current = true; // don't try again after setting the name
+    // If the name is already initialized (either by user input or because we're
+    // editing), or if the user is not logged in, don't try to autofill the name
+    if (nameInitialized.current || !session.isLoggedIn) return;
+
+    // If the user doesn't have a default name, mark the name as initialized to
+    // avoid trying to autofill on every render
+    if (!session.user.defaultName) {
+      nameInitialized.current = true;
       return;
     }
 
-    const newName = accountDetails.defaultName;
+    // If the user has a default name, use it to autofill the name field
+    const newName = session.user.defaultName;
     setDisplayName(newName);
     handleNameChange(newName);
     addToast("success", MESSAGES.INFO_NAME_AUTOFILLED, {
       title: "NAME AUTOFILLED",
     });
     nameInitialized.current = true;
-  }, [loginState, accountDetails, setDisplayName, addToast, handleNameChange]);
+  }, [session, setDisplayName, addToast, handleNameChange]);
 
   // SUBMIT AVAILABILITY
   const handleSubmitAvailability = async () => {
@@ -169,14 +172,10 @@ export default function ClientPage({
 
     // Save the default name if checkbox checked
     if (saveDefaultName) {
-      if (accountDetails) {
+      if (session.isLoggedIn) {
         try {
           await clientPost(ROUTES.account.setDefaultName, {
             display_name: displayName,
-          });
-          login({
-            ...accountDetails,
-            defaultName: displayName,
           });
           addToast("success", MESSAGES.SUCCESS_DEFAULT_NAME_SAVED);
         } catch (e) {
@@ -266,11 +265,10 @@ export default function ClientPage({
           <div className="hidden md:block">
             <DisplayNameInput
               errors={errors}
+              session={session}
               displayName={displayName}
               setDisplayName={setDisplayName}
               handleNameChange={handleNameChange}
-              loginState={loginState}
-              accountDetails={accountDetails}
               saveDefaultName={saveDefaultName}
               setSaveDefaultName={setSaveDefaultName}
             />
@@ -312,11 +310,10 @@ export default function ClientPage({
           <div className="mx-3 -mt-2">
             <DisplayNameInput
               errors={errors}
+              session={session}
               displayName={displayName}
               setDisplayName={setDisplayName}
               handleNameChange={handleNameChange}
-              loginState={loginState}
-              accountDetails={accountDetails}
               saveDefaultName={saveDefaultName}
               setSaveDefaultName={setSaveDefaultName}
             />
@@ -356,20 +353,18 @@ export default function ClientPage({
 
 function DisplayNameInput({
   errors,
+  session,
   displayName,
   setDisplayName,
   handleNameChange,
-  loginState,
-  accountDetails,
   saveDefaultName,
   setSaveDefaultName,
 }: {
   errors: Record<string, string>;
+  session: Session;
   displayName: string;
   setDisplayName: (name: string) => void;
   handleNameChange: (name: string) => void;
-  loginState: LoginState;
-  accountDetails: AccountDetails | null;
   saveDefaultName: boolean;
   setSaveDefaultName: (save: boolean) => void;
 }) {
@@ -401,7 +396,7 @@ function DisplayNameInput({
           <br />
           add your availabilities here
         </div>
-        {loginState === "logged_in" && !accountDetails!.defaultName && (
+        {session.isLoggedIn && !session.user.defaultName && (
           <div className="text-foreground/75">
             <Checkbox
               label="Save as nickname for autofill"
