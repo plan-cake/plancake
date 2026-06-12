@@ -4,6 +4,7 @@ import * as Collapsible from "@radix-ui/react-collapsible";
 import { ChevronRightIcon, TriangleAlertIcon } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
+import InfoPoint from "@/components/info-point";
 import { useEventContext } from "@/core/event/context";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { MESSAGES } from "@/lib/messages";
@@ -92,15 +93,50 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label
-          htmlFor="custom-code-input"
-          className="flex justify-between font-bold"
-        >
-          {!isEditing && "Custom"} Event Code
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor="custom-code-input"
+              className="flex justify-between font-bold"
+            >
+              <div className="flex items-center gap-2">
+                {!isEditing && "Custom"} Event Code
+              </div>
+            </label>
+            <InfoPoint
+              content={
+                <div className="flex max-w-64 flex-col gap-2 p-1">
+                  <div>
+                    Each Plancake event is identified by a code, used in its
+                    unique link.
+                  </div>
+                  <div>
+                    For the code <span className="font-bold">abcd1234</span>,
+                    the link would be:{" "}
+                    <span className="underline">
+                      {window.location.host}/
+                      <span className="font-bold">abcd1234</span>
+                    </span>
+                  </div>
+                  {isEditing ? (
+                    <div>
+                      You can{"'"}t change this code after an event is created.
+                    </div>
+                  ) : (
+                    <div>
+                      You can provide a custom code for this event (subject to
+                      availability), otherwise we{"'"}ll generate one for you.
+                    </div>
+                  )}
+                </div>
+              }
+              className="h-5 w-5 opacity-75"
+            />
+          </div>
           {errors.customCode && (
             <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
-        </label>
+        </div>
         <input
           id="custom-code-input"
           type="text"
