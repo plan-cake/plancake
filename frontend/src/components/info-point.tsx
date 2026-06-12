@@ -15,11 +15,11 @@ type InfoPointProps = {
   /**
    * The title displayed on the drawer when tapping the info point on mobile.
    */
-  drawerTitle: string;
+  title: string;
   /**
-   * Hidden description for the drawer shown on mobile, to aid with accessibility.
+   * Hidden description for use with screen readers.
    */
-  drawerDescription: string;
+  description: string;
   /**
    * The content to be displayed on desktop when hovering the info point.
    */
@@ -37,8 +37,8 @@ type InfoPointProps = {
 
 export default function InfoPoint({
   tooltipSide = "top",
-  drawerTitle,
-  drawerDescription,
+  title,
+  description,
   tooltipContent,
   drawerContent,
   className,
@@ -57,16 +57,18 @@ export default function InfoPoint({
   return (
     <>
       <Tooltip side={tooltipSide} content={tooltipContent}>
-        <CircleQuestionMarkIcon
-          className={className}
+        <button
           onClick={() => setDrawerOpen(isTouchDevice)}
-        />
+          aria-label={description}
+        >
+          <CircleQuestionMarkIcon className={className} />
+        </button>
       </Tooltip>
       <FloatingDrawer
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
-        title={drawerTitle}
-        description={drawerDescription}
+        title={title}
+        description={description}
       >
         {drawerContent}
       </FloatingDrawer>

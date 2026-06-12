@@ -127,8 +127,8 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
               </div>
             </label>
             <InfoPoint
-              drawerTitle="Custom Event Codes"
-              drawerDescription="More information about custom event codes"
+              title="Custom Event Codes"
+              description="More information about custom event codes"
               tooltipContent={
                 <div className="max-w-3xs p-1">{customCodeInfo}</div>
               }
