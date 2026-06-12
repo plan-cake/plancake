@@ -6,8 +6,8 @@ import { motion } from "framer-motion";
 
 import DashboardButton from "@/features/header/components/buttons/dashboard";
 import NewEventButton from "@/features/header/components/buttons/new-event";
-import ThemeToggle from "@/features/header/components/buttons/theme-toggle";
 import LogoArea from "@/features/header/components/logo-area";
+import ThemePicker from "@/features/header/components/theme-picker";
 import { useHeaderSize } from "@/features/header/context";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
@@ -94,17 +94,21 @@ export default function ShrinkingHeader({
         <LogoArea isShrunk={isShrunk} />
 
         <motion.div
-          layout
           animate={{ scale: activeMenu ? 0.95 : 1 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className={cn(
-            "frosted-glass relative flex h-fit items-center rounded-full",
+            "relative isolate flex h-fit items-center rounded-full",
             "header-transition-[gap,padding]",
             isShrunk ? "gap-1 p-1" : "gap-2 p-2",
           )}
         >
+          <div
+            className="frosted-glass pointer-events-none absolute inset-0 -z-10 rounded-full"
+            aria-hidden="true"
+          />
+
           <NewEventButton />
-          <ThemeToggle />
+          <ThemePicker />
           <DashboardButton />
 
           {accountButton}
