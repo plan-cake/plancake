@@ -5,10 +5,11 @@ import { memo, useState } from "react";
 import { TriangleAlertIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import MobileFooterTray from "@/components/mobile-footer-tray";
+import MobileFooterIsland from "@/components/mobile-footer-island";
 import SegmentedControl from "@/components/segmented-control";
 import TextInputField from "@/components/text-input-field";
 import { EventProvider, useEventContext } from "@/core/event/context";
+import checkUnselectedRange from "@/core/event/lib/unselected-range";
 import { EventInformation } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
@@ -113,7 +114,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       )}
 
       <div className="-mb-1 flex w-full items-center justify-between">
-        <div className="mb-4 md:w-1/2">
+        <div className="mb-4 w-full md:w-1/2">
           <TextInputField
             id={"event-name"}
             type="text"
@@ -130,17 +131,6 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         </div>
       </div>
 
-      <div className="md:hidden">
-        <SegmentedControl
-          value={mobileTab}
-          onChange={setMobileTab}
-          options={[
-            { label: "Event Details", value: "details" },
-            { label: "Grid Preview", value: "preview" },
-          ]}
-        />
-      </div>
-
       <div
         className={cn(
           "w-full grid-cols-1 gap-y-2",
@@ -150,28 +140,32 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       >
         <DateRangeSelection editing={type === "edit"} />
 
-        <p
-          className={`flex items-center gap-2 md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
-        >
-          Possible Times
-          {errors.timeRange && <TriangleAlertIcon className="h-4 w-4" />}
-        </p>
-        <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
-          <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
-            <TimeSelector
-              id="from-time-dropdown"
-              value={eventRange.timeRange.from}
-              onChange={setStartTime}
-            />
-          </FormSelectorField>
+        <div className="flex flex-col gap-1">
+          <p
+            className={`flex items-center gap-2 font-bold md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
+          >
+            Possible Times
+            {errors.timeRange && <TriangleAlertIcon className="h-4 w-4" />}
+          </p>
+          <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
+            <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
+              <TimeSelector
+                id="from-time-dropdown"
+                value={eventRange.timeRange.from}
+                onChange={setStartTime}
+                placeholder="Start Time"
+              />
+            </FormSelectorField>
 
-          <FormSelectorField label="UNTIL" htmlFor="to-time-dropdown">
-            <TimeSelector
-              id="to-time-dropdown"
-              value={eventRange.timeRange.to}
-              onChange={setEndTime}
-            />
-          </FormSelectorField>
+            <FormSelectorField label="UNTIL" htmlFor="to-time-dropdown">
+              <TimeSelector
+                id="to-time-dropdown"
+                value={eventRange.timeRange.to}
+                onChange={setEndTime}
+                placeholder="End Time"
+              />
+            </FormSelectorField>
+          </div>
         </div>
 
         <div className="md:content md:col-start-1 md:row-start-10 md:flex md:max-w-[250px] md:items-end">
@@ -185,7 +179,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
       <div
         className={cn(
-          "bg-panel rounded-3xl p-4 pr-6 pt-6 md:hidden",
+          "md:hidden",
           mobileTab === "details" ? "hidden" : "block",
         )}
       >
@@ -193,19 +187,28 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           mode="preview"
           isWeekdayEvent={eventRange.type === "weekday"}
           disableSelect={true}
+          unselectedRange={checkUnselectedRange(eventRange)}
           timezone={eventRange.timezone}
           timeslots={timeslots}
         />
       </div>
-      <div className="h-16 md:hidden" />
 
       {/* This z-index is necessary to avoid the time column overlapping */}
       <div className="z-10">
-        <MobileFooterTray
-          buttons={
-            type === "edit" ? [cancelButton, submitButton] : [submitButton]
-          }
-        />
+        <MobileFooterIsland
+          leftButtons={type === "edit" ? [cancelButton] : undefined}
+          rightButtons={[submitButton]}
+        >
+          <SegmentedControl
+            value={mobileTab}
+            onChange={setMobileTab}
+            options={[
+              { label: "Event Details", value: "details" },
+              { label: "Grid Preview", value: "preview" },
+            ]}
+            hidePadding
+          />
+        </MobileFooterIsland>
       </div>
     </div>
   );
