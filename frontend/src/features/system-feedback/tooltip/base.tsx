@@ -2,11 +2,13 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@/lib/utils/classname";
 
+export type TooltipSide = "top" | "bottom";
+
 type TooltipProps = {
   /**
    * The side the tooltip should appear on. Defaults to "bottom".
    */
-  side?: "top" | "bottom";
+  side?: TooltipSide;
   /**
    * The content to be displayed in the tooltip. For most cases, this will just be a
    * string, but it can be any content for a more detailed tooltip.

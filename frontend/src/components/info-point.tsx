@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { CircleQuestionMarkIcon } from "lucide-react";
 
 import { FloatingDrawer } from "@/features/drawer";
-import Tooltip from "@/features/system-feedback/tooltip/base";
+import Tooltip, { TooltipSide } from "@/features/system-feedback/tooltip/base";
 
 export default function InfoPoint({
   tooltipSide = "top",
@@ -13,7 +13,7 @@ export default function InfoPoint({
   drawerContent,
   className,
 }: {
-  tooltipSide?: "top" | "bottom";
+  tooltipSide?: TooltipSide;
   drawerTitle: string;
   drawerDescription: string;
   tooltipContent: React.ReactNode;
