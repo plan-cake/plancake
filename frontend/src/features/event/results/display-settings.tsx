@@ -5,14 +5,10 @@ import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 export default function DisplaySettings({
   timezone,
   onTimezoneChange,
-  open = false,
-  setOpen,
   drawerNesting = 0,
 }: {
   timezone: string;
   onTimezoneChange: (newTZ: string) => void;
-  open?: boolean;
-  setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   drawerNesting?: number;
 }) {
   // const { showOnlyBestTimes, setShowOnlyBestTimes } = useResultsContext();
@@ -31,8 +27,6 @@ export default function DisplaySettings({
         value={timezone}
         onChange={onTimezoneChange}
         drawerNesting={drawerNesting}
-        open={open}
-        onOpenChange={setOpen}
       />
       {/* </div> */}
     </>
