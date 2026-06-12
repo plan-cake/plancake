@@ -162,7 +162,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       );
     }
 
-    if (typeof tooltip !== "undefined") {
+    if (tooltip != null) {
       buttonComponent = <Tooltip content={tooltip}>{buttonComponent}</Tooltip>;
     }
 
