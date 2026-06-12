@@ -85,7 +85,7 @@ export function RemoveParticipantDialog({
       onConfirm={onConfirm}
     >
       <div className="text-center">
-        {personToRemove == currentUser ? (
+        {personToRemove === currentUser ? (
           "Are you sure you want to leave this event?"
         ) : (
           <span>
