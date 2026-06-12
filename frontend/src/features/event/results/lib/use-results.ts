@@ -106,51 +106,30 @@ export function useEventResults(initialData: ResultsInformation) {
     };
   }, [optimisticAvailabilities, optimisticParticipants]);
 
-  /**
-   * Determines the "target participants" based in order of priority:
-   *  - selected participants (via click)
-   *  - hovered participant (via mouseover)
-   *  - all participants (if no selection or hover, show everyone)
-   *
-   * @returns An object containing:
-   *  - list: the array of participants to show in the grid (based on priority)
-   *  - set: a Set version of the above list for O(1) lookups
-   *  - isFiltering: boolean indicating if we are currently filtering (i.e. not showing everyone)
-   */
-  const targetParticipants = useMemo(() => {
-    const active =
-      selectedParticipants.length > 0
-        ? selectedParticipants
-        : hoveredParticipant
-          ? [hoveredParticipant]
-          : [];
+  const { globalFilteredMap, validParticipantsForList } = useMemo(() => {
+    const map: ResultsAvailabilityMap = {};
+    const validSet = new Set<string>();
 
-    return {
-      list: active.length > 0 ? active : optimisticParticipants,
-      set: new Set(active),
-      isFiltering: active.length > 0,
-    };
-  }, [selectedParticipants, hoveredParticipant, optimisticParticipants]);
-
-  /**
-   * Filters the results map to only include participants that are in the "target
-   * participants" list. This is to ensure that the results grid and participant list
-   * are always in sync.
-   */
-  const participantFilteredMap = useMemo(() => {
-    if (!targetParticipants.isFiltering) return optimisticAvailabilities;
-
-    const resultMap: ResultsAvailabilityMap = {};
     for (const [slot, availablePeople] of Object.entries(
       optimisticAvailabilities,
     )) {
-      const relevantPeople = availablePeople.filter((p) =>
-        targetParticipants.set.has(p),
-      );
-      if (relevantPeople.length > 0) resultMap[slot] = relevantPeople;
+      if (availablePeople.length < minAvailability) continue;
+      if (showOnlyBestTimes && !bestTimesCache.slotsSet.has(slot)) continue;
+
+      map[slot] = availablePeople;
+      availablePeople.forEach((p) => validSet.add(p));
     }
-    return resultMap;
-  }, [optimisticAvailabilities, targetParticipants]);
+
+    return {
+      globalFilteredMap: map,
+      validParticipantsForList: Array.from(validSet),
+    };
+  }, [
+    optimisticAvailabilities,
+    minAvailability,
+    showOnlyBestTimes,
+    bestTimesCache,
+  ]);
 
   /**
    * This is the final filtered availabilities map that is used for rendering the
@@ -161,32 +140,44 @@ export function useEventResults(initialData: ResultsInformation) {
    * @returns The filtered availabilities map and the list of valid participants to
    *          show in the participant list.
    */
-  const { filteredAvailabilities, validParticipantsForList } = useMemo(() => {
+  const { filteredAvailabilities, gridNumParticipants } = useMemo(() => {
+    const hasSelections = selectedParticipants.length > 0;
+    const isHovering = !hasSelections && hoveredParticipant !== null;
+
+    const active = hasSelections
+      ? selectedParticipants
+      : isHovering
+        ? [hoveredParticipant]
+        : [];
+
+    const targetSet = new Set(active);
+    const isFiltering = active.length > 0;
+
+    const sourceMap = isHovering ? optimisticAvailabilities : globalFilteredMap;
+
+    if (!isFiltering) {
+      return {
+        filteredAvailabilities: sourceMap,
+        gridNumParticipants: optimisticParticipants.length,
+      };
+    }
+
     const finalMap: ResultsAvailabilityMap = {};
-    const validParticipants = new Set<string>();
-
-    for (const [slot, availablePeople] of Object.entries(
-      participantFilteredMap,
-    )) {
-      // Apply Slider Filter
-      if (availablePeople.length < minAvailability) continue;
-
-      // Apply Best Times Filter (using the O(1) cache)
-      if (showOnlyBestTimes && !bestTimesCache.slotsSet.has(slot)) continue;
-
-      finalMap[slot] = availablePeople;
-      availablePeople.forEach((p) => validParticipants.add(p));
+    for (const [slot, availablePeople] of Object.entries(sourceMap)) {
+      const relevantPeople = availablePeople.filter((p) => targetSet.has(p));
+      if (relevantPeople.length > 0) finalMap[slot] = relevantPeople;
     }
 
     return {
       filteredAvailabilities: finalMap,
-      validParticipantsForList: Array.from(validParticipants),
+      gridNumParticipants: active.length,
     };
   }, [
-    participantFilteredMap,
-    minAvailability,
-    showOnlyBestTimes,
-    bestTimesCache,
+    selectedParticipants,
+    hoveredParticipant,
+    optimisticAvailabilities,
+    globalFilteredMap,
+    optimisticParticipants.length,
   ]);
 
   useEffect(() => {
@@ -201,7 +192,7 @@ export function useEventResults(initialData: ResultsInformation) {
     participants: optimisticParticipants,
     availabilities: optimisticAvailabilities,
     filteredAvailabilities,
-    gridNumParticipants: targetParticipants.list.length,
+    gridNumParticipants,
     validParticipantsForList,
 
     // User Info

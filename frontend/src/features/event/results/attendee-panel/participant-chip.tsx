@@ -59,7 +59,7 @@ export default function ParticipantChip({
         !isAvailable && isSelected && "text-violet",
 
         // Slider Inclusion Styling
-        !includedInSlider && "opacity-50",
+        !includedInSlider && "bg-gray-200/25 opacity-50",
 
         // Selection Styling
         isSelected &&

@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { GlobeIcon, SquarePenIcon } from "lucide-react";
+import { GlobeIcon, SlidersHorizontalIcon, SquarePenIcon } from "lucide-react";
 
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
-import { MorphingDrawer } from "@/features/drawer";
+import { FloatingDrawer, MorphingDrawer } from "@/features/drawer";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
+import AvailabilityFilters from "@/features/event/results/availability-filters";
 import { useResultsContext } from "@/features/event/results/context";
 import ConfirmationDialog from "@/features/system-feedback/confirmation/base";
 import { tzEqual } from "@/lib/utils/date-time-format";
@@ -42,6 +43,7 @@ export default function ResultsDrawer({
 
   /* TABS */
   const [activeSnap, setActiveSnap] = useState<number | string | null>(0.22);
+  const [openViewOptions, setOpenViewOptions] = useState(false);
 
   useEffect(() => {
     onSnapChange(activeSnap);
@@ -68,6 +70,43 @@ export default function ResultsDrawer({
   );
 
   /* BUTTONS */
+  const timezoneButton = (
+    <TimeZoneSelector
+      id="timezone-select"
+      value={timezone}
+      onChange={onTimezoneChange}
+      drawerNesting={1}
+      trigger={
+        <EmptyButton
+          buttonStyle={
+            tzChanged ? "bordered semi-transparent" : "semi-transparent"
+          }
+          icon={<GlobeIcon />}
+          aria-label="Change Timezone"
+        />
+      }
+    />
+  );
+
+  const filtersButton = (
+    <FloatingDrawer
+      showOverlay={false}
+      open={openViewOptions}
+      onOpenChange={setOpenViewOptions}
+      title="View Options"
+      description="View Options"
+      trigger={
+        <EmptyButton
+          buttonStyle="semi-transparent"
+          icon={<SlidersHorizontalIcon />}
+          aria-label="View Options"
+        />
+      }
+    >
+      <AvailabilityFilters />
+    </FloatingDrawer>
+  );
+
   const paintingButton = (
     <LinkButton
       buttonStyle="primary"
@@ -101,21 +140,10 @@ export default function ResultsDrawer({
       }
       footerContent={
         <div className="mx-1 flex grow justify-between gap-2">
-          <TimeZoneSelector
-            id="timezone-select"
-            value={timezone}
-            onChange={onTimezoneChange}
-            drawerNesting={1}
-            trigger={
-              <EmptyButton
-                buttonStyle={
-                  tzChanged ? "bordered semi-transparent" : "semi-transparent"
-                }
-                icon={<GlobeIcon />}
-                aria-label="Change Timezone"
-              />
-            }
-          />
+          <div className="flex gap-2">
+            {timezoneButton}
+            {filtersButton}
+          </div>
           {paintingButton}
         </div>
       }
