@@ -35,7 +35,7 @@ export default function Tooltip({
           sideOffset={4}
           className={cn(
             "bg-foreground text-background text-sm",
-            "max-w-screen z-100 rounded-2xl px-2 py-1",
+            "max-w-screen z-[100] rounded-2xl px-2 py-1",
             "shadow-lg will-change-transform",
             "data-[state=delayed-open]:animate-tooltipOpen",
             "data-[state=instant-open]:animate-tooltipOpen",
