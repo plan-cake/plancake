@@ -172,6 +172,17 @@ export function getVersionHistoryData(): VersionHistoryData {
             "Fixed the drawer transition on the mobile results page",
           ],
         },
+        {
+          version: "v0.4.4",
+          releaseDate: { year: 2026, month: 5, day: 12 },
+          changes: [
+            "Added a share menu to the results page",
+            "Added a strict check for cookies being enabled",
+            "Updated the mobile layout on the painting page and event editor",
+            "Updated the appearance of event editor controls",
+            "Removed default dates and times from the new event page",
+          ],
+        },
       ],
     },
   ];
