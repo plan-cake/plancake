@@ -4,9 +4,9 @@ import { ChangePasswordStepProps } from "@/features/account/setting-dialogs/chan
 
 export default function ResetStep({ flow }: ChangePasswordStepProps) {
   return (
-    <div>
+    <div className="w-full text-center">
       <p>Enter your new password!</p>
-      <div className="mt-[25px] flex flex-col justify-center gap-4">
+      <div className="mt-4 flex flex-col justify-center gap-4">
         <TextInputField
           key="newPassword"
           id="newPassword"

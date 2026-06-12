@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils/classname";
 
 export default function OtpStep({ flow }: ChangePasswordStepProps) {
   return (
-    <div>
-      <p>We sent a password reset code to your email. Enter the code below!</p>
+    <div className="w-full text-center">
+      <p>Check your email for the password reset code!</p>
       <div className="mb-6 flex flex-col items-center justify-center gap-2">
         <p
           className={cn(
