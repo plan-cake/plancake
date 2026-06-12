@@ -77,6 +77,29 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
     checkCodeAvailability(newValue);
   };
 
+  const customCodeInfo = (
+    <div className="flex flex-col gap-2">
+      <div>
+        Each Plancake event is identified by a code, used in its unique link.
+      </div>
+      <div>
+        For the code <span className="font-bold">abcd1234</span>, the link would
+        be:{" "}
+        <span className="underline">
+          {window.location.host}/<span className="font-bold">abcd1234</span>
+        </span>
+      </div>
+      {isEditing ? (
+        <div>You can{"'"}t change this code after an event is created.</div>
+      ) : (
+        <div>
+          You can provide a custom code for this event (subject to
+          availability), otherwise we{"'"}ll generate one for you.
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <>
       <div className="flex flex-col gap-1">
@@ -104,34 +127,12 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
               </div>
             </label>
             <InfoPoint
-              title="Custom Event Codes"
-              description="More information about custom event codes"
-              content={
-                <div className="flex max-w-64 flex-col gap-2 p-1">
-                  <div>
-                    Each Plancake event is identified by a code, used in its
-                    unique link.
-                  </div>
-                  <div>
-                    For the code <span className="font-bold">abcd1234</span>,
-                    the link would be:{" "}
-                    <span className="underline">
-                      {window.location.host}/
-                      <span className="font-bold">abcd1234</span>
-                    </span>
-                  </div>
-                  {isEditing ? (
-                    <div>
-                      You can{"'"}t change this code after an event is created.
-                    </div>
-                  ) : (
-                    <div>
-                      You can provide a custom code for this event (subject to
-                      availability), otherwise we{"'"}ll generate one for you.
-                    </div>
-                  )}
-                </div>
+              drawerTitle="Custom Event Codes"
+              drawerDescription="More information about custom event codes"
+              tooltipContent={
+                <div className="max-w-3xs p-1">{customCodeInfo}</div>
               }
+              drawerContent={customCodeInfo}
               className="h-5 w-5 opacity-75"
             />
           </div>

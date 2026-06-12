@@ -7,15 +7,17 @@ import Tooltip from "@/features/system-feedback/tooltip/base";
 
 export default function InfoPoint({
   tooltipSide = "top",
-  title,
-  description,
-  content,
+  drawerTitle,
+  drawerDescription,
+  tooltipContent,
+  drawerContent,
   className,
 }: {
   tooltipSide?: "top" | "bottom";
-  title: string;
-  description: string;
-  content: React.ReactNode;
+  drawerTitle: string;
+  drawerDescription: string;
+  tooltipContent: React.ReactNode;
+  drawerContent: React.ReactNode;
   className?: string;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -31,7 +33,7 @@ export default function InfoPoint({
 
   return (
     <>
-      <Tooltip side={tooltipSide} content={content}>
+      <Tooltip side={tooltipSide} content={tooltipContent}>
         <CircleQuestionMarkIcon
           className={className}
           onClick={() => setDrawerOpen(isTouchDevice)}
@@ -40,10 +42,10 @@ export default function InfoPoint({
       <FloatingDrawer
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
-        title={title}
-        description={description}
+        title={drawerTitle}
+        description={drawerDescription}
       >
-        {content}
+        {drawerContent}
       </FloatingDrawer>
     </>
   );
