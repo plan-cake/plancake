@@ -1,7 +1,7 @@
 import { LayoutDashboardIcon } from "lucide-react";
 
 import LinkButton from "@/features/button/components/link";
-import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
+import ShrinkingHeaderButton from "@/features/header/components/buttons/shrinking-header";
 
 export default function DashboardButton() {
   return (

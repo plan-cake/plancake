@@ -1,25 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
 import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
-import { useResultsContext } from "@/features/event/results/context";
-import { ConfirmationDialog } from "@/features/system-feedback";
+import {
+  useParticipantRemoval,
+  RemoveParticipantDialog,
+} from "@/features/event/results/remove-participant";
 import { cn } from "@/lib/utils/classname";
 
 export default function AttendeesPanel() {
   const {
-    participants,
+    isRemoving,
+    setIsRemoving,
+    personToRemove,
+    isConfirmationOpen,
+    setIsConfirmationOpen,
+    promptRemove,
+    toggleRemoving,
+    confirmRemove,
     currentUser,
-    clearSelectedParticipants,
-    handleRemoveParticipant: onRemoveParticipant,
-  } = useResultsContext();
-
-  /* REMOVING STATES */
-  const [isRemoving, setIsRemoving] = useState(false);
-  const [personToRemove, setPersonToRemove] = useState<string | null>(null);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  } = useParticipantRemoval();
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -27,17 +29,7 @@ export default function AttendeesPanel() {
     };
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, []);
-
-  const promptRemove = (person: string) => {
-    setPersonToRemove(person);
-    setIsConfirmationOpen(true);
-  };
-
-  const toggleRemoving = () => {
-    setIsRemoving(!isRemoving);
-    clearSelectedParticipants();
-  };
+  }, [setIsRemoving]);
 
   return (
     <div
@@ -54,39 +46,13 @@ export default function AttendeesPanel() {
 
       <ParticipantList isRemoving={isRemoving} promptRemove={promptRemove} />
 
-      <ConfirmationDialog
-        type="delete"
-        autoClose={true}
-        title={
-          personToRemove === currentUser ? "Leave Event" : "Remove Participant"
-        }
-        description={
-          personToRemove === currentUser
-            ? "Are you sure you want to leave this event?"
-            : "Are you sure you want to remove " + personToRemove + "?"
-        }
-        open={isConfirmationOpen}
+      <RemoveParticipantDialog
+        personToRemove={personToRemove}
+        currentUser={currentUser}
+        isOpen={isConfirmationOpen}
         onOpenChange={setIsConfirmationOpen}
-        onConfirm={async () => {
-          if (!personToRemove) return false;
-          const success = await onRemoveParticipant(personToRemove);
-          if (success) {
-            if (participants.length === 1) setIsRemoving(false);
-          }
-          return success;
-        }}
-      >
-        <div className="text-center">
-          {personToRemove === currentUser ? (
-            "Are you sure you want to leave this event?"
-          ) : (
-            <span>
-              Are you sure you want to remove{" "}
-              <span className="font-bold">{personToRemove}</span>?
-            </span>
-          )}
-        </div>
-      </ConfirmationDialog>
+        onConfirm={confirmRemove}
+      />
     </div>
   );
 }
