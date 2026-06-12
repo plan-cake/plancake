@@ -47,8 +47,9 @@ export default function DeleteAccountDialog() {
       await clientPost(ROUTES.auth.deleteAccount, {
         password: currentPassword,
       });
-      router.push("/login");
       addToast("success", MESSAGES.SUCCESS_ACCOUNT_DELETE);
+      router.push("/login");
+      router.refresh();
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;

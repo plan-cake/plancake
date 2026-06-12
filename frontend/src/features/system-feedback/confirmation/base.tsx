@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
 
@@ -39,6 +39,7 @@ export default function ConfirmationDialog({
   onOpenChange,
 }: ConfirmationDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
+  const isProcessingRef = useRef(false);
 
   // use controlled state if provided, otherwise local state
   const isControlled = controlledOpen !== undefined;
@@ -59,6 +60,9 @@ export default function ConfirmationDialog({
   }, [handleOpenChange]);
 
   const handleConfirm = useCallback(async () => {
+    // Prevent overlapping execution if Enter is double-pressed or pressed while button is clicked
+    if (isProcessingRef.current) return false;
+
     // If autoClose is enabled, we optimistically close
     // the dialog before calling onConfirm
     if (autoClose) {
@@ -67,11 +71,16 @@ export default function ConfirmationDialog({
       return true;
     }
 
-    const success = await onConfirm();
-    if (success) {
-      handleOpenChange(false);
+    isProcessingRef.current = true;
+    try {
+      const success = await onConfirm();
+      if (success) {
+        handleOpenChange(false);
+      }
+      return success;
+    } finally {
+      isProcessingRef.current = false;
     }
-    return success;
   }, [autoClose, onConfirm, handleOpenChange]);
 
   useEffect(() => {
@@ -90,8 +99,13 @@ export default function ConfirmationDialog({
         return;
       }
 
-      if (e.key === "Escape") handleClose();
-      else if (e.key === "Enter") handleConfirm();
+      if (e.key === "Escape") {
+        e.preventDefault();
+        handleClose();
+      } else if (e.key === "Enter") {
+        e.preventDefault(); // Stop standard button click events from firing simultaneously
+        handleConfirm();
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
