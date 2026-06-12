@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 
-import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
-import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
+import PanelHeader from "@/features/event/results/attendees/panel-header";
+import ParticipantList from "@/features/event/results/attendees/participant-list";
 import {
   useParticipantRemoval,
   RemoveParticipantDialog,
-} from "@/features/event/results/remove-participant";
+} from "@/features/event/results/attendees/remove-participant";
 import { cn } from "@/lib/utils/classname";
 
 export default function AttendeesPanel() {

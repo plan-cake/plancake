@@ -5,15 +5,15 @@ import { ShareIcon, SquarePenIcon } from "lucide-react";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import { FloatingDrawer, MorphingDrawer } from "@/features/drawer";
-import PanelHeader from "@/features/event/results/attendee-panel/panel-header";
-import ParticipantList from "@/features/event/results/attendee-panel/participant-list";
+import PanelHeader from "@/features/event/results/attendees/panel-header";
+import ParticipantList from "@/features/event/results/attendees/participant-list";
 import {
   RemoveParticipantDialog,
   useParticipantRemoval,
-} from "@/features/event/results/remove-participant";
+} from "@/features/event/results/attendees/remove-participant";
 import ShareMenu from "@/features/event/results/share-menu";
 
-export default function ResultsDrawer({
+export default function AttendeesDrawer({
   onSnapChange,
   eventTitle,
   eventCode,

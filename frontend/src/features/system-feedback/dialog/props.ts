@@ -1,4 +1,4 @@
-import { DialogType } from "@/features/system-feedback";
+import type { DialogType } from "@/features/system-feedback";
 
 type CommonDialogProps = {
   /**
