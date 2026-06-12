@@ -69,6 +69,13 @@ type CommonDialogProps = {
    * @default undefined
    */
   overlayClassName?: string;
+  /**
+   * Whether to show a close button in the top-right corner of the dialog.
+   *
+   * @type {boolean}
+   * @default false
+   */
+  showCloseButton?: boolean;
 };
 
 export type BaseDialogProps = CommonDialogProps;

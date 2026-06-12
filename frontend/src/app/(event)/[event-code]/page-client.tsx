@@ -4,10 +4,9 @@ import { useState } from "react";
 
 import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
 
-import CopyToastButton from "@/components/copy-toast-button";
 import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
-import ActionButton from "@/features/button/components/action";
+import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import ScheduleGrid from "@/features/event/grid/grid";
 import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
@@ -19,9 +18,9 @@ import {
   useResultsContext,
 } from "@/features/event/results/context";
 import { ResultsInformation } from "@/features/event/results/lib/types";
+import ShareMenu from "@/features/event/results/share-menu";
 import HeaderSpacer from "@/features/header/components/header-spacer";
-import { useToast } from "@/features/system-feedback";
-import { MESSAGES } from "@/lib/messages";
+import BaseDialog from "@/features/system-feedback/dialog/components/base";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -60,9 +59,6 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     eventRange,
     timeslots,
   } = eventData;
-
-  /* TOAST PROVIDER */
-  const { addToast } = useToast();
 
   /* TIMEZONE HANDLING */
   const handleTZChange = (newTZ: string | number) => {
@@ -110,44 +106,21 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     />
   );
 
-  const shareButton = (buttonStyle: HeaderButtonStyle) => {
-    // Check if sharing is supported
-    if (typeof navigator !== "undefined" && !navigator.share) {
-      /* This condition means it will be rendered until mounted on the client, then it
-       * disappears if not supported. There are more browsers that support the API than
-       * don't, so this is a better trade-off than having the button appear after initial
-       * mount on supported browsers.
-       *
-       * This also won't be visible on mobile anyway, since the buttons are hidden in the
-       * kebab menu.
-       */
-      return null;
-    } else {
-      return (
-        <ActionButton
-          buttonStyle={buttonStyle}
+  const shareButton = (
+    <BaseDialog
+      title="Share Event"
+      description="Share this event with others"
+      trigger={
+        <EmptyButton
+          buttonStyle="secondary"
           icon={<ShareIcon />}
           label="Share Event"
-          onClick={async () => {
-            try {
-              await navigator.share({
-                title: eventTitle,
-                url: window.location.href,
-              });
-            } catch (error) {
-              // An error is thrown if sharing is cancelled, ignore that
-              if (error instanceof Error && error.name !== "AbortError") {
-                addToast("error", MESSAGES.ERROR_GENERIC);
-              }
-            }
-          }}
         />
-      );
-    }
-  };
-
-  const copyButton = (buttonStyle: HeaderButtonStyle) => (
-    <CopyToastButton code={eventCode} buttonStyle={buttonStyle} />
+      }
+      showCloseButton
+    >
+      <ShareMenu eventTitle={eventTitle} eventCode={eventCode} />
+    </BaseDialog>
   );
 
   return (
@@ -158,18 +131,15 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       <div className="flex flex-row justify-between gap-2 md:flex-wrap">
         <h1 className="text-2xl font-bold">{eventTitle}</h1>
 
-        <div className="md:hidden">
-          <KebabMenu>
-            {isCreator && editButton("frosted glass inset")}
-            {shareButton("frosted glass inset")}
-            {copyButton("frosted glass inset")}
-          </KebabMenu>
-        </div>
+        {isCreator && (
+          <div className="md:hidden">
+            <KebabMenu>{editButton("frosted glass inset")}</KebabMenu>
+          </div>
+        )}
 
         <div className="ml-auto hidden flex-wrap justify-end gap-2 md:flex">
           {isCreator && editButton("secondary")}
-          {shareButton("secondary")}
-          {copyButton("secondary")}
+          {shareButton}
           {paintingButton}
         </div>
       </div>
@@ -188,6 +158,13 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           timeslots={timeslots}
         />
 
+        <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm md:hidden">
+          <DisplaySettings
+            timezone={timezone}
+            onTimezoneChange={handleTZChange}
+          />
+        </div>
+
         {/* Mobile Spacer & Drawer */}
         <div
           className="w-full md:hidden"
@@ -195,9 +172,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         />
         <div className="md:hidden">
           <AttendeesDrawer
-            timezone={timezone}
-            onTimezoneChange={handleTZChange}
             onSnapChange={setDrawerSnap}
+            eventTitle={eventTitle}
             eventCode={eventCode}
           />
         </div>
