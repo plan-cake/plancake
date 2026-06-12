@@ -6,11 +6,12 @@ import { CheckIcon, ChevronDownIcon } from "lucide-react";
 import { DropdownProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
-export default function Dropdown<TValue extends string | number>({
+export default function Dropdown<TValue extends string | number | null>({
   id,
   onChange,
   value,
   options,
+  placeholder,
   disabled,
   className,
 }: DropdownProps<TValue>) {
@@ -19,6 +20,7 @@ export default function Dropdown<TValue extends string | number>({
       value={value?.toString()}
       onValueChange={(v) => {
         // parse value back to number when possible, then cast to TValue
+        if (v === "") return onChange(null as TValue);
         const parsed = isNaN(Number(v)) ? v : Number(v);
         onChange(parsed as unknown as TValue);
       }}
@@ -37,8 +39,13 @@ export default function Dropdown<TValue extends string | number>({
         aria-label="Custom select"
         disabled={disabled}
       >
-        <span className="flex-1 truncate text-wrap pr-2">
-          <Select.Value placeholder="placeholder" />
+        <span
+          className={cn(
+            "flex-1 truncate text-wrap pr-2",
+            value === null && "text-foreground/60",
+          )}
+        >
+          <Select.Value placeholder={placeholder} />
         </span>
 
         <Select.Icon className="flex-shrink-0">
@@ -50,7 +57,10 @@ export default function Dropdown<TValue extends string | number>({
         <Select.Content className="bg-background z-50 max-h-60 overflow-auto rounded-2xl border border-gray-400 shadow-lg dark:shadow-violet-700">
           <Select.Viewport className="p-1">
             {options.map((option) => (
-              <DropdownItem key={option.value.toString()} value={option.value}>
+              <DropdownItem
+                key={option.value?.toString() || ""}
+                value={option.value}
+              >
                 {option.label}
               </DropdownItem>
             ))}
@@ -62,7 +72,7 @@ export default function Dropdown<TValue extends string | number>({
 }
 
 type DropdownItemProps = {
-  value: string | number;
+  value: string | number | null;
   children: React.ReactNode;
 };
 
@@ -71,10 +81,10 @@ const DropdownItem = forwardRef<HTMLDivElement, DropdownItemProps>(
     return (
       <Select.Item
         ref={ref}
-        value={value.toString()}
+        value={value?.toString() || ""}
         className={cn(
           "data-[highlighted]:bg-accent relative flex h-[30px] select-none items-center rounded-xl px-6 leading-none",
-          "hover:outline-none data-[disabled]:pointer-events-none data-[disabled]:text-gray-400 data-[highlighted]:text-white",
+          "data-[disabled]:text-foreground/60 hover:outline-none data-[disabled]:pointer-events-none data-[highlighted]:text-white",
           "data-[highlighted]:outline-foreground data-[highlighted]:outline-2 data-[highlighted]:outline-offset-2",
           "focus-visible:outline-foreground focus-visible:rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2",
         )}

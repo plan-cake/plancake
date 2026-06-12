@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { TriangleAlertIcon } from "lucide-react";
@@ -14,7 +14,9 @@ import TimeColumn from "@/features/event/grid/time-column";
 import InteractiveTimeBlock from "@/features/event/grid/timeblocks/interactive";
 import PreviewTimeBlock from "@/features/event/grid/timeblocks/preview";
 import ResultsTimeBlock from "@/features/event/grid/timeblocks/results";
+import { getHighestMatchCount } from "@/features/event/results/lib/utils";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
 interface ScheduleGridProps {
@@ -24,6 +26,8 @@ interface ScheduleGridProps {
   isWeekdayEvent?: boolean;
 
   disableSelect?: boolean;
+
+  unselectedRange?: boolean;
 
   // for "view" mode
   availabilities?: ResultsAvailabilityMap;
@@ -61,6 +65,7 @@ export default function ScheduleGrid({
   timezone,
   mode = "preview",
   isWeekdayEvent = false,
+  unselectedRange = false,
   availabilities = {},
   numParticipants = 0,
   hoveredSlot,
@@ -94,7 +99,36 @@ export default function ScheduleGrid({
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < totalPages - 1;
 
-  if (error) return <GridError message={error} />;
+  // Check if the scrollbar is present to pass to the header
+  const [scrollbarPresent, setScrollbarPresent] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const checkScrollbar = () =>
+      // Include mobile check because it will report true even if the scrollbar is hidden
+      setScrollbarPresent(el.scrollHeight > el.clientHeight && !isMobile);
+    const resizeObserver = new ResizeObserver(checkScrollbar);
+    resizeObserver.observe(el);
+    checkScrollbar();
+
+    return () => resizeObserver.disconnect();
+  });
+
+  if (unselectedRange)
+    return (
+      <GridMessage
+        error={false}
+        message={
+          isWeekdayEvent
+            ? MESSAGES.INFO_UNSELECTED_WEEK_RANGE
+            : MESSAGES.INFO_UNSELECTED_DATE_RANGE
+        }
+      />
+    );
+
+  if (error) return <GridMessage error={true} message={error} />;
 
   return (
     <div
@@ -108,6 +142,7 @@ export default function ScheduleGrid({
         visibleDays={visibleDays}
         currentPage={currentPage}
         totalPages={totalPages}
+        scrollbarPresent={scrollbarPresent}
         isWeekdayEvent={isWeekdayEvent}
         onPrevPage={() => paginate(-1)}
         onNextPage={() => paginate(1)}
@@ -115,9 +150,11 @@ export default function ScheduleGrid({
       />
 
       <div
+        ref={scrollRef}
         className={cn(
-          "relative flex-grow select-none overflow-x-hidden pb-1 pt-2",
-          mode === "preview" ? "overflow-y-auto" : "overflow-y-hidden",
+          "relative flex-grow select-none overflow-x-hidden pt-2",
+          !isMobile ? "overflow-y-auto" : "overflow-y-hidden",
+          mode === "preview" ? "pb-1" : "pb-6",
         )}
       >
         <div className="z-5 pointer-events-none absolute left-0 top-2 flex w-full flex-col gap-4">
@@ -171,6 +208,7 @@ export default function ScheduleGrid({
                       hoveredSlot={hoveredSlot}
                       availabilities={availabilities}
                       numParticipants={numParticipants}
+                      highestMatchCount={getHighestMatchCount(availabilities)}
                       onHoverSlot={setHoveredSlot}
                     />
                   );
@@ -184,9 +222,20 @@ export default function ScheduleGrid({
   );
 }
 
-const GridError = ({ message }: { message: string }) => (
-  <div className="flex h-full w-full items-center justify-center text-sm">
-    <TriangleAlertIcon className="text-error mr-2 h-5 w-5" />
+const GridMessage = ({
+  error,
+  message,
+}: {
+  error: boolean;
+  message: string;
+}) => (
+  <div
+    className={cn(
+      "flex h-full w-full items-center justify-center gap-2 text-center text-sm",
+      !error && "opacity-75",
+    )}
+  >
+    {error && <TriangleAlertIcon className="text-error h-5 w-5" />}
     {message}
   </div>
 );
