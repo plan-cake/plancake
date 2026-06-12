@@ -1,4 +1,4 @@
-import { CheckIcon, EraserIcon, LogOutIcon, Undo2Icon } from "lucide-react";
+import { CheckIcon, DoorOpenIcon, EraserIcon, Undo2Icon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { useResultsContext } from "@/features/event/results/context";
@@ -125,11 +125,11 @@ export default function PanelHeader({
           {showSelfRemove && (
             <ActionButton
               buttonStyle="semi-transparent"
-              icon={<LogOutIcon />}
+              icon={<DoorOpenIcon />}
               onClick={() => {
                 promptRemove(currentUser);
               }}
-              aria-label="Remove Self from Event"
+              aria-label="Leave Event"
               className="hover:bg-error/25 hover:text-error active:bg-error/40 shrink-0"
             />
           )}

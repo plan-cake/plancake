@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
 import Checkbox from "@/components/checkbox";
-import MobileFooterTray from "@/components/mobile-footer-tray";
+import MobileFooterIsland from "@/components/mobile-footer-island";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
@@ -16,7 +16,6 @@ import { validateAvailabilityData } from "@/features/event/availability/validate
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
 import HeaderSpacer from "@/features/header/components/header-spacer";
-import { useHeaderSize } from "@/features/header/context";
 import {
   ConfirmationDialog,
   RateLimitBanner,
@@ -27,7 +26,6 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { SelfAvailability } from "@/lib/utils/api/types";
-import { cn } from "@/lib/utils/classname";
 import { timeslotToISOString } from "@/lib/utils/date-time-format";
 import type { Session } from "@/lib/utils/get-session";
 
@@ -47,9 +45,6 @@ export default function ClientPage({
   initialData: SelfAvailability | null;
 }) {
   const router = useRouter();
-
-  // HEADER SIZE CONTEXT
-  const { topMarginClass } = useHeaderSize();
 
   // AVAILABILITY STATE
   const { state, setDisplayName, setTimeZone, toggleSlot } = useAvailability(
@@ -246,7 +241,7 @@ export default function ClientPage({
   );
 
   return (
-    <div className="flex flex-col space-y-4 pl-6 pr-6">
+    <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
       <HeaderSpacer />
 
       {/* Rate Limit Error */}
@@ -264,49 +259,19 @@ export default function ClientPage({
       </div>
 
       {/* Main Content */}
-      <div className="mb-12 flex h-fit flex-col gap-4 md:mb-0 md:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 md:mb-0 md:flex-row">
         {/* Left Panel */}
-        <div
-          className={cn(
-            topMarginClass,
-            "h-fit w-full shrink-0 space-y-4 overflow-y-auto md:sticky md:w-80",
-          )}
-        >
-          <div className="space-y-2">
-            <div className="w-fit">
-              <p
-                className={`text-error text-right text-xs ${errors.displayName ? "visible" : "invisible"}`}
-              >
-                {errors.displayName ? errors.displayName : "Error Placeholder"}
-              </p>
-              Hi,{" "}
-              <input
-                required
-                type="text"
-                value={displayName}
-                onChange={(e) => {
-                  setDisplayName(e.target.value);
-                  handleNameChange(e.target.value);
-                }}
-                placeholder="add your name"
-                className={`inline-block w-auto border-b bg-transparent px-1 focus:outline-none ${
-                  errors.displayName
-                    ? "border-error placeholder:text-error"
-                    : "border-gray-400"
-                }`}
-              />
-              <br />
-              add your availabilities here
-            </div>
-            {session.isLoggedIn && !session.user.defaultName && (
-              <div className="text-foreground/75">
-                <Checkbox
-                  label="Save as nickname for autofill"
-                  checked={saveDefaultName}
-                  onChange={(checked) => setSaveDefaultName(checked)}
-                ></Checkbox>
-              </div>
-            )}
+        <div className="h-fit w-full shrink-0 space-y-4 overflow-y-auto md:sticky md:w-80">
+          <div className="hidden md:block">
+            <DisplayNameInput
+              errors={errors}
+              session={session}
+              displayName={displayName}
+              setDisplayName={setDisplayName}
+              handleNameChange={handleNameChange}
+              saveDefaultName={saveDefaultName}
+              setSaveDefaultName={setSaveDefaultName}
+            />
           </div>
 
           <div className="bg-panel rounded-3xl p-6 text-sm">
@@ -338,7 +303,22 @@ export default function ClientPage({
 
       {/* This z-index is necessary to avoid the time column overlapping */}
       <div className="z-10">
-        <MobileFooterTray buttons={[cancelButton, submitButton]} />
+        <MobileFooterIsland
+          leftButtons={[cancelButton]}
+          rightButtons={[submitButton]}
+        >
+          <div className="mx-3 -mt-2">
+            <DisplayNameInput
+              errors={errors}
+              session={session}
+              displayName={displayName}
+              setDisplayName={setDisplayName}
+              handleNameChange={handleNameChange}
+              saveDefaultName={saveDefaultName}
+              setSaveDefaultName={setSaveDefaultName}
+            />
+          </div>
+        </MobileFooterIsland>
       </div>
 
       <ConfirmationDialog
@@ -367,6 +347,65 @@ export default function ClientPage({
           return true;
         }}
       />
+    </div>
+  );
+}
+
+function DisplayNameInput({
+  errors,
+  session,
+  displayName,
+  setDisplayName,
+  handleNameChange,
+  saveDefaultName,
+  setSaveDefaultName,
+}: {
+  errors: Record<string, string>;
+  session: Session;
+  displayName: string;
+  setDisplayName: (name: string) => void;
+  handleNameChange: (name: string) => void;
+  saveDefaultName: boolean;
+  setSaveDefaultName: (save: boolean) => void;
+}) {
+  return (
+    <div className="h-fit w-full shrink-0 space-y-4 overflow-y-auto md:w-80">
+      <div className="space-y-2">
+        <div className="w-fit">
+          <p
+            className={`text-error text-right text-xs ${errors.displayName ? "visible" : "invisible"}`}
+          >
+            {errors.displayName ? errors.displayName : "Error Placeholder"}
+          </p>
+          Hi,{" "}
+          <input
+            required
+            type="text"
+            value={displayName}
+            onChange={(e) => {
+              setDisplayName(e.target.value);
+              handleNameChange(e.target.value);
+            }}
+            placeholder="add your name"
+            className={`inline-block w-auto border-b bg-transparent px-1 focus:outline-none ${
+              errors.displayName
+                ? "border-error placeholder:text-error"
+                : "border-gray-400"
+            }`}
+          />
+          <br />
+          add your availabilities here
+        </div>
+        {session.isLoggedIn && !session.user.defaultName && (
+          <div className="text-foreground/75">
+            <Checkbox
+              label="Save as nickname for autofill"
+              checked={saveDefaultName}
+              onChange={(checked) => setSaveDefaultName(checked)}
+            ></Checkbox>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
