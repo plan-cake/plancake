@@ -10,4 +10,4 @@ export type BaseFeedbackType = "success" | "error" | "info";
 /* EXTENDED FEEDBACK TYPES */
 export type BannerType = BaseFeedbackType;
 export type ToastType = BaseFeedbackType | "copy";
-export type ConfirmationDialogType = BaseFeedbackType | "warning" | "delete";
+export type DialogType = BaseFeedbackType | "warning" | "delete";

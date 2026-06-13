@@ -7,6 +7,7 @@ import handleErrorResponse from "@/lib/utils/api/handle-api-error";
 import { processDashboardData } from "@/lib/utils/api/processors/process-dashboard-data";
 import { serverGet } from "@/lib/utils/api/server-fetch";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
+import { getSession } from "@/lib/utils/get-session";
 
 // Explicitly set this page to be dynamic so Next.js doesn't try to statically build it
 export const dynamic = "force-dynamic";
@@ -16,12 +17,13 @@ export function generateMetadata(): Metadata {
 }
 
 export default async function Page() {
+  const session = await getSession();
   try {
     const eventData = await serverGet(ROUTES.dashboard.get, undefined, {
       cache: "no-store",
     });
     const processedData = processDashboardData(eventData);
-    return <ClientPage {...processedData} />;
+    return <ClientPage {...processedData} logged_in={session.isLoggedIn} />;
   } catch (e) {
     const error = e as ApiErrorResponse;
     handleErrorResponse(error.status, error.data);
