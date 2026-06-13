@@ -27,7 +27,11 @@ export const MESSAGES = {
   ERROR_EVENT_NAME_MISSING: "Missing event name.",
   ERROR_EVENT_NAME_LENGTH: `Event name must be under ${MAX_TITLE_LENGTH} characters.`,
   ERROR_EVENT_CODE_TAKEN: "This code is unavailable. Please choose another.",
+  ERROR_EVENT_DATES_MISSING: "Please select possible dates for this event.",
+  ERROR_EVENT_WEEKDAYS_MISSING: "Please select possible days for this event.",
+  ERROR_EVENT_TIMES_MISSING: "Please select possible times for this event.",
   ERROR_EVENT_RANGE_INVALID: "Please select a valid date/time range.",
+  ERROR_EVENT_TIMES_INVALID: "Please select a valid time range.",
   ERROR_EVENT_RANGE_TOO_LONG: `Too many days selected. Max is ${MAX_DURATION}.`,
 
   // default name errors
@@ -56,9 +60,16 @@ export const MESSAGES = {
   INFO_NOT_LOGGED_IN: "You are not logged in.",
   INFO_EVENT_PASSED: "All dates in this event have passed.",
   INFO_ADD_AVAILABILITY: "Add your availability by clicking the button above.",
-  INFO_ADD_AVAILABILITY_MOBILE: "Add your availability by clicking the button below.",
+  INFO_ADD_AVAILABILITY_MOBILE:
+    "Add your availability by clicking the button below.",
   INFO_COPY_SHARE_LINK: "Copy and share the link so others can join!",
-  INFO_NO_MUTUAL_AVAILABILITY: "There are no times with more than 1 person available. The plans are NOT making it out of the group chat...",
+  INFO_UNSELECTED_DATE_RANGE:
+    "Select dates and times to see a preview of the event grid.",
+  INFO_UNSELECTED_WEEK_RANGE:
+    "Select days and times to see a preview of the event grid.",
+  INFO_NO_MUTUAL_AVAILABILITY:
+    "There are no times with more than 1 person available. The plans are NOT making it out of the group chat...",
   INFO_NO_IDEAL_TIMES: "There are no times where everyone is available.",
-  INFO_NO_IDEAL_TIMES_BANNER: "There are no times where everyone is available. Times with an indicator are the best options.",
+  INFO_NO_IDEAL_TIMES_BANNER:
+    "There are no times where everyone is available. Times with an indicator are the best options.",
 };

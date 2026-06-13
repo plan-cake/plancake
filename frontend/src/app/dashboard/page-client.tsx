@@ -5,7 +5,6 @@ import { startTransition, useOptimistic, useRef, useState } from "react";
 import Link from "next/link";
 
 import SegmentedControl from "@/components/segmented-control";
-import { useAccount } from "@/features/account/context";
 import { DashboardEventProps } from "@/features/dashboard/components/event";
 import EventGrid from "@/features/dashboard/components/event-grid";
 import { deleteEvent } from "@/features/dashboard/delete-event";
@@ -27,7 +26,8 @@ export type DashboardPageProps = {
 export default function ClientPage({
   created_events,
   participated_events,
-}: DashboardPageProps) {
+  logged_in,
+}: DashboardPageProps & { logged_in: boolean }) {
   const [optimisticCreatedEvents, deleteOptimisticCreatedEvent] = useOptimistic(
     created_events,
     (state, eventToDelete: string) => {
@@ -47,8 +47,6 @@ export default function ClientPage({
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const eventToDelete = useRef<string | null>(null);
   const { addToast } = useToast();
-
-  const { loginState } = useAccount();
 
   const currentTabEvents =
     tab === "created" ? optimisticCreatedEvents : optimisticParticipatedEvents;
@@ -82,7 +80,7 @@ export default function ClientPage({
     <div className="flex min-h-screen flex-col gap-4 px-6 pb-4">
       <HeaderSpacer />
       <h1 className="text-2xl font-bold">Dashboard</h1>
-      {loginState === "logged_out" && (
+      {!logged_in && (
         <Banner type="info" title="Logged in as a Guest">
           <div>
             This data is only available from this browser.{" "}
@@ -100,34 +98,28 @@ export default function ClientPage({
           </div>
         </Banner>
       )}
-      <div className="bg-panel w-full rounded-3xl">
-        <div className="px-2 pt-2">
-          <SegmentedControl
-            value={tab}
-            onChange={setTab}
-            options={[
-              { label: "My Events", value: "created" },
-              { label: "Others' Events", value: "participated" },
-            ]}
-          />
-        </div>
-        <div className="p-4 pt-2">
-          {currentTabEvents.length ? (
-            <EventGrid
-              events={currentTabEvents}
-              onDeleteEvent={onDeleteEvent}
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-4 p-4 text-center italic opacity-75">
-              <div>
-                {tab === "created"
-                  ? "You haven't created any events yet."
-                  : "You haven't participated in any events yet."}
-              </div>
-              <div>{`When you do, it'll show up here for quick access!`}</div>
+      <div className="bg-panel flex w-full flex-col gap-4 rounded-3xl p-4">
+        <SegmentedControl
+          value={tab}
+          onChange={setTab}
+          options={[
+            { label: "My Events", value: "created" },
+            { label: "Others' Events", value: "participated" },
+          ]}
+          hidePadding
+        />
+        {currentTabEvents.length ? (
+          <EventGrid events={currentTabEvents} onDeleteEvent={onDeleteEvent} />
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-4 p-4 text-center italic opacity-75">
+            <div>
+              {tab === "created"
+                ? "You haven't created any events yet."
+                : "You haven't participated in any events yet."}
             </div>
-          )}
-        </div>
+            <div>{`When you do, it'll show up here for quick access!`}</div>
+          </div>
+        )}
       </div>
       <ConfirmationDialog
         type="delete"

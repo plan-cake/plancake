@@ -27,6 +27,7 @@ export default function BaseDrawer({
   modal = true,
   showOverlay = !frostedGlass && modal,
   nested = false,
+  hideCloseButton = false,
   ...rest
 }: DrawerProps) {
   useDrawerResize();
@@ -235,7 +236,7 @@ export default function BaseDrawer({
                     </Drawer.Description>
                   </div>
 
-                  {_type !== "morphing" && (
+                  {_type !== "morphing" && !hideCloseButton && (
                     <div className="absolute right-4 top-3 z-10">
                       <ActionButton
                         buttonStyle="frosted glass"
