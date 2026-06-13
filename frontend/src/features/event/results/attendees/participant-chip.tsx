@@ -32,7 +32,9 @@ export default function ParticipantChip({
     <li
       style={{ animationDelay: `${delay}s` }}
       onMouseEnter={() => {
-        if (window.matchMedia("(hover: hover)").matches) {
+        if (window.matchMedia("(hover: hover)").matches && includedInSlider) {
+          // Only trigger hover effects on devices that support hover and if the
+          // participant is included in the slider
           onHoverChange(true);
         }
       }}
@@ -40,7 +42,10 @@ export default function ParticipantChip({
       onClick={() => {
         if (isRemoving) {
           onRemove();
-        } else {
+        } else if (includedInSlider || isSelected) {
+          // Only allow clicking if included in the slider OR already selected
+          // (The already selected check allows them to un-click themselves if state
+          // got weird)
           onHoverChange(false);
           onClick();
         }
@@ -59,7 +64,8 @@ export default function ParticipantChip({
         !isAvailable && isSelected && "text-violet",
 
         // Slider Inclusion Styling
-        !includedInSlider && "bg-gray-200/25 opacity-50",
+        !includedInSlider &&
+          "pointer-events-none bg-gray-200/25 opacity-50 grayscale",
 
         // Selection Styling
         isSelected &&
