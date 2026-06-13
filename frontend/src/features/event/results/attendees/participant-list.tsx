@@ -1,4 +1,4 @@
-import ParticipantChip from "@/features/event/results/attendee-panel/participant-chip";
+import ParticipantChip from "@/features/event/results/attendees/participant-chip";
 import { useResultsContext } from "@/features/event/results/context";
 
 export default function ParticipantList({
