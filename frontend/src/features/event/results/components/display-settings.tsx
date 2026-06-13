@@ -1,5 +1,5 @@
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
-import AvailabilityFilters from "@/features/event/results/availability-filters";
+import AvailabilityFilters from "@/features/event/results/components/availability-filters";
 
 export default function DisplaySettings({
   timezone,

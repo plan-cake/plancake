@@ -11,8 +11,8 @@ import {
   RemoveParticipantDialog,
   useParticipantRemoval,
 } from "@/features/event/results/attendees/remove-participant";
-import AvailabilityFilters from "@/features/event/results/availability-filters";
-import ShareMenu from "@/features/event/results/share-menu";
+import AvailabilityFilters from "@/features/event/results/components/availability-filters";
+import ShareMenu from "@/features/event/results/components/share-menu";
 
 export default function AttendeesDrawer({
   onSnapChange,

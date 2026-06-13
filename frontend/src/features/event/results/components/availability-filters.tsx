@@ -55,7 +55,7 @@ export default function AvailabilityFilters() {
   }
 
   return (
-    <div className="flex flex-col gap-4 pb-6">
+    <div className="flex flex-col gap-2 pb-6">
       <Checkbox
         label="Show times that work for everyone"
         checked={showOnlyBestTimes}
@@ -63,7 +63,7 @@ export default function AvailabilityFilters() {
       />
 
       <div>
-        <label htmlFor="min-availability" className="mb-2 block font-medium">
+        <label htmlFor="min-availability" className="mb-2 block font-semibold">
           Minimum Availability
         </label>
         <Slider.Root

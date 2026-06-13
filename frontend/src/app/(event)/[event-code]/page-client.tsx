@@ -18,7 +18,7 @@ import {
   useResultsContext,
 } from "@/features/event/results/context";
 import { ResultsInformation } from "@/features/event/results/lib/types";
-import ShareMenu from "@/features/event/results/share-menu";
+import ShareMenu from "@/features/event/results/components/share-menu";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import BaseDialog from "@/features/system-feedback/dialog/components/base";
 import { cn } from "@/lib/utils/classname";
