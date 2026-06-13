@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { ShareIcon, SquarePenIcon } from "lucide-react";
+import { ShareIcon, SlidersHorizontalIcon, SquarePenIcon } from "lucide-react";
 
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
@@ -11,6 +11,7 @@ import {
   RemoveParticipantDialog,
   useParticipantRemoval,
 } from "@/features/event/results/attendees/remove-participant";
+import AvailabilityFilters from "@/features/event/results/availability-filters";
 import ShareMenu from "@/features/event/results/share-menu";
 
 export default function AttendeesDrawer({
@@ -37,6 +38,7 @@ export default function AttendeesDrawer({
 
   /* TABS */
   const [activeSnap, setActiveSnap] = useState<number | string | null>(0.22);
+  const [openViewOptions, setOpenViewOptions] = useState(false);
 
   useEffect(() => {
     onSnapChange(activeSnap);
@@ -59,6 +61,25 @@ export default function AttendeesDrawer({
       label={(currentUser ? "Edit" : "Add") + " Availability"}
       href={`/${eventCode}/painting`}
     />
+  );
+
+  const filtersButton = (
+    <FloatingDrawer
+      showOverlay={false}
+      open={openViewOptions}
+      onOpenChange={setOpenViewOptions}
+      title="View Options"
+      description="View Options"
+      trigger={
+        <EmptyButton
+          buttonStyle="semi-transparent"
+          icon={<SlidersHorizontalIcon />}
+          aria-label="View Options"
+        />
+      }
+    >
+      <AvailabilityFilters />
+    </FloatingDrawer>
   );
 
   /* SHARE MENU */
@@ -88,22 +109,25 @@ export default function AttendeesDrawer({
       }
       footerContent={
         <div className="mx-1 flex grow justify-between gap-2">
-          <FloatingDrawer
-            title="Share Event"
-            description="Share this event with others"
-            open={shareMenuOpen}
-            onOpenChange={setShareMenuOpen}
-            trigger={
-              <EmptyButton
-                buttonStyle="semi-transparent"
-                icon={<ShareIcon />}
-                aria-label="Share Event"
-              />
-            }
-            nested={true}
-          >
-            <ShareMenu eventTitle={eventTitle} eventCode={eventCode} />
-          </FloatingDrawer>
+          <div className="flex gap-2">
+            <FloatingDrawer
+              title="Share Event"
+              description="Share this event with others"
+              open={shareMenuOpen}
+              onOpenChange={setShareMenuOpen}
+              trigger={
+                <EmptyButton
+                  buttonStyle="semi-transparent"
+                  icon={<ShareIcon />}
+                  aria-label="Share Event"
+                />
+              }
+              nested={true}
+            >
+              <ShareMenu eventTitle={eventTitle} eventCode={eventCode} />
+            </FloatingDrawer>
+            {filtersButton}
+          </div>
           {paintingButton}
         </div>
       }
