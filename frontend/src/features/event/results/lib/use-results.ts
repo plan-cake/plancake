@@ -153,7 +153,7 @@ export function useEventResults(initialData: ResultsInformation) {
     const targetSet = new Set(active);
     const isFiltering = active.length > 0;
 
-    const sourceMap = isHovering ? optimisticAvailabilities : globalFilteredMap;
+    const sourceMap = globalFilteredMap;
 
     if (!isFiltering) {
       return {
