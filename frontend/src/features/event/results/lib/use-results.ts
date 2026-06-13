@@ -175,16 +175,21 @@ export function useEventResults(initialData: ResultsInformation) {
   }, [
     selectedParticipants,
     hoveredParticipant,
-    optimisticAvailabilities,
     globalFilteredMap,
     optimisticParticipants.length,
   ]);
 
+  // show toast if user toggles on best times but there are no mutual availability
   useEffect(() => {
     if (showOnlyBestTimes && bestTimesCache.hasNoConsensus) {
       addToast("info", MESSAGES.INFO_NO_MUTUAL_AVAILABILITY);
     }
   }, [bestTimesCache.hasNoConsensus, showOnlyBestTimes, addToast]);
+
+  // clamp min availability to never to higher than the total participants
+  useEffect(() => {
+    setMinAvailability((prev) => Math.min(prev, optimisticParticipants.length));
+  }, [optimisticParticipants.length]);
 
   return {
     // Data
