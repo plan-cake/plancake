@@ -15,16 +15,14 @@ export default function AvailabilityFilters() {
   return (
     <div className="flex flex-col gap-4">
       <Checkbox
-        label="Only show best times"
+        label="Show times that work for everyone"
         checked={showOnlyBestTimes}
         onChange={setShowOnlyBestTimes}
       />
 
       <div>
         <label htmlFor="min-availability" className="mb-1 block font-medium">
-          Show times with at least{" "}
-          <span className="text-accent font-bold">{minAvailability}</span>{" "}
-          {minAvailability === 1 ? "person" : "people"}
+          Minimum Availability
         </label>
         <Slider.Root
           className="relative flex h-5 w-full touch-none select-none items-center"
