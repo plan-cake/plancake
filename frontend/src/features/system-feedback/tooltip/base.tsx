@@ -15,6 +15,11 @@ type TooltipProps = {
    */
   content: React.ReactNode;
   /**
+   * Optional maximum height for the tooltip. If the content is taller than this, it will
+   * become scrollable.
+   */
+  maxHeight?: string;
+  /**
    * The element that triggers the tooltip when hovered.
    */
   children: React.ReactNode;
@@ -23,6 +28,7 @@ type TooltipProps = {
 export default function Tooltip({
   side = "bottom",
   content,
+  maxHeight,
   children,
 }: TooltipProps) {
   return (
@@ -35,14 +41,19 @@ export default function Tooltip({
           sideOffset={4}
           className={cn(
             "bg-foreground text-background text-sm",
-            "max-w-screen z-[100] rounded-2xl px-2 py-1",
+            "max-w-screen z-[100] rounded-2xl",
             "shadow-lg will-change-transform",
             "data-[state=delayed-open]:animate-tooltipOpen",
             "data-[state=instant-open]:animate-tooltipOpen",
             "data-[state=closed]:animate-tooltipClose",
           )}
         >
-          {content}
+          <div
+            className={cn("px-2 py-1", maxHeight && "overflow-y-auto")}
+            style={maxHeight ? { maxHeight } : undefined}
+          >
+            {content}
+          </div>
           <TooltipPrimitive.Arrow className="fill-foreground" />
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>
