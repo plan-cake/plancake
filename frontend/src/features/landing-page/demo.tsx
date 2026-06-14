@@ -8,70 +8,52 @@ import ActionButton from "@/features/button/components/action";
 import ScheduleGrid from "@/features/event/grid/grid";
 import ParticipantChip from "@/features/event/results/attendees/participant-chip";
 
-export default function Demo() {
-  const timeslots = [];
+const PARTICIPANTS = ["Mickey", "Goofy", "Donald", "You"];
 
+const generateTimeslots = () => {
+  const slots = [];
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 12; j++) {
       const date = new Date(2025, 9, 19 + i, 8);
       // advance by 15 minutes each
       date.setMinutes(date.getMinutes() + j * 15);
-      timeslots.push(date);
+      slots.push(date);
     }
   }
+  return slots;
+};
 
-  const [userAvailability, setUserAvailability] = useState<Set<string>>(
-    new Set(),
-  );
-
-  const participants = ["Mickey", "Goofy", "Donald", "You"];
-  const [currentlyAvailable, setCurrentlyAvailable] = useState<string[]>([
-    "Mickey",
-    "Goofy",
-    "Donald",
-    "You",
-  ]);
-
-  const newAvailabilities: Record<string, string[]> = {};
+const generateAvailabilities = (timeslots: Date[]) => {
+  const availabilities: Record<string, string[]> = {};
   for (let i = 0; i < timeslots.length; i++) {
     const slotIso = timeslots[i].toISOString();
     const available = [];
-    if ((i >= 4 && i < 22) || (i >= 28 && i < 34)) available.push("Mickey");
-    if ((i >= 0 && i < 20) || (i >= 30 && i < 36)) available.push("Goofy");
+    if ((i >= 4 && i < 22) || (i >= 28 && i < 34))
+      available.push(PARTICIPANTS[0]);
+    if ((i >= 0 && i < 20) || (i >= 30 && i < 36))
+      available.push(PARTICIPANTS[1]);
     if ((i >= 3 && i < 12) || (i >= 15 && i < 23) || (i >= 26 && i < 34))
-      available.push("Donald");
-    newAvailabilities[slotIso] = available;
+      available.push(PARTICIPANTS[2]);
+    availabilities[slotIso] = available;
   }
+  return availabilities;
+};
 
-  const [availabilities, setAvailabilities] =
-    useState<Record<string, string[]>>(newAvailabilities);
+const TIMESLOTS = generateTimeslots();
+const INITIAL_AVAILABILITIES = generateAvailabilities(TIMESLOTS);
 
-  const handleAvailabilitySubmit = () => {
-    setAvailabilities((prev) => {
-      for (const slotIso of Object.keys(prev)) {
-        if (userAvailability.has(slotIso)) {
-          if (!prev[slotIso].includes("You"))
-            prev[slotIso] = [...prev[slotIso], "You"];
-        } else {
-          prev[slotIso] = prev[slotIso].filter((p) => p !== "You");
-        }
-      }
-      return { ...prev };
-    });
-  };
-
+export default function Demo() {
+  const [userAvailability, setUserAvailability] = useState<Set<string>>(
+    new Set(),
+  );
+  const [availabilities, setAvailabilities] = useState<
+    Record<string, string[]>
+  >(INITIAL_AVAILABILITIES);
+  const [currentlyAvailable, setCurrentlyAvailable] =
+    useState<string[]>(PARTICIPANTS);
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
 
-  const handleSlotHover = (slotIso: string | null) => {
-    setHoveredSlot(slotIso);
-    if (slotIso) {
-      setCurrentlyAvailable(availabilities[slotIso]);
-    } else {
-      setCurrentlyAvailable(participants);
-    }
-  };
-
-  const toggleSlot = (slotIso: string, togglingOn: boolean) => {
+  const paintSlot = (slotIso: string, togglingOn: boolean) => {
     setUserAvailability((prev) => {
       const newSet = new Set(prev);
       if (togglingOn) {
@@ -81,6 +63,30 @@ export default function Demo() {
       }
       return newSet;
     });
+  };
+
+  const handleAvailabilitySubmit = () => {
+    const you = PARTICIPANTS[3];
+
+    setAvailabilities((prev) => {
+      for (const slotIso of Object.keys(prev)) {
+        if (userAvailability.has(slotIso)) {
+          if (!prev[slotIso].includes(you)) prev[slotIso].push(you);
+        } else {
+          prev[slotIso] = prev[slotIso].filter((p) => p !== you);
+        }
+      }
+      return { ...prev };
+    });
+  };
+
+  const handleResultsHover = (slotIso: string | null) => {
+    setHoveredSlot(slotIso);
+    if (slotIso) {
+      setCurrentlyAvailable(availabilities[slotIso]);
+    } else {
+      setCurrentlyAvailable(PARTICIPANTS);
+    }
   };
 
   const step1 = (
@@ -112,10 +118,10 @@ export default function Demo() {
       <ScheduleGrid
         mode="paint"
         staticHeader
-        timeslots={timeslots}
+        timeslots={TIMESLOTS}
         timezone="America/New_York"
         userAvailability={userAvailability}
-        onToggleSlot={toggleSlot}
+        onToggleSlot={paintSlot}
       />
       <div className="-mt-2 flex items-center justify-center gap-2">
         <ActionButton
@@ -138,15 +144,15 @@ export default function Demo() {
       <ScheduleGrid
         mode="view"
         staticHeader
-        timeslots={timeslots}
+        timeslots={TIMESLOTS}
         timezone="America/New_York"
         availabilities={availabilities}
         numParticipants={4}
         hoveredSlot={hoveredSlot}
-        setHoveredSlot={handleSlotHover}
+        setHoveredSlot={handleResultsHover}
       />
       <div className="pointer-events-none -mt-2 flex flex-wrap items-center justify-center gap-2 px-2">
-        {participants.map((p) => (
+        {PARTICIPANTS.map((p) => (
           <ParticipantChip
             key={p}
             areSelected={false}
