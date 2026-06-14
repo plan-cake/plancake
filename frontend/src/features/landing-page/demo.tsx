@@ -109,6 +109,7 @@ export default function Demo() {
             </div>
             <ScheduleGrid
               mode="paint"
+              staticHeader
               timeslots={timeslots}
               timezone="America/New_York"
               userAvailability={userAvailability}
@@ -148,6 +149,7 @@ export default function Demo() {
             </div>
             <ScheduleGrid
               mode="view"
+              staticHeader
               timeslots={timeslots}
               timezone="America/New_York"
               availabilities={availabilities}
