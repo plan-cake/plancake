@@ -84,7 +84,7 @@ export default function Demo() {
   };
 
   const step1 = (
-    <div className="bg-background mx-auto w-fit rounded-full px-4 py-2 text-center">
+    <div className="bg-background rounded-4xl mx-auto w-fit px-4 py-2 text-center">
       <div className="text-lg font-bold">1. Create your event</div>
       <div className="text-sm opacity-75">
         Pick a range of dates and times you think might work.
@@ -93,7 +93,7 @@ export default function Demo() {
   );
 
   const step2 = (
-    <div className="bg-background mx-auto w-fit rounded-full px-4 py-2 text-center">
+    <div className="bg-background rounded-4xl mx-auto w-fit px-4 py-2 text-center">
       <div className="text-lg font-bold">2. Share with your friends</div>
       <div className="text-sm opacity-75">
         Anyone can join from the event link, no account required.
@@ -102,7 +102,7 @@ export default function Demo() {
   );
 
   const step3 = (
-    <div className="bg-background h-fit rounded-3xl p-4">
+    <div className="bg-background rounded-4xl h-fit p-4">
       <div className="text-center">
         <div className="text-lg font-bold">3. Paint your availability</div>
         <div className="text-sm opacity-75">
@@ -128,7 +128,7 @@ export default function Demo() {
   );
 
   const step4 = (
-    <div className="bg-background w-full rounded-3xl p-4">
+    <div className="bg-background rounded-4xl w-full p-4">
       <div className="text-center">
         <div className="text-lg font-bold">4. Watch the results stack up</div>
         <div className="text-sm opacity-75">
@@ -165,7 +165,7 @@ export default function Demo() {
   );
 
   return (
-    <div className="rounded-4xl bg-panel flex flex-col gap-8 p-8">
+    <div className="bg-panel flex flex-col gap-8 rounded-[4rem] p-8">
       <div className="text-center text-xl font-bold">
         Here&apos;s how it works:
       </div>
