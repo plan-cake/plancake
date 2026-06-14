@@ -53,7 +53,10 @@ export default function ParticipantRow({
 
   if (participants.length > 0) {
     rowContent = (
-      <Tooltip content={<TooltipContent participants={participants} />}>
+      <Tooltip
+        content={<TooltipContent participants={participants} />}
+        maxHeight="384px"
+      >
         {rowContent}
       </Tooltip>
     );
