@@ -79,24 +79,20 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
 
   const customCodeInfo = (
     <div className="flex flex-col gap-2">
-      <div>
-        Each Plancake event is identified by a code, used in its unique link.
-      </div>
-      <div>
-        For the code <span className="font-bold">abcd1234</span>, the link would
-        be:{" "}
-        <span className="underline">
-          {typeof window === "undefined" ? "" : window.location.host}/
-          <span className="font-bold">abcd1234</span>
-        </span>
-      </div>
       {isEditing ? (
-        <div>You can{"'"}t change this code after an event is created.</div>
+        <div>The event code cannot be changed after the event is created.</div>
       ) : (
-        <div>
-          You can provide a custom code for this event (subject to
-          availability), otherwise we{"'"}ll generate one for you.
-        </div>
+        <>
+          <div>You have the option to customize your event link.</div>
+          <div>
+            For example, the link for custom code{" "}
+            <span className="font-bold">breakfast</span> would be:{" "}
+            <span className="underline">
+              {typeof window === "undefined" ? "" : window.location.host}/
+              <span className="font-bold">breakfast</span>
+            </span>
+          </div>
+        </>
       )}
     </div>
   );
