@@ -17,6 +17,7 @@ interface ScheduleHeaderProps {
   currentPage: number;
   totalPages: number;
   scrollbarPresent?: boolean;
+  isStatic?: boolean;
   isWeekdayEvent?: boolean;
   onPrevPage: () => void;
   onNextPage: () => void;
@@ -44,6 +45,7 @@ export default function ScheduleHeader({
   currentPage,
   totalPages,
   scrollbarPresent = false,
+  isStatic = false,
   isWeekdayEvent = false,
   onPrevPage,
   onNextPage,
@@ -54,9 +56,10 @@ export default function ScheduleHeader({
   return (
     <div
       className={cn(
-        preview ? "md:bg-panel top-0" : cn(topMarginClass, "bg-background"),
+        preview ? "md:bg-panel" : cn(topMarginClass, "bg-background"),
         scrollbarPresent && "pr-4",
-        "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
+        isStatic ? "" : cn("sticky", preview ? "top-0" : ""),
+        "z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
       )}
       style={{
         gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 10}px`,

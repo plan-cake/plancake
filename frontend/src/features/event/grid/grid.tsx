@@ -26,6 +26,7 @@ interface ScheduleGridProps {
   isWeekdayEvent?: boolean;
 
   disableSelect?: boolean;
+  staticHeader?: boolean;
 
   unselectedRange?: boolean;
 
@@ -65,6 +66,7 @@ export default function ScheduleGrid({
   timezone,
   mode = "preview",
   isWeekdayEvent = false,
+  staticHeader = false,
   unselectedRange = false,
   availabilities = {},
   numParticipants = 0,
@@ -138,6 +140,7 @@ export default function ScheduleGrid({
         currentPage={currentPage}
         totalPages={totalPages}
         scrollbarPresent={scrollbarPresent}
+        isStatic={staticHeader}
         isWeekdayEvent={isWeekdayEvent}
         onPrevPage={() => paginate(-1)}
         onNextPage={() => paginate(1)}
