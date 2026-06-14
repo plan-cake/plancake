@@ -102,7 +102,7 @@ export default function Demo() {
   );
 
   const step3 = (
-    <div className="bg-background h-fit rounded-3xl px-4 pt-4">
+    <div className="bg-background h-fit rounded-3xl p-4">
       <div className="text-center">
         <div className="text-lg font-bold">3. Paint your availability</div>
         <div className="text-sm opacity-75">
@@ -117,7 +117,7 @@ export default function Demo() {
         userAvailability={userAvailability}
         onToggleSlot={toggleSlot}
       />
-      <div className="flex items-center justify-center gap-2 pb-4">
+      <div className="-mt-2 flex items-center justify-center gap-2">
         <ActionButton
           buttonStyle="primary"
           label="Submit"
@@ -128,7 +128,7 @@ export default function Demo() {
   );
 
   const step4 = (
-    <div className="bg-background w-full rounded-3xl px-4 pt-4">
+    <div className="bg-background w-full rounded-3xl p-4">
       <div className="text-center">
         <div className="text-lg font-bold">4. Watch the results stack up</div>
         <div className="text-sm opacity-75">
@@ -145,7 +145,7 @@ export default function Demo() {
         hoveredSlot={hoveredSlot}
         setHoveredSlot={handleSlotHover}
       />
-      <div className="pointer-events-none flex items-center justify-center gap-2 pb-4">
+      <div className="pointer-events-none -mt-2 flex flex-wrap items-center justify-center gap-2 px-2">
         {participants.map((p) => (
           <ParticipantChip
             key={p}
