@@ -1,7 +1,8 @@
-import { PlusIcon, LayoutDashboardIcon } from "lucide-react";
+import { LayoutDashboardIcon, PlusIcon } from "lucide-react";
 
 import Logo from "@/components/logo";
 import LinkButton from "@/features/button/components/link";
+import Demo from "@/features/landing-page/demo";
 
 export default function Home() {
   return (
@@ -37,6 +38,12 @@ export default function Home() {
               href="/dashboard"
             />
           </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="mx-auto mb-12 max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Demo />
         </div>
       </section>
 
