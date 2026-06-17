@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { motion } from "framer-motion";
 import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
 
 import KebabMenu from "@/components/kebab-menu";
@@ -187,13 +188,16 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           )}
         >
           {banners}
-          <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4">
+          <motion.div
+            layout
+            className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4"
+          >
             <AttendeesPanel />
             <DisplaySettings
               timezone={timezone}
               onTimezoneChange={handleTZChange}
             />
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
