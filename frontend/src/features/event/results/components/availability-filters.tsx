@@ -4,37 +4,6 @@ import Checkbox from "@/components/checkbox";
 import { useResultsContext } from "@/features/event/results/context";
 import { cn } from "@/lib/utils/classname";
 
-interface NumberedPinProps {
-  value: number;
-  size?: number;
-}
-
-function NumberedPin({ value, size = 30 }: NumberedPinProps) {
-  return (
-    <div
-      className="bg-accent flex items-center justify-center"
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        borderRadius: "50% 50% 50% 10%",
-        transform: "rotate(-225deg)",
-      }}
-    >
-      <span
-        style={{
-          transform: "rotate(225deg)",
-          color: "#FFFFFF",
-          fontWeight: "bold",
-          fontSize: `${size * 0.4}px`,
-          userSelect: "none",
-        }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}
-
 export default function AvailabilityFilters() {
   const {
     participants,
@@ -117,6 +86,32 @@ export default function AvailabilityFilters() {
           </Slider.Thumb>
         </Slider.Root>
       </div>
+    </div>
+  );
+}
+
+function NumberedPin({ value, size = 30 }: { value: number; size?: number }) {
+  return (
+    <div
+      className="bg-accent flex items-center justify-center"
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        borderRadius: "50% 50% 50% 10%",
+        transform: "rotate(-225deg)",
+      }}
+    >
+      <span
+        style={{
+          transform: "rotate(225deg)",
+          color: "#FFFFFF",
+          fontWeight: "bold",
+          fontSize: `${size * 0.4}px`,
+          userSelect: "none",
+        }}
+      >
+        {value}
+      </span>
     </div>
   );
 }
