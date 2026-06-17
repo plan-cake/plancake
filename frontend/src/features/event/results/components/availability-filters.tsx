@@ -57,11 +57,11 @@ export default function AvailabilityFilters() {
                           i === 0 || i === max - 1
                             ? "bg-foreground h-2 w-[1.5px] rounded-full"
                             : value % 10 === 0
-                              ? "bg-foreground/50 h-2 w-[1px] rounded-full"
+                              ? "bg-foreground/75 h-2 w-[1px] rounded-full"
                               : value % 5 === 0
-                                ? "bg-foreground/25 h-1.5 w-[1px] rounded-full"
-                                : max < 40 &&
-                                  "bg-foreground/25 h-1 w-[1px] rounded-full",
+                                ? "bg-foreground/50 h-1.5 w-[1px] rounded-full"
+                                : max < 50 &&
+                                  "bg-foreground/50 h-1 w-[1px] rounded-full",
                         )}
                       />
 
