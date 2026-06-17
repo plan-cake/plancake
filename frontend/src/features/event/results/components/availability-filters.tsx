@@ -38,7 +38,7 @@ export default function AvailabilityFilters() {
           <Slider.Track className="bg-foreground/25 relative h-1.5 grow rounded-full">
             <Slider.Range className="bg-accent absolute h-full rounded-full" />
 
-            <div className="pointer-events-none absolute inset-0 m-2 mt-1">
+            <div className="pointer-events-none absolute inset-0 m-1.5 mt-1">
               {max > 0 &&
                 Array.from({ length: max }).map((_, i) => {
                   const value = i + 1;
@@ -78,7 +78,7 @@ export default function AvailabilityFilters() {
 
           <Slider.Thumb
             aria-label="Minimum availability"
-            className="bg-accent relative block h-4 w-4 rounded-full"
+            className="bg-lion focus:outline-lion relative block h-3 w-3 rounded-full"
           >
             <div className="absolute left-1/2 top-full mt-0.5 flex -translate-x-1/2 flex-col items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <NumberedPin value={minAvailability} />
@@ -93,7 +93,7 @@ export default function AvailabilityFilters() {
 function NumberedPin({ value, size = 30 }: { value: number; size?: number }) {
   return (
     <div
-      className="bg-accent flex items-center justify-center"
+      className="bg-lion flex items-center justify-center"
       style={{
         width: `${size}px`,
         height: `${size}px`,
@@ -102,10 +102,9 @@ function NumberedPin({ value, size = 30 }: { value: number; size?: number }) {
       }}
     >
       <span
+        className="text-violet"
         style={{
           transform: "rotate(225deg)",
-          color: "#FFFFFF",
-          fontWeight: "bold",
           fontSize: `${size * 0.4}px`,
           userSelect: "none",
         }}
