@@ -9,11 +9,12 @@ import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
+import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import ScheduleGrid from "@/features/event/grid/grid";
 import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
 import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
+import AvailabilityFilters from "@/features/event/results/components/availability-filters";
 import { getResultBanners } from "@/features/event/results/components/banners";
-import DisplaySettings from "@/features/event/results/components/display-settings";
 import ShareMenu from "@/features/event/results/components/share-menu";
 import {
   ResultsProvider,
@@ -88,6 +89,25 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     currentUser !== null,
   );
 
+  /* DISPLAY SETTINGS */
+  const timezoneSelector = (
+    <motion.div layout className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
+      Displaying event in
+      <TimeZoneSelector
+        id="timezone-select"
+        value={timezone}
+        onChange={handleTZChange}
+        drawerNesting={0}
+      />
+    </motion.div>
+  );
+
+  const availabilityFilters = (
+    <motion.div layout className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
+      <AvailabilityFilters />
+    </motion.div>
+  );
+
   /* BUTTONS */
   const paintingButton = (
     <LinkButton
@@ -159,12 +179,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           timeslots={timeslots}
         />
 
-        <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm md:hidden">
-          <DisplaySettings
-            timezone={timezone}
-            onTimezoneChange={handleTZChange}
-          />
-        </div>
+        <div className="md:hidden">{timezoneSelector}</div>
 
         {/* Mobile Spacer & Drawer */}
         <div
@@ -193,10 +208,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4"
           >
             <AttendeesPanel />
-            <DisplaySettings
-              timezone={timezone}
-              onTimezoneChange={handleTZChange}
-            />
+            {timezoneSelector}
+            {availabilityFilters}
           </motion.div>
         </div>
       </div>
