@@ -65,7 +65,7 @@ export default function ParticipantChip({
 
         // Slider Inclusion Styling
         !includedInSlider &&
-          "pointer-events-none bg-gray-200/25 opacity-50 grayscale",
+          "text-foreground pointer-events-none bg-gray-200/25 opacity-50",
 
         // Selection Styling
         isSelected &&
