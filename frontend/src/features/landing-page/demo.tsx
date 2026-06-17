@@ -52,6 +52,7 @@ export default function Demo() {
   const [currentlyAvailable, setCurrentlyAvailable] =
     useState<string[]>(PARTICIPANTS);
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
+  const [allowSubmit, setAllowSubmit] = useState(false);
 
   const paintSlot = (slotIso: string, togglingOn: boolean) => {
     setUserAvailability((prev) => {
@@ -63,6 +64,8 @@ export default function Demo() {
       }
       return newSet;
     });
+
+    setAllowSubmit(true);
   };
 
   const handleAvailabilitySubmit = () => {
@@ -78,6 +81,8 @@ export default function Demo() {
       }
       return { ...prev };
     });
+
+    setAllowSubmit(false);
   };
 
   const handleResultsHover = (slotIso: string | null) => {
@@ -128,6 +133,7 @@ export default function Demo() {
           buttonStyle="primary"
           label="Submit"
           onClick={handleAvailabilitySubmit}
+          disabled={!allowSubmit}
         />
       </div>
     </div>
