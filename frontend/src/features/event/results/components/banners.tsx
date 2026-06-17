@@ -36,13 +36,13 @@ export function getResultBanners(
     if (getHighestMatchCount(availabilities) <= 1) {
       return (
         <Banner type="info" subtitle="Yikes..." showPing>
-          <p>{MESSAGES.INFO_NO_MUTUAL_AVAILABILITY}</p>
+          <p>{MESSAGES.INFO_NO_OVERLAP}</p>
         </Banner>
       );
     }
     return (
       <Banner type="info" subtitle="Oh dear :(" showPing>
-        <p>{MESSAGES.INFO_NO_IDEAL_TIMES_BANNER}</p>
+        <p>{MESSAGES.INFO_NO_IDEAL_TIMES}</p>
       </Banner>
     );
   } else if (participated && participants.length === 1) {
