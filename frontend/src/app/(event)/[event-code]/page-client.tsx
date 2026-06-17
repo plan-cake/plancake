@@ -13,12 +13,12 @@ import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
 import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
 import { getResultBanners } from "@/features/event/results/components/banners";
 import DisplaySettings from "@/features/event/results/components/display-settings";
+import ShareMenu from "@/features/event/results/components/share-menu";
 import {
   ResultsProvider,
   useResultsContext,
 } from "@/features/event/results/context";
 import { ResultsInformation } from "@/features/event/results/lib/types";
-import ShareMenu from "@/features/event/results/components/share-menu";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import BaseDialog from "@/features/system-feedback/dialog/components/base";
 import { cn } from "@/lib/utils/classname";

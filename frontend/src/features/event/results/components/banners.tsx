@@ -32,7 +32,7 @@ export function getResultBanners(
         <p className="hidden md:block">{MESSAGES.INFO_ADD_AVAILABILITY}</p>
       </Banner>
     );
-  } else if (!hasMutualAvailability(availabilities, participants)) {
+  } else if (!hasMutualAvailability(availabilities, participants.length)) {
     if (getHighestMatchCount(availabilities) <= 1) {
       return (
         <Banner type="info" subtitle="Yikes..." showPing>
