@@ -12,7 +12,6 @@ import { removePerson } from "@/features/event/results/lib/remove-person";
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import { findConsensusAndConflicts } from "@/features/event/results/lib/utils";
 import { useToast } from "@/features/system-feedback/toast/context";
-import { MESSAGES } from "@/lib/messages";
 
 export function useEventResults(initialData: ResultsInformation) {
   const { addToast } = useToast();
@@ -178,13 +177,6 @@ export function useEventResults(initialData: ResultsInformation) {
     globalFilteredMap,
     optimisticParticipants.length,
   ]);
-
-  // show toast if user toggles on best times but there are no mutual availability
-  useEffect(() => {
-    if (showOnlyBestTimes && bestTimesCache.hasNoConsensus) {
-      addToast("info", MESSAGES.INFO_NO_MUTUAL_AVAILABILITY);
-    }
-  }, [bestTimesCache.hasNoConsensus, showOnlyBestTimes, addToast]);
 
   // clamp min availability to never to higher than the total participants
   useEffect(() => {
