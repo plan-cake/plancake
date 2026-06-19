@@ -50,9 +50,12 @@ export default function AvailabilityFilters() {
         <div>
           <label
             htmlFor="min-availability"
-            className="mb-2 block font-semibold"
+            className="mb-2 flex items-center justify-between font-semibold"
           >
-            Minimum Availability
+            <span>Minimum Availability</span>
+            <span className="text-foreground/75 font-normal md:hidden">
+              {minAvailability}
+            </span>
           </label>
           <Slider.Root
             className="group relative flex w-full touch-none select-none items-center hover:cursor-pointer"
@@ -70,7 +73,6 @@ export default function AvailabilityFilters() {
                 )}
               />
             </Slider.Track>
-
             <div className="pointer-events-none absolute inset-0 mt-10 md:m-1.5 md:mt-1">
               {max > 0 &&
                 Array.from({ length: max }).map((_, i) => {
