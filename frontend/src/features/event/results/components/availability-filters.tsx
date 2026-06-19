@@ -53,7 +53,7 @@ export default function AvailabilityFilters() {
             className="mb-2 flex items-center justify-between font-semibold"
           >
             <span>Minimum Availability</span>
-            <span className="text-foreground/75 font-normal md:hidden">
+            <span className="text-foreground/75 font-normal">
               {minAvailability}
             </span>
           </label>
@@ -68,7 +68,7 @@ export default function AvailabilityFilters() {
             <Slider.Track className="bg-foreground/25 relative h-10 grow overflow-hidden rounded-full md:h-1.5">
               <Slider.Range
                 className={cn(
-                  "bg-accent absolute h-full rounded-l-full",
+                  "bg-accent absolute h-full rounded-l-full md:rounded-full",
                   minAvailability === max && "rounded-full",
                 )}
               />
@@ -112,40 +112,11 @@ export default function AvailabilityFilters() {
 
             <Slider.Thumb
               aria-label="Minimum availability"
-              className="bg-lion focus:outline-lion relative hidden h-3 w-3 rounded-full md:block"
-            >
-              <div className="absolute left-1/2 top-full mt-0.5 flex -translate-x-1/2 flex-col items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                <NumberedPin value={minAvailability} />
-              </div>
-            </Slider.Thumb>
+              className="bg-lion focus:outline-lion relative hidden h-3 w-4 rounded-full opacity-0 transition-opacity duration-300 md:block md:group-hover:opacity-100"
+            />
           </Slider.Root>
         </div>
       </section>
-    </div>
-  );
-}
-
-function NumberedPin({ value, size = 30 }: { value: number; size?: number }) {
-  return (
-    <div
-      className="bg-lion flex items-center justify-center"
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        borderRadius: "50% 50% 50% 10%",
-        transform: "rotate(-225deg)",
-      }}
-    >
-      <span
-        className="text-violet"
-        style={{
-          transform: "rotate(225deg)",
-          fontSize: `${size * 0.4}px`,
-          userSelect: "none",
-        }}
-      >
-        {value}
-      </span>
     </div>
   );
 }
