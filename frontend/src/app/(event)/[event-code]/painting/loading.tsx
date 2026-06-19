@@ -17,7 +17,6 @@ export default function Loading() {
             <div className="bg-loading h-8 w-3/4 rounded-3xl" />
             <div className="bg-loading h-8 w-1/2 rounded-3xl" />
           </div>
-          <div className="h-70 bg-loading hidden rounded-3xl md:block" />
           <div className="bg-loading h-20 rounded-3xl" />
         </div>
 
