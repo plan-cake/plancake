@@ -66,6 +66,7 @@ export default function AttendeesDrawer({
   const filtersButton = (
     <FloatingDrawer
       showOverlay={false}
+      modal={false}
       open={openViewOptions}
       onOpenChange={setOpenViewOptions}
       title="View Options"
