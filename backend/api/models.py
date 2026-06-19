@@ -118,6 +118,14 @@ class UrlCode(models.Model):
     created_at = DateTimeNoTZField(auto_now_add=True)
     last_used = DateTimeNoTZField(auto_now=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                Lower("url_code"),
+                name="unique_case_insensitive_url_code",
+            )
+        ]
+
 
 class EventParticipant(models.Model):
     event_participant_id = models.AutoField(primary_key=True)
