@@ -55,6 +55,7 @@ from api.utils import (
     LiveUpdateEventEditData,
     MessageOutputSerializer,
     check_rate_limit,
+    event_lookup,
     format_event_info,
     get_session,
     notify_live_update,
@@ -248,7 +249,7 @@ def edit_date_event(request):
         with transaction.atomic():
             # Find the event
             event = UserEvent.objects.get(
-                url_code=event_code,
+                url_code__url_code__iexact=event_code,
                 user_account=user,
                 date_type=UserEvent.EventType.SPECIFIC,
             )
@@ -343,7 +344,7 @@ def edit_week_event(request):
         with transaction.atomic():
             # Find the event
             event = UserEvent.objects.get(
-                url_code=event_code,
+                url_code__url_code__iexact=event_code,
                 user_account=user,
                 date_type=UserEvent.EventType.GENERIC,
             )
@@ -417,7 +418,7 @@ def delete_event(request):
         return NOT_CREATOR_ERROR
 
     try:
-        event = UserEvent.objects.get(url_code=event_code)
+        event = event_lookup(event_code)
         if event.user_account != user:
             return NOT_CREATOR_ERROR
         # This should remove everything with foreign key cascades

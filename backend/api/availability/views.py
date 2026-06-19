@@ -34,6 +34,7 @@ from api.utils import (
     LiveUpdateRemoveData,
     MessageOutputSerializer,
     check_rate_limit,
+    event_lookup,
     notify_live_update,
 )
 
@@ -67,7 +68,7 @@ def add_availability(request):
 
     try:
         with transaction.atomic():
-            user_event = UserEvent.objects.get(url_code=event_code)
+            user_event = event_lookup(event_code)
 
             if not check_name_available(user_event, user, display_name):
                 return Response(
@@ -198,7 +199,7 @@ def check_display_name(request):
     display_name = request.validated_data.get("display_name")
 
     try:
-        event = UserEvent.objects.get(url_code=event_code)
+        event = event_lookup(event_code)
         if check_name_available(event, user, display_name):
             return Response(
                 {"message": ["Name is available."]},
@@ -243,7 +244,7 @@ def get_self_availability(request):
         return NOT_PARTICIPATED_ERROR
 
     try:
-        event = UserEvent.objects.get(url_code=event_code)
+        event = event_lookup(event_code)
         participant = EventParticipant.objects.get(user_event=event, user_account=user)
 
         if event.date_type == UserEvent.EventType.SPECIFIC:
@@ -310,7 +311,7 @@ def get_all_availability(request):
     user_display_name = None
 
     try:
-        event = UserEvent.objects.get(url_code=event_code)
+        event = event_lookup(event_code)
         participants = event.participants.all().order_by("created_at")
 
         # Prep the dictionary with empty arrays for the return value
@@ -442,7 +443,7 @@ def remove_self_availability(request):
         return NOT_PARTICIPATED_ERROR
 
     try:
-        event = UserEvent.objects.get(url_code=event_code)
+        event = event_lookup(event_code)
         # Because of the foreign key cascades, this should remove everything
         participant = EventParticipant.objects.get(user_event=event, user_account=user)
         participant.delete()
@@ -490,7 +491,7 @@ def remove_availability(request):
         return NOT_CREATOR_ERROR
 
     try:
-        event = UserEvent.objects.get(url_code=event_code)
+        event = event_lookup(event_code)
         if event.user_account != user:
             return NOT_CREATOR_ERROR
         # Because of the foreign key cascades, this should remove everything
