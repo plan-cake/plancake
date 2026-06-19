@@ -53,6 +53,24 @@ export default function BaseTimeBlock({
           gridTemplateRows: `repeat(${numQuarterHours}, minmax(20px, 1fr))`,
         }}
       >
+        {Array.from({ length: visibleDaysCount }).map((_, idx) => (
+          <div
+            key={`col-backdrop-${idx}`}
+            className="bg-background"
+            style={{
+              gridRow: "1 / -1",
+              gridColumn: idx + 1,
+              backgroundImage: `repeating-linear-gradient(
+                45deg, 
+                color-mix(in srgb, var(--color-foreground) 10%, transparent) 0px, 
+                color-mix(in srgb, var(--color-foreground) 10%, transparent) 10px, 
+                color-mix(in srgb, var(--color-background) 10%, transparent) 10px, 
+                color-mix(in srgb, var(--color-background) 10%, transparent) 11px
+              )`,
+            }}
+          />
+        ))}
+
         {children}
       </div>
 
