@@ -62,50 +62,55 @@ export default function AvailabilityFilters() {
             step={1}
             onValueChange={(value) => setMinAvailability(value[0])}
           >
-            <Slider.Track className="bg-foreground/25 relative h-1.5 grow rounded-full">
-              <Slider.Range className="bg-accent absolute h-full rounded-full" />
-
-              <div className="pointer-events-none absolute inset-0 m-1.5 mt-1">
-                {max > 0 &&
-                  Array.from({ length: max }).map((_, i) => {
-                    const value = i + 1;
-                    const leftPercentage = max <= 1 ? 0 : (i / (max - 1)) * 100;
-
-                    return (
-                      <div
-                        key={value}
-                        className={cn(
-                          "absolute flex -translate-x-1/2 flex-col items-center pt-2",
-                        )}
-                        style={{ left: `${leftPercentage}%` }}
-                      >
-                        <div
-                          className={cn(
-                            i === 0 || i === max - 1
-                              ? "bg-foreground h-2 w-[1.5px] rounded-full"
-                              : value % 10 === 0
-                                ? "bg-foreground/75 h-2 w-[1px] rounded-full"
-                                : value % 5 === 0
-                                  ? "bg-foreground/50 h-1.5 w-[1px] rounded-full"
-                                  : max < 50 &&
-                                    "bg-foreground/50 h-1 w-[1px] rounded-full",
-                          )}
-                        />
-
-                        {(i === 0 || i === max - 1) && (
-                          <p className="text-foreground text-xs font-medium">
-                            {value}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-              </div>
+            <Slider.Track className="bg-foreground/25 relative h-10 grow overflow-hidden rounded-full md:h-1.5">
+              <Slider.Range
+                className={cn(
+                  "bg-accent absolute h-full rounded-l-full",
+                  minAvailability === max && "rounded-full",
+                )}
+              />
             </Slider.Track>
+
+            <div className="pointer-events-none absolute inset-0 mt-10 md:m-1.5 md:mt-1">
+              {max > 0 &&
+                Array.from({ length: max }).map((_, i) => {
+                  const value = i + 1;
+                  const leftPercentage = max <= 1 ? 0 : (i / (max - 1)) * 100;
+
+                  return (
+                    <div
+                      key={value}
+                      className={cn(
+                        "absolute flex -translate-x-1/2 flex-col items-center pt-2",
+                      )}
+                      style={{ left: `${leftPercentage}%` }}
+                    >
+                      <div
+                        className={cn(
+                          i === 0 || i === max - 1
+                            ? "bg-foreground h-2 w-[1.5px] rounded-full"
+                            : value % 10 === 0
+                              ? "bg-foreground/75 h-2 w-[1px] rounded-full"
+                              : value % 5 === 0
+                                ? "bg-foreground/50 h-1.5 w-[1px] rounded-full"
+                                : max < 50 &&
+                                  "bg-foreground/50 h-1 w-[1px] rounded-full",
+                        )}
+                      />
+
+                      {(i === 0 || i === max - 1) && (
+                        <p className="text-foreground text-xs font-medium">
+                          {value}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
 
             <Slider.Thumb
               aria-label="Minimum availability"
-              className="bg-lion focus:outline-lion relative block h-3 w-3 rounded-full"
+              className="bg-lion focus:outline-lion relative hidden h-3 w-3 rounded-full md:block"
             >
               <div className="absolute left-1/2 top-full mt-0.5 flex -translate-x-1/2 flex-col items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <NumberedPin value={minAvailability} />
