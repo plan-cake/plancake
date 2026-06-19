@@ -6,7 +6,7 @@ export default function Loading() {
       <HeaderSpacer />
 
       <div className="flex w-full flex-wrap items-center justify-between md:flex-row">
-        <div className="bg-loading h-12 w-3/4 rounded-3xl md:w-1/2" />
+        <div className="bg-loading h-12 w-full rounded-3xl md:w-1/2" />
         <div className="w-50 bg-loading hidden h-10 rounded-full" />
       </div>
 
