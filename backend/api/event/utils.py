@@ -131,7 +131,7 @@ def validate_weekday_timeslots(timeslots):
     return {}
 
 
-def event_lookup(event_code: str):
+def event_lookup_prefetch(event_code: str):
     """
     Looks up an event by its URL code.
 

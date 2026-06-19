@@ -32,7 +32,7 @@ from api.event.serializers import (
 )
 from api.event.utils import (
     check_custom_code,
-    event_lookup,
+    event_lookup_prefetch,
     generate_code,
     js_weekday,
     touch_url_code,
@@ -443,7 +443,7 @@ def get_event_details(request):
     event_code = request.validated_data.get("event_code")
 
     try:
-        event = event_lookup(event_code)
+        event = event_lookup_prefetch(event_code)
         touch_url_code(event_code)
         data = format_event_info(event)
         match event.date_type:
