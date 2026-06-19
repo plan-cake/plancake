@@ -15,7 +15,7 @@ logger = logging.getLogger("api")
 
 def check_code_available(code):
     try:
-        UrlCode.objects.get(url_code=code)
+        UrlCode.objects.get(url_code__iexact=code)
         return False
     except UrlCode.DoesNotExist:
         pass
@@ -41,12 +41,12 @@ def check_custom_code(code):
         "verify-email",
         "version-history",
     ]
-    if code in RESERVED_KEYWORDS or not check_code_available(code):
+    if code.lower() in RESERVED_KEYWORDS or not check_code_available(code):
         return "Code unavailable."
 
 
 ALLOWED_URL_CODE_CHARS = "".join(
-    [c for c in string.ascii_letters + string.digits if c not in "Il1O0"]
+    [c for c in string.ascii_lowercase + string.digits if c not in "Il1O0"]
 )
 
 
