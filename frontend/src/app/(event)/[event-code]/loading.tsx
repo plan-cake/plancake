@@ -8,7 +8,7 @@ export default function Loading() {
       <div className="flex w-full flex-wrap items-center justify-between md:flex-row">
         <div className="bg-loading h-12 w-1/2 rounded-3xl" />
 
-        <div className="w-50 bg-loading h-10 rounded-full" />
+        <div className="w-50 bg-loading hidden h-10 rounded-full md:block" />
       </div>
 
       <div className="mb-8 flex h-full flex-col gap-4 md:mb-0 md:flex-row">
