@@ -64,7 +64,10 @@ export default function AvailabilityFilters() {
         <div>
           <label
             htmlFor="min-availability"
-            className="mb-2 flex items-center justify-between font-semibold"
+            className={cn(
+              "mb-2 flex items-center justify-between font-semibold",
+              showOnlyBestTimes && "opacity-50 grayscale",
+            )}
           >
             <span>Minimum Availability</span>
             <span className="text-foreground/75 font-normal">
