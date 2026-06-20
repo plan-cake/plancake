@@ -25,7 +25,7 @@ export default function PasswordCriteria({
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
         >
-          <div className="pt-2">
+          <div className="pt-2 text-start">
             <AnimatePresence mode="sync">
               <motion.div
                 key={allCriteriaMet ? "strong" : "criteria"}
