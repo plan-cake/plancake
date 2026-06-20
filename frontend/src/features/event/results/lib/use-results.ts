@@ -91,7 +91,7 @@ export function useEventResults(initialData: ResultsInformation) {
 
   /**
    * Returns a cache of the best timeslots where all participants are available.
-   * Since this can be an expensive computation, it is memoized and only recalcuated
+   * Since this can be an expensive computation, it is memoized and only recalculated
    * when availabilities or participants change
    */
   const bestTimesCache = useMemo(() => {
