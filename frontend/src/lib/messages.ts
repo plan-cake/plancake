@@ -2,7 +2,7 @@ import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
 import {
   MAX_DURATION,
   MAX_TITLE_LENGTH,
-} from "@/features/event/editor/validate-data";
+} from "@/features/event/editor/constants";
 
 export const MESSAGES = {
   // generic errors
