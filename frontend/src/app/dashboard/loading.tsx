@@ -8,7 +8,7 @@ export default function Loading() {
 
       <div className="bg-panel w-full rounded-3xl">
         <div className="p-4">
-          <div className="bg-foreground/10 h-10 w-1/2 animate-pulse rounded-full" />
+          <div className="bg-background h-10 w-1/2 animate-pulse rounded-full" />
         </div>
 
         {/* 2. Skeleton for the Event Grid */}
@@ -17,7 +17,7 @@ export default function Loading() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="bg-foreground/5 h-50 w-full animate-pulse rounded-lg"
+                className="bg-background h-50 w-full animate-pulse rounded-lg"
               />
             ))}
           </div>
