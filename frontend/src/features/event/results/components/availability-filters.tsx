@@ -98,40 +98,39 @@ export default function AvailabilityFilters() {
             </Slider.Track>
 
             <div className="pointer-events-none absolute inset-0 mt-10 md:m-1.5 md:mt-1">
-              {max > 0 &&
-                Array.from({ length: max }).map((_, i) => {
-                  const value = i + 1;
-                  const leftPercentage = max <= 1 ? 0 : (i / (max - 1)) * 100;
+              {Array.from({ length: max }).map((_, i) => {
+                const value = i + 1;
+                const leftPercentage = max <= 1 ? 0 : (i / (max - 1)) * 100;
 
-                  return (
+                return (
+                  <div
+                    key={value}
+                    className={cn(
+                      "absolute flex -translate-x-1/2 flex-col items-center pt-2",
+                    )}
+                    style={{ left: `${leftPercentage}%` }}
+                  >
                     <div
-                      key={value}
                       className={cn(
-                        "absolute flex -translate-x-1/2 flex-col items-center pt-2",
+                        i === 0 || i === max - 1
+                          ? "bg-foreground h-2 w-[1.5px] rounded-full"
+                          : value % 10 === 0
+                            ? "bg-foreground/75 h-2 w-[1px] rounded-full"
+                            : value % 5 === 0
+                              ? "bg-foreground/50 h-1.5 w-[1px] rounded-full"
+                              : max < 50 &&
+                                "bg-foreground/50 h-1 w-[1px] rounded-full",
                       )}
-                      style={{ left: `${leftPercentage}%` }}
-                    >
-                      <div
-                        className={cn(
-                          i === 0 || i === max - 1
-                            ? "bg-foreground h-2 w-[1.5px] rounded-full"
-                            : value % 10 === 0
-                              ? "bg-foreground/75 h-2 w-[1px] rounded-full"
-                              : value % 5 === 0
-                                ? "bg-foreground/50 h-1.5 w-[1px] rounded-full"
-                                : max < 50 &&
-                                  "bg-foreground/50 h-1 w-[1px] rounded-full",
-                        )}
-                      />
+                    />
 
-                      {(i === 0 || i === max - 1) && (
-                        <p className="text-foreground text-xs font-medium">
-                          {value}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
+                    {(i === 0 || i === max - 1) && (
+                      <p className="text-foreground text-xs font-medium">
+                        {value}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <Slider.Thumb

@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { motion } from "framer-motion";
+
 import PanelHeader from "@/features/event/results/attendees/panel-header";
 import ParticipantList from "@/features/event/results/attendees/participant-list";
 import {
@@ -32,7 +34,9 @@ export default function AttendeesPanel() {
   }, [setIsRemoving]);
 
   return (
-    <div
+    <motion.div
+      layout
+      key="attendees-panel"
       className={cn(
         "bg-panel rounded-3xl",
         "flex min-h-0 w-full shrink flex-col gap-2 overflow-hidden",
@@ -53,6 +57,6 @@ export default function AttendeesPanel() {
         onOpenChange={setIsConfirmationOpen}
         onConfirm={confirmRemove}
       />
-    </div>
+    </motion.div>
   );
 }

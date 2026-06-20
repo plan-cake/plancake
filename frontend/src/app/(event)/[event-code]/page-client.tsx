@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
 
 import KebabMenu from "@/components/kebab-menu";
@@ -91,7 +91,11 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
   /* DISPLAY SETTINGS */
   const timezoneSelector = (
-    <motion.div layout className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
+    <motion.div
+      layout
+      key="timezone-selector"
+      className="bg-panel shrink-0 rounded-3xl p-6 text-sm"
+    >
       Displaying event in
       <TimeZoneSelector
         id="timezone-select"
@@ -103,8 +107,18 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   );
 
   const availabilityFilters = (
-    <motion.div layout className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
-      <AvailabilityFilters />
+    <motion.div
+      layout
+      key="availability-filters"
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ type: "tween", ease: "easeInOut", duration: 0.3 }}
+      className="shrink-0 overflow-hidden"
+    >
+      <div className="bg-panel rounded-3xl p-6 text-sm">
+        <AvailabilityFilters />
+      </div>
     </motion.div>
   );
 
@@ -191,6 +205,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             onSnapChange={setDrawerSnap}
             eventTitle={eventTitle}
             eventCode={eventCode}
+            numParticipants={participants.length}
           />
         </div>
 
@@ -209,7 +224,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           >
             <AttendeesPanel />
             {timezoneSelector}
-            {availabilityFilters}
+            <AnimatePresence initial={false}>
+              {participants.length > 1 && availabilityFilters}
+            </AnimatePresence>
           </motion.div>
         </div>
       </div>

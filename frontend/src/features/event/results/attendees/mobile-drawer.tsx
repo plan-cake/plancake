@@ -18,10 +18,12 @@ export default function AttendeesDrawer({
   onSnapChange,
   eventTitle,
   eventCode,
+  numParticipants,
 }: {
   onSnapChange: (snap: number | string | null) => void;
   eventTitle: string;
   eventCode: string;
+  numParticipants: number;
 }) {
   const {
     isRemoving,
@@ -127,7 +129,7 @@ export default function AttendeesDrawer({
             >
               <ShareMenu eventTitle={eventTitle} eventCode={eventCode} />
             </FloatingDrawer>
-            {filtersButton}
+            {numParticipants > 1 && filtersButton}
           </div>
           {paintingButton}
         </div>
