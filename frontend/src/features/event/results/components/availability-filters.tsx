@@ -58,8 +58,9 @@ export default function AvailabilityFilters() {
             </span>
           </label>
           <Slider.Root
+            id="min-availability"
             className="group relative flex w-full touch-none select-none items-center hover:cursor-pointer"
-            value={[minAvailability]}
+            value={[Math.min(minAvailability, max)]}
             min={1}
             max={max}
             step={1}
