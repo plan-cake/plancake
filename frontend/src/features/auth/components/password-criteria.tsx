@@ -36,7 +36,7 @@ export default function PasswordCriteria({
                 {allCriteriaMet ? (
                   <div className="flex items-center gap-1">
                     <CheckIcon className={iconClass} />
-                    <b>Password is strong!</b>
+                    <b>Your password is strong!</b>
                   </div>
                 ) : (
                   <>
