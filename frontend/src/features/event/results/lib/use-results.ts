@@ -178,9 +178,14 @@ export function useEventResults(initialData: ResultsInformation) {
     optimisticParticipants.length,
   ]);
 
-  // clamp min availability to never to higher than the total participants
+  // Clamp min availability to never be higher than the total participants.
+  // Keep it within the slider's [1..N] bounds, even if the list becomes empty.
   useEffect(() => {
-    setMinAvailability((prev) => Math.min(prev, optimisticParticipants.length));
+    setMinAvailability((prev) => {
+      const max = optimisticParticipants.length;
+      if (max === 0) return 1;
+      return Math.min(Math.max(prev, 1), max);
+    });
   }, [optimisticParticipants.length]);
 
   return {
