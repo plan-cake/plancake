@@ -19,6 +19,20 @@ export default function AvailabilityFilters() {
   const max = participants.length;
   const hasNoAvailability = Object.keys(filteredAvailabilities).length === 0;
 
+  const displayedAvailability = showOnlyBestTimes
+    ? max
+    : Math.min(minAvailability, max);
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setShowOnlyBestTimes(checked);
+
+    if (checked) {
+      setMinAvailability(max);
+    } else {
+      setMinAvailability(1);
+    }
+  };
+
   return (
     <div className="flex flex-col pb-6">
       <AnimatePresence initial={false}>
@@ -44,7 +58,7 @@ export default function AvailabilityFilters() {
         <Checkbox
           label="Show times that work for everyone"
           checked={showOnlyBestTimes}
-          onChange={setShowOnlyBestTimes}
+          onChange={handleCheckboxChange}
         />
 
         <div>
@@ -54,13 +68,18 @@ export default function AvailabilityFilters() {
           >
             <span>Minimum Availability</span>
             <span className="text-foreground/75 font-normal">
-              {minAvailability}
+              {displayedAvailability}
             </span>
           </label>
+
           <Slider.Root
             id="min-availability"
-            className="group relative flex w-full touch-none select-none items-center hover:cursor-pointer"
-            value={[Math.min(minAvailability, max)]}
+            disabled={showOnlyBestTimes}
+            className={cn(
+              "group relative flex w-full touch-none select-none items-center hover:cursor-pointer",
+              "data-[disabled]:opacity-50 data-[disabled]:grayscale data-[disabled]:hover:cursor-not-allowed",
+            )}
+            value={[displayedAvailability]}
             min={1}
             max={max}
             step={1}
@@ -70,10 +89,11 @@ export default function AvailabilityFilters() {
               <Slider.Range
                 className={cn(
                   "bg-accent absolute h-full rounded-l-full md:rounded-full",
-                  minAvailability === max && "rounded-full",
+                  displayedAvailability === max && "rounded-full",
                 )}
               />
             </Slider.Track>
+
             <div className="pointer-events-none absolute inset-0 mt-10 md:m-1.5 md:mt-1">
               {max > 0 &&
                 Array.from({ length: max }).map((_, i) => {
@@ -116,7 +136,9 @@ export default function AvailabilityFilters() {
               className={cn(
                 "relative hidden h-3 w-4 rounded-full md:block",
                 "bg-lion focus:outline-lion ring-lion/50 focus:ring-3",
-                "group-hover:scale-120 transition-[scale] ease-in-out",
+                "transition-[scale] ease-in-out",
+                // Disable the hover scale effect if the slider is disabled
+                showOnlyBestTimes && "group-hover:scale-100",
               )}
             />
           </Slider.Root>
