@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import * as Slider from "@radix-ui/react-slider";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -32,6 +34,21 @@ export default function AvailabilityFilters() {
       setMinAvailability(1);
     }
   };
+
+  const ticks = useMemo(() => {
+    const indices = [];
+    for (let i = 0; i < max; i++) {
+      const value = i + 1;
+      const isEndpoint = i === 0 || i === max - 1;
+      const isMajorTick = value % 10 === 0;
+      const isMinorTick = value % 5 === 0;
+
+      if (max < 50 || isEndpoint || isMajorTick || isMinorTick) {
+        indices.push(i);
+      }
+    }
+    return indices;
+  }, [max]);
 
   return (
     <div className="flex flex-col pb-6">
@@ -98,16 +115,14 @@ export default function AvailabilityFilters() {
             </Slider.Track>
 
             <div className="pointer-events-none absolute inset-0 mt-10 md:m-1.5 md:mt-1">
-              {Array.from({ length: max }).map((_, i) => {
+              {ticks.map((i) => {
                 const value = i + 1;
                 const leftPercentage = max <= 1 ? 0 : (i / (max - 1)) * 100;
 
                 return (
                   <div
                     key={value}
-                    className={cn(
-                      "absolute flex -translate-x-1/2 flex-col items-center pt-2",
-                    )}
+                    className="absolute flex -translate-x-1/2 flex-col items-center pt-2"
                     style={{ left: `${leftPercentage}%` }}
                   >
                     <div
