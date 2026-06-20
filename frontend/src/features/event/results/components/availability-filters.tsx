@@ -112,7 +112,7 @@ export default function AvailabilityFilters() {
 
             <Slider.Thumb
               aria-label="Minimum availability"
-              className="bg-lion focus:outline-lion relative hidden h-3 w-4 rounded-full opacity-0 transition-opacity duration-300 md:block md:group-hover:opacity-100"
+              className="bg-lion focus:outline-lion relative hidden h-3 w-4 rounded-full md:block"
             />
           </Slider.Root>
         </div>
