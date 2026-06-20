@@ -63,9 +63,14 @@ export default function ParticipantChip({
 
         !isAvailable && isSelected && "text-violet",
 
-        // Slider Inclusion Styling
+        // Slider Styling
+        // Participants are only disabled when they are both excluded from the slider filters
+        // and not in removing mode.
         !includedInSlider &&
-          "text-foreground pointer-events-none bg-gray-200/25 opacity-50",
+          !isRemoving &&
+          (isSelected
+            ? "text-foreground bg-gray-200/25 opacity-50"
+            : "text-foreground pointer-events-none bg-gray-200/25 opacity-50"),
 
         // Selection Styling
         isSelected &&
