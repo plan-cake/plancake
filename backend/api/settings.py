@@ -125,7 +125,7 @@ REST_FRAMEWORK = {
         ThrottleScopes.PASSWORD_RESET.key: "10/hour",
         ThrottleScopes.EVENT_CREATION.key: "25/hour",
         ThrottleScopes.AVAILABILITY_ADD.key: "50/hour",
-        ThrottleScopes.CODE_CHECK.key: "50/hour",
+        ThrottleScopes.CODE_CHECK.key: "10/min",
     },
 }
 
