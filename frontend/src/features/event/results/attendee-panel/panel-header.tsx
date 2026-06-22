@@ -145,6 +145,7 @@ export default function PanelHeader({
               !hasSelection && "pointer-events-none opacity-0",
             )}
             aria-label="Clear Selection"
+            tooltip="Clear Selection"
           />
 
           {isCreator && (
@@ -152,7 +153,8 @@ export default function PanelHeader({
               buttonStyle="semi-transparent"
               icon={isRemoving ? <CheckIcon /> : <EraserIcon />}
               onClick={toggleRemoving}
-              aria-label={isRemoving ? "Stop Removing" : "Remove Participants"}
+              aria-label={isRemoving ? "Stop Removing" : "Remove Attendees"}
+              tooltip={isRemoving ? "Stop Removing" : "Remove Attendees"}
               className={cn(
                 "shrink-0",
                 !isRemoving &&
@@ -169,6 +171,7 @@ export default function PanelHeader({
                 promptRemove(currentUser);
               }}
               aria-label="Leave Event"
+              tooltip="Leave Event"
               className="hover:bg-error/25 hover:text-error active:bg-error/40 shrink-0"
             />
           )}

@@ -99,7 +99,11 @@ export default function DeleteAccountDialog() {
       onOpenChange={handleOpenChange}
       onConfirm={handleDeleteAccount}
     >
-      <EmptyButton buttonStyle="danger" label="Delete Account" />
+      <EmptyButton
+        buttonStyle="danger"
+        label="Delete Account"
+        tooltip="Woah... be careful!"
+      />
     </ConfirmationDialog>
   );
 }
