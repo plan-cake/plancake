@@ -56,7 +56,6 @@ export function useEventResults(initialData: ResultsInformation) {
       return state.filter((p) => p.display_name !== personToRemove);
     },
   );
-
   const [optimisticAvailabilities, updateOptimisticAvailabilities] =
     useOptimistic(availability || {}, (state, person: string) => {
       const updatedState = { ...state };
@@ -65,6 +64,10 @@ export function useEventResults(initialData: ResultsInformation) {
       }
       return updatedState;
     });
+  const [optimisticCurrentUser, removeOptimisticCurrentUser] = useOptimistic(
+    currentUser,
+    () => null,
+  );
 
   /* ACTIONS */
   const handleSetHoveredParticipant = useCallback((person: string | null) => {
@@ -93,6 +96,9 @@ export function useEventResults(initialData: ResultsInformation) {
     startTransition(() => {
       removeOptimisticParticipant(person);
       updateOptimisticAvailabilities(person);
+      if (isRemovingSelf) {
+        removeOptimisticCurrentUser(null);
+      }
     });
 
     // Server Action
@@ -375,7 +381,7 @@ export function useEventResults(initialData: ResultsInformation) {
     gridNumParticipants,
 
     // User Info
-    currentUser,
+    currentUser: optimisticCurrentUser,
     isCreator,
 
     // UI State
