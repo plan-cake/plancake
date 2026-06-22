@@ -10,6 +10,7 @@ import {
 import { ResultsAvailabilityMap } from "@/core/availability/types";
 import { removePerson } from "@/features/event/results/lib/remove-person";
 import { ResultsInformation } from "@/features/event/results/lib/types";
+import { useLiveUpdates } from "@/features/event/results/lib/use-live-updates";
 import { findConsensusAndConflicts } from "@/features/event/results/lib/utils";
 import { useToast } from "@/features/system-feedback/toast/context";
 import { MESSAGES } from "@/lib/messages";
@@ -358,6 +359,13 @@ export function useEventResults(initialData: ResultsInformation) {
     }
   }, [hasNoConsensus, showOnlyBestTimes, addToast]);
 
+  useLiveUpdates(
+    eventCode,
+    liveAddParticipant,
+    liveUpdateParticipant,
+    liveRemoveParticipant,
+  );
+
   return {
     // Data
     eventType: initialData.eventType,
@@ -385,10 +393,5 @@ export function useEventResults(initialData: ResultsInformation) {
     handleRemoveParticipant,
     setShowOnlyBestTimes,
     setTimezone,
-
-    // Live Updates
-    liveAddParticipant,
-    liveUpdateParticipant,
-    liveRemoveParticipant,
   };
 }
