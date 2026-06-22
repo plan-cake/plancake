@@ -154,9 +154,8 @@ export default function AvailabilityFilters() {
               aria-label="Minimum availability"
               className={cn(
                 "relative hidden h-3 w-4 rounded-full md:block",
-                "bg-lion focus:outline-lion ring-lion/50 focus:ring-3",
-                "transition-[scale] ease-in-out",
-                // Disable the hover scale effect if the slider is disabled
+                "bg-accent focus-visible:ring-accent/50 focus-visible:ring-3 focus:outline-none",
+                "group-hover:scale-120 transition-[scale] ease-in-out",
                 showOnlyBestTimes && "group-hover:scale-100",
               )}
             />
