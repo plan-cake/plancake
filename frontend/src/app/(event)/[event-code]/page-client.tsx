@@ -91,11 +91,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
   /* DISPLAY SETTINGS */
   const timezoneSelector = (
-    <motion.div
-      layout
-      key="timezone-selector"
-      className="bg-panel shrink-0 rounded-3xl p-6 text-sm"
-    >
+    <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
       Displaying event in
       <TimeZoneSelector
         id="timezone-select"
@@ -103,7 +99,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         onChange={handleTZChange}
         drawerNesting={0}
       />
-    </motion.div>
+    </div>
   );
 
   const availabilityFilters = (
