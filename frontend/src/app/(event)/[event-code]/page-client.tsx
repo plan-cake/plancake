@@ -11,7 +11,7 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import ScheduleGrid from "@/features/event/grid/grid";
 import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
-import { getResultBanner } from "@/features/event/results/banners";
+import { getResultBanner } from "@/features/event/results/banner";
 import {
   ResultsProvider,
   useResultsContext,
