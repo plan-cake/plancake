@@ -190,7 +190,8 @@ export default function BaseDrawer({
                   if (isPill) {
                     setIsAnimating(true);
                     setSnap(snapPoints?.[1] ?? null);
-                    setIsAnimating(false);
+                    // Let the footer observer update before setting isAnimating to false
+                    setTimeout(() => setIsAnimating(false), 0);
                   }
                 }}
                 className={cn(
