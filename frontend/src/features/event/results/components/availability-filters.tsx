@@ -64,7 +64,9 @@ export default function AvailabilityFilters() {
             <div className="pb-3">
               <Banner
                 type="error"
-                subtitle={"Uhhh there are no good times, adjust your filters!"}
+                subtitle={
+                  "There are no good times, try adjusting your filters!"
+                }
               />
             </div>
           </motion.div>
