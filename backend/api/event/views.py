@@ -27,6 +27,7 @@ from api.event.serializers import (
     EventCodeSerializer,
     EventDetailSerializer,
     RequiredCustomCodeSerializer,
+    TrueCodeSerializer,
     WeekEventCreateSerializer,
     WeekEventEditSerializer,
 )
@@ -222,6 +223,29 @@ def check_code(request):
         return Response({"error": {"custom_code": [error]}}, status=400)
 
     return Response({"message": ["Custom code is valid and available."]}, status=200)
+
+
+@api_endpoint("GET")
+@validate_query_param_input(EventCodeSerializer)
+@validate_output(TrueCodeSerializer)
+def get_true_code(request):
+    """
+    Gets the true URL code for an event.
+
+    The true code is the URL code with the same capitalization that the event creator
+    used when creating the event. This ensures that certain caches work properly by having
+    all instances use identically-capitalized URLs.
+
+    If the event does not exist, a 404 error is returned.
+    """
+    event_code = request.validated_data.get("event_code")
+
+    try:
+        true_code = UrlCode.objects.get(url_code__iexact=event_code).url_code
+    except UrlCode.DoesNotExist:
+        return EVENT_NOT_FOUND_ERROR
+
+    return Response({"true_code": true_code}, status=200)
 
 
 @api_endpoint("POST")

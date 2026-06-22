@@ -56,6 +56,10 @@ export type CustomCode = {
   custom_code: string;
 }
 
+export type TrueCode = {
+  true_code: string;
+}
+
 export type EventEditData = {
   title: string;
   timeslots: string[];

@@ -16,6 +16,10 @@ class EventCodeSerializer(serializers.Serializer):
     event_code = serializers.CharField(required=True, max_length=255)
 
 
+class TrueCodeSerializer(serializers.Serializer):
+    true_code = serializers.CharField(required=True, max_length=255)
+
+
 class EventInfoSerializer(serializers.Serializer):
     title = serializers.CharField(required=True, max_length=50)
     timeslots = serializers.ListField(
