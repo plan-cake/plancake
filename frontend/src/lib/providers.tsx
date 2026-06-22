@@ -1,5 +1,6 @@
 "use client";
 
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { LucideProvider } from "lucide-react";
 import { ThemeProvider } from "next-themes";
 
@@ -20,7 +21,11 @@ export function Providers({
       <LucideProvider absoluteStrokeWidth={true} strokeWidth={1.5}>
         <AccountProvider accountDetails={accountDetails}>
           <HeaderSizeProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+              <TooltipProvider delayDuration={300} skipDelayDuration={500}>
+                {children}
+              </TooltipProvider>
+            </ToastProvider>
           </HeaderSizeProvider>
         </AccountProvider>
       </LucideProvider>
