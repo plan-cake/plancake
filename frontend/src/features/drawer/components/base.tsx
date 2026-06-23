@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { XIcon } from "lucide-react";
 import { Drawer } from "vaul";
@@ -35,10 +35,20 @@ export default function BaseDrawer({
 
   const contentRef = useRef<HTMLDivElement>(null);
   const wasDraggingRef = useRef(false);
+  const animatingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
   useVaulStickyFooter(contentRef, isDragging || isAnimating);
+
+  // Animating timeout cleanup
+  useEffect(() => {
+    return () => {
+      if (animatingTimeoutRef.current) {
+        clearTimeout(animatingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   /**
    * CONDITIONAL PROPS BASED ON VARIANT
@@ -188,10 +198,17 @@ export default function BaseDrawer({
                 onClick={() => {
                   if (wasDraggingRef.current) return;
                   if (isPill) {
+                    if (animatingTimeoutRef.current) {
+                      clearTimeout(animatingTimeoutRef.current);
+                    }
+
                     setIsAnimating(true);
                     setSnap(snapPoints?.[1] ?? null);
                     // Let the footer observer update before setting isAnimating to false
-                    setTimeout(() => setIsAnimating(false), 0);
+                    animatingTimeoutRef.current = setTimeout(() => {
+                      setIsAnimating(false);
+                      animatingTimeoutRef.current = null;
+                    }, 0);
                   }
                 }}
                 className={cn(
