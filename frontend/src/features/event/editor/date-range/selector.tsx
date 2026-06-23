@@ -30,7 +30,7 @@ export default function DateRangeSelection({
           className="flex items-center gap-2 font-bold"
         >
           <CalendarsIcon className="h-4 w-4" strokeWidth={2} />
-          Type
+          Event Type
         </label>
         <EventTypeSelect id="event-type-select" disabled={editing} />
       </div>
