@@ -146,7 +146,9 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           >
             <ClockIcon className="h-4 w-4" strokeWidth={2} />
             Possible Times
-            {errors.timeRange && <TriangleAlertIcon className="h-4 w-4" />}
+            {errors.timeRange && (
+              <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
+            )}
           </div>
           <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
             <FormSelectorField label="FROM" htmlFor="from-time-dropdown">

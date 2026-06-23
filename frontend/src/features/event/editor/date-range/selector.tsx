@@ -41,7 +41,7 @@ export default function DateRangeSelection({
           <CalendarRangeIcon className="h-4 w-4" strokeWidth={2} />
           {rangeType === "specific" ? "Possible Dates" : "Possible Days"}
           {(errors.dateRange || errors.weekdayRange) && (
-            <TriangleAlertIcon className="text-error h-4 w-4" />
+            <TriangleAlertIcon className="text-error h-4 w-4" strokeWidth={2} />
           )}
         </div>
 

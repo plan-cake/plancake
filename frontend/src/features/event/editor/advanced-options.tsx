@@ -108,7 +108,7 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
           <LinkIcon className="h-4 w-4" strokeWidth={2} />
           {!isEditing && "Custom"} Event Code
           {errors.customCode && (
-            <TriangleAlertIcon className="text-error h-4 w-4" />
+            <TriangleAlertIcon className="text-error h-4 w-4" strokeWidth={2} />
           )}
         </label>
         <input
