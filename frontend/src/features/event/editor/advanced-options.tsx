@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { ChevronRightIcon, TriangleAlertIcon } from "lucide-react";
+import {
+  ChevronRightIcon,
+  GlobeIcon,
+  LinkIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
 import { useEventContext } from "@/core/event/context";
@@ -79,7 +84,11 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
   return (
     <>
       <div className="flex flex-col gap-1">
-        <label htmlFor="timezone-select" className="font-bold">
+        <label
+          htmlFor="timezone-select"
+          className="flex items-center gap-2 font-bold"
+        >
+          <GlobeIcon className="h-4 w-4" strokeWidth={2} />
           Timezone
         </label>
         <div>
@@ -94,8 +103,9 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
       <div className="flex flex-col gap-1">
         <label
           htmlFor="custom-code-input"
-          className="flex justify-between font-bold"
+          className="flex items-center gap-2 font-bold"
         >
+          <LinkIcon className="h-4 w-4" strokeWidth={2} />
           {!isEditing && "Custom"} Event Code
           {errors.customCode && (
             <TriangleAlertIcon className="text-error h-4 w-4" />

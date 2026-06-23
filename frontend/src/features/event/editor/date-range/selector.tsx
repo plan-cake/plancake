@@ -1,5 +1,9 @@
 import { parseISO } from "date-fns";
-import { TriangleAlertIcon } from "lucide-react";
+import {
+  CalendarRangeIcon,
+  CalendarsIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
 import { SpecificDateRange } from "@/core/event/types";
@@ -21,20 +25,25 @@ export default function DateRangeSelection({
   return (
     <div className="contents">
       <div className="flex w-fit flex-col gap-1">
-        <label htmlFor="event-type-select" className="font-bold">
+        <label
+          htmlFor="event-type-select"
+          className="flex items-center gap-2 font-bold"
+        >
+          <CalendarsIcon className="h-4 w-4" strokeWidth={2} />
           Type
         </label>
         <EventTypeSelect id="event-type-select" disabled={editing} />
       </div>
       <div className="flex w-full flex-col justify-center gap-1">
-        <p
+        <div
           className={`flex items-center gap-2 font-bold ${errors.dateRange || errors.weekdayRange ? "text-error" : ""}`}
         >
+          <CalendarRangeIcon className="h-4 w-4" strokeWidth={2} />
           {rangeType === "specific" ? "Possible Dates" : "Possible Days"}
           {(errors.dateRange || errors.weekdayRange) && (
             <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
-        </p>
+        </div>
 
         {eventRange?.type === "specific" ? (
           <SpecificDateRangeDisplay
