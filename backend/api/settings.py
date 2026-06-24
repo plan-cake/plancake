@@ -195,7 +195,7 @@ LOGGING = {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": f"{LOG_DIR}/django.log",
             "formatter": "verbose",
-            "level": "DEBUG",
+            "level": "DEBUG" if DEBUG else "INFO",
             "maxBytes": 1024 * 1024 * 5,  # 5 MB
             "backupCount": 5,
         },
