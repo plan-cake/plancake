@@ -63,9 +63,9 @@ export default function BaseTimeBlock({
               backgroundImage: `repeating-linear-gradient(
                 45deg, 
                 color-mix(in srgb, var(--color-foreground) 10%, transparent) 0px, 
-                color-mix(in srgb, var(--color-foreground) 10%, transparent) 10px, 
-                color-mix(in srgb, var(--color-background) 10%, transparent) 10px, 
-                color-mix(in srgb, var(--color-background) 10%, transparent) 11px
+                color-mix(in srgb, var(--color-foreground) 10%, transparent) 8px, 
+                color-mix(in srgb, var(--color-background) 10%, transparent) 8px, 
+                color-mix(in srgb, var(--color-background) 10%, transparent) 9.5px
               )`,
             }}
           />
