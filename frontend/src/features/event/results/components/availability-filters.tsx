@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import * as Slider from "@radix-ui/react-slider";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useAnimation } from "framer-motion";
 
 import Checkbox from "@/components/checkbox";
 import { useResultsContext } from "@/features/event/results/context";
@@ -9,6 +9,7 @@ import { Banner } from "@/features/system-feedback/banner/base";
 import { cn } from "@/lib/utils/classname";
 
 export default function AvailabilityFilters() {
+  const controls = useAnimation();
   const {
     participants,
     minAvailability,
@@ -50,6 +51,13 @@ export default function AvailabilityFilters() {
     return indices;
   }, [max]);
 
+  useEffect(() => {
+    controls.start({
+      scale: [1, 1.3, 1],
+      transition: { duration: 0.2, ease: "easeOut" },
+    });
+  }, [displayedAvailability, controls]);
+
   return (
     <div className="flex flex-col pb-6">
       <AnimatePresence initial={false}>
@@ -89,9 +97,9 @@ export default function AvailabilityFilters() {
             )}
           >
             <span>Minimum Availability</span>
-            <span className="text-foreground/75 font-normal">
+            <motion.span animate={controls} className="text-lion font-bold">
               {displayedAvailability}
-            </span>
+            </motion.span>
           </label>
 
           <Slider.Root
