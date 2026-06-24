@@ -101,7 +101,6 @@ export function useEventResults(initialData: ResultsInformation) {
     );
     return {
       slotsSet: new Set(allAvailableSlots),
-      hasNoConsensus: allAvailableSlots.length === 0,
     };
   }, [optimisticAvailabilities, optimisticParticipants]);
 
