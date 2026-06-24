@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
 import {
@@ -33,20 +33,22 @@ export default function ClientPage({
   }, []);
 
   // Section expansion management
-  const allVersions = versionHistoryData.flatMap((version) => {
-    const versions = [];
-    if (version.bugFixes && version.bugFixes.length > 0) {
-      versions.push(version.version);
-    }
-    if (version.minorVersions && version.minorVersions.length > 0) {
-      versions.push(...version.minorVersions.map((minor) => minor.version));
-    }
+  const allVersions = useMemo(() => {
+    const versions = new Set<string>();
+    versionHistoryData.forEach((version) => {
+      if (version.bugFixes && version.bugFixes.length > 0) {
+        versions.add(version.version);
+      }
+      if (version.minorVersions && version.minorVersions.length > 0) {
+        version.minorVersions.forEach((minor) => versions.add(minor.version));
+      }
+    });
     return versions;
-  });
+  }, [versionHistoryData]);
   const [expandedVersions, setExpandedVersions] = useState<Set<string>>(
     new Set(),
   );
-  const allExpanded = expandedVersions.size === allVersions.length;
+  const allExpanded = expandedVersions.size === allVersions.size;
 
   const toggleVersion = (version: string) => {
     setExpandedVersions((prev) => {
