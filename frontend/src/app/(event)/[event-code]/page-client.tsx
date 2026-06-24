@@ -90,11 +90,11 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   );
 
   /* DISPLAY SETTINGS */
-  const timezoneSelector = (
+  const renderTimezoneSelector = (id: string) => (
     <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
       Displaying event in
       <TimeZoneSelector
-        id="timezone-select"
+        id={id}
         value={timezone}
         onChange={handleTZChange}
         drawerNesting={0}
@@ -189,7 +189,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           timeslots={timeslots}
         />
 
-        <div className="md:hidden">{timezoneSelector}</div>
+        <div className="md:hidden">
+          {renderTimezoneSelector("timezone-select-mobile")}
+        </div>
 
         {/* Mobile Spacer & Drawer */}
         <div
@@ -219,7 +221,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4"
           >
             <AttendeesPanel />
-            {timezoneSelector}
+            {renderTimezoneSelector("timezone-select-desktop")}
             <AnimatePresence initial={false}>
               {participants.length > 1 && availabilityFilters}
             </AnimatePresence>
