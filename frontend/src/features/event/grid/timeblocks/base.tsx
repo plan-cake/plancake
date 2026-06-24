@@ -56,7 +56,7 @@ export default function BaseTimeBlock({
         {Array.from({ length: visibleDaysCount }).map((_, idx) => (
           <div
             key={`col-backdrop-${idx}`}
-            className="bg-background"
+            className="bg-background hover:cursor-not-allowed"
             style={{
               gridRow: "1 / -1",
               gridColumn: idx + 1,
