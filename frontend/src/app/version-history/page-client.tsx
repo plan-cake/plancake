@@ -69,7 +69,7 @@ export default function ClientPage({
   };
 
   return (
-    <div className="flex min-h-screen flex-col gap-2">
+    <div className="flex min-h-screen flex-col">
       <HeaderSpacer />
       <div
         className={cn(
@@ -92,7 +92,7 @@ export default function ClientPage({
           onClick={allExpanded ? collapseAll : expandAll}
         />
       </div>
-      <div className="mx-auto flex w-full flex-col gap-8 px-8">
+      <div className="mx-auto flex w-full flex-col gap-8 px-8 pt-2">
         {versionHistoryData.map((version, index) => {
           const isCurrent = index === versionHistoryData.length - 1;
           const hasMinorVersions =
