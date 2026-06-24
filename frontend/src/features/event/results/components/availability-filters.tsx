@@ -116,7 +116,7 @@ export default function AvailabilityFilters() {
               />
             </Slider.Track>
 
-            <div className="pointer-events-none absolute inset-0 mt-10 md:m-1.5 md:mt-1">
+            <div className="pointer-events-none absolute inset-0 mt-10 md:m-2 md:mt-1">
               {ticks.map((i) => {
                 const value = i + 1;
                 const leftPercentage = max <= 1 ? 0 : (i / (max - 1)) * 100;
