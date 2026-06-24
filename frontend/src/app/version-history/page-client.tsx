@@ -2,8 +2,13 @@
 import { useEffect, useRef, useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { ChevronRightIcon } from "lucide-react";
+import {
+  ChevronRightIcon,
+  ListChevronsDownUpIcon,
+  ListChevronsUpDownIcon,
+} from "lucide-react";
 
+import ActionButton from "@/features/button/components/action";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import { useHeaderSize } from "@/features/header/context";
 import {
@@ -27,16 +32,65 @@ export default function ClientPage({
     bottomRef.current?.scrollIntoView({ behavior: "instant" });
   }, []);
 
+  // Section expansion management
+  const allVersions = versionHistoryData.flatMap((version) => {
+    const versions = [];
+    if (version.bugFixes && version.bugFixes.length > 0) {
+      versions.push(version.version);
+    }
+    if (version.minorVersions && version.minorVersions.length > 0) {
+      versions.push(...version.minorVersions.map((minor) => minor.version));
+    }
+    return versions;
+  });
+  const [expandedVersions, setExpandedVersions] = useState<Set<string>>(
+    new Set(),
+  );
+  const allExpanded = expandedVersions.size === allVersions.length;
+
+  const toggleVersion = (version: string) => {
+    setExpandedVersions((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(version)) {
+        newSet.delete(version);
+      } else {
+        newSet.add(version);
+      }
+      return newSet;
+    });
+  };
+
+  const expandAll = () => {
+    setExpandedVersions(new Set(allVersions));
+  };
+
+  const collapseAll = () => {
+    setExpandedVersions(new Set());
+  };
+
   return (
     <div className="flex min-h-screen flex-col gap-2">
       <HeaderSpacer />
       <div
         className={cn(
           topMarginClass,
-          "bg-background z-15 sticky flex w-full px-6 py-2",
+          "bg-background z-15 sticky flex w-full items-center justify-between px-6 py-2",
         )}
       >
         <h1 className="text-2xl font-bold">Version History</h1>
+        <ActionButton
+          buttonStyle="semi-transparent"
+          icon={
+            allExpanded ? (
+              <ListChevronsDownUpIcon />
+            ) : (
+              <ListChevronsUpDownIcon />
+            )
+          }
+          label={allExpanded ? "Collapse All" : "Expand All"}
+          shrinkOnMobile
+          onClick={allExpanded ? collapseAll : expandAll}
+        />
       </div>
       <div className="mx-auto flex w-full flex-col gap-8 px-8">
         {versionHistoryData.map((version, index) => {
@@ -57,6 +111,8 @@ export default function ClientPage({
                 isCurrent={isCurrent}
                 isLast={isCurrent && !hasMinorVersions}
                 extendLine={!isCurrent && !hasMinorVersions}
+                isExpanded={expandedVersions.has(version.version)}
+                toggleExpanded={toggleVersion}
               />
               {version.minorVersions &&
                 version.minorVersions.map((minorVersion, minorIndex) => {
@@ -70,6 +126,8 @@ export default function ClientPage({
                       isCurrent={isCurrent}
                       isLast={isCurrent && isLastMinor}
                       extendLine={!isCurrent && isLastMinor}
+                      isExpanded={expandedVersions.has(minorVersion.version)}
+                      toggleExpanded={toggleVersion}
                     />
                   );
                 })}
@@ -131,14 +189,16 @@ function MajorVersion({
   isCurrent,
   isLast,
   extendLine,
+  isExpanded,
+  toggleExpanded,
 }: {
   versionData: MajorVersionData;
   isCurrent: boolean;
   isLast: boolean;
   extendLine: boolean;
+  isExpanded: boolean;
+  toggleExpanded: (version: string) => void;
 }) {
-  const [bugsOpen, setBugsOpen] = useState(false);
-
   const releaseDate = new Date(
     Date.UTC(
       versionData.releaseDate.year,
@@ -177,8 +237,8 @@ function MajorVersion({
         </ul>
         {versionData.bugFixes && versionData.bugFixes.length > 0 && (
           <Collapsible.Root
-            open={bugsOpen}
-            onOpenChange={setBugsOpen}
+            open={isExpanded}
+            onOpenChange={() => toggleExpanded(versionData.version)}
             className="ml-3"
           >
             <Collapsible.Trigger asChild>
@@ -188,7 +248,7 @@ function MajorVersion({
                   className={cn(
                     "transition-transform duration-200",
                     "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
-                    bugsOpen && "rotate-90",
+                    isExpanded && "rotate-90",
                   )}
                 >
                   <ChevronRightIcon className="h-4 w-4" />
@@ -214,14 +274,16 @@ function MinorVersion({
   isCurrent,
   isLast,
   extendLine,
+  isExpanded,
+  toggleExpanded,
 }: {
   versionData: MinorVersionData;
   isCurrent: boolean;
   isLast: boolean;
   extendLine: boolean;
+  isExpanded: boolean;
+  toggleExpanded: (version: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
-
   const releaseDate = new Date(
     Date.UTC(
       versionData.releaseDate.year,
@@ -243,7 +305,10 @@ function MinorVersion({
         extend={extendLine}
       />
       <div className="px-4">
-        <Collapsible.Root open={open} onOpenChange={setOpen}>
+        <Collapsible.Root
+          open={isExpanded}
+          onOpenChange={() => toggleExpanded(versionData.version)}
+        >
           <Collapsible.Trigger asChild className="cursor-pointer">
             <div className="group flex items-center gap-2">
               <span className="font-bold">{versionData.version}</span>
@@ -254,7 +319,7 @@ function MinorVersion({
                 className={cn(
                   "transition-transform duration-200",
                   "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
-                  open && "rotate-90",
+                  isExpanded && "rotate-90",
                 )}
               >
                 <ChevronRightIcon className="h-4 w-4" />
