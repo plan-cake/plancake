@@ -126,6 +126,13 @@ class TimeZoneField(serializers.CharField):
         return value
 
 
+def event_lookup(event_code: str):
+    """
+    Looks up an event by its URL code.
+    """
+    return UserEvent.objects.get(url_code__url_code__iexact=event_code)
+
+
 def get_event_type(date_type):
     match date_type:
         case UserEvent.EventType.SPECIFIC:

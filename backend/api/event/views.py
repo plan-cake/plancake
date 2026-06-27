@@ -27,12 +27,13 @@ from api.event.serializers import (
     EventCodeSerializer,
     EventDetailSerializer,
     RequiredCustomCodeSerializer,
+    TrueCodeSerializer,
     WeekEventCreateSerializer,
     WeekEventEditSerializer,
 )
 from api.event.utils import (
     check_custom_code,
-    event_lookup,
+    event_lookup_prefetch,
     generate_code,
     js_weekday,
     touch_url_code,
@@ -55,6 +56,7 @@ from api.utils import (
     LiveUpdateEventEditData,
     MessageOutputSerializer,
     check_rate_limit,
+    event_lookup,
     format_event_info,
     get_session,
     notify_live_update,
@@ -223,6 +225,29 @@ def check_code(request):
     return Response({"message": ["Custom code is valid and available."]}, status=200)
 
 
+@api_endpoint("GET")
+@validate_query_param_input(EventCodeSerializer)
+@validate_output(TrueCodeSerializer)
+def get_true_code(request):
+    """
+    Gets the true URL code for an event.
+
+    The true code is the URL code with the same capitalization that the event creator
+    used when creating the event. This ensures that certain caches work properly by having
+    all instances use identically-capitalized URLs.
+
+    If the event does not exist, a 404 error is returned.
+    """
+    event_code = request.validated_data.get("event_code")
+
+    try:
+        true_code = UrlCode.objects.get(url_code__iexact=event_code).url_code
+    except UrlCode.DoesNotExist:
+        return EVENT_NOT_FOUND_ERROR
+
+    return Response({"true_code": true_code}, status=200)
+
+
 @api_endpoint("POST")
 @check_auth
 @validate_json_input(DateEventEditSerializer)
@@ -248,7 +273,7 @@ def edit_date_event(request):
         with transaction.atomic():
             # Find the event
             event = UserEvent.objects.get(
-                url_code=event_code,
+                url_code__url_code__iexact=event_code,
                 user_account=user,
                 date_type=UserEvent.EventType.SPECIFIC,
             )
@@ -343,7 +368,7 @@ def edit_week_event(request):
         with transaction.atomic():
             # Find the event
             event = UserEvent.objects.get(
-                url_code=event_code,
+                url_code__url_code__iexact=event_code,
                 user_account=user,
                 date_type=UserEvent.EventType.GENERIC,
             )
@@ -417,7 +442,7 @@ def delete_event(request):
         return NOT_CREATOR_ERROR
 
     try:
-        event = UserEvent.objects.get(url_code=event_code)
+        event = event_lookup(event_code)
         if event.user_account != user:
             return NOT_CREATOR_ERROR
         # This should remove everything with foreign key cascades
@@ -443,7 +468,7 @@ def get_event_details(request):
     event_code = request.validated_data.get("event_code")
 
     try:
-        event = event_lookup(event_code)
+        event = event_lookup_prefetch(event_code)
         touch_url_code(event_code)
         data = format_event_info(event)
         match event.date_type:

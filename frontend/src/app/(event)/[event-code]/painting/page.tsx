@@ -9,12 +9,15 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import handleErrorResponse from "@/lib/utils/api/handle-api-error";
 import { processEventData } from "@/lib/utils/api/processors/process-event-data";
 import { serverGet } from "@/lib/utils/api/server-fetch";
+import checkEventCode from "@/lib/utils/check-event-code";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
 
 export async function generateMetadata({
   params,
 }: EventCodePageProps): Promise<Metadata> {
   const { "event-code": eventCode } = await params;
+
+  await checkEventCode(eventCode, (trueCode) => `/${trueCode}/painting`);
 
   const initialEventData = await getCachedEventDetails(eventCode);
 

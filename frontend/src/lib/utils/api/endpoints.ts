@@ -23,6 +23,7 @@ import {
   VerificationCode,
   ActiveSessionList,
   SessionId,
+  TrueCode,
 } from "@/lib/utils/api/types";
 
 /**
@@ -116,6 +117,12 @@ export const ROUTES = {
      * @throws 400 - If the custom code is not available or invalid.
      */
     checkCode: route<MessageResponse, CustomCode>("/event/check-code/"),
+    /**
+     * Gets the true URL code for an event, given the event code.
+     * @method GET
+     * @throws 404 - If the event does not exist.
+     */
+    getTrueCode: route<TrueCode, EventCode>("/event/get-true-code/"),
     /**
      * Edits the details of a 'date' type event.
      * @method POST
