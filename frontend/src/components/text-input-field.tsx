@@ -71,6 +71,8 @@ export default function TextInputField(props: TextInputFieldProps) {
   const isOverLimit = maxLength ? value.length > maxLength : false;
   const activeError = isOverLimit ? maxLengthError : error;
 
+  const errorId = `${id}-error`;
+
   // ref for placeholder size
   const labelRef = useRef<HTMLLabelElement>(null);
   const [labelWidth, setLabelWidth] = useState(0);
@@ -108,13 +110,21 @@ export default function TextInputField(props: TextInputFieldProps) {
       {/* --- inline error layout --- */}
       {isInline && (
         <p
+          id={errorId}
           className={cn(
             "text-error mb-1 flex items-center justify-end gap-1 text-xs",
             activeError ? "visible" : "invisible",
           )}
+          aria-live="polite"
         >
           {activeError ? activeError : "Error Placeholder"}
         </p>
+      )}
+
+      {isInline && (
+        <label htmlFor={id} className="sr-only">
+          {label}
+        </label>
       )}
 
       <div
@@ -132,6 +142,8 @@ export default function TextInputField(props: TextInputFieldProps) {
           onFocus={onFocus}
           onBlur={onBlur}
           placeholder={isInline ? placeholder || label : " "} // triggers placeholder-shown state for floating label
+          aria-invalid={!!activeError}
+          aria-describedby={activeError ? errorId : undefined}
           className={cn(
             "peer bg-transparent",
             "focus:outline-none",
@@ -191,6 +203,7 @@ export default function TextInputField(props: TextInputFieldProps) {
           <label
             htmlFor={id}
             ref={labelRef}
+            id={activeError ? errorId : undefined}
             className={cn(
               "pointer-events-none absolute origin-[0_0] cursor-text select-none px-1",
               "transition-[top,scale] duration-200 ease-in-out",
