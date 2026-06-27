@@ -8,6 +8,7 @@ import { useDebouncedCallback } from "use-debounce";
 
 import Checkbox from "@/components/checkbox";
 import MobileFooterIsland from "@/components/mobile-footer-island";
+import TextInputField from "@/components/text-input-field";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
@@ -379,26 +380,19 @@ function DisplayNameInput({
     <div className="h-fit w-full shrink-0 space-y-4 overflow-y-auto md:w-80">
       <div className="space-y-2">
         <div className="w-fit">
-          <p
-            className={`text-error text-right text-xs ${errors.displayName ? "visible" : "invisible"}`}
-          >
-            {errors.displayName ? errors.displayName : "Error Placeholder"}
-          </p>
           Hi,{" "}
-          <input
-            required
+          <TextInputField
+            id="displayName"
             type="text"
+            label="Display name"
+            style="inline"
             value={displayName}
             onChange={(e) => {
-              setDisplayName(e.target.value);
-              handleNameChange(e.target.value);
+              setDisplayName(e);
+              handleNameChange(e);
             }}
             placeholder="add your name"
-            className={`inline-block w-auto border-b bg-transparent px-1 focus:outline-none ${
-              errors.displayName
-                ? "border-error placeholder:text-error"
-                : "border-gray-400"
-            }`}
+            error={errors.displayName}
           />
           <br />
           add your availabilities here

@@ -100,7 +100,7 @@ export default function Page() {
                 type="text"
                 onChange={handleDefaultNameChange}
                 error={defaultNameError}
-                outlined
+                style="outlined"
               />
             </div>
             <div
