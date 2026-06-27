@@ -10,6 +10,7 @@ import {
 import { ResultsAvailabilityMap } from "@/core/availability/types";
 import { removePerson } from "@/features/event/results/lib/remove-person";
 import { ResultsInformation } from "@/features/event/results/lib/types";
+import { useLiveUpdates } from "@/features/event/results/lib/use-live-updates";
 import { findConsensusAndConflicts } from "@/features/event/results/lib/utils";
 import { useToast } from "@/features/system-feedback/toast/context";
 import { MESSAGES } from "@/lib/messages";
@@ -55,7 +56,6 @@ export function useEventResults(initialData: ResultsInformation) {
       return state.filter((p) => p.display_name !== personToRemove);
     },
   );
-
   const [optimisticAvailabilities, updateOptimisticAvailabilities] =
     useOptimistic(availability || {}, (state, person: string) => {
       const updatedState = { ...state };
@@ -64,6 +64,10 @@ export function useEventResults(initialData: ResultsInformation) {
       }
       return updatedState;
     });
+  const [optimisticCurrentUser, removeOptimisticCurrentUser] = useOptimistic(
+    currentUser,
+    () => null,
+  );
 
   /* ACTIONS */
   const handleSetHoveredParticipant = useCallback((person: string | null) => {
@@ -92,6 +96,9 @@ export function useEventResults(initialData: ResultsInformation) {
     startTransition(() => {
       removeOptimisticParticipant(person);
       updateOptimisticAvailabilities(person);
+      if (isRemovingSelf) {
+        removeOptimisticCurrentUser(null);
+      }
     });
 
     // Server Action
@@ -358,6 +365,13 @@ export function useEventResults(initialData: ResultsInformation) {
     }
   }, [hasNoConsensus, showOnlyBestTimes, addToast]);
 
+  useLiveUpdates(
+    eventCode,
+    liveAddParticipant,
+    liveUpdateParticipant,
+    liveRemoveParticipant,
+  );
+
   return {
     // Data
     eventType: initialData.eventType,
@@ -367,7 +381,7 @@ export function useEventResults(initialData: ResultsInformation) {
     gridNumParticipants,
 
     // User Info
-    currentUser,
+    currentUser: optimisticCurrentUser,
     isCreator,
 
     // UI State
@@ -385,10 +399,5 @@ export function useEventResults(initialData: ResultsInformation) {
     handleRemoveParticipant,
     setShowOnlyBestTimes,
     setTimezone,
-
-    // Live Updates
-    liveAddParticipant,
-    liveUpdateParticipant,
-    liveRemoveParticipant,
   };
 }

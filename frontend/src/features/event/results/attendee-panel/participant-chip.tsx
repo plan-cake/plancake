@@ -58,7 +58,7 @@ export default function ParticipantChip({
     },
   };
 
-  const ChipContent = (
+  return (
     <motion.li
       className="self-start" // prevents framer motion issue with row height on enter
       initial={{
@@ -137,8 +137,6 @@ export default function ParticipantChip({
       </div>
     </motion.li>
   );
-
-  return ChipContent;
 }
 
 function TransitioningDisplayName({ displayName }: { displayName: string }) {
