@@ -1,9 +1,14 @@
+import asyncio
+import json
 import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from asgiref.sync import sync_to_async
 from django.db import transaction
 from django.db.models import Q
+from django.http import JsonResponse, StreamingHttpResponse
+from redis.asyncio import Redis
 from rest_framework.response import Response
 
 from api.availability.utils import get_weekday_date
@@ -11,6 +16,7 @@ from api.decorators import (
     api_endpoint,
     check_auth,
     require_auth,
+    sse_endpoint,
     validate_json_input,
     validate_output,
     validate_query_param_input,
@@ -34,8 +40,25 @@ from api.event.utils import (
     validate_weekday_timeslots,
 )
 from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
-from api.settings import GENERIC_ERR_RESPONSE, ThrottleScopes
-from api.utils import MessageOutputSerializer, check_rate_limit, format_event_info
+from api.redis_pools import async_pool
+from api.settings import (
+    ACCOUNT_COOKIE_NAME,
+    GENERIC_ERR_RESPONSE,
+    GUEST_COOKIE_NAME,
+    LIVE_UPDATES_HEARTBEAT_SECONDS,
+    MAX_LIVE_CONNECTIONS_EVENT,
+    MAX_LIVE_CONNECTIONS_GLOBAL,
+    ThrottleScopes,
+)
+from api.utils import (
+    LiveUpdateEvent,
+    LiveUpdateEventEditData,
+    MessageOutputSerializer,
+    check_rate_limit,
+    format_event_info,
+    get_session,
+    notify_live_update,
+)
 
 logger = logging.getLogger("api")
 
@@ -284,6 +307,14 @@ def edit_date_event(request):
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
 
+    notify_live_update(
+        LiveUpdateEvent(
+            user_id=user.user_account_id,
+            event_code=event_code,
+            data=LiveUpdateEventEditData(),
+        )
+    )
+
     logger.debug(f"Event updated with code: {event_code}")
     return Response({"message": ["Event updated successfully."]}, status=200)
 
@@ -352,6 +383,14 @@ def edit_week_event(request):
 
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR
+
+    notify_live_update(
+        LiveUpdateEvent(
+            user_id=user.user_account_id,
+            event_code=event_code,
+            data=LiveUpdateEventEditData(),
+        )
+    )
 
     logger.debug(f"Event updated with code: {event_code}")
     return Response({"message": ["Event updated successfully."]}, status=200)
@@ -427,3 +466,107 @@ def get_event_details(request):
         },
         status=200,
     )
+
+
+@sse_endpoint("GET")
+async def get_live_updates(request, event_code):
+    """
+    Creates an SSE connection that streams live updates for an event, identified by its
+    URL code.
+
+    The updates include:
+    - New participants
+    - Participants changing their availability and/or display name
+    - Removed participants (either by choice or by the creator removing them)
+    - Event edits (title, timeslots, time zone changes)
+
+    These updates are polled on a heartbeat interval, meaning that multiple events can be
+    sent to the client at once if they happen in quick succession.
+
+    The connection can fail if there are too many concurrent connections, either globally
+    or for the specific event. In that case, a 503 response is returned.
+    """
+    # Using async Redis client
+    client: Redis = Redis(connection_pool=async_pool)
+
+    GLOBAL_COUNT = "live_updates_global_count"
+    EVENT_COUNT = f"live_updates_event_{event_code}_count"
+
+    # Check global limit
+    global_count = await client.incr(GLOBAL_COUNT)
+    if global_count > MAX_LIVE_CONNECTIONS_GLOBAL:
+        await client.decr(GLOBAL_COUNT)
+        await client.aclose()
+        return JsonResponse(
+            {"error": {"general": ["Live updates are currently unavailable."]}},
+            status=503,
+        )
+
+    # Check per-event limit
+    event_count = await client.incr(EVENT_COUNT)
+    if event_count > MAX_LIVE_CONNECTIONS_EVENT:
+        await client.decr(GLOBAL_COUNT)
+        await client.decr(EVENT_COUNT)
+        await client.aclose()
+        return JsonResponse(
+            {
+                "error": {
+                    "general": [
+                        "Live updates for this event are currently unavailable."
+                    ]
+                }
+            },
+            status=503,
+        )
+
+    # Get current user ID from cookies
+    aget_session = sync_to_async(get_session)
+    session = None
+    user_id = -1
+    if ACCOUNT_COOKIE_NAME in request.COOKIES:
+        session = await aget_session(request.COOKIES[ACCOUNT_COOKIE_NAME])
+    if session is None and GUEST_COOKIE_NAME in request.COOKIES:
+        session = await aget_session(request.COOKIES[GUEST_COOKIE_NAME])
+    if session:
+        user_id = session.user_account_id
+
+    async def event_generator():
+        pubsub = client.pubsub()
+        await pubsub.subscribe(f"event_{event_code}")
+
+        try:
+            while True:
+                # Expire after 10 seconds to prevent stale counts if the server crashes
+                await client.expire(GLOBAL_COUNT, 10)
+                await client.expire(EVENT_COUNT, 10)
+
+                messages_exist = False
+
+                # Process all queued messages
+                while True:
+                    message = await pubsub.get_message(ignore_subscribe_messages=True)
+                    if not message:
+                        break
+
+                    messages_exist = True
+
+                    # Get the payload, add the user ID, and send it to the client
+                    event = json.loads(message["data"].decode("utf-8"))
+                    data = event["data"]
+                    data["is_you"] = event["user_id"] == user_id
+                    yield f"data: {json.dumps(data)}\n\n"
+
+                # If there are no messages, send a ping
+                if not messages_exist:
+                    # JavaScript ignores, but keeps connection alive for proxies
+                    yield ":\n\n"
+
+                await asyncio.sleep(LIVE_UPDATES_HEARTBEAT_SECONDS)
+        except Exception:
+            await pubsub.unsubscribe(f"event_{event_code}")
+        finally:
+            await client.decr(GLOBAL_COUNT)
+            await client.decr(EVENT_COUNT)
+            await client.aclose()
+
+    return StreamingHttpResponse(event_generator(), content_type="text/event-stream")

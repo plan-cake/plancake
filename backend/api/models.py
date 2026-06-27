@@ -121,6 +121,7 @@ class UrlCode(models.Model):
 
 class EventParticipant(models.Model):
     event_participant_id = models.AutoField(primary_key=True)
+    public_id = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
     user_event = models.ForeignKey(
         UserEvent, on_delete=models.CASCADE, related_name="participants"
     )

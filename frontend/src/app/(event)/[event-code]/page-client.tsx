@@ -11,7 +11,7 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import ScheduleGrid from "@/features/event/grid/grid";
 import AttendeesPanel from "@/features/event/results/attendee-panel/panel";
-import { getResultBanners } from "@/features/event/results/banners";
+import { getResultBanner } from "@/features/event/results/banner";
 import {
   ResultsProvider,
   useResultsContext,
@@ -61,7 +61,6 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     timeslots,
   } = eventData;
 
-  /* TOAST PROVIDER */
   const { addToast } = useToast();
 
   /* TIMEZONE HANDLING */
@@ -82,8 +81,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     return drawerSnap;
   };
 
-  /* BANNERS */
-  const banners = getResultBanners(
+  /* BANNER */
+  const bannerElement = getResultBanner(
     availabilities,
     participants,
     timeslots,
@@ -174,7 +173,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         </div>
       </div>
 
-      <div className="md:hidden">{banners}</div>
+      <div className="-mb-2 md:hidden">{bannerElement}</div>
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-4">
         <ScheduleGrid
@@ -210,7 +209,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             "relative bottom-auto left-auto w-80 space-y-4 px-0",
           )}
         >
-          {banners}
+          {bannerElement}
           <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4">
             <AttendeesPanel />
             <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
