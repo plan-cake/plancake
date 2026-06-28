@@ -1,9 +1,11 @@
-FROM node:18-alpine
+# This Dockerfile is used to build the development image for the frontend.
+
+FROM node:22-slim
 
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm ci
 
 EXPOSE 3000
 

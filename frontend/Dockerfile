@@ -1,4 +1,7 @@
-FROM node:18-alpine AS builder
+# This Dockerfile is used to build the production image for the frontend.
+
+# BUILD IMAGE
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
@@ -10,8 +13,8 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# Production image
-FROM node:18-alpine AS runner
+# PRODUCTION IMAGE
+FROM node:22-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
