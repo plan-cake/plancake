@@ -29,17 +29,14 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/app
-    # env_file:
-    #   - ./frontend/.env
       - node_modules:/app/node_modules
       - next_cache:/app/.next
     env_file:
       - ./frontend/.env
     environment:
-      - NEXT_PUBLIC_DEBUG=true
-      - NEXT_PUBLIC_API_URL=/server
-      - NEXT_PUBLIC_TEST_ENVIRONMENT=Local
+      # The API URL for both the client and the Next.js server to communicate with the backend
       - INTERNAL_API_URL=http://backend:8000
+      # For Next.js to detect file changes in Docker
       - WATCHPACK_POLLING=true
     depends_on:
       - backend
