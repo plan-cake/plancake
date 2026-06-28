@@ -32,7 +32,8 @@ export async function serverGet<T extends { url: string }>(
   params?: InferReq<T>,
   options?: RequestInit,
 ): Promise<InferRes<T>> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const baseUrl =
+    process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
   let queryString = "";
   if (params && Object.keys(params).length > 0) {
