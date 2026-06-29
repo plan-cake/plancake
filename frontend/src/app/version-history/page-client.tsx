@@ -72,17 +72,17 @@ export default function ClientPage({
   };
 
   return (
-    <div className="flex min-h-screen flex-col px-6">
+    <div className="flex min-h-screen flex-col">
       <HeaderSpacer />
       <div
         className={cn(
           topMarginClass,
-          "bg-background z-15 sticky flex w-full items-center justify-between py-2",
+          "bg-background z-15 sticky flex w-full items-center justify-between px-6 py-2",
         )}
       >
         <h1 className="text-2xl font-bold">Version History</h1>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 px-6">
         <div className="flex justify-between">
           <ActionButton
             buttonStyle="semi-transparent"
