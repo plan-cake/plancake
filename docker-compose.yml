@@ -38,6 +38,7 @@ services:
       - INTERNAL_API_URL=http://backend:8000
       # For Next.js to detect file changes in Docker
       - WATCHPACK_POLLING=true
+    command: ["sh", "./start.sh"]
     depends_on:
       - backend
 
