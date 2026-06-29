@@ -70,7 +70,9 @@ export async function serverPost<T extends { url: string }>(
   body?: InferReq<T>,
   options?: RequestInit,
 ): Promise<InferRes<T>> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // Inside serverGet and serverPost:
+  const baseUrl =
+    process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
   const url = `${baseUrl}${endpoint.url}`;
   const cookieString = await getAuthCookieString();
   const forwardedHeaders = await getForwardedHeaders();
