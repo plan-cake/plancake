@@ -5,7 +5,7 @@
 # network access. The command includes a build flag to ensure that the latest changes
 # are reflected in the containers.
 up:
-	docker compose up -d --build && \
+	@docker compose up -d --build && \
 	echo "" && \
 	echo "Plancake Industries" && \
 	echo "   - Local:   http://localhost:3000" && \
@@ -32,6 +32,14 @@ logs-web:
 	docker compose logs -f frontend
 
 # --- SHELLS & COMMANDS ---
+
+# Print out the URLs for the local and network access.
+url:
+	@echo "" && \
+	echo "Plancake Industries" && \
+	echo "   - Local:   http://localhost:3000" && \
+	echo "   - Network: $$(node scripts/print-ip.js)" && \
+	echo ""
 
 # Open a terminal inside the frontend container
 shell-web:
