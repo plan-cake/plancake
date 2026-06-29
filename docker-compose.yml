@@ -17,7 +17,8 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      - LIVE_UPDATES_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - LIVE_UPDATES_URL=redis://redis:6379/1
     depends_on:
       - redis
 

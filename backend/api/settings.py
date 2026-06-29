@@ -166,10 +166,10 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour=0, minute=0),  # Every day at midnight
     },
 }
-CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/1")
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 
 # Live updates
-LIVE_UPDATES_URL = env("LIVE_UPDATES_URL", default="redis://localhost:6379/0")
+LIVE_UPDATES_URL = env("LIVE_UPDATES_URL", default="redis://localhost:6379/1")
 LIVE_UPDATES_HEARTBEAT_SECONDS = 1
 MAX_LIVE_CONNECTIONS_EVENT = 25
 MAX_LIVE_CONNECTIONS_GLOBAL = 500
