@@ -80,64 +80,69 @@ export default function ClientPage({
         )}
       >
         <h1 className="text-2xl font-bold">Version History</h1>
-        <ActionButton
-          buttonStyle="semi-transparent"
-          icon={
-            allExpanded ? (
-              <ListChevronsDownUpIcon />
-            ) : (
-              <ListChevronsUpDownIcon />
-            )
-          }
-          label={allExpanded ? "Collapse All" : "Expand All"}
-          shrinkOnMobile
-          onClick={handleToggleAll}
-        />
       </div>
-      <div className="mx-auto flex w-full flex-col gap-8 px-8 pt-2">
-        {versionHistoryData.map((version, index) => {
-          const isCurrent = index === versionHistoryData.length - 1;
-          const hasMinorVersions =
-            version.minorVersions && version.minorVersions.length > 0;
+      <div className="flex flex-col gap-4 px-8">
+        <div>
+          <ActionButton
+            buttonStyle="semi-transparent"
+            icon={
+              allExpanded ? (
+                <ListChevronsDownUpIcon />
+              ) : (
+                <ListChevronsUpDownIcon />
+              )
+            }
+            label={allExpanded ? "Collapse All" : "Expand All"}
+            onClick={handleToggleAll}
+          />
+        </div>
+        <div className="mx-auto flex w-full flex-col gap-8">
+          {versionHistoryData.map((version, index) => {
+            const isCurrent = index === versionHistoryData.length - 1;
+            const hasMinorVersions =
+              version.minorVersions && version.minorVersions.length > 0;
 
-          return (
-            <div
-              className={
-                isCurrent ? "bg-panel outline-panel outline-16 rounded-xl" : ""
-              }
-              key={version.version}
-            >
-              <MajorVersion
+            return (
+              <div
+                className={
+                  isCurrent
+                    ? "bg-panel outline-panel outline-16 rounded-xl"
+                    : ""
+                }
                 key={version.version}
-                versionData={version}
-                isCurrent={isCurrent}
-                isLast={isCurrent && !hasMinorVersions}
-                extendLine={!isCurrent && !hasMinorVersions}
-                isExpanded={expandedVersions.has(version.version)}
-                toggleExpanded={toggleVersion}
-              />
-              {version.minorVersions &&
-                version.minorVersions.map((minorVersion, minorIndex) => {
-                  const isLastMinor =
-                    minorIndex === version.minorVersions!.length - 1;
+              >
+                <MajorVersion
+                  key={version.version}
+                  versionData={version}
+                  isCurrent={isCurrent}
+                  isLast={isCurrent && !hasMinorVersions}
+                  extendLine={!isCurrent && !hasMinorVersions}
+                  isExpanded={expandedVersions.has(version.version)}
+                  toggleExpanded={toggleVersion}
+                />
+                {version.minorVersions &&
+                  version.minorVersions.map((minorVersion, minorIndex) => {
+                    const isLastMinor =
+                      minorIndex === version.minorVersions!.length - 1;
 
-                  return (
-                    <MinorVersion
-                      key={minorVersion.version}
-                      versionData={minorVersion}
-                      isCurrent={isCurrent}
-                      isLast={isCurrent && isLastMinor}
-                      extendLine={!isCurrent && isLastMinor}
-                      isExpanded={expandedVersions.has(minorVersion.version)}
-                      toggleExpanded={toggleVersion}
-                    />
-                  );
-                })}
-            </div>
-          );
-        })}
-        {/* Bottom div as a scroll reference, also adding bottom padding */}
-        <div ref={bottomRef} />
+                    return (
+                      <MinorVersion
+                        key={minorVersion.version}
+                        versionData={minorVersion}
+                        isCurrent={isCurrent}
+                        isLast={isCurrent && isLastMinor}
+                        extendLine={!isCurrent && isLastMinor}
+                        isExpanded={expandedVersions.has(minorVersion.version)}
+                        toggleExpanded={toggleVersion}
+                      />
+                    );
+                  })}
+              </div>
+            );
+          })}
+          {/* Bottom div as a scroll reference, also adding bottom padding */}
+          <div ref={bottomRef} />
+        </div>
       </div>
     </div>
   );
