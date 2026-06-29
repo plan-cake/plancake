@@ -62,12 +62,12 @@ export default function ClientPage({
     });
   };
 
-  const expandAll = () => {
-    setExpandedVersions(new Set(allVersions));
-  };
-
-  const collapseAll = () => {
-    setExpandedVersions(new Set());
+  const handleToggleAll = () => {
+    if (allExpanded) {
+      setExpandedVersions(new Set());
+    } else {
+      setExpandedVersions(new Set(allVersions));
+    }
   };
 
   return (
@@ -91,7 +91,7 @@ export default function ClientPage({
           }
           label={allExpanded ? "Collapse All" : "Expand All"}
           shrinkOnMobile
-          onClick={allExpanded ? collapseAll : expandAll}
+          onClick={handleToggleAll}
         />
       </div>
       <div className="mx-auto flex w-full flex-col gap-8 px-8 pt-2">
