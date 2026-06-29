@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
 import {
+  ArrowDownIcon,
   ChevronRightIcon,
   ListChevronsDownUpIcon,
   ListChevronsUpDownIcon,
@@ -81,8 +82,8 @@ export default function ClientPage({
       >
         <h1 className="text-2xl font-bold">Version History</h1>
       </div>
-        <div>
       <div className="flex flex-col gap-4">
+        <div className="flex justify-between">
           <ActionButton
             buttonStyle="semi-transparent"
             icon={
@@ -94,6 +95,15 @@ export default function ClientPage({
             }
             label={allExpanded ? "Collapse All" : "Expand All"}
             onClick={handleToggleAll}
+          />
+          <ActionButton
+            buttonStyle="semi-transparent"
+            icon={<ArrowDownIcon />}
+            label="Scroll to Latest"
+            shrinkOnMobile
+            onClick={() => {
+              bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+            }}
           />
         </div>
         <div className="mx-auto flex w-full flex-col gap-8 px-2">
