@@ -77,7 +77,8 @@ export default function ClientPage({
       <div
         className={cn(
           topMarginClass,
-          "bg-background z-15 sticky flex w-full items-center justify-between px-6 py-2",
+          "flex w-full items-center justify-between",
+          "bg-background z-15 sticky px-6 pb-2 pt-4",
         )}
       >
         <h1 className="text-2xl font-bold">Version History</h1>
