@@ -71,18 +71,18 @@ export default function ClientPage({
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col px-6">
       <HeaderSpacer />
       <div
         className={cn(
           topMarginClass,
-          "bg-background z-15 sticky flex w-full items-center justify-between px-6 py-2",
+          "bg-background z-15 sticky flex w-full items-center justify-between py-2",
         )}
       >
         <h1 className="text-2xl font-bold">Version History</h1>
       </div>
-      <div className="flex flex-col gap-4 px-8">
         <div>
+      <div className="flex flex-col gap-4">
           <ActionButton
             buttonStyle="semi-transparent"
             icon={
@@ -96,7 +96,7 @@ export default function ClientPage({
             onClick={handleToggleAll}
           />
         </div>
-        <div className="mx-auto flex w-full flex-col gap-8">
+        <div className="mx-auto flex w-full flex-col gap-8 px-2">
           {versionHistoryData.map((version, index) => {
             const isCurrent = index === versionHistoryData.length - 1;
             const hasMinorVersions =
