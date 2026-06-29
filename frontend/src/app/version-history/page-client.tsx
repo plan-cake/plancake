@@ -102,7 +102,10 @@ export default function ClientPage({
             label="Scroll to Latest"
             shrinkOnMobile
             onClick={() => {
-              bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+              // State logic within the button cancels the scroll unless it's delayed
+              setTimeout(() => {
+                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+              }, 0);
             }}
           />
         </div>
