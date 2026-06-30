@@ -9,6 +9,7 @@ import { TOAST_CONFIG } from "@/features/system-feedback/toast/config";
 import ToastContext from "@/features/system-feedback/toast/context";
 import { ToastData, ToastOptions } from "@/features/system-feedback/toast/type";
 import { ToastType } from "@/features/system-feedback/type";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 export default function ToastProvider({
@@ -16,6 +17,8 @@ export default function ToastProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const isMobile = useCheckMobile();
+
   const [toasts, setToasts] = useState<ToastData[]>([]);
   const [isHoveringViewport, setIsHoveringViewport] = useState(false);
 
@@ -110,14 +113,24 @@ export default function ToastProvider({
           onMouseLeave={() => setIsHoveringViewport(false)}
           style={{
             // adjust the position of the toast viewport based on keyboard height
-            transform: `translateY(-${keyboardHeight}px)`,
+            transform: isMobile
+              ? undefined
+              : `translateY(-${keyboardHeight}px)`,
             transition: "transform 0.2s ease-out",
           }}
           className={cn(
-            "fixed bottom-12 right-0 z-[2147483647] md:bottom-0",
-            keyboardHeight > 0 && "bottom-0",
-            "flex list-none flex-col items-end outline-none",
-            "m-0 space-y-1 pb-[var(--viewport-padding)] pr-[var(--viewport-padding)] [--viewport-padding:_25px]",
+            "fixed z-[2147483647]",
+            "m-0 list-none outline-none [--viewport-padding:_25px]",
+            isMobile
+              ? cn(
+                  "left-0 right-0 top-0",
+                  "px-[var(--viewport-padding)] pt-[var(--viewport-padding)]",
+                )
+              : cn(
+                  "bottom-0 right-0",
+                  "flex flex-col items-end",
+                  "space-y-1 pb-[var(--viewport-padding)] pr-[var(--viewport-padding)]",
+                ),
           )}
         >
           {toasts.map((toast) => {
