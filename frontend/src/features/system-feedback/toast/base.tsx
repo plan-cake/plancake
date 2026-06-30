@@ -64,7 +64,7 @@ export default function BaseToast({
   return (
     <Toast.Root
       className={cn(
-        "rounded-4xl group relative grid max-w-sm grid-cols-[auto_1fr_auto] items-center gap-x-4 overflow-hidden px-4 py-3 shadow-xl",
+        "rounded-4xl group relative w-full overflow-hidden px-4 py-3 shadow-xl",
         "data-[state=closed]:animate-toastSlideOutRight data-[state=open]:animate-toastSlideInLeft",
         "data-[swipe=end]:animate-toastSwipeOutRight data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]",
         "data-[swipe=cancel]:translate-x-0 data-[swipe=cancel]:transition-[transform_200ms_ease-out]",
@@ -85,39 +85,43 @@ export default function BaseToast({
         />
       )}
 
-      <div className="z-10 flex items-center justify-center">{icon}</div>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="z-10 flex items-center justify-center">{icon}</div>
 
-      <div className="z-10 flex flex-col gap-1">
-        <Toast.Title className="text-sm font-semibold leading-none">
-          {title}
-        </Toast.Title>
-        <Toast.Description className="text-sm leading-snug opacity-90">
-          {message}
-        </Toast.Description>
+          <div className="z-10 flex flex-col gap-1">
+            <Toast.Title className="text-sm font-semibold leading-none">
+              {title}
+            </Toast.Title>
+            <Toast.Description className="text-sm leading-snug opacity-90">
+              {message}
+            </Toast.Description>
+          </div>
+        </div>
+
+        <Toast.Close asChild>
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={() => {
+              if (
+                document.activeElement &&
+                document.activeElement instanceof HTMLElement
+              ) {
+                document.activeElement.blur();
+              }
+            }}
+            className={cn(
+              "z-10 flex h-6 w-6 items-center justify-center rounded-full",
+              "hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-white/50",
+              !isPersistent &&
+                "opacity-0 focus-visible:opacity-100 group-hover:opacity-100",
+            )}
+          >
+            <XIcon className="h-4 w-4" />
+          </button>
+        </Toast.Close>
       </div>
-
-      <Toast.Close asChild>
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={() => {
-            if (
-              document.activeElement &&
-              document.activeElement instanceof HTMLElement
-            ) {
-              document.activeElement.blur();
-            }
-          }}
-          className={cn(
-            "z-10 col-start-3 row-span-2 flex h-6 w-6 items-center justify-center rounded-full",
-            "hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-white/50",
-            !isPersistent &&
-              "opacity-0 focus-visible:opacity-100 group-hover:opacity-100",
-          )}
-        >
-          <XIcon className="h-4 w-4" />
-        </button>
-      </Toast.Close>
     </Toast.Root>
   );
 }
