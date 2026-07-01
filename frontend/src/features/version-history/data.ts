@@ -183,6 +183,17 @@ export function getVersionHistoryData(): VersionHistoryData {
             "Removed default dates and times from the new event page",
           ],
         },
+        {
+          version: "v0.4.5",
+          releaseDate: { year: 2026, month: 5, day: 29 },
+          changes: [
+            "Added animations to the password strength criteria",
+            "Updated confirmation dialogs to display as drawers on mobile",
+            "Updated loading page skeletons to be consistent with new page layouts",
+            "Updated the authentication code checking rate limit to prevent lockouts",
+            "Fixed an issue where the mobile results page drawer would not display the footer when opened",
+          ],
+        },
       ],
     },
   ];
