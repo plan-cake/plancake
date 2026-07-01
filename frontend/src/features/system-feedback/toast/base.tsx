@@ -127,6 +127,7 @@ export default function BaseToast({
           "flex items-center justify-between gap-4",
           isMobile && stackIndex > 1 && "opacity-0",
         )}
+        aria-hidden={isMobile && stackIndex > 0}
       >
         <div className="flex items-center gap-4">
           <div className="z-10 flex items-center justify-center">{icon}</div>
@@ -159,6 +160,7 @@ export default function BaseToast({
               !isPersistent &&
                 "opacity-0 focus-visible:opacity-100 group-hover:opacity-100",
             )}
+            tabIndex={isMobile && stackIndex > 0 ? -1 : undefined}
           >
             <XIcon className="h-4 w-4" />
           </button>
