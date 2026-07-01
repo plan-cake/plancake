@@ -105,7 +105,7 @@ export default function ToastProvider({
 
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>
-      <Toast.Provider swipeDirection="right">
+      <Toast.Provider swipeDirection={isMobile ? "up" : "right"}>
         {children}
 
         <Toast.Viewport

@@ -76,11 +76,16 @@ export default function BaseToast({
               "transition-[transform,background-color,scale] duration-200 ease-out",
               "origin-[center_-100%]",
               index < 3 && "shadow-xl",
+              "data-[state=closed]:animate-toastSlideOutUp data-[state=open]:animate-toastSlideInDown",
+              "data-[swipe=end]:animate-toastSwipeOutUp data-[swipe=move]:translate-y-[var(--radix-toast-swipe-move-y)]",
+              "data-[swipe=cancel]:translate-y-0 data-[swipe=cancel]:transition-[transform_200ms_ease-out]",
             )
-          : cn("relative shadow-xl"),
-        "data-[state=closed]:animate-toastSlideOutRight data-[state=open]:animate-toastSlideInLeft",
-        "data-[swipe=end]:animate-toastSwipeOutRight data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]",
-        "data-[swipe=cancel]:translate-x-0 data-[swipe=cancel]:transition-[transform_200ms_ease-out]",
+          : cn(
+              "relative shadow-xl",
+              "data-[state=closed]:animate-toastSlideOutRight data-[state=open]:animate-toastSlideInLeft",
+              "data-[swipe=end]:animate-toastSwipeOutRight data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]",
+              "data-[swipe=cancel]:translate-x-0 data-[swipe=cancel]:transition-[transform_200ms_ease-out]",
+            ),
       )}
       style={{
         backgroundColor: `var(--color-${backgroundColor})`,
