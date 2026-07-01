@@ -108,7 +108,7 @@ export default function BaseToast({
       <div
         className={cn(
           "flex items-center justify-between gap-4",
-          index > 1 && "opacity-0",
+          isMobile && index > 1 && "opacity-0",
         )}
       >
         <div className="flex items-center gap-4">
