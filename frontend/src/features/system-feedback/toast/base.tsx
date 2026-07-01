@@ -46,11 +46,13 @@ export default function BaseToast({
   const isMobile = useCheckMobile();
   const [prevStackIndex, setPrevStackIndex] = useState(stackIndex);
   const [resetCount, setResetCount] = useState(0);
-  if (isMobile && stackIndex !== prevStackIndex) {
-    setPrevStackIndex(stackIndex);
-    remainingTime.current = duration;
-    setResetCount((prev) => prev + 1);
-  }
+  useEffect(() => {
+    if (isMobile && stackIndex !== prevStackIndex) {
+      setPrevStackIndex(stackIndex);
+      remainingTime.current = duration;
+      setResetCount((prev) => prev + 1);
+    }
+  }, [isMobile, stackIndex, prevStackIndex, duration]);
 
   useEffect(() => {
     if (isPersistent || !open) return;
