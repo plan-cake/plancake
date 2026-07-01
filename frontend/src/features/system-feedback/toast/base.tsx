@@ -18,7 +18,7 @@ type BaseToastProps = {
   duration?: number;
   isPersistent?: boolean;
   isPaused: boolean;
-  index: number;
+  stackIndex: number;
 };
 
 export default function BaseToast({
@@ -32,7 +32,7 @@ export default function BaseToast({
   duration = 5000,
   isPersistent = false,
   isPaused,
-  index,
+  stackIndex,
 }: BaseToastProps) {
   // Whenever the viewport hover state changes, the toast provider rerenders
   // all toasts, which means that all toast durations will get reset. In order
@@ -75,7 +75,7 @@ export default function BaseToast({
               "absolute w-[calc(100%-2*var(--viewport-padding))]",
               "transition-[transform,background-color,scale] duration-200 ease-out",
               "origin-[center_-100%]",
-              index < 3 && "shadow-xl",
+              stackIndex < 3 && "shadow-xl",
               "data-[state=closed]:animate-toastSlideOutUp data-[state=open]:animate-toastSlideInDown",
               "data-[swipe=end]:animate-toastSwipeOutUp data-[swipe=move]:translate-y-[var(--radix-toast-swipe-move-y)]",
               "data-[swipe=cancel]:translate-y-0 data-[swipe=cancel]:transition-[transform_200ms_ease-out]",
@@ -92,9 +92,9 @@ export default function BaseToast({
         color: `var(--color-${textColor})`,
         ...(isMobile
           ? {
-              zIndex: 2147483647 - index,
-              scale: Math.max(0, 1 - index * 0.1),
-              backgroundColor: `color-mix(in oklab, var(--color-${backgroundColor}), var(--color-background) ${index * 40}%)`,
+              zIndex: 2147483647 - stackIndex,
+              scale: Math.max(0, 1 - stackIndex * 0.1),
+              backgroundColor: `color-mix(in oklab, var(--color-${backgroundColor}), var(--color-background) ${stackIndex * 40}%)`,
             }
           : {}),
       }}
@@ -113,7 +113,7 @@ export default function BaseToast({
       <div
         className={cn(
           "flex items-center justify-between gap-4",
-          isMobile && index > 1 && "opacity-0",
+          isMobile && stackIndex > 1 && "opacity-0",
         )}
       >
         <div className="flex items-center gap-4">
