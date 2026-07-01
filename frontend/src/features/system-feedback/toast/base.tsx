@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import * as Toast from "@radix-ui/react-toast";
 import { XIcon } from "lucide-react";
@@ -41,6 +41,17 @@ export default function BaseToast({
   const startTime = useRef<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // ON MOBILE ONLY, when the toast is moved to any position but the top of the stack, the
+  // duration is reset to give each toast, when in the top position, its full duration
+  const isMobile = useCheckMobile();
+  const [prevStackIndex, setPrevStackIndex] = useState(stackIndex);
+  const [resetCount, setResetCount] = useState(0);
+  if (isMobile && stackIndex !== prevStackIndex) {
+    setPrevStackIndex(stackIndex);
+    remainingTime.current = duration;
+    setResetCount((prev) => prev + 1);
+  }
+
   useEffect(() => {
     if (isPersistent || !open) return;
 
@@ -63,8 +74,6 @@ export default function BaseToast({
       }
     };
   }, [isPaused, open, isPersistent, onOpenChange]);
-
-  const isMobile = useCheckMobile();
 
   return (
     <Toast.Root
@@ -104,6 +113,7 @@ export default function BaseToast({
     >
       {!isPersistent && (
         <ProgressBar
+          key={resetCount} // Resets the progress bar when the duration is reset
           duration={duration}
           backgroundColor={backgroundColor}
           isPaused={isPaused}
