@@ -4,6 +4,7 @@ import * as Toast from "@radix-ui/react-toast";
 import { XIcon } from "lucide-react";
 
 import ProgressBar from "@/features/system-feedback/toast/progress-bar";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 type BaseToastProps = {
@@ -17,6 +18,7 @@ type BaseToastProps = {
   duration?: number;
   isPersistent?: boolean;
   isPaused: boolean;
+  index: number;
 };
 
 export default function BaseToast({
@@ -30,6 +32,7 @@ export default function BaseToast({
   duration = 5000,
   isPersistent = false,
   isPaused,
+  index,
 }: BaseToastProps) {
   // Whenever the viewport hover state changes, the toast provider rerenders
   // all toasts, which means that all toast durations will get reset. In order
@@ -61,10 +64,20 @@ export default function BaseToast({
     };
   }, [isPaused, open, isPersistent, onOpenChange]);
 
+  const isMobile = useCheckMobile();
+
   return (
     <Toast.Root
       className={cn(
-        "rounded-4xl group relative w-full overflow-hidden px-4 py-3 shadow-xl",
+        "rounded-4xl group overflow-hidden px-4 py-3",
+        isMobile
+          ? cn(
+              "absolute w-[calc(100%-2*var(--viewport-padding))]",
+              "transition-[transform,background-color,scale] duration-200 ease-out",
+              "origin-[center_-100%]",
+              index < 3 && "shadow-xl",
+            )
+          : cn("relative shadow-xl"),
         "data-[state=closed]:animate-toastSlideOutRight data-[state=open]:animate-toastSlideInLeft",
         "data-[swipe=end]:animate-toastSwipeOutRight data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]",
         "data-[swipe=cancel]:translate-x-0 data-[swipe=cancel]:transition-[transform_200ms_ease-out]",
@@ -72,6 +85,13 @@ export default function BaseToast({
       style={{
         backgroundColor: `var(--color-${backgroundColor})`,
         color: `var(--color-${textColor})`,
+        ...(isMobile
+          ? {
+              zIndex: 2147483647 - index,
+              scale: Math.max(0, 1 - index * 0.1),
+              backgroundColor: `color-mix(in oklab, var(--color-${backgroundColor}), var(--color-background) ${index * 40}%)`,
+            }
+          : {}),
       }}
       open={open}
       onOpenChange={onOpenChange}
@@ -85,7 +105,12 @@ export default function BaseToast({
         />
       )}
 
-      <div className="flex items-center justify-between gap-4">
+      <div
+        className={cn(
+          "flex items-center justify-between gap-4",
+          index > 1 && "opacity-0",
+        )}
+      >
         <div className="flex items-center gap-4">
           <div className="z-10 flex items-center justify-center">{icon}</div>
 

@@ -133,7 +133,7 @@ export default function ToastProvider({
                 ),
           )}
         >
-          {toasts.map((toast) => {
+          {toasts.map((toast, index) => {
             const config = TOAST_CONFIG[toast.type] || TOAST_CONFIG.info;
             const Icon = config.icon;
 
@@ -148,7 +148,7 @@ export default function ToastProvider({
                 icon={<Icon className="col-start-1 row-span-2 h-5 w-5" />}
                 isPersistent={toast.isPersistent}
                 duration={toast.duration}
-                isPaused={isHoveringViewport}
+                isPaused={isHoveringViewport || (isMobile && index > 0)}
                 onOpenChange={(isOpen) => {
                   if (!isOpen) {
                     if (toast.onDismiss) {
@@ -157,6 +157,7 @@ export default function ToastProvider({
                     removeToast(toast.id);
                   }
                 }}
+                index={index}
               />
             );
           })}
