@@ -105,7 +105,7 @@ export default function BaseToast({
           ? {
               zIndex: 2147483647 - stackIndex,
               scale: Math.max(0, 1 - stackIndex * 0.1),
-              backgroundColor: `color-mix(in oklab, var(--color-${backgroundColor}), var(--color-background) ${stackIndex * 40}%)`,
+              backgroundColor: `color-mix(in oklab, var(--color-${backgroundColor}), var(--color-background) ${Math.min(100, stackIndex * 40)}%)`,
             }
           : {}),
       }}
