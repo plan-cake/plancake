@@ -2,11 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { EyeClosedIcon, EyeIcon, TriangleAlertIcon } from "lucide-react";
 
-import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
 import PasswordCriteria from "@/features/auth/components/password-criteria";
-import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
-import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
-import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
 type FieldType = "text" | "email" | "password";
@@ -26,6 +22,8 @@ export type TextInputFieldProps = {
   showPasswordCriteria?: boolean;
   passwordCriteria?: { [key: string]: boolean };
   placeholder?: string;
+  maxLength?: number;
+  maxLengthError?: string;
 };
 
 export default function TextInputField(props: TextInputFieldProps) {
@@ -43,6 +41,8 @@ export default function TextInputField(props: TextInputFieldProps) {
     showPasswordCriteria = false,
     passwordCriteria = {},
     placeholder,
+    maxLength,
+    maxLengthError,
   } = props;
   const [showPassword, setShowPassword] = useState(false);
 
@@ -52,20 +52,6 @@ export default function TextInputField(props: TextInputFieldProps) {
 
   const isOutlined = style === "outlined";
   const isInline = style === "inline";
-
-  let maxLength: number | undefined = undefined;
-  let maxLengthError: string | undefined = undefined;
-
-  if (id === "event-name") {
-    maxLength = MAX_TITLE_LENGTH;
-    maxLengthError = MESSAGES.ERROR_EVENT_NAME_LENGTH;
-  } else if (id === "displayName") {
-    maxLength = MAX_DISPLAY_NAME_LENGTH;
-    maxLengthError = MESSAGES.ERROR_NAME_LENGTH;
-  } else if (id === "defaultName") {
-    maxLength = MAX_DEFAULT_NAME_LENGTH;
-    maxLengthError = MESSAGES.ERROR_DEFAULT_NAME_LENGTH;
-  }
 
   // Character limit checking
   const isOverLimit = maxLength ? value.length > maxLength : false;

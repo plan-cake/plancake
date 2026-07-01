@@ -13,6 +13,7 @@ import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
+import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
@@ -95,6 +96,14 @@ export default function ClientPage({
       setErrors((prev) => ({
         ...prev,
         displayName: MESSAGES.ERROR_NAME_MISSING,
+      }));
+      return;
+    }
+
+    if (displayName.length > MAX_DISPLAY_NAME_LENGTH) {
+      setErrors((prev) => ({
+        ...prev,
+        displayName: MESSAGES.ERROR_NAME_LENGTH,
       }));
       return;
     }
@@ -393,6 +402,8 @@ function DisplayNameInput({
             }}
             placeholder="add your name"
             error={errors.displayName}
+            maxLength={MAX_DISPLAY_NAME_LENGTH}
+            maxLengthError={MESSAGES.ERROR_NAME_LENGTH}
           />
           <br />
           add your availabilities here

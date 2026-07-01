@@ -101,6 +101,8 @@ export default function Page() {
                 onChange={handleDefaultNameChange}
                 error={defaultNameError}
                 style="outlined"
+                maxLength={MAX_DEFAULT_NAME_LENGTH}
+                maxLengthError={MESSAGES.ERROR_DEFAULT_NAME_LENGTH}
               />
             </div>
             <div
