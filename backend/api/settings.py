@@ -125,7 +125,7 @@ REST_FRAMEWORK = {
         ThrottleScopes.PASSWORD_RESET.key: "10/hour",
         ThrottleScopes.EVENT_CREATION.key: "25/hour",
         ThrottleScopes.AVAILABILITY_ADD.key: "50/hour",
-        ThrottleScopes.CODE_CHECK.key: "50/hour",
+        ThrottleScopes.CODE_CHECK.key: "10/min",
     },
 }
 
@@ -206,7 +206,7 @@ LOGGING = {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": f"{LOG_DIR}/django.log",
             "formatter": "verbose",
-            "level": "DEBUG",
+            "level": "DEBUG" if DEBUG else "INFO",
             "maxBytes": 1024 * 1024 * 5,  # 5 MB
             "backupCount": 5,
         },

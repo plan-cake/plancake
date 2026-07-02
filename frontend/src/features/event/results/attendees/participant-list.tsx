@@ -1,6 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 
-import ParticipantChip from "@/features/event/results/attendee-panel/participant-chip";
+import ParticipantChip from "@/features/event/results/attendees/participant-chip";
 import { useResultsContext } from "@/features/event/results/context";
 import { AllAvailability } from "@/lib/utils/api/types";
 

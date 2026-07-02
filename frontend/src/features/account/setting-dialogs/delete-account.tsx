@@ -5,9 +5,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import TextInputField from "@/components/text-input-field";
-import { useAccount } from "@/features/account/context";
 import EmptyButton from "@/features/button/components/empty";
-import { ConfirmationDialog, useToast } from "@/features/system-feedback";
+import { useToast, FormDialog } from "@/features/system-feedback";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
@@ -18,7 +17,6 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 export default function DeleteAccountDialog() {
   const router = useRouter();
   const isMobile = useCheckMobile();
-  const { logout } = useAccount();
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -49,9 +47,9 @@ export default function DeleteAccountDialog() {
       await clientPost(ROUTES.account.deleteAccount, {
         password: currentPassword,
       });
-      logout();
-      router.push("/login");
       addToast("success", MESSAGES.SUCCESS_ACCOUNT_DELETE);
+      router.push("/login");
+      router.refresh();
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -64,46 +62,45 @@ export default function DeleteAccountDialog() {
   };
 
   return (
-    <ConfirmationDialog
+    <FormDialog
       type="error"
-      showIcon
       asNestedDrawer={isMobile}
       title="WARNING: DELETING ACCOUNT"
-      description={
-        <div className="flex flex-col items-center gap-4">
-          <div>
-            <p>
-              Are you <span className="font-bold">absolutely</span> sure you
-              want to delete your account?
-            </p>
-            <p className="text-error font-bold underline">
-              This action cannot be undone.
-            </p>
-          </div>
-
-          <TextInputField
-            key="password"
-            id="password"
-            type="password"
-            label="Enter your password*"
-            value={currentPassword}
-            onChange={(value) => {
-              setCurrentPassword(value);
-            }}
-            outlined
-            error={errors.currentPassword || errors.api}
-          />
-        </div>
+      description={"Delete Account Confirmation"}
+      trigger={
+        <EmptyButton
+          buttonStyle="danger"
+          label="Delete Account"
+          tooltip="Woah... be careful!"
+        />
       }
       open={confirmationOpen}
       onOpenChange={handleOpenChange}
-      onConfirm={handleDeleteAccount}
+      onSubmit={handleDeleteAccount}
+      submitLabel="Delete Account"
     >
-      <EmptyButton
-        buttonStyle="danger"
-        label="Delete Account"
-        tooltip="Woah... be careful!"
+      <div className="text-center">
+        <p>
+          Are you <span className="font-bold">absolutely</span> sure you want to
+          delete your account?
+        </p>
+        <p className="text-error font-bold underline">
+          This action cannot be undone.
+        </p>
+      </div>
+
+      <TextInputField
+        key="password"
+        id="password"
+        type="password"
+        label="Enter your password*"
+        value={currentPassword}
+        onChange={(value) => {
+          setCurrentPassword(value);
+        }}
+        outlined
+        error={errors.currentPassword || errors.api}
       />
-    </ConfirmationDialog>
+    </FormDialog>
   );
 }
