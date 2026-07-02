@@ -1,5 +1,19 @@
 
-.PHONY: up down restart logs-api logs-web shell-api shell-web migrate makemigrations
+.PHONY: help up down restart logs-api logs-web shell-api shell-web migrate makemigrations
+
+help:
+	@echo "Usage: make <target>"
+	@echo ""
+	@echo "Targets:"
+	@echo "  up                Starts the environment in the background and prints out the URLs for local and network access."
+	@echo "  down              Stops the environment completely and removes the connected containers, networks, and volumes."
+	@echo "  restart           Restarts the containers without rebuilding them. Use this for things like env changes."
+	@echo "  logs-api          Stream the Django backend logs."
+	@echo "  logs-web          Stream the Next.js frontend logs."
+	@echo "  shell-api         Open a terminal inside the backend container."
+	@echo "  shell-web         Open a terminal inside the frontend container."
+	@echo "  migrate           Run Django migrations inside the running container."
+	@echo "  makemigrations    Generate new Django migrations inside the running container."
 
 # Starts the enviroment in the background and prints out the URLs for the local and
 # network access. The command includes a build flag to ensure that the latest changes
