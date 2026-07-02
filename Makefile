@@ -43,11 +43,11 @@ url:
 
 # Open a terminal inside the frontend container
 shell-web:
-	docker compose exec frontend /bin/sh
+	docker compose exec -it frontend /bin/sh
 
 # Open a terminal inside the backend container
 shell-api:
-	docker compose exec backend /bin/bash
+	docker compose exec -it backend /bin/bash
 
 # Run Django migrations inside the running container
 migrate:
