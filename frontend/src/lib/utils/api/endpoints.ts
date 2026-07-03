@@ -24,7 +24,7 @@ import {
   ActiveSessionList,
   SessionId,
   TrueCode,
-  GuestDataSummary,
+  GuestData,
 } from "@/lib/utils/api/types";
 
 /**
@@ -273,9 +273,9 @@ export const ROUTES = {
   },
   guestImport: {
     /**
-     * Gets a count of events created and participated in by the guest user.
+     * Gets data about the guest user's created and participated events.
      * @method GET
      */
-    getSummary: route<GuestDataSummary>("/guest-import/get-summary/"),
+    getData: route<GuestData>("/guest-import/get-data/"),
   }
 } as const;

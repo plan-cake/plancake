@@ -3,24 +3,23 @@ import { TriangleAlertIcon } from "lucide-react";
 import EmptyButton from "@/features/button/components/empty";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { serverGet } from "@/lib/utils/api/server-fetch";
+import { GuestData } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
 
 export default async function Page() {
-  let guestSummary: {
-    created_events: number;
-    participated_events: number;
-  } | null = null;
+  let guestData: GuestData | null = null;
   try {
-    guestSummary = await serverGet(ROUTES.guestImport.getSummary);
+    guestData = await serverGet(ROUTES.guestImport.getData);
   } catch {
-    // Do nothing, keep guestSummary as null to indicate an error occurred
+    // Do nothing, keep guestData as null to indicate an error occurred
   }
 
   const guestDataFound =
-    guestSummary !== null &&
-    (guestSummary?.created_events > 0 || guestSummary?.participated_events > 0);
-  const createdEvents = guestSummary?.created_events ?? 0;
-  const participatedEvents = guestSummary?.participated_events ?? 0;
+    guestData !== null &&
+    (guestData?.created_events.length > 0 ||
+      guestData?.participated_events.length > 0);
+  const createdEvents = guestData?.created_events ?? [];
+  const participatedEvents = guestData?.participated_events ?? [];
 
   return (
     <div className="flex flex-col gap-6">
@@ -38,19 +37,22 @@ export default async function Page() {
             <div>
               <div className="font-semibold">Guest data found:</div>
               <div
-                className={cn("text-sm", createdEvents === 0 && "opacity-50")}
+                className={cn(
+                  "text-sm",
+                  createdEvents.length === 0 && "opacity-50",
+                )}
               >
-                • {createdEvents} event{createdEvents !== 1 ? "s" : ""} that you
-                created
+                • {createdEvents.length} event
+                {createdEvents.length !== 1 ? "s" : ""} that you created
               </div>
               <div
                 className={cn(
                   "text-sm",
-                  participatedEvents === 0 && "opacity-50",
+                  participatedEvents.length === 0 && "opacity-50",
                 )}
               >
-                • {participatedEvents} event
-                {participatedEvents !== 1 ? "s" : ""} that you added your
+                • {participatedEvents.length} event
+                {participatedEvents.length !== 1 ? "s" : ""} that you added your
                 availability to
               </div>
             </div>
@@ -58,7 +60,7 @@ export default async function Page() {
               <EmptyButton buttonStyle="primary" label="Import" />
             </div>
           </>
-        ) : guestSummary === null ? (
+        ) : guestData === null ? (
           <div className="flex items-center gap-2 opacity-75">
             <TriangleAlertIcon className="h-5 w-5 flex-none" />
             Something went wrong trying to fetch guest data. Please try again
