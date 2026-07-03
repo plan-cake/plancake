@@ -45,9 +45,7 @@ def get_summary(request):
     created_events = UserEvent.objects.filter(
         user_account=guest_user, url_code__isnull=False
     ).count()
-    # Don't include events that the user both created and participated in
     participations = EventParticipant.objects.filter(
-        ~Q(user_event__user_account=guest_user),
         user_account=guest_user,
         user_event__url_code__isnull=False,
     ).count()
