@@ -24,6 +24,7 @@ import {
   ActiveSessionList,
   SessionId,
   TrueCode,
+  GuestDataSummary,
 } from "@/lib/utils/api/types";
 
 /**
@@ -270,4 +271,11 @@ export const ROUTES = {
      */
     deleteAccount: route<MessageResponse, Password>("/account/delete-account/"),
   },
+  guestImport: {
+    /**
+     * Gets a count of events created and participated in by the guest user.
+     * @method GET
+     */
+    getSummary: route<GuestDataSummary>("/guest-import/get-summary/"),
+  }
 } as const;
