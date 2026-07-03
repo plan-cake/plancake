@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils/classname";
 
 const SETTINGS_TABS = [
   { href: "/settings", label: "General" },
+  { href: "/settings/guest-import", label: "Guest Import" },
   { href: "/settings/security", label: "Security" },
   { href: "/settings/remove", label: "Account Removal" },
 ] as const;
