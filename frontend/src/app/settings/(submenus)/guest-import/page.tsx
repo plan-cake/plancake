@@ -40,7 +40,9 @@ export default async function Page() {
         {guestDataFound ? (
           <>
             <div>
-              <div className="font-semibold">Guest data found:</div>
+              <div className="font-semibold">
+                Guest data found on this browser:
+              </div>
               <div
                 className={cn(
                   "text-sm",
