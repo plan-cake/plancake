@@ -7,6 +7,7 @@ import EmptyButton from "@/features/button/components/empty";
 import BaseModal from "@/features/system-feedback/dialog/components/base";
 import { DIALOG_CONFIG } from "@/features/system-feedback/dialog/config";
 import { FormDialogProps } from "@/features/system-feedback/dialog/props";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 export default function FormDialog({
@@ -28,6 +29,11 @@ export default function FormDialog({
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : uncontrolledOpen;
+
+  const isMobile = useCheckMobile();
+  if (isMobile && !asNestedDrawer) {
+    asNestedDrawer = true;
+  }
 
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
