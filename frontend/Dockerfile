@@ -2,7 +2,7 @@
 
 # The node version is specified as a build argument for ease of updating to the most
 # stable version of Node.js in the future.
-ARG NODE_VERSION=22-slim
+ARG NODE_VERSION=22-alpine
 
 ## INSTALL DEPENDENCIES
 FROM node:${NODE_VERSION} AS dependencies
