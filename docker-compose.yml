@@ -7,6 +7,7 @@ services:
       - "6379:6379"
 
   backend:
+    image: ghcr.io/plan-cake/plancake-backend:${IMAGE_TAG:-latest}
     build:
       context: ./backend
     command: ["sh", "./start.sh"]
@@ -23,6 +24,7 @@ services:
       - redis
 
   frontend:
+    image: ghcr.io/plan-cake/plancake-frontend:${IMAGE_TAG:-latest}
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
