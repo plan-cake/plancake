@@ -1,6 +1,7 @@
-import { TriangleAlertIcon } from "lucide-react";
+import { CornerDownRightIcon, TriangleAlertIcon } from "lucide-react";
 
 import EmptyButton from "@/features/button/components/empty";
+import { Banner } from "@/features/system-feedback";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { serverGet } from "@/lib/utils/api/server-fetch";
 import { GuestData } from "@/lib/utils/api/types";
@@ -20,6 +21,10 @@ export default async function Page() {
       guestData?.participated_events.length > 0);
   const createdEvents = guestData?.created_events ?? [];
   const participatedEvents = guestData?.participated_events ?? [];
+  const conflictCount =
+    guestData?.participated_events.filter(
+      (event) => event.account_display_name !== null,
+    ).length ?? 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -55,7 +60,21 @@ export default async function Page() {
                 {participatedEvents.length !== 1 ? "s" : ""} that you added your
                 availability to
               </div>
+              {conflictCount > 0 && (
+                <div className="text-error ml-3 flex items-center gap-2 text-sm">
+                  <CornerDownRightIcon className="h-4 w-4 flex-none" />
+                  {conflictCount} conflict{conflictCount !== 1 ? "s" : ""} found
+                </div>
+              )}
             </div>
+            {conflictCount > 0 && (
+              <Banner type="info">
+                Conflicts occur when you{"'"}ve added availability to the same
+                event both as a guest and from your account. You can only keep
+                one when importing, since each user can only have one submission
+                to an event.
+              </Banner>
+            )}
             <div className="w-fit">
               <EmptyButton buttonStyle="primary" label="Import" />
             </div>
