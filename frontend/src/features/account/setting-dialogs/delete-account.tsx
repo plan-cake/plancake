@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 
 import TextInputField from "@/components/text-input-field";
 import EmptyButton from "@/features/button/components/empty";
-import { useToast, FormDialog } from "@/features/system-feedback";
-import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { FormDialog, useToast } from "@/features/system-feedback";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -16,7 +15,6 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function DeleteAccountDialog() {
   const router = useRouter();
-  const isMobile = useCheckMobile();
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -64,7 +62,6 @@ export default function DeleteAccountDialog() {
   return (
     <FormDialog
       type="error"
-      asNestedDrawer={isMobile}
       title="WARNING: DELETING ACCOUNT"
       description={"Delete Account Confirmation"}
       trigger={
