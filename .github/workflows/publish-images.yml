@@ -3,7 +3,6 @@ name: Build and Publish Docker Images
 on:
   push:
     branches: ["main", "v*.*.*"]
-  pull_request:
   workflow_dispatch:
 
 # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
@@ -39,7 +38,7 @@ jobs:
         id: meta-backend
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/plan-cake/plancake-backend
+          images: ghcr.io/mirmirmirr/plancake-backend
           tags: |
             type=ref,event=branch
             type=raw,value=latest,enable={{is_default_branch}}
@@ -58,7 +57,7 @@ jobs:
         id: meta-frontend
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/plan-cake/plancake-frontend
+          images: ghcr.io/mirmirmirr/plancake-frontend
           tags: |
             type=ref,event=branch
             type=raw,value=latest,enable={{is_default_branch}}
