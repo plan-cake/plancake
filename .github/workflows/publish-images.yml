@@ -3,6 +3,7 @@ name: Build and Publish Docker Images
 on:
   push:
     branches: ["main", "v*.*.*"]
+  pull_request:
   workflow_dispatch:
 
 # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
