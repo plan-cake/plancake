@@ -227,13 +227,13 @@ function ConflictOption({
   return (
     <div
       className={cn(
-        "mx-auto flex-1 text-center text-sm",
-        selected === false ? "line-through opacity-50" : "",
+        "flex-1 text-center text-sm",
         selected === true ? "font-bold" : "",
+        selected === false ? "line-through opacity-50" : "",
       )}
     >
       <p className="opacity-50">{label}</p>
-      <p className="flex flex-row items-center justify-center gap-1">{name}</p>
+      <p>{name}</p>
     </div>
   );
 }
