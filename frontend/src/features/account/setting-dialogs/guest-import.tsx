@@ -1,6 +1,8 @@
 "use client";
 
-import { ExternalLinkIcon, TriangleAlertIcon } from "lucide-react";
+import { useMemo, useState } from "react";
+
+import { CheckIcon, ExternalLinkIcon, TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 
 import EmptyButton from "@/features/button/components/empty";
@@ -10,14 +12,47 @@ import Tooltip from "@/features/system-feedback/tooltip/base";
 import { GuestData } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
 
+type AvailabilityImportChoice = "guest" | "account";
+type ImportPayload = {
+  [url_code: string]: AvailabilityImportChoice;
+};
+
 export default function GuestImportDialog({
   guestData,
 }: {
   guestData: GuestData;
 }) {
-  const unresolvedConflicts = guestData.participated_events.some(
-    (event) => event.account_display_name !== null,
+  const [importPayload, setImportPayload] = useState<{
+    [url_code: string]: AvailabilityImportChoice;
+  }>(
+    guestData.participated_events.reduce((acc, event) => {
+      if (event.account_display_name === null) {
+        acc[event.url_code] = "guest";
+      }
+      return acc;
+    }, {} as ImportPayload),
   );
+
+  const hasUnresolvedConflicts =
+    guestData.participated_events.length !== Object.keys(importPayload).length;
+  const conflictedEvents = useMemo(() => {
+    return new Set(
+      guestData.participated_events
+        .filter((event) => event.account_display_name !== null)
+        .map((event) => event.url_code),
+    );
+  }, [guestData.participated_events]);
+
+  const resolveConflict = (
+    url_code: string,
+    choice: AvailabilityImportChoice | null,
+  ) => {
+    if (choice === null) return;
+    setImportPayload((prev) => ({
+      ...prev,
+      [url_code]: choice,
+    }));
+  };
 
   return (
     <FormDialog
@@ -27,7 +62,7 @@ export default function GuestImportDialog({
       trigger={<EmptyButton buttonStyle="primary" label="Import" />}
       onSubmit={() => false}
       submitLabel="Confirm"
-      submitDisabled={unresolvedConflicts}
+      submitDisabled={hasUnresolvedConflicts}
     >
       <div className="text-center">
         <p>Are you sure you want to import this guest data?</p>
@@ -46,26 +81,29 @@ export default function GuestImportDialog({
         </DataSection>
         <DataSection title="Availabilities">
           {guestData.participated_events.map((event) => {
-            const conflict = event.account_display_name !== null;
+            const choice = importPayload[event.url_code] ?? null;
+            const hasConflict = conflictedEvents.has(event.url_code);
 
             return (
               <EventDisplay
                 key={event.url_code}
                 title={event.title}
                 url_code={event.url_code}
-                conflict={conflict}
+                conflict={hasConflict && choice === null}
               >
-                {conflict ? (
+                {hasConflict ? (
                   <div>
                     <div className="flex items-center justify-between gap-2 pb-1 text-sm">
-                      <div className="mx-auto flex-1 text-center text-sm">
-                        <p className="opacity-50">Guest</p>
-                        <p>{event.guest_display_name}</p>
-                      </div>
-                      <div className="mx-auto flex-1 text-center text-sm">
-                        <p className="opacity-50">Account</p>
-                        <p>{event.account_display_name}</p>
-                      </div>
+                      <ConflictOption
+                        label="Guest"
+                        name={event.guest_display_name}
+                        selected={choice !== null ? choice === "guest" : null}
+                      />
+                      <ConflictOption
+                        label="Account"
+                        name={event.account_display_name!}
+                        selected={choice !== null ? choice === "account" : null}
+                      />
                     </div>
                     <div className="flex justify-center">
                       <Selector
@@ -73,7 +111,9 @@ export default function GuestImportDialog({
                         dialogTitle="Resolve Conflict"
                         id={`resolve-conflict-${event.url_code}`}
                         drawerNesting={2}
-                        onChange={() => {}}
+                        onChange={(choice) =>
+                          resolveConflict(event.url_code, choice)
+                        }
                         options={[
                           { label: "Keep Guest", value: "guest" },
                           {
@@ -81,10 +121,15 @@ export default function GuestImportDialog({
                             value: "account",
                           },
                         ]}
-                        value={null}
+                        value={choice}
                         placeholder="Resolve Conflict"
                       />
                     </div>
+                    {choice !== null && (
+                      <div className="mt-1 text-center text-xs opacity-50">
+                        The other submission will be deleted.
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <p className="text-sm">Name: {event.guest_display_name}</p>
@@ -94,10 +139,12 @@ export default function GuestImportDialog({
           })}
         </DataSection>
       </div>
-      <div className="text-error flex items-center justify-center gap-1">
-        <TriangleAlertIcon className="h-4 w-4 flex-none" />
-        Please resolve conflicts.
-      </div>
+      {hasUnresolvedConflicts && (
+        <div className="text-error flex items-center justify-center gap-1">
+          <TriangleAlertIcon className="h-4 w-4 flex-none" />
+          Please resolve conflicts.
+        </div>
+      )}
     </FormDialog>
   );
 }
@@ -164,6 +211,29 @@ function EventHeader({
           <ExternalLinkIcon className="h-4 w-4 flex-none" />
         </Link>
       </Tooltip>
+    </div>
+  );
+}
+
+function ConflictOption({
+  label,
+  name,
+  selected,
+}: {
+  label: string;
+  name: string;
+  selected: boolean | null;
+}) {
+  return (
+    <div
+      className={cn(
+        "mx-auto flex-1 text-center text-sm",
+        selected === false ? "line-through opacity-50" : "",
+        selected === true ? "font-bold" : "",
+      )}
+    >
+      <p className="opacity-50">{label}</p>
+      <p className="flex flex-row items-center justify-center gap-1">{name}</p>
     </div>
   );
 }
