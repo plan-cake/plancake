@@ -65,16 +65,22 @@ export default async function Page() {
               {conflictCount > 0 && (
                 <div className="text-error ml-3 flex items-center gap-2 text-sm">
                   <CornerDownRightIcon className="h-4 w-4 flex-none" />
-                  {conflictCount} conflict{conflictCount !== 1 ? "s" : ""} found
+                  {conflictCount} conflict{conflictCount !== 1 ? "s" : ""}
                 </div>
               )}
             </div>
             {conflictCount > 0 && (
-              <Banner type="info">
+              <Banner
+                type="info"
+                title={`${conflictCount} Conflict${conflictCount !== 1 ? "s" : ""} Found`}
+              >
                 Conflicts occur when you{"'"}ve added availability to the same
-                event both as a guest and from your account. You can only keep
-                one when importing, since each user can only have one submission
-                to an event.
+                event both as a guest and from your account. You can{" "}
+                <span className="font-bold">
+                  choose which submission to keep
+                </span>{" "}
+                in the next step when resolving each conflict, and the other
+                will be deleted.
               </Banner>
             )}
             <div className="w-fit">
