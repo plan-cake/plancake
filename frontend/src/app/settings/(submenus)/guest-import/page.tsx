@@ -1,6 +1,6 @@
 import { CornerDownRightIcon, TriangleAlertIcon } from "lucide-react";
 
-import EmptyButton from "@/features/button/components/empty";
+import GuestImportDialog from "@/features/account/setting-dialogs/guest-import";
 import { Banner } from "@/features/system-feedback";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { serverGet } from "@/lib/utils/api/server-fetch";
@@ -84,7 +84,7 @@ export default async function Page() {
               </Banner>
             )}
             <div className="w-fit">
-              <EmptyButton buttonStyle="primary" label="Import" />
+              <GuestImportDialog guestData={guestData!} />
             </div>
           </>
         ) : guestData === null ? (
