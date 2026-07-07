@@ -402,8 +402,10 @@ function DisplayNameInput({
             }}
             placeholder="add your name"
             error={errors.displayName}
-            maxLength={MAX_DISPLAY_NAME_LENGTH}
-            maxLengthError={MESSAGES.ERROR_NAME_LENGTH}
+            maxLength={{
+              length: MAX_DISPLAY_NAME_LENGTH,
+              error: MESSAGES.ERROR_NAME_LENGTH,
+            }}
           />
           <br />
           add your availabilities here

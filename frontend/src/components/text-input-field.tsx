@@ -22,8 +22,10 @@ export type TextInputFieldProps = {
   showPasswordCriteria?: boolean;
   passwordCriteria?: { [key: string]: boolean };
   placeholder?: string;
-  maxLength?: number;
-  maxLengthError?: string;
+  maxLength?: {
+    length: number;
+    error: string;
+  };
 };
 
 export default function TextInputField(props: TextInputFieldProps) {
@@ -42,7 +44,6 @@ export default function TextInputField(props: TextInputFieldProps) {
     passwordCriteria = {},
     placeholder,
     maxLength,
-    maxLengthError,
   } = props;
   const [showPassword, setShowPassword] = useState(false);
 
@@ -54,8 +55,8 @@ export default function TextInputField(props: TextInputFieldProps) {
   const isInline = style === "inline";
 
   // Character limit checking
-  const isOverLimit = maxLength ? value.length > maxLength : false;
-  const activeError = isOverLimit ? maxLengthError : error;
+  const isOverLimit = maxLength ? value.length > maxLength.length : false;
+  const activeError = isOverLimit ? maxLength?.error : error;
 
   const errorId = `${id}-error`;
 

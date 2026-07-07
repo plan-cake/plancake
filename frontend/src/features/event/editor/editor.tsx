@@ -125,8 +125,10 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
             onChange={setTitle}
             error={errors.title || errors.api}
             className="text-2xl font-semibold"
-            maxLength={MAX_TITLE_LENGTH}
-            maxLengthError={MESSAGES.ERROR_EVENT_NAME_LENGTH}
+            maxLength={{
+              length: MAX_TITLE_LENGTH,
+              error: MESSAGES.ERROR_EVENT_NAME_LENGTH,
+            }}
           />
         </div>
         <div className="hidden gap-2 md:flex">
