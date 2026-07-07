@@ -2,12 +2,11 @@
 
 import { useMemo, useState } from "react";
 
-import { CheckIcon, ExternalLinkIcon, TriangleAlertIcon } from "lucide-react";
+import { ExternalLinkIcon, TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 
-import EmptyButton from "@/features/button/components/empty";
+import HeaderSpacer from "@/features/header/components/header-spacer";
 import Selector from "@/features/selector/components/selector";
-import { FormDialog } from "@/features/system-feedback";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import { GuestData } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
@@ -17,11 +16,7 @@ type ImportPayload = {
   [url_code: string]: AvailabilityImportChoice;
 };
 
-export default function GuestImportDialog({
-  guestData,
-}: {
-  guestData: GuestData;
-}) {
+export default function ClientPage({ guestData }: { guestData: GuestData }) {
   const [importPayload, setImportPayload] = useState<{
     [url_code: string]: AvailabilityImportChoice;
   }>(
@@ -55,15 +50,8 @@ export default function GuestImportDialog({
   };
 
   return (
-    <FormDialog
-      type="info"
-      title="Guest Import"
-      description={"Guest Data Import Review"}
-      trigger={<EmptyButton buttonStyle="primary" label="Import" />}
-      onSubmit={() => false}
-      submitLabel="Confirm"
-      submitDisabled={hasUnresolvedConflicts}
-    >
+    <div>
+      <HeaderSpacer />
       <div className="text-center">
         <p>Are you sure you want to import this guest data?</p>
         <p>This action cannot be undone.</p>
@@ -145,7 +133,7 @@ export default function GuestImportDialog({
           Please resolve conflicts.
         </div>
       )}
-    </FormDialog>
+    </div>
   );
 }
 

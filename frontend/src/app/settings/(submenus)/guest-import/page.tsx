@@ -1,6 +1,6 @@
 import { CornerDownRightIcon, TriangleAlertIcon } from "lucide-react";
 
-import GuestImportDialog from "@/features/account/setting-dialogs/guest-import";
+import LinkButton from "@/features/button/components/link";
 import { Banner } from "@/features/system-feedback";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { serverGet } from "@/lib/utils/api/server-fetch";
@@ -83,9 +83,12 @@ export default async function Page() {
                 will be deleted.
               </Banner>
             )}
-            <div className="w-fit">
-              <GuestImportDialog guestData={guestData!} />
-            </div>
+            <LinkButton
+              buttonStyle="primary"
+              label="Review and Import"
+              href="/settings/guest-import/review"
+              className="w-fit"
+            />
           </>
         ) : guestData === null ? (
           <div className="flex items-center gap-2 opacity-75">
