@@ -9,6 +9,7 @@ import MobileFooterIsland from "@/components/mobile-footer-island";
 import LinkButton from "@/features/button/components/link";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import Selector from "@/features/selector/components/selector";
+import { Banner } from "@/features/system-feedback";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import { GuestData } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
@@ -97,6 +98,18 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
           ))}
         </DataSection>
         <DataSection title="Availabilities">
+          {unresolvedConflicts > 0 && (
+            <Banner
+              type="error"
+              title={`${unresolvedConflicts} Conflict${unresolvedConflicts !== 1 ? "s" : ""} Found`}
+            >
+              Conflicts occur when you{"'"}ve added availability to the same
+              event both as a guest and from your account. You must{" "}
+              <span className="font-bold">choose which submission to keep</span>{" "}
+              when resolving each conflict.
+            </Banner>
+          )}
+
           {guestData.participated_events.map((event) => {
             const choice = importPayload[event.url_code] ?? null;
             const hasConflict = conflictedEvents.has(event.url_code);
