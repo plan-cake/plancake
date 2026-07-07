@@ -43,9 +43,8 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
 
   const resolveConflict = (
     url_code: string,
-    choice: AvailabilityImportChoice | null,
+    choice: AvailabilityImportChoice,
   ) => {
-    if (choice === null) return;
     setImportPayload((prev) => ({
       ...prev,
       [url_code]: choice,
