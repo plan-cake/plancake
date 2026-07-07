@@ -1,7 +1,5 @@
 import logging
 
-from django.db.models import Q
-from rest_framework import serializers
 from rest_framework.response import Response
 
 from api.decorators import (
@@ -9,6 +7,7 @@ from api.decorators import (
     require_account_auth,
     validate_output,
 )
+from api.guest_import.serializers import GuestDataSummarySerializer
 from api.guest_import.utils import get_guest_account
 from api.models import (
     EventParticipant,
@@ -16,29 +15,6 @@ from api.models import (
 )
 
 logger = logging.getLogger("api")
-
-
-class GuestEventSerializer(serializers.Serializer):
-    url_code = serializers.CharField()
-    title = serializers.CharField()
-
-
-class GuestParticipationSerializer(serializers.Serializer):
-    url_code = serializers.CharField()
-    title = serializers.CharField()
-    guest_display_name = serializers.CharField()
-    account_display_name = serializers.CharField(allow_null=True)
-
-
-class GuestDataSummarySerializer(serializers.Serializer):
-    created_events = serializers.ListField(
-        child=GuestEventSerializer(),
-        allow_empty=True,
-    )
-    participated_events = serializers.ListField(
-        child=GuestParticipationSerializer(),
-        allow_empty=True,
-    )
 
 
 @api_endpoint("GET")
