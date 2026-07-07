@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import { ExternalLinkIcon, TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 
+import MobileFooterIsland from "@/components/mobile-footer-island";
+import LinkButton from "@/features/button/components/link";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import Selector from "@/features/selector/components/selector";
 import Tooltip from "@/features/system-feedback/tooltip/base";
@@ -28,8 +30,8 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
     }, {} as ImportPayload),
   );
 
-  const hasUnresolvedConflicts =
-    guestData.participated_events.length !== Object.keys(importPayload).length;
+  const unresolvedConflicts =
+    guestData.participated_events.length - Object.keys(importPayload).length;
   const conflictedEvents = useMemo(() => {
     return new Set(
       guestData.participated_events
@@ -49,15 +51,42 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
     }));
   };
 
-  return (
-    <div>
-      <HeaderSpacer />
-      <div className="text-center">
-        <p>Are you sure you want to import this guest data?</p>
-        <p>This action cannot be undone.</p>
-      </div>
+  const cancelButton = (
+    <LinkButton
+      buttonStyle="transparent"
+      label="Cancel"
+      href="/settings/guest-import"
+    />
+  );
 
-      <div className="flex w-full flex-col gap-6">
+  const importButton = (
+    <LinkButton
+      buttonStyle="primary"
+      label="Import Data"
+      href="/settings/guest-import"
+      disabled={unresolvedConflicts > 0}
+    />
+  );
+
+  const actionText = (
+    <p className="text-center font-semibold">
+      Are you sure you want to import this guest data? This action cannot be
+      undone.
+    </p>
+  );
+
+  return (
+    <div className="flex flex-col gap-4 px-6 pb-4">
+      <HeaderSpacer />
+      <div className="flex justify-between gap-2">
+        <h1 className="text-2xl font-bold">Guest Import Review</h1>
+        <div className="hidden gap-2 md:flex">
+          {cancelButton}
+          {importButton}
+        </div>
+      </div>
+      <h2 className="hidden text-lg md:block">{actionText}</h2>
+      <div className="flex flex-col gap-4 md:flex-row">
         <DataSection title="Events">
           {guestData.created_events.map((event) => (
             <EventDisplay
@@ -127,12 +156,19 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
           })}
         </DataSection>
       </div>
-      {hasUnresolvedConflicts && (
-        <div className="text-error flex items-center justify-center gap-1">
-          <TriangleAlertIcon className="h-4 w-4 flex-none" />
-          Please resolve conflicts.
-        </div>
-      )}
+      <MobileFooterIsland
+        leftButtons={[cancelButton]}
+        rightButtons={[importButton]}
+      >
+        {unresolvedConflicts > 0 ? (
+          <div className="text-error flex items-center justify-center gap-1 font-bold">
+            <TriangleAlertIcon className="h-4 w-4 flex-none" />
+            Please resolve conflicts.
+          </div>
+        ) : (
+          actionText
+        )}
+      </MobileFooterIsland>
     </div>
   );
 }
@@ -145,7 +181,7 @@ function DataSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-background flex w-full flex-col gap-2 rounded-3xl p-2">
+    <div className="bg-panel flex h-fit w-full flex-col gap-2 rounded-3xl p-2">
       <div className="text-center text-lg font-bold">{title}</div>
       {children}
     </div>
@@ -164,7 +200,7 @@ function EventDisplay({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="bg-panel flex flex-col rounded-2xl px-3 py-2">
+    <div className="bg-background flex flex-col rounded-2xl px-3 py-2">
       <EventHeader title={title} url_code={url_code} conflict={conflict} />
       {children}
     </div>
