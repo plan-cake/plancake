@@ -71,10 +71,10 @@ def get_data(request):
             if participation["url_code"] == conflict.user_event.url_code.url_code:
                 participation["account_display_name"] = conflict.display_name
 
-    return Response(
-        {
-            "created_events": created_events,
-            "participated_events": participated_events,
-        },
-        status=200,
-    )
+    response.data = {
+        "created_events": created_events,
+        "participated_events": participated_events,
+    }
+    response.status_code = 200
+
+    return response
