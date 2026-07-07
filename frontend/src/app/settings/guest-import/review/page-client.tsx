@@ -75,6 +75,10 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
     </p>
   );
 
+  const noneText = (
+    <div className="p-2 text-center italic opacity-50">None</div>
+  );
+
   return (
     <div className="flex flex-col gap-4 px-6 pb-4">
       <HeaderSpacer />
@@ -88,6 +92,7 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
       <h2 className="hidden text-lg md:block">{actionText}</h2>
       <div className="flex flex-col gap-4 md:flex-row">
         <DataSection title="Events">
+          {guestData.created_events.length === 0 && noneText}
           {guestData.created_events.map((event) => (
             <EventDisplay
               key={event.url_code}
@@ -108,6 +113,8 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
               when resolving each conflict.
             </Banner>
           )}
+
+          {guestData.participated_events.length === 0 && noneText}
 
           {guestData.participated_events.map((event) => {
             const choice = importPayload[event.url_code] ?? null;
