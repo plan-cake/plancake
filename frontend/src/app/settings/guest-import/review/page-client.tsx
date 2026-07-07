@@ -144,7 +144,8 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
                     </div>
                     {choice !== null && (
                       <div className="mt-1 text-center text-xs opacity-50">
-                        The other submission will be deleted.
+                        The {choice === "guest" ? "account" : "guest"}{" "}
+                        submission will be deleted.
                       </div>
                     )}
                   </div>
