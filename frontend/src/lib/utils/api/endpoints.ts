@@ -1,5 +1,6 @@
 import {
   AccountData,
+  ActiveSessionList,
   AllAvailability,
   AuthedPasswordResetCode,
   AuthedPasswordResetData,
@@ -12,6 +13,8 @@ import {
   EventDetails,
   EventDisplayNameData,
   EventEditData,
+  GuestData,
+  GuestDataSummary,
   LoginData,
   MessageResponse,
   NewEventData,
@@ -20,11 +23,9 @@ import {
   PasswordResetData,
   RegisterData,
   SelfAvailability,
-  VerificationCode,
-  ActiveSessionList,
   SessionId,
   TrueCode,
-  GuestData,
+  VerificationCode,
 } from "@/lib/utils/api/types";
 
 /**
@@ -272,6 +273,11 @@ export const ROUTES = {
     deleteAccount: route<MessageResponse, Password>("/account/delete-account/"),
   },
   guestImport: {
+    /**
+     * Gets a summary of the guest user's created and participated events.
+     * @method GET
+     */
+    getSummary: route<GuestDataSummary>("/guest-import/get-summary/"),
     /**
      * Gets data about the guest user's created and participated events.
      * @method GET

@@ -1,6 +1,11 @@
 from rest_framework import serializers
 
 
+class GuestDataSummarySerializer(serializers.Serializer):
+    created_events = serializers.IntegerField()
+    participated_events = serializers.IntegerField()
+
+
 class GuestEventSerializer(serializers.Serializer):
     url_code = serializers.CharField()
     title = serializers.CharField()
@@ -13,7 +18,7 @@ class GuestParticipationSerializer(serializers.Serializer):
     account_display_name = serializers.CharField(allow_null=True)
 
 
-class GuestDataSummarySerializer(serializers.Serializer):
+class GuestDataSerializer(serializers.Serializer):
     created_events = serializers.ListField(
         child=GuestEventSerializer(),
         allow_empty=True,

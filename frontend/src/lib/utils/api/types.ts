@@ -163,6 +163,11 @@ export type AuthedPasswordResetData = {
   prune_sessions?: boolean;
 }
 
+export type GuestDataSummary = {
+  created_events: number;
+  participated_events: number;
+}
+
 type GuestCreatedEvent = {
   url_code: string;
   title: string;
