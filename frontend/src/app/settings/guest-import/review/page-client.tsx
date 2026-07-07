@@ -146,7 +146,6 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
                         dialogDescription="Resolve the submission conflict"
                         dialogTitle="Resolve Conflict"
                         id={`resolve-conflict-${event.url_code}`}
-                        drawerNesting={2}
                         onChange={(choice) =>
                           resolveConflict(event.url_code, choice)
                         }
