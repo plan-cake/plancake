@@ -40,7 +40,7 @@ export default async function Page() {
             <LinkButton
               buttonStyle="primary"
               label="Review and Import"
-              href="/settings/guest-import/review"
+              href="/guest-import/review"
               className="w-fit"
             />
           </>

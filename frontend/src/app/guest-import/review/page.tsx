@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import ClientPage from "@/app/settings/guest-import/review/page-client";
+import ClientPage from "@/app/guest-import/review/page-client";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { serverGet } from "@/lib/utils/api/server-fetch";
 
