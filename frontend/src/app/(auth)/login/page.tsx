@@ -10,6 +10,7 @@ import AuthPageLayout from "@/components/layout/auth-page";
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
 import ActionButton from "@/features/button/components/action";
+import { DONT_SHOW_AGAIN_KEY } from "@/features/guest-import/constants";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -24,9 +25,11 @@ export default function Page() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
+  const dontShowGuestImport =
+    localStorage.getItem(DONT_SHOW_AGAIN_KEY) === "true";
   const callbackUrl = getSafeRedirectUrl(
     searchParams.get("callbackUrl"),
-    "/guest-import/login",
+    dontShowGuestImport ? undefined : "/guest-import/login",
   );
 
   // TOASTS AND ERROR STATES
