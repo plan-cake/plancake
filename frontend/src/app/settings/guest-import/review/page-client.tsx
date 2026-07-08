@@ -4,13 +4,17 @@ import { useMemo, useState } from "react";
 
 import { ExternalLinkIcon, TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import MobileFooterIsland from "@/components/mobile-footer-island";
+import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import Selector from "@/features/selector/components/selector";
-import { Banner } from "@/features/system-feedback";
+import { Banner, useToast } from "@/features/system-feedback";
 import Tooltip from "@/features/system-feedback/tooltip/base";
+import { clientPost } from "@/lib/utils/api/client-fetch";
+import { ROUTES } from "@/lib/utils/api/endpoints";
 import { GuestData } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
 
@@ -20,6 +24,9 @@ type ImportPayload = {
 };
 
 export default function ClientPage({ guestData }: { guestData: GuestData }) {
+  const { addToast } = useToast();
+  const router = useRouter();
+
   const [importPayload, setImportPayload] = useState<{
     [url_code: string]: AvailabilityImportChoice;
   }>(
@@ -51,6 +58,21 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
     }));
   };
 
+  const submitImport = async () => {
+    try {
+      await clientPost(ROUTES.guestImport.importData, {
+        availability_choices: importPayload,
+      });
+      addToast("success", "Guest data imported successfully.");
+      router.push("/dashboard");
+    } catch {
+      addToast(
+        "error",
+        "Something went wrong with your request. Please refresh the page and try again.",
+      );
+    }
+  };
+
   const cancelButton = (
     <LinkButton
       buttonStyle="transparent"
@@ -60,10 +82,10 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
   );
 
   const importButton = (
-    <LinkButton
+    <ActionButton
       buttonStyle="primary"
       label="Import Data"
-      href="/settings/guest-import"
+      onClick={submitImport}
       disabled={unresolvedConflicts > 0}
     />
   );
