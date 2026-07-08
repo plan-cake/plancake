@@ -24,7 +24,10 @@ export default function Page() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  const callbackUrl = getSafeRedirectUrl(searchParams.get("callbackUrl"));
+  const callbackUrl = getSafeRedirectUrl(
+    searchParams.get("callbackUrl"),
+    "/guest-import/login",
+  );
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
