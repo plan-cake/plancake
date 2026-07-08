@@ -1,5 +1,5 @@
 import LinkButton from "@/features/button/components/link";
-import GuestDataSummary from "@/features/guest-import/components/summary";
+import GuestSummary from "@/features/guest-import/components/guest-summary";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { serverGet } from "@/lib/utils/api/server-fetch";
 
@@ -21,7 +21,7 @@ export default async function Page() {
 
         {events > 0 || availabilities > 0 ? (
           <>
-            <GuestDataSummary events={events} availabilities={availabilities} />
+            <GuestSummary events={events} availabilities={availabilities} />
             <LinkButton
               buttonStyle="primary"
               label="Review and Import"

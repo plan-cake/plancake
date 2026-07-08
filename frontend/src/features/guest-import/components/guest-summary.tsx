@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils/classname";
 
-export default function GuestDataSummary({
+export default function GuestSummary({
   events,
   availabilities,
 }: {
