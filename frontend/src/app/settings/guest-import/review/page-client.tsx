@@ -87,6 +87,11 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
       label="Import Data"
       onClick={submitImport}
       disabled={unresolvedConflicts > 0}
+      tooltip={
+        unresolvedConflicts > 0
+          ? "Please resolve conflicts before importing."
+          : undefined
+      }
     />
   );
 
