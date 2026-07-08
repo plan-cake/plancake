@@ -1,7 +1,7 @@
 import LinkButton from "@/features/button/components/link";
+import GuestDataSummary from "@/features/guest-import/components/summary";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { serverGet } from "@/lib/utils/api/server-fetch";
-import { cn } from "@/lib/utils/classname";
 
 export default async function Page() {
   const guestSummary = await serverGet(ROUTES.guestImport.getSummary);
@@ -21,22 +21,7 @@ export default async function Page() {
 
         {events > 0 || availabilities > 0 ? (
           <>
-            <div>
-              <div className="font-semibold">
-                Guest data found on this browser:
-              </div>
-              <div className={cn("text-sm", events === 0 && "opacity-50")}>
-                • {events} event
-                {events !== 1 ? "s" : ""} that you created
-              </div>
-              <div
-                className={cn("text-sm", availabilities === 0 && "opacity-50")}
-              >
-                • {availabilities} event
-                {availabilities !== 1 ? "s" : ""} that you added your
-                availability to
-              </div>
-            </div>
+            <GuestDataSummary events={events} availabilities={availabilities} />
             <LinkButton
               buttonStyle="primary"
               label="Review and Import"
