@@ -27,3 +27,11 @@ class GuestDataSerializer(serializers.Serializer):
         child=GuestParticipationSerializer(),
         allow_empty=True,
     )
+
+
+class GuestImportDataSerializer(serializers.Serializer):
+    availability_choices = serializers.DictField(
+        required=True,
+        child=serializers.ChoiceField(required=True, choices=["guest", "account"]),
+        allow_empty=True,
+    )

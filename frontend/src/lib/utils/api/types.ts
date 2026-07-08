@@ -184,3 +184,9 @@ export type GuestData = {
   created_events: GuestCreatedEvent[];
   participated_events: GuestParticipatedEvent[];
 }
+
+export type GuestImportData = {
+  availability_choices: {
+    [url_code: string]: "guest" | "account";
+  };
+}

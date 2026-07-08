@@ -5,4 +5,5 @@ from . import views
 urlpatterns = [
     path("get-summary/", views.get_summary),
     path("get-data/", views.get_data),
+    path("import-data/", views.import_data),
 ]

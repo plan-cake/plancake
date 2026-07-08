@@ -15,6 +15,7 @@ import {
   EventEditData,
   GuestData,
   GuestDataSummary,
+  GuestImportData,
   LoginData,
   MessageResponse,
   NewEventData,
@@ -283,5 +284,11 @@ export const ROUTES = {
      * @method GET
      */
     getData: route<GuestData>("/guest-import/get-data/"),
+    /**
+     * Imports the guest user's data into the logged-in user's account, resolving any
+     * availability submission conflicts based on the provided choices.
+     * @method POST
+     */
+    importData: route<MessageResponse, GuestImportData>("/guest-import/import-data/"),
   }
 } as const;
