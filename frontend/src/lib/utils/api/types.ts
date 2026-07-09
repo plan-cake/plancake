@@ -170,11 +170,13 @@ export type GuestDataSummary = {
 
 type GuestCreatedEvent = {
   url_code: string;
+  public_id: string;
   title: string;
 }
 
 type GuestParticipatedEvent = {
   url_code: string;
+  public_id: string;
   title: string;
   guest_display_name: string;
   account_display_name: string | null;
@@ -187,6 +189,6 @@ export type GuestData = {
 
 export type GuestImportData = {
   availability_choices: {
-    [url_code: string]: "guest" | "account";
+    [public_id: string]: "guest" | "account";
   };
 }
