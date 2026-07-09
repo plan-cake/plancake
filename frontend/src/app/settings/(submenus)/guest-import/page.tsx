@@ -26,7 +26,7 @@ export default async function Page() {
               <LinkButton
                 buttonStyle="primary"
                 label="Review and Import"
-                href="/guest-import/review"
+                href="/guest-import/import"
               />
             </div>
           </>

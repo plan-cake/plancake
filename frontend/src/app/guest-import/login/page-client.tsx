@@ -45,7 +45,7 @@ export default function ClientPage({
             buttonStyle="primary"
             label="Review and Import"
             onClick={() => {
-              navigate("/guest-import/review");
+              navigate("/guest-import/import");
             }}
           />,
         ]}

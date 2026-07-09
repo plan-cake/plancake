@@ -110,7 +110,7 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
     <div className="flex flex-col gap-4 px-6 pb-4">
       <HeaderSpacer />
       <div className="flex justify-between gap-2">
-        <h1 className="text-2xl font-bold">Guest Import Review</h1>
+        <h1 className="text-2xl font-bold">Guest Import</h1>
         <div className="hidden gap-2 md:flex">
           {cancelButton}
           {importButton}
