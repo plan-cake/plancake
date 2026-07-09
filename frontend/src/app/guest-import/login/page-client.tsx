@@ -27,7 +27,7 @@ export default function ClientPage({
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <MessagePage
         title="Guest Import"
         description="You have guest data that can be imported to your account."
