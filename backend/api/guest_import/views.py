@@ -117,6 +117,11 @@ def get_data(request):
         for participation in participated_events:
             if participation["public_id"] == conflict.user_event.public_id:
                 participation["account_display_name"] = conflict.display_name
+    logger.info(
+        "%s conflicted events found during guest import for user: %s",
+        len(conflicts),
+        account_user.email,
+    )
 
     response.data = {
         "created_events": created_events,
@@ -166,12 +171,20 @@ def import_data(request):
             user_account=guest_user
         ).select_related("user_event")
         if not guest_events.exists() and not guest_submissions.exists():
+            logger.warning(
+                "No guest data found for import attempt for user: %s",
+                account_user.email,
+            )
             return no_data_found()
 
         # Check if all the guest user's submissions are accounted for in the choices
         if set(availability_choices.keys()) != set(
             str(submission.user_event.public_id) for submission in guest_submissions
         ):
+            logger.warning(
+                "Availability choices do not match guest submissions for user: %s",
+                account_user.email,
+            )
             response.data = {
                 "error": {
                     "availability_choices": [
