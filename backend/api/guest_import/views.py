@@ -163,7 +163,7 @@ def import_data(request):
 
         # Check if all the guest user's submissions are accounted for in the choices
         if set(availability_choices.keys()) != set(
-            submission.user_event.public_id for submission in guest_submissions
+            str(submission.user_event.public_id) for submission in guest_submissions
         ):
             response.data = {
                 "error": {
