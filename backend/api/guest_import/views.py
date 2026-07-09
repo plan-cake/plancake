@@ -1,5 +1,6 @@
 import logging
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from rest_framework.response import Response
 
@@ -76,12 +77,18 @@ def get_data(request):
         response.status_code = 200
         return response
 
+    def get_url_code(event):
+        try:
+            return event.url_code.url_code
+        except ObjectDoesNotExist:
+            return None
+
     events = UserEvent.objects.filter(user_account=guest_user).select_related(
         "url_code"
     )
     created_events = [
         {
-            "url_code": event.url_code.url_code,
+            "url_code": get_url_code(event),
             "public_id": event.public_id,
             "title": event.title,
         }
@@ -93,7 +100,7 @@ def get_data(request):
     ).select_related("user_event__url_code")
     participated_events = [
         {
-            "url_code": participation.user_event.url_code.url_code,
+            "url_code": get_url_code(participation.user_event),
             "public_id": participation.user_event.public_id,
             "title": participation.user_event.title,
             "guest_display_name": participation.display_name,
