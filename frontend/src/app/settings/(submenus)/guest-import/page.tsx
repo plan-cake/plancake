@@ -22,12 +22,13 @@ export default async function Page() {
         {events > 0 || availabilities > 0 ? (
           <>
             <GuestSummary events={events} availabilities={availabilities} />
-            <LinkButton
-              buttonStyle="primary"
-              label="Review and Import"
-              href="/guest-import/review"
-              className="w-fit"
-            />
+            <div className="w-fit">
+              <LinkButton
+                buttonStyle="primary"
+                label="Review and Import"
+                href="/guest-import/review"
+              />
+            </div>
           </>
         ) : (
           <div className="opacity-75">No guest data found.</div>
