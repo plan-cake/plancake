@@ -81,7 +81,7 @@ export default function ClientPage({
       <HeaderSpacer />
       <h1 className="text-2xl font-bold">Dashboard</h1>
       {!logged_in && (
-        <Banner type="info" title="Logged in as a Guest">
+        <Banner type="info" title="Currently in Guest Mode">
           <div>
             This data is only available from this browser.{" "}
             <Link
@@ -90,11 +90,8 @@ export default function ClientPage({
             >
               Create an account
             </Link>{" "}
-            to sync data across devices.
-          </div>
-          <div className="opacity-60">
-            Currently, guest data cannot be transferred to an account. Keep an
-            eye out for updates!
+            to sync data across devices. You can import this data at any time in
+            account settings.
           </div>
         </Banner>
       )}
