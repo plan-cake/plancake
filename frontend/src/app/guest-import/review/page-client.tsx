@@ -208,7 +208,7 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
       >
         {unresolvedConflicts > 0 ? (
           <div className="text-error flex items-center justify-center gap-1 font-bold">
-            <TriangleAlertIcon className="h-4 w-4 flex-none" />
+            <TriangleAlertIcon className="h-4 w-4 flex-none" strokeWidth={2} />
             Please resolve conflicts.
           </div>
         ) : (
@@ -265,7 +265,9 @@ function EventHeader({
   return (
     <div className="flex items-start justify-between">
       <div className={cn("flex items-center gap-1", conflict && "text-error")}>
-        {conflict && <TriangleAlertIcon className="h-4 w-4 flex-none" />}
+        {conflict && (
+          <TriangleAlertIcon className="h-4 w-4 flex-none" strokeWidth={2} />
+        )}
         <p className="font-bold">{title}</p>
       </div>
       <Tooltip content="Opens in a new tab">
