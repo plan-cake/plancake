@@ -15,8 +15,9 @@ export default function GuestSummary({
         {events !== 1 ? "s" : ""} that you created
       </div>
       <div className={cn("text-sm", availabilities === 0 && "opacity-50")}>
-        • {availabilities} event
-        {availabilities !== 1 ? "s" : ""} that you added your availability to
+        • {availabilities} availabilit
+        {availabilities !== 1 ? "ies" : "y"} that you added to{" "}
+        {availabilities === 1 ? "an event" : "events"}
       </div>
     </div>
   );
