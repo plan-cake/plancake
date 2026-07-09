@@ -43,14 +43,9 @@ def get_summary(request):
         response.status_code = 200
         return response
 
-    events = UserEvent.objects.filter(
-        user_account=guest_user, url_code__isnull=False
-    ).count()
+    events = UserEvent.objects.filter(user_account=guest_user).count()
 
-    participations = EventParticipant.objects.filter(
-        user_account=guest_user,
-        user_event__url_code__isnull=False,
-    ).count()
+    participations = EventParticipant.objects.filter(user_account=guest_user).count()
 
     response.data = {
         "created_events": events,
@@ -81,12 +76,13 @@ def get_data(request):
         response.status_code = 200
         return response
 
-    events = UserEvent.objects.filter(
-        user_account=guest_user, url_code__isnull=False
-    ).select_related("url_code")
+    events = UserEvent.objects.filter(user_account=guest_user).select_related(
+        "url_code"
+    )
     created_events = [
         {
             "url_code": event.url_code.url_code,
+            "public_id": event.public_id,
             "title": event.title,
         }
         for event in events
@@ -94,11 +90,11 @@ def get_data(request):
 
     participations = EventParticipant.objects.filter(
         user_account=guest_user,
-        user_event__url_code__isnull=False,
     ).select_related("user_event__url_code")
     participated_events = [
         {
             "url_code": participation.user_event.url_code.url_code,
+            "public_id": participation.user_event.public_id,
             "title": participation.user_event.title,
             "guest_display_name": participation.display_name,
             "account_display_name": None,
@@ -109,10 +105,10 @@ def get_data(request):
     conflicts = EventParticipant.objects.filter(
         user_account=account_user,
         user_event__in=participations.values_list("user_event", flat=True),
-    ).select_related("user_event__url_code")
+    )
     for conflict in conflicts:
         for participation in participated_events:
-            if participation["url_code"] == conflict.user_event.url_code.url_code:
+            if participation["public_id"] == conflict.user_event.public_id:
                 participation["account_display_name"] = conflict.display_name
 
     response.data = {
@@ -158,18 +154,16 @@ def import_data(request):
 
     with transaction.atomic():
         # Check if the guest has any data to import
-        guest_events = UserEvent.objects.filter(
-            user_account=guest_user, url_code__isnull=False
-        )
+        guest_events = UserEvent.objects.filter(user_account=guest_user)
         guest_submissions = EventParticipant.objects.filter(
             user_account=guest_user
-        ).select_related("user_event__url_code")
+        ).select_related("user_event")
         if not guest_events.exists() and not guest_submissions.exists():
             return no_data_found()
 
         # Check if all the guest user's submissions are accounted for in the choices
         if set(availability_choices.keys()) != set(
-            submission.user_event.url_code.url_code for submission in guest_submissions
+            submission.user_event.public_id for submission in guest_submissions
         ):
             response.data = {
                 "error": {
@@ -182,27 +176,27 @@ def import_data(request):
             return response
 
         # Transfer event ownership
-        UserEvent.objects.filter(
-            user_account=guest_user, url_code__isnull=False
-        ).update(user_account=account_user)
+        UserEvent.objects.filter(user_account=guest_user).update(
+            user_account=account_user
+        )
 
         # === DELETE DISCARDED SUBMISSIONS ===
         account_chosen = []
         guest_chosen = []
-        for url_code, choice in availability_choices.items():
+        for public_id, choice in availability_choices.items():
             match choice:
                 case "account":
-                    account_chosen.append(url_code)
+                    account_chosen.append(public_id)
                 case "guest":
-                    guest_chosen.append(url_code)
+                    guest_chosen.append(public_id)
 
         # Start by removing the guest's submissions from events that have "account" specified
         EventParticipant.objects.filter(
-            user_account=guest_user, user_event__url_code__url_code__in=account_chosen
+            user_account=guest_user, user_event__public_id__in=account_chosen
         ).delete()
         # Then remove the account's submissions from events that have "guest" specified
         EventParticipant.objects.filter(
-            user_account=account_user, user_event__url_code__url_code__in=guest_chosen
+            user_account=account_user, user_event__public_id__in=guest_chosen
         ).delete()
 
         # Then of all the remaining guest submissions transfer ownership to the account
