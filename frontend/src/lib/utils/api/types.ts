@@ -169,13 +169,13 @@ export type GuestDataSummary = {
 }
 
 type GuestCreatedEvent = {
-  url_code: string;
+  url_code: string | null;
   public_id: string;
   title: string;
 }
 
 type GuestParticipatedEvent = {
-  url_code: string;
+  url_code: string | null;
   public_id: string;
   title: string;
   guest_display_name: string;

@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils/classname";
 
 type AvailabilityImportChoice = "guest" | "account";
 type ImportPayload = {
-  [url_code: string]: AvailabilityImportChoice;
+  [public_id: string]: AvailabilityImportChoice;
 };
 
 export default function ClientPage({ guestData }: { guestData: GuestData }) {
@@ -28,11 +28,11 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
   const router = useRouter();
 
   const [importPayload, setImportPayload] = useState<{
-    [url_code: string]: AvailabilityImportChoice;
+    [public_id: string]: AvailabilityImportChoice;
   }>(
     guestData.participated_events.reduce((acc, event) => {
       if (event.account_display_name === null) {
-        acc[event.url_code] = "guest";
+        acc[event.public_id] = "guest";
       }
       return acc;
     }, {} as ImportPayload),
@@ -44,17 +44,17 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
     return new Set(
       guestData.participated_events
         .filter((event) => event.account_display_name !== null)
-        .map((event) => event.url_code),
+        .map((event) => event.public_id),
     );
   }, [guestData.participated_events]);
 
   const resolveConflict = (
-    url_code: string,
+    public_id: string,
     choice: AvailabilityImportChoice,
   ) => {
     setImportPayload((prev) => ({
       ...prev,
-      [url_code]: choice,
+      [public_id]: choice,
     }));
   };
 
@@ -122,7 +122,7 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
           {guestData.created_events.length === 0 && noneText}
           {guestData.created_events.map((event) => (
             <EventDisplay
-              key={event.url_code}
+              key={event.public_id}
               title={event.title}
               url_code={event.url_code}
             />
@@ -144,12 +144,12 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
           {guestData.participated_events.length === 0 && noneText}
 
           {guestData.participated_events.map((event) => {
-            const choice = importPayload[event.url_code] ?? null;
-            const hasConflict = conflictedEvents.has(event.url_code);
+            const choice = importPayload[event.public_id] ?? null;
+            const hasConflict = conflictedEvents.has(event.public_id);
 
             return (
               <EventDisplay
-                key={event.url_code}
+                key={event.public_id}
                 title={event.title}
                 url_code={event.url_code}
                 conflict={hasConflict && choice === null}
@@ -172,9 +172,9 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
                       <Selector
                         dialogDescription="Resolve the submission conflict"
                         dialogTitle="Resolve Conflict"
-                        id={`resolve-conflict-${event.url_code}`}
+                        id={`resolve-conflict-${event.public_id}`}
                         onChange={(choice) =>
-                          resolveConflict(event.url_code, choice)
+                          resolveConflict(event.public_id, choice)
                         }
                         options={[
                           { label: "Keep Guest", value: "guest" },
@@ -241,7 +241,7 @@ function EventDisplay({
   children,
 }: {
   title: string;
-  url_code: string;
+  url_code: string | null;
   conflict?: boolean;
   children?: React.ReactNode;
 }) {
@@ -259,7 +259,7 @@ function EventHeader({
   conflict,
 }: {
   title: string;
-  url_code: string;
+  url_code: string | null;
   conflict?: boolean;
 }) {
   return (
@@ -270,19 +270,21 @@ function EventHeader({
         )}
         <p className="font-bold">{title}</p>
       </div>
-      <Tooltip content="Opens in a new tab">
-        <Link
-          href={`/${url_code}`}
-          className={cn(
-            "flex items-center gap-1",
-            "opacity-50 hover:opacity-75 active:opacity-100",
-          )}
-          target="_blank"
-        >
-          View
-          <ExternalLinkIcon className="h-4 w-4 flex-none" />
-        </Link>
-      </Tooltip>
+      {url_code && (
+        <Tooltip content="Opens in a new tab">
+          <Link
+            href={`/${url_code}`}
+            className={cn(
+              "flex items-center gap-1",
+              "opacity-50 hover:opacity-75 active:opacity-100",
+            )}
+            target="_blank"
+          >
+            View
+            <ExternalLinkIcon className="h-4 w-4 flex-none" />
+          </Link>
+        </Tooltip>
+      )}
     </div>
   );
 }
