@@ -29,10 +29,10 @@ def get_guest_account(request, response):
                     raise UserSession.DoesNotExist
 
                 update_session_metadata(request, session)
-
-            set_session_cookie(response, GUEST_COOKIE_NAME, session.session_token, True)
-            return session.user_account
         except UserSession.DoesNotExist:
             logger.info("Guest session expired.")
+        else:
+            set_session_cookie(response, GUEST_COOKIE_NAME, session.session_token, True)
+            return session.user_account
 
     return None
