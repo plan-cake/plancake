@@ -89,31 +89,12 @@ export default function ClientPage({
   //   return () => removeToast(toastId);
   // }, [addToast, removeToast]);
 
-  const handleNameChange = useDebouncedCallback(async (displayName) => {
-    if (errors.displayName) setErrors((prev) => ({ ...prev, displayName: "" }));
-
-    if (displayName === "") {
-      setErrors((prev) => ({
-        ...prev,
-        displayName: MESSAGES.ERROR_NAME_MISSING,
-      }));
-      return;
-    }
-
-    if (displayName.length > MAX_DISPLAY_NAME_LENGTH) {
-      setErrors((prev) => ({
-        ...prev,
-        displayName: MESSAGES.ERROR_NAME_LENGTH,
-      }));
-      return;
-    }
-
+  const checkNameAvailability = useDebouncedCallback(async (displayName) => {
     try {
       await clientPost(ROUTES.availability.checkDisplayName, {
         event_code: eventCode,
         display_name: displayName,
       });
-      setErrors((prev) => ({ ...prev, displayName: "" }));
     } catch (e) {
       const error = e as ApiErrorResponse;
       if (error.badRequest) {
@@ -126,6 +107,24 @@ export default function ClientPage({
       }
     }
   }, 300);
+
+  const handleNameChange = (value: string) => {
+    setDisplayName(value);
+    if (value === "") {
+      setErrors((prev) => ({
+        ...prev,
+        displayName: MESSAGES.ERROR_NAME_MISSING,
+      }));
+    } else if (value.length > MAX_DISPLAY_NAME_LENGTH) {
+      setErrors((prev) => ({
+        ...prev,
+        displayName: MESSAGES.ERROR_NAME_LENGTH,
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, displayName: "" }));
+      checkNameAvailability(value);
+    }
+  };
 
   // DEFAULT NAME SETTING
   const [saveDefaultName, setSaveDefaultName] = useState(false);
@@ -148,12 +147,12 @@ export default function ClientPage({
     // If the user has a default name, use it to autofill the name field
     const newName = session.user.defaultName;
     setDisplayName(newName);
-    handleNameChange(newName);
+    checkNameAvailability(newName);
     addToast("success", MESSAGES.INFO_NAME_AUTOFILLED, {
       title: "NAME AUTOFILLED",
     });
     nameInitialized.current = true;
-  }, [session, setDisplayName, addToast, handleNameChange]);
+  }, [session, setDisplayName, addToast, checkNameAvailability]);
 
   // SUBMIT AVAILABILITY
   const handleSubmitAvailability = async () => {
@@ -276,7 +275,6 @@ export default function ClientPage({
             errors={errors}
             session={session}
             displayName={displayName}
-            setDisplayName={setDisplayName}
             handleNameChange={handleNameChange}
             saveDefaultName={saveDefaultName}
             setSaveDefaultName={setSaveDefaultName}
@@ -329,7 +327,6 @@ export default function ClientPage({
               errors={errors}
               session={session}
               displayName={displayName}
-              setDisplayName={setDisplayName}
               handleNameChange={handleNameChange}
               saveDefaultName={saveDefaultName}
               setSaveDefaultName={setSaveDefaultName}
@@ -372,7 +369,6 @@ function DisplayNameInput({
   errors,
   session,
   displayName,
-  setDisplayName,
   handleNameChange,
   saveDefaultName,
   setSaveDefaultName,
@@ -380,7 +376,6 @@ function DisplayNameInput({
   errors: Record<string, string>;
   session: Session;
   displayName: string;
-  setDisplayName: (name: string) => void;
   handleNameChange: (name: string) => void;
   saveDefaultName: boolean;
   setSaveDefaultName: (save: boolean) => void;
@@ -396,10 +391,7 @@ function DisplayNameInput({
             label="Display name"
             style="inline"
             value={displayName}
-            onChange={(e) => {
-              setDisplayName(e);
-              handleNameChange(e);
-            }}
+            onChange={handleNameChange}
             placeholder="add your name"
             error={errors.displayName}
             maxLength={{
