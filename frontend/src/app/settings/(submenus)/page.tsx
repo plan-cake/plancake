@@ -62,11 +62,11 @@ export default function Page() {
   };
 
   const handleDefaultNameChange = (value: string) => {
+    setDefaultName(value);
     if (value.length > MAX_DEFAULT_NAME_LENGTH) {
       setDefaultNameError(MESSAGES.ERROR_DEFAULT_NAME_LENGTH);
     } else {
       setDefaultNameError("");
-      setDefaultName(value);
     }
   };
 
