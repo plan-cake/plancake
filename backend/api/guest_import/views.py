@@ -113,10 +113,11 @@ def get_data(request):
         user_account=account_user,
         user_event__in=participations.values_list("user_event", flat=True),
     ).select_related("user_event")
+    participation_map = {p["public_id"]: p for p in participated_events}
     for conflict in conflicts:
-        for participation in participated_events:
-            if participation["public_id"] == conflict.user_event.public_id:
-                participation["account_display_name"] = conflict.display_name
+        participation = participation_map.get(conflict.user_event.public_id)
+        if participation:
+            participation["account_display_name"] = conflict.display_name
     logger.info(
         "%s conflicted events found during guest import for user: %s",
         len(conflicts),
