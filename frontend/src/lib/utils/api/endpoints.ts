@@ -288,6 +288,8 @@ export const ROUTES = {
      * Imports the guest user's data into the logged-in user's account, resolving any
      * availability submission conflicts based on the provided choices.
      * @method POST
+     * @throws 400 - If there is no guest data found.
+     * @throws 400 - If the availability choices do not match the guest submissions.
      */
     importData: route<MessageResponse, GuestImportData>("/guest-import/import-data/"),
   }
