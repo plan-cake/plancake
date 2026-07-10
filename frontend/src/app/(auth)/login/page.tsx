@@ -25,12 +25,7 @@ export default function Page() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  const dontShowGuestImport =
-    localStorage.getItem(DONT_SHOW_AGAIN_KEY) === "true";
-  const callbackUrl = getSafeRedirectUrl(
-    searchParams.get("callbackUrl"),
-    dontShowGuestImport ? undefined : "/guest-import/login",
-  );
+  const callbackUrl = searchParams.get("callbackUrl");
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
@@ -60,12 +55,19 @@ export default function Page() {
     }
 
     try {
+      const dontShowGuestImport =
+        localStorage.getItem(DONT_SHOW_AGAIN_KEY) === "true";
+      const redirectUrl = getSafeRedirectUrl(
+        callbackUrl,
+        dontShowGuestImport ? undefined : "/guest-import/login",
+      );
+
       await clientPost(ROUTES.auth.login, {
         email,
         password,
         remember_me: rememberMe,
       });
-      router.push(callbackUrl);
+      router.push(redirectUrl);
       router.refresh();
       return true;
     } catch (e) {
