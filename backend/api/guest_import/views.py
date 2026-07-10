@@ -141,7 +141,7 @@ def import_data(request):
     """
     Transfers ownership of events and availabilities created by the guest to the account.
 
-    The body of the request should contain a mapping of event URL codes to the user's
+    The body of the request should contain a mapping of event's public ID to the user's
     chosen submission to keep, for each event the guest had submitted availability to. If
     there is no conflict, "guest" should be specified.
 
