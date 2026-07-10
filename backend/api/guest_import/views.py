@@ -112,7 +112,7 @@ def get_data(request):
     conflicts = EventParticipant.objects.filter(
         user_account=account_user,
         user_event__in=participations.values_list("user_event", flat=True),
-    )
+    ).select_related("user_event")
     for conflict in conflicts:
         for participation in participated_events:
             if participation["public_id"] == conflict.user_event.public_id:
