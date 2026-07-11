@@ -19,7 +19,7 @@ import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
 import DateRangeSelection from "@/features/event/editor/date-range/selector";
 import { EventEditorType } from "@/features/event/editor/types";
 import { validateEventData } from "@/features/event/editor/validate-data";
-import { GridPreviewDialog, ScheduleGrid } from "@/features/event/grid";
+import { ScheduleGrid } from "@/features/event/grid";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { RateLimitBanner } from "@/features/system-feedback";
@@ -34,7 +34,6 @@ type EventEditorProps = {
 
 type SegmentedControlOption = "details" | "preview";
 
-const MemoizedGridPreview = memo(GridPreviewDialog);
 const MemoizedScheduleGrid = memo(ScheduleGrid);
 
 export default function EventEditor({ type, initialData }: EventEditorProps) {
@@ -179,7 +178,16 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         </div>
         <div className="h-16 md:hidden" />
         <div className="hidden flex-1 md:col-start-2 md:row-span-9 md:row-start-2 md:block">
-          <MemoizedGridPreview eventRange={eventRange} timeslots={timeslots} />
+          <div className="bg-panel h-full rounded-3xl py-4 pl-2 pr-4">
+            <MemoizedScheduleGrid
+              mode="preview"
+              isWeekdayEvent={eventRange.type === "weekday"}
+              disableSelect={true}
+              unselectedRange={checkUnselectedRange(eventRange)}
+              timezone={eventRange.timezone}
+              timeslots={timeslots}
+            />
+          </div>
         </div>
       </div>
 
