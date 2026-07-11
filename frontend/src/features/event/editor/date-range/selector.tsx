@@ -26,7 +26,7 @@ export default function DateRangeSelection({
         </label>
         <EventTypeSelect id="event-type-select" disabled={editing} />
       </div>
-      <div className="flex w-fit flex-col justify-center gap-1">
+      <div className="flex w-fit flex-col gap-1">
         <p
           className={`flex items-center gap-2 font-bold ${errors.dateRange || errors.weekdayRange ? "text-error" : ""}`}
         >
