@@ -88,7 +88,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     }
   };
 
-  // BUTTONS
+  // REUSED COMPONENTS
   const cancelButton = (
     <LinkButton
       buttonStyle="transparent"
@@ -102,6 +102,16 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       label={type === "edit" ? "Update Event" : "Create Event"}
       onClick={submitEventInfo}
       loadOnSuccess
+    />
+  );
+  const grid = (
+    <MemoizedScheduleGrid
+      mode="preview"
+      isWeekdayEvent={eventRange.type === "weekday"}
+      disableSelect={true}
+      unselectedRange={checkUnselectedRange(eventRange)}
+      timezone={eventRange.timezone}
+      timeslots={timeslots}
     />
   );
 
@@ -179,14 +189,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         <div className="h-16 md:hidden" />
         <div className="hidden flex-1 md:col-start-2 md:row-span-9 md:row-start-2 md:block">
           <div className="bg-panel h-full rounded-3xl py-4 pl-2 pr-4">
-            <MemoizedScheduleGrid
-              mode="preview"
-              isWeekdayEvent={eventRange.type === "weekday"}
-              disableSelect={true}
-              unselectedRange={checkUnselectedRange(eventRange)}
-              timezone={eventRange.timezone}
-              timeslots={timeslots}
-            />
+            {grid}
           </div>
         </div>
       </div>
@@ -197,14 +200,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           mobileTab === "details" ? "hidden" : "block",
         )}
       >
-        <MemoizedScheduleGrid
-          mode="preview"
-          isWeekdayEvent={eventRange.type === "weekday"}
-          disableSelect={true}
-          unselectedRange={checkUnselectedRange(eventRange)}
-          timezone={eventRange.timezone}
-          timeslots={timeslots}
-        />
+        {grid}
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}
