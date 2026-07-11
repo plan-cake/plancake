@@ -15,6 +15,7 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import TimeSelector from "@/features/event/components/selectors/time";
 import AdvancedOptions from "@/features/event/editor/advanced-options";
+import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
 import DateRangeSelection from "@/features/event/editor/date-range/selector";
 import { EventEditorType } from "@/features/event/editor/types";
 import { validateEventData } from "@/features/event/editor/validate-data";
@@ -22,6 +23,7 @@ import { GridPreviewDialog, ScheduleGrid } from "@/features/event/grid";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { RateLimitBanner } from "@/features/system-feedback";
+import { MESSAGES } from "@/lib/messages";
 import submitEvent from "@/lib/utils/api/submit-event";
 import { cn } from "@/lib/utils/classname";
 
@@ -123,6 +125,10 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
             onChange={setTitle}
             error={errors.title || errors.api}
             className="text-2xl font-semibold"
+            maxLength={{
+              length: MAX_TITLE_LENGTH,
+              error: MESSAGES.ERROR_EVENT_NAME_LENGTH,
+            }}
           />
         </div>
         <div className="hidden gap-2 md:flex">

@@ -80,7 +80,7 @@ export default function Page() {
               label="Email*"
               value={email}
               onChange={handleEmailChange}
-              outlined
+              style="outlined"
               error={errors.email || errors.api}
             />,
           ]}
