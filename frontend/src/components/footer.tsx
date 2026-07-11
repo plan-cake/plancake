@@ -25,7 +25,7 @@ export default function Footer() {
           </div>
 
           {/* Copyright text */}
-          <p className="text-sm">
+          <p>
             © 2025 Plancake. Stacking up perfect plans, one pancake at a time.
           </p>
         </div>
