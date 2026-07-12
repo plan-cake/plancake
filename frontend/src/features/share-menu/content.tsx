@@ -74,7 +74,7 @@ export default function ShareMenuContent({
           {currentURL ? currentURL.replace(/^https?:\/\//, "") : "Loading..."}
         </div>
         <div className="text-center text-sm opacity-60">
-          Anyone can join the event using this link
+          Anyone can join the event using this link.
         </div>
       </div>
       <div
