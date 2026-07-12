@@ -9,7 +9,7 @@ import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
-export default function ShareMenu({
+export default function ShareMenuContent({
   eventTitle,
   eventCode,
 }: {
