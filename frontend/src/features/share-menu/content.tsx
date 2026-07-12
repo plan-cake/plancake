@@ -63,6 +63,7 @@ export default function ShareMenuContent({
     <div className="flex w-full flex-col items-center gap-4">
       <QRCode url={currentURL} />
       <div className="flex flex-col items-center gap-1">
+        <div className="text-center">{eventTitle}</div>
         <div
           className={cn(
             "w-full min-w-0 text-center text-xl font-bold",
