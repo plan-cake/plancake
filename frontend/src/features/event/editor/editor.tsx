@@ -108,7 +108,6 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     <MemoizedScheduleGrid
       mode="preview"
       isWeekdayEvent={eventRange.type === "weekday"}
-      disableSelect={true}
       unselectedRange={checkUnselectedRange(eventRange)}
       timezone={eventRange.timezone}
       timeslots={timeslots}
