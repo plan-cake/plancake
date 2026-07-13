@@ -2,6 +2,7 @@ import functools
 import logging
 import uuid
 
+import requests
 from django.db import DatabaseError, transaction
 from rest_framework import serializers
 from rest_framework.decorators import api_view
@@ -11,6 +12,8 @@ from rest_framework.response import Response
 from api.models import UserAccount, UserSession
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
+    CF_TURNSTILE_SECRET_KEY,
+    CF_TURNSTILE_VERIFY_URL,
     GENERIC_ERR_RESPONSE,
     GUEST_COOKIE_NAME,
     ThrottleScopes,
@@ -19,6 +22,7 @@ from api.utils import (
     RateLimitError,
     check_rate_limit,
     delete_session_cookie,
+    get_client_ip_address,
     get_metadata,
     get_session,
     set_session_cookie,
@@ -517,3 +521,46 @@ def sse_endpoint(method):
         return func
 
     return decorator
+
+
+def require_captcha(func):
+    """
+    A decorator to check if the request has a valid Cloudflare Turnstile token.
+
+    If the token is invalid, an error response will be returned.
+    """
+
+    @functools.wraps(func)
+    def wrapper(request, *args, **kwargs):
+        client_token = request.data.get("cf_turnstile_token")
+        if not client_token:
+            return Response(
+                {"error": {"general": ["CAPTCHA token is required."]}}, status=400
+            )
+
+        # Assemble payload, including client IP if possible for extra security
+        payload = {
+            "secret": CF_TURNSTILE_SECRET_KEY,
+            "response": client_token,
+        }
+        if client_ip := get_client_ip_address(request):
+            payload["remoteip"] = client_ip
+
+        CAPTCHA_FAILED_RESPONSE = Response(
+            {"error": {"general": ["CAPTCHA verification failed."]}}, status=400
+        )
+
+        try:
+            # Verify the token with Cloudflare Turnstile
+            response = requests.post(CF_TURNSTILE_VERIFY_URL, data=payload, timeout=5)
+            response.raise_for_status()
+            result = response.json()
+            if not result.get("success"):
+                return CAPTCHA_FAILED_RESPONSE
+        except Exception as e:
+            logger.warning("CAPTCHA verification failed: %s", e)
+            return CAPTCHA_FAILED_RESPONSE
+
+        return func(request, *args, **kwargs)
+
+    return wrapper

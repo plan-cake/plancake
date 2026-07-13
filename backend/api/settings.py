@@ -129,6 +129,10 @@ REST_FRAMEWORK = {
     },
 }
 
+# Cloudflare Turnstile secret key
+CF_TURNSTILE_SECRET_KEY = env("CF_TURNSTILE_SECRET_KEY")
+CF_TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+
 SESS_EXP_SECONDS = 3600  # 1 hour
 
 LONG_SESS_EXP_SECONDS = 31536000  # 1 year
