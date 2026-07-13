@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 type PointerType = "coarse" | "fine";
 
 export default function usePointerType() {
+  /**
+   * This initial null state is used to give the option to render a fallback/placeholder
+   * before the actual pointer type is determined.
+   */
   const [pointerType, setPointerType] = useState<PointerType | null>(null);
   useEffect(() => {
     const mediaQuery = window.matchMedia("(pointer: coarse)");
