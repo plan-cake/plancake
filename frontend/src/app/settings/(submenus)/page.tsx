@@ -62,11 +62,11 @@ export default function Page() {
   };
 
   const handleDefaultNameChange = (value: string) => {
+    setDefaultName(value);
     if (value.length > MAX_DEFAULT_NAME_LENGTH) {
       setDefaultNameError(MESSAGES.ERROR_DEFAULT_NAME_LENGTH);
     } else {
       setDefaultNameError("");
-      setDefaultName(value);
     }
   };
 
@@ -100,7 +100,11 @@ export default function Page() {
                 type="text"
                 onChange={handleDefaultNameChange}
                 error={defaultNameError}
-                outlined
+                style="outlined"
+                maxLength={{
+                  length: MAX_DEFAULT_NAME_LENGTH,
+                  error: MESSAGES.ERROR_DEFAULT_NAME_LENGTH,
+                }}
               />
             </div>
             <div
