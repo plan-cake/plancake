@@ -568,4 +568,5 @@ def require_captcha(func):
 
         return func(request, *args, **kwargs)
 
+    get_metadata(wrapper).captcha_required = True
     return wrapper
