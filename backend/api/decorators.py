@@ -14,6 +14,7 @@ from api.settings import (
     ACCOUNT_COOKIE_NAME,
     CF_TURNSTILE_SECRET_KEY,
     CF_TURNSTILE_VERIFY_URL,
+    DEBUG,
     GENERIC_ERR_RESPONSE,
     GUEST_COOKIE_NAME,
     ThrottleScopes,
@@ -532,6 +533,10 @@ def require_captcha(func):
 
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
+        if DEBUG:
+            logger.debug("Skipping CAPTCHA verification in DEBUG mode.")
+            return func(request, *args, **kwargs)
+
         client_token = request.data.get("cf_turnstile_token")
         if not client_token:
             return Response(
