@@ -537,7 +537,7 @@ def require_captcha(func):
             logger.debug("Skipping CAPTCHA verification in DEBUG mode.")
             return func(request, *args, **kwargs)
 
-        client_token = request.data.get("cf_turnstile_token")
+        client_token = request.data.get("captcha_token")
         if not client_token:
             return Response(
                 {"error": {"general": ["CAPTCHA token is required."]}}, status=400
