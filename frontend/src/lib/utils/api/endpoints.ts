@@ -41,6 +41,10 @@ function route<Res, Req = void>(url: string) {
   } as const;
 }
 
+type CaptchaToken = {
+  captcha_token: string;
+};
+
 // Helpers to extract types from the route object
 export type InferReq<T> = T extends { __req: infer R } ? R : never;
 export type InferRes<T> = T extends { __res: infer R } ? R : never;
@@ -52,12 +56,12 @@ export const ROUTES = {
      * @method POST
      * @throws {400} - If the password is not strong enough.
      */
-    register: route<MessageResponse, RegisterData>("/auth/register/"),
+    register: route<MessageResponse, RegisterData & CaptchaToken>("/auth/register/"),
     /**
      * Attempts to resend the verification email for an unverified user account.
      * @method POST
      */
-    resendRegisterEmail: route<MessageResponse, Email>("/auth/resend-register-email/"),
+    resendRegisterEmail: route<MessageResponse, Email & CaptchaToken>("/auth/resend-register-email/"),
     /**
      * Verifies the email address of an unverified user account.
      * @method POST
@@ -81,7 +85,7 @@ export const ROUTES = {
      * Starts the password reset process by sending a password reset email.
      * @method POST
      */
-    startPasswordReset: route<MessageResponse, Email>("/auth/start-password-reset/"),
+    startPasswordReset: route<MessageResponse, Email & CaptchaToken>("/auth/start-password-reset/"),
     /**
      * Given a valid password reset token, resets the password for a user account.
      * @method POST
@@ -103,14 +107,14 @@ export const ROUTES = {
      * @throws 400 - If the timeslots are invalid.
      * @throws 400 - If the custom code is not available or invalid.
      */
-    dateCreate: route<EventCode, NewEventData>("/event/date-create/"),
+    dateCreate: route<EventCode, NewEventData & CaptchaToken>("/event/date-create/"),
     /**
      * Creates a 'week' type event.
      * @method POST
      * @throws 400 - If the timeslots are invalid.
      * @throws 400 - If the custom code is not available or invalid.
      */
-    weekCreate: route<EventCode, NewEventData>("/event/week-create/"),
+    weekCreate: route<EventCode, NewEventData & CaptchaToken>("/event/week-create/"),
     /**
      * Checks if a custom event code is available for use.
      * @method POST
@@ -159,7 +163,7 @@ export const ROUTES = {
      * @throws 400 - If the timeslots are invalid.
      * @throws 404 - If the event code is invalid.
      */
-    add: route<MessageResponse, AvailabilityAddData>("/availability/add/"),
+    add: route<MessageResponse, AvailabilityAddData & CaptchaToken>("/availability/add/"),
     /**
      * Checks if a display name is available for the current user in an event.
      * @method POST

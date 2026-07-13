@@ -19,6 +19,7 @@ from api.auth.utils import list_failed_criteria, validate_password
 from api.decorators import (
     api_endpoint,
     require_account_auth,
+    require_captcha,
     validate_json_input,
     validate_output,
 )
@@ -51,6 +52,7 @@ logger = logging.getLogger("api")
 
 
 @api_endpoint("POST")
+@require_captcha
 @validate_json_input(RegisterAccountSerializer)
 @validate_output(MessageOutputSerializer)
 def register(request):
@@ -119,6 +121,7 @@ def register(request):
 
 
 @api_endpoint("POST")
+@require_captcha
 @validate_json_input(EmailSerializer)
 @validate_output(MessageOutputSerializer)
 def resend_register_email(request):
@@ -307,6 +310,7 @@ def check_account_auth(request):
 
 
 @api_endpoint("POST")
+@require_captcha
 @validate_json_input(EmailSerializer)
 @validate_output(MessageOutputSerializer)
 def start_password_reset(request):
