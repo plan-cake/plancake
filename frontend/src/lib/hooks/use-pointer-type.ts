@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 type PointerType = "coarse" | "fine";
 
 export default function usePointerType() {
-  const [pointerType, setPointerType] = useState<PointerType>();
+  const [pointerType, setPointerType] = useState<PointerType | null>(null);
   useEffect(() => {
     const mediaQuery = window.matchMedia("(pointer: coarse)");
     setPointerType(mediaQuery.matches ? "coarse" : "fine");
