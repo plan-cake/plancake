@@ -533,10 +533,6 @@ def require_captcha(func):
 
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
-        if DEBUG:
-            logger.debug("Skipping CAPTCHA verification in DEBUG mode.")
-            return func(request, *args, **kwargs)
-
         client_token = request.data.get("captcha_token")
         if not client_token:
             return Response(
