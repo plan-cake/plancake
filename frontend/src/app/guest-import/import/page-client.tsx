@@ -15,6 +15,7 @@ import { Banner, useToast } from "@/features/system-feedback";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
+import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { GuestData } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
 
@@ -65,10 +66,12 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
       });
       addToast("success", "Guest data imported successfully.");
       router.push("/dashboard");
-    } catch {
+    } catch (e) {
+      const error = e as ApiErrorResponse;
       addToast(
         "error",
-        "Something went wrong with your request. Please refresh the page and try again.",
+        error.formattedMessage ||
+          "Something went wrong with your request. Please refresh the page and try again.",
       );
     }
   };
