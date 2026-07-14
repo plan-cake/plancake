@@ -39,7 +39,7 @@ export class ApiErrorResponse extends Error {
     this.rateLimited = status === 429;
     this.captchaFailed =
       status === 400 &&
-      data.error.general?.includes("CAPTCHA verification failed.");
+      (data.error.general?.includes("CAPTCHA verification failed.") ?? false);
     this.serverError = status >= 500;
     this.formattedMessage = formatApiError(data);
   }
