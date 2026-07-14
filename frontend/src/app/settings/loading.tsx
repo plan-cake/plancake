@@ -13,7 +13,7 @@ export default function Loading() {
       </div>
 
       <div className="mt-2 flex flex-col gap-6 md:flex-row md:gap-12">
-        <div className="bg-loading w-23 h-11 rounded-3xl md:w-64" />
+        <div className="bg-loading h-11 w-full rounded-3xl md:w-64" />
         <div className="bg-loading h-68 w-full max-w-2xl rounded-3xl" />
       </div>
     </div>
