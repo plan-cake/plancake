@@ -16,8 +16,6 @@ interface CaptchaProps {
   backendVerificationFailed: boolean;
   onClearBackendError: () => void;
   onInitError: () => void;
-  // Permanently show the error banner, for testing purposes
-  debugShowBanner?: boolean;
 }
 
 export default function Captcha({
@@ -25,7 +23,6 @@ export default function Captcha({
   backendVerificationFailed,
   onClearBackendError,
   onInitError,
-  debugShowBanner = false,
 }: CaptchaProps) {
   // WIDGET THEMING
   const { resolvedTheme } = useTheme();
@@ -78,7 +75,7 @@ export default function Captcha({
   };
 
   // Render banner if the CAPTCHA failed to initialize
-  if (initError || debugShowBanner) {
+  if (initError) {
     return (
       <Banner type="error" title="CAPTCHA Blocked" className="text-left">
         Please disable strict ad blockers or try a different browser to
