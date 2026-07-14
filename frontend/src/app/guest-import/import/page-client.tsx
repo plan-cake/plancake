@@ -99,10 +99,10 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
   );
 
   const actionText = (
-    <p className="text-center font-semibold">
+    <div className="text-center font-semibold">
       Are you sure you want to import this guest data? This action cannot be
       undone.
-    </p>
+    </div>
   );
 
   const noneText = (
