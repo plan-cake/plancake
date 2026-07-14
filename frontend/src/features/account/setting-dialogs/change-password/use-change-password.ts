@@ -148,7 +148,7 @@ export function useChangePasswordFlow() {
       );
 
     try {
-      await clientPost(ROUTES.auth.changePassword, {
+      await clientPost(ROUTES.account.changePassword, {
         password: form.currentPassword,
         new_password: form.newPassword,
         prune_sessions: form.pruneSessions,
