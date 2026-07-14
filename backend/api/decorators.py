@@ -533,7 +533,11 @@ def require_captcha(func):
 
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
-        client_token = request.data.get("captcha_token")
+        client_token = (
+            request.data.get("captcha_token")
+            if isinstance(request.data, dict)
+            else None
+        )
         if not client_token:
             return Response(
                 {"error": {"general": ["CAPTCHA token is required."]}}, status=400
