@@ -56,8 +56,9 @@ export default function ClientPage({
   );
   const { displayName, timeZone, userAvailability } = state;
 
-  // CAPTCHA STATE
+  // CAPTCHA STATES
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -264,6 +265,7 @@ export default function ClientPage({
       }
       onClick={handleSubmitAvailability}
       loadOnSuccess
+      disabled={captchaInitError}
     />
   );
 
@@ -287,6 +289,7 @@ export default function ClientPage({
             return newErrors;
           })
         }
+        onInitError={() => setCaptchaInitError(true)}
       />
 
       {/* Header and Button Row */}

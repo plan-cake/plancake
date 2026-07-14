@@ -23,8 +23,11 @@ export default function Page() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordCriteria, setPasswordCriteria] = useState({});
   const [showPasswordCriteria, setShowPasswordCriteria] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const router = useRouter();
+
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
@@ -160,6 +163,7 @@ export default function Page() {
           backendVerificationFailed={!!errors.captcha}
           onTokenChange={setCaptchaToken}
           onClearBackendError={() => handleError("captcha", "")}
+          onInitError={() => setCaptchaInitError(true)}
         />
         <div className="flex w-full justify-end">
           <ActionButton
@@ -167,7 +171,7 @@ export default function Page() {
             label="Register"
             onClick={handleSubmit}
             loadOnSuccess
-            disabled={!!errors.captcha}
+            disabled={captchaInitError}
           />
         </div>
       </div>

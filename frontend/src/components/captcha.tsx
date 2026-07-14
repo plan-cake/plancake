@@ -15,6 +15,7 @@ interface CaptchaProps {
   onTokenChange: (token: string | null) => void;
   backendVerificationFailed: boolean;
   onClearBackendError: () => void;
+  onInitError: () => void;
   // Permanently show the error banner, for testing purposes
   debugShowBanner?: boolean;
 }
@@ -23,6 +24,7 @@ export default function Captcha({
   onTokenChange,
   backendVerificationFailed,
   onClearBackendError,
+  onInitError,
   debugShowBanner = false,
 }: CaptchaProps) {
   // WIDGET THEMING
@@ -66,6 +68,7 @@ export default function Captcha({
 
   const handleError = () => {
     setInitError(true);
+    onInitError();
     onTokenChange(null);
   };
 

@@ -20,7 +20,10 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 export default function Page() {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+
+  // CAPTCHA STATES
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
@@ -102,6 +105,7 @@ export default function Page() {
               backendVerificationFailed={!!errors.captcha}
               onTokenChange={setCaptchaToken}
               onClearBackendError={() => handleError("captcha", "")}
+              onInitError={() => setCaptchaInitError(true)}
             />
             <div className="flex justify-end">
               <ActionButton
@@ -109,6 +113,7 @@ export default function Page() {
                 label="Send Link"
                 onClick={handleSubmit}
                 loadOnSuccess
+                disabled={captchaInitError}
               />
             </div>
           </div>

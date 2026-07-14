@@ -59,8 +59,11 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     setEndTime,
   } = useEventContext();
   const { title, customCode, eventRange, timeslots } = state;
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const router = useRouter();
+
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
 
   const [mobileTab, setMobileTab] = useState<SegmentedControlOption>("details");
 
@@ -112,6 +115,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       label={type === "edit" ? "Update Event" : "Create Event"}
       onClick={submitEventInfo}
       loadOnSuccess
+      disabled={captchaInitError}
     />
   );
 
@@ -129,6 +133,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           backendVerificationFailed={!!errors.captcha}
           onTokenChange={setCaptchaToken}
           onClearBackendError={() => handleError("captcha", "")}
+          onInitError={() => setCaptchaInitError(true)}
         />
       )}
 
