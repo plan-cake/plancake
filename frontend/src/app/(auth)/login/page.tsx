@@ -55,8 +55,11 @@ export default function Page() {
     }
 
     try {
-      const dontShowGuestImport =
-        localStorage.getItem(DONT_SHOW_AGAIN_KEY) === "true";
+      let dontShowGuestImport = false;
+      try {
+        dontShowGuestImport =
+          localStorage.getItem(DONT_SHOW_AGAIN_KEY) === "true";
+      } catch {}
       const redirectUrl = getSafeRedirectUrl(
         callbackUrl,
         dontShowGuestImport ? undefined : "/guest-import/login",
