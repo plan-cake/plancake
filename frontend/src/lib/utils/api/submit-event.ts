@@ -50,7 +50,7 @@ export default async function submitEvent(
     return false;
   }
 
-  const jsonBody: EventJsonBody = {
+  const baseBody: EventJsonBody = {
     title: data.title,
     time_zone: data.eventRange.timezone,
     timeslots: data.timeslots.map((d) =>
@@ -58,18 +58,17 @@ export default async function submitEvent(
     ),
   };
 
-  if (type === "new") {
-    (jsonBody as NewEventJsonBody).captcha_token = captchaToken!;
-    if (data.code) (jsonBody as NewEventJsonBody).custom_code = data.code;
-  } else if (type === "edit") {
-    (jsonBody as EditEventJsonBody).event_code = data.code;
-  }
+  const payload: NewEventJsonBody | EditEventJsonBody =
+    type === "new"
+      ? {
+          ...baseBody,
+          captcha_token: captchaToken!,
+          ...(data.code ? { custom_code: data.code } : {}),
+        }
+      : { ...baseBody, event_code: data.code };
 
   try {
-    const resData = await clientPost(
-      apiRoute,
-      jsonBody as NewEventJsonBody | EditEventJsonBody,
-    );
+    const resData = await clientPost(apiRoute, payload);
     if (type === "new") {
       const code = (resData as EventCode).event_code;
       onSuccess(code);
