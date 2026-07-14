@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import { Turnstile } from "@marsidev/react-turnstile";
+import { useTheme } from "next-themes";
 
 import { FloatingDrawer } from "@/features/drawer";
 import { Banner } from "@/features/system-feedback/banner/base";
@@ -24,6 +25,10 @@ export default function Captcha({
   onClearBackendError,
   debugShowBanner = false,
 }: CaptchaProps) {
+  // WIDGET THEMING
+  const { resolvedTheme } = useTheme();
+  const widgetTheme = resolvedTheme === "dark" ? "dark" : "light";
+
   // DIALOG TYPE
   const isMobile = useCheckMobile();
   const Dialog = isMobile ? FloatingDrawer : BaseDialog;
@@ -90,7 +95,7 @@ export default function Captcha({
             onSuccess={handleSuccess}
             onExpire={handleExpire}
             onError={handleError}
-            options={{ size: "invisible", theme: "auto" }}
+            options={{ size: "invisible", theme: widgetTheme }}
           />
         </div>
       )}
@@ -111,7 +116,7 @@ export default function Captcha({
             onSuccess={handleSuccess}
             onExpire={handleExpire}
             onError={handleError}
-            options={{ size: "normal", theme: "auto" }}
+            options={{ size: "normal", theme: widgetTheme }}
           />
         </div>
       </Dialog>
