@@ -5,6 +5,7 @@ import { memo, useState } from "react";
 import { TriangleAlertIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import Captcha from "@/components/captcha";
 import MobileFooterIsland from "@/components/mobile-footer-island";
 import SegmentedControl from "@/components/segmented-control";
 import TextInputField from "@/components/text-input-field";
@@ -58,6 +59,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     setEndTime,
   } = useEventContext();
   const { title, customCode, eventRange, timeslots } = state;
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const router = useRouter();
 
   const [mobileTab, setMobileTab] = useState<SegmentedControlOption>("details");
@@ -68,8 +70,14 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
     try {
       const validationErrors = await validateEventData(type, state);
+
       if (Object.keys(validationErrors).length > 0) {
         batchHandleErrors(validationErrors);
+        return false;
+      }
+
+      if (type == "new" && !captchaToken) {
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
         return false;
       }
 
@@ -77,6 +85,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         { title, code: customCode, eventRange, timeslots },
         type,
         eventRange.type,
+        captchaToken,
         (code: string) => router.push(`/${code}`),
         handleError,
       );
@@ -113,6 +122,14 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       {/* Rate Limit Error */}
       {errors.rate_limit && (
         <RateLimitBanner>{errors.rate_limit}</RateLimitBanner>
+      )}
+
+      {type === "new" && (
+        <Captcha
+          backendVerificationFailed={!!errors.captcha}
+          onTokenChange={setCaptchaToken}
+          onClearBackendError={() => handleError("captcha", "")}
+        />
       )}
 
       <div className="-mb-1 flex w-full items-center justify-between">
