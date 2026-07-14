@@ -121,7 +121,6 @@ def register(request):
 
 
 @api_endpoint("POST")
-@require_captcha
 @validate_json_input(EmailSerializer)
 @validate_output(MessageOutputSerializer)
 def resend_register_email(request):

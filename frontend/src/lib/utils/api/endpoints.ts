@@ -64,7 +64,7 @@ export const ROUTES = {
      * Attempts to resend the verification email for an unverified user account.
      * @method POST
      */
-    resendRegisterEmail: route<MessageResponse, Email & CaptchaToken>("/auth/resend-register-email/"),
+    resendRegisterEmail: route<MessageResponse, Email>("/auth/resend-register-email/"),
     /**
      * Verifies the email address of an unverified user account.
      * @method POST
