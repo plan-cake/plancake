@@ -69,7 +69,7 @@ export default function Captcha({
   // Render banner if the CAPTCHA failed to initialize
   if (initError) {
     return (
-      <Banner type="error" title="CAPTCHA Blocked">
+      <Banner type="error" title="CAPTCHA Blocked" className="text-left">
         Please disable strict ad blockers or try a different browser to
         continue.
       </Banner>
