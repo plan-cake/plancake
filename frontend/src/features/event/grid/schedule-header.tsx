@@ -70,6 +70,7 @@ export default function ScheduleHeader({
             onClick={onPrevPage}
             className="ml-3 p-1.5"
             aria-label="Previous Page"
+            tooltip="Previous Page"
           />
         </div>
       ) : (
@@ -121,6 +122,7 @@ export default function ScheduleHeader({
             onClick={onNextPage}
             className="p-1.5"
             aria-label="Next Page"
+            tooltip="Next Page"
           />
         </div>
       ) : (
