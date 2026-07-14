@@ -118,9 +118,9 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [],
     "DEFAULT_THROTTLE_RATES": {
         ThrottleScopes.GLOBAL.key: "300/min",
-        ThrottleScopes.USER_ACCOUNT_CREATION.key: "10/hour",
+        ThrottleScopes.USER_ACCOUNT_CREATION.key: "100/min",
         ThrottleScopes.RESEND_EMAIL.key: "20/hour",
-        ThrottleScopes.GUEST_ACCOUNT_CREATION.key: "10/min",
+        ThrottleScopes.GUEST_ACCOUNT_CREATION.key: "100/min",
         ThrottleScopes.LOGIN.key: "30/hour",
         ThrottleScopes.PASSWORD_RESET.key: "10/hour",
         ThrottleScopes.EVENT_CREATION.key: "25/hour",
