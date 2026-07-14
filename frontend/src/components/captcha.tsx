@@ -35,6 +35,7 @@ export default function Captcha({
   const turnstileRef = useRef<TurnstileInstance | null>(null);
   const [initError, setInitError] = useState(false);
   const [recoveryDialogOpen, setRecoveryDialogOpen] = useState(false);
+  const [recoveryCompleted, setRecoveryCompleted] = useState(false);
 
   const siteKey = process.env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY!;
 
@@ -54,6 +55,8 @@ export default function Captcha({
     if (recoveryDialogOpen) {
       // If this was in the dialog, clear the backend error
       setRecoveryDialogOpen(false);
+      // This stops the invisible widget from re-rendering and resetting the token
+      setRecoveryCompleted(true);
       onClearBackendError();
     }
   };
@@ -87,7 +90,7 @@ export default function Captcha({
   // Otherwise, use the invisible widget and only show the dialog on failure
   return (
     <>
-      {!recoveryDialogOpen && (
+      {!recoveryDialogOpen && !recoveryCompleted && (
         <div className="hidden">
           <Turnstile
             ref={turnstileRef}
