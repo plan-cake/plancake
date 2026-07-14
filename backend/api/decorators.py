@@ -547,20 +547,18 @@ def require_captcha(func):
         if client_ip := get_client_ip_address(request):
             payload["remoteip"] = client_ip
 
-        CAPTCHA_FAILED_RESPONSE = Response(
-            {"error": {"general": ["CAPTCHA verification failed."]}}, status=400
-        )
-
         try:
             # Verify the token with Cloudflare Turnstile
             response = requests.post(CF_TURNSTILE_VERIFY_URL, data=payload, timeout=5)
             response.raise_for_status()
             result = response.json()
             if not result.get("success"):
-                return CAPTCHA_FAILED_RESPONSE
+                return Response(
+                    {"error": {"general": ["CAPTCHA verification failed."]}}, status=400
+                )
         except Exception as e:
-            logger.warning("CAPTCHA verification failed: %s", e)
-            return CAPTCHA_FAILED_RESPONSE
+            logger.warning("CAPTCHA verification had a problem: %s", e)
+            return GENERIC_ERR_RESPONSE
 
         return func(request, *args, **kwargs)
 
