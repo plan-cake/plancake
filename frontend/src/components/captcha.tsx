@@ -14,12 +14,15 @@ interface CaptchaProps {
   onTokenChange: (token: string | null) => void;
   backendVerificationFailed: boolean;
   onClearBackendError: () => void;
+  // Permanently show the error banner, for testing purposes
+  debugShowBanner?: boolean;
 }
 
 export default function Captcha({
   onTokenChange,
   backendVerificationFailed,
   onClearBackendError,
+  debugShowBanner = false,
 }: CaptchaProps) {
   // DIALOG TYPE
   const isMobile = useCheckMobile();
@@ -67,7 +70,7 @@ export default function Captcha({
   };
 
   // Render banner if the CAPTCHA failed to initialize
-  if (initError) {
+  if (initError || debugShowBanner) {
     return (
       <Banner type="error" title="CAPTCHA Blocked" className="text-left">
         Please disable strict ad blockers or try a different browser to
