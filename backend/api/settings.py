@@ -239,6 +239,7 @@ class PlancakeLogger(logging.Logger):
                             }
                         ]
                     },
+                    timeout=5,
                 )
             except Exception as e:
                 self.warning(
