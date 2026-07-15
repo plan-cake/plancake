@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOutIcon, UserIcon } from "lucide-react";
+import { LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import KebabMenu from "@/components/kebab-menu";
@@ -54,6 +54,7 @@ export default function AccountButton({
   const accountSettingsButton = (
     <LinkButton
       buttonStyle="frosted glass inset"
+      icon={<SettingsIcon />}
       label="Account Settings"
       href="/settings"
     />
