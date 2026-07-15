@@ -252,11 +252,13 @@ class PlancakeLogger(logging.Logger):
 
     def error(self, msg, *args, **kwargs):
         super().error(msg, *args, **kwargs)
-        self.execute_webhook(msg, 0xFF0000)
+        formatted_msg = str(msg) % args if args else str(msg)
+        self.execute_webhook(formatted_msg, 0xFF0000)
 
     def critical(self, msg, *args, **kwargs):
         super().critical(msg, *args, **kwargs)
-        self.execute_webhook(msg, 0xFF00FF)
+        formatted_msg = str(msg) % args if args else str(msg)
+        self.execute_webhook(formatted_msg, 0xFF00FF)
 
 
 # Now any logger in the project will have access to this class
