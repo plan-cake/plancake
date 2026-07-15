@@ -74,7 +74,7 @@ export default function AccountButton({
             className="relative z-10"
             buttonStyle="frosted glass inset"
             icon={<UserIcon />}
-            aria-label="Account settings"
+            aria-label="Account Menu"
           />
         }
       >
