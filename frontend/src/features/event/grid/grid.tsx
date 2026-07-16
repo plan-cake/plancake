@@ -24,6 +24,7 @@ interface ScheduleGridProps {
   timeslots: Date[];
   timezone: string;
   pageDays: number;
+  useCompactHeader: boolean;
   isWeekdayEvent?: boolean;
 
   unselectedRange?: boolean;
@@ -64,6 +65,7 @@ export default function ScheduleGrid({
   timeslots,
   timezone,
   pageDays,
+  useCompactHeader,
   mode = "preview",
   isWeekdayEvent = false,
   unselectedRange = false,
@@ -142,6 +144,7 @@ export default function ScheduleGrid({
       <ScheduleHeader
         preview={mode === "preview"}
         visibleDays={visibleDays}
+        compact={useCompactHeader}
         currentPage={currentPage}
         totalPages={totalPages}
         scrollbarPresent={scrollbarPresent}

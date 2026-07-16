@@ -58,8 +58,12 @@ export default function ClientPage({
   const { displayName, timeZone, userAvailability } = state;
 
   // GRID PAGE DAYS
-  const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
-    useGridPageDays();
+  const {
+    gridPageDays,
+    gridPageDaysOptions,
+    usingMaxGridPageDays,
+    setGridPageDays,
+  } = useGridPageDays();
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -325,6 +329,7 @@ export default function ClientPage({
             }
           }}
           pageDays={gridPageDays}
+          useCompactHeader={usingMaxGridPageDays}
         />
 
         {displaySettings}

@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils/classname";
 interface ScheduleHeaderProps {
   preview?: boolean;
   visibleDays: { dayKey: string; dayDisplay: string }[];
+  compact: boolean;
   currentPage: number;
   totalPages: number;
   scrollbarPresent?: boolean;
@@ -41,6 +42,7 @@ const variants = {
 export default function ScheduleHeader({
   preview = false,
   visibleDays,
+  compact,
   currentPage,
   totalPages,
   scrollbarPresent = false,
@@ -94,16 +96,39 @@ export default function ScheduleHeader({
           >
             {visibleDays.map(({ dayDisplay }, i) => {
               const [weekday, month, day] = dayDisplay.split(" ");
+              const condenseWeekday = (weekday: string) => {
+                return weekday === "Thu"
+                  ? "R"
+                  : weekday === "Sun"
+                    ? "U"
+                    : weekday[0];
+              };
+              const condenseMonth = (month: string) => {
+                const date = new Date(`${month} 1, 2020`);
+                return date.getMonth() + 1;
+              };
 
               return (
                 <div
                   key={i}
-                  className="flex flex-col items-center justify-center text-sm font-medium leading-tight"
+                  className={cn(
+                    "flex flex-col items-center justify-center text-sm leading-tight",
+                    ["Sat", "Sun"].includes(weekday) && "opacity-60",
+                    compact && "tracking-tighter lg:tracking-normal",
+                  )}
                 >
-                  <div>{isWeekdayEvent ? weekday.toUpperCase() : weekday}</div>
+                  <div>
+                    {compact
+                      ? condenseWeekday(weekday)
+                      : isWeekdayEvent
+                        ? weekday.toUpperCase()
+                        : weekday}
+                  </div>
                   {!isWeekdayEvent && (
                     <div>
-                      {month} {day.replace(/^0+/, "")}
+                      {compact ? condenseMonth(month) : month}
+                      {compact ? "/" : " "}
+                      {day.replace(/^0+/, "")}
                     </div>
                   )}
                 </div>

@@ -68,8 +68,12 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   };
 
   /* GRID PAGE DAYS */
-  const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
-    useGridPageDays();
+  const {
+    gridPageDays,
+    gridPageDaysOptions,
+    usingMaxGridPageDays,
+    setGridPageDays,
+  } = useGridPageDays();
 
   /* MOBILE DRAWER SPACING */
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);
@@ -174,6 +178,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           numParticipants={gridNumParticipants}
           timeslots={timeslots}
           pageDays={gridPageDays}
+          useCompactHeader={usingMaxGridPageDays}
         />
 
         <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm md:hidden">

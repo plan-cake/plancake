@@ -54,5 +54,13 @@ export default function useGridPageDays() {
     setGridPageDaysState(value);
   };
 
-  return { gridPageDays, gridPageDaysOptions, setGridPageDays };
+  const usingMaxGridPageDays =
+    gridPageDays === Math.max(...gridPageDaysOptions);
+
+  return {
+    gridPageDays,
+    gridPageDaysOptions,
+    usingMaxGridPageDays,
+    setGridPageDays,
+  };
 }
