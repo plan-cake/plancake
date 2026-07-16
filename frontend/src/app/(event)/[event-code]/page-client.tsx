@@ -8,7 +8,9 @@ import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
+import GridPageDaysSelector from "@/features/event/components/selectors/grid-page-days";
 import ScheduleGrid from "@/features/event/grid/grid";
+import useGridPageDays from "@/features/event/grid/lib/use-page-days";
 import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
 import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
 import { getResultBanners } from "@/features/event/results/components/banners";
@@ -64,6 +66,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   const handleTZChange = (newTZ: string | number) => {
     setTimezone(newTZ.toString());
   };
+
+  /* GRID PAGE DAYS */
+  const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
+    useGridPageDays();
 
   /* MOBILE DRAWER SPACING */
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);
@@ -123,6 +129,17 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     </BaseDialog>
   );
 
+  const daysPerPageSelector = (
+    <div className="mb-2">
+      <p>Days per page</p>
+      <GridPageDaysSelector
+        value={gridPageDays}
+        options={gridPageDaysOptions}
+        onChange={setGridPageDays}
+      />
+    </div>
+  );
+
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
       <HeaderSpacer />
@@ -156,9 +173,11 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           availabilities={filteredAvailabilities}
           numParticipants={gridNumParticipants}
           timeslots={timeslots}
+          pageDays={gridPageDays}
         />
 
         <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm md:hidden">
+          {daysPerPageSelector}
           <DisplaySettings
             timezone={timezone}
             onTimezoneChange={handleTZChange}
@@ -190,6 +209,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4">
             <AttendeesPanel />
             <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
+              {daysPerPageSelector}
               <DisplaySettings
                 timezone={timezone}
                 onTimezoneChange={handleTZChange}

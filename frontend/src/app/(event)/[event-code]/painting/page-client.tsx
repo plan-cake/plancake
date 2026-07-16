@@ -15,8 +15,10 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
+import GridPageDaysSelector from "@/features/event/components/selectors/grid-page-days";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
+import useGridPageDays from "@/features/event/grid/lib/use-page-days";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,
@@ -54,6 +56,10 @@ export default function ClientPage({
     eventRange.type,
   );
   const { displayName, timeZone, userAvailability } = state;
+
+  // GRID PAGE DAYS
+  const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
+    useGridPageDays();
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -280,13 +286,23 @@ export default function ClientPage({
             setSaveDefaultName={setSaveDefaultName}
           />
 
-          <div className="bg-panel rounded-3xl p-6 text-sm">
-            Displaying event in
-            <TimeZoneSelector
-              id="timezone-select"
-              value={timeZone}
-              onChange={setTimeZone}
-            />
+          <div className="bg-panel flex flex-col gap-2 rounded-3xl p-6 text-sm">
+            <div>
+              <p>Days per page</p>
+              <GridPageDaysSelector
+                value={gridPageDays}
+                options={gridPageDaysOptions}
+                onChange={setGridPageDays}
+              />
+            </div>
+            <div>
+              <p>Displaying event in</p>
+              <TimeZoneSelector
+                id="timezone-select"
+                value={timeZone}
+                onChange={setTimeZone}
+              />
+            </div>
           </div>
         </div>
 
@@ -304,6 +320,7 @@ export default function ClientPage({
               setMaxVisitedPage(index);
             }
           }}
+          pageDays={gridPageDays}
         />
 
         <div className="bg-panel rounded-3xl p-6 text-sm md:hidden">
