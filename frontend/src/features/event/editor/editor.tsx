@@ -160,6 +160,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
                 value={eventRange.timeRange.from}
                 onChange={setStartTime}
                 placeholder="Start Time"
+                dialogTitle="Select Start Time"
               />
             </FormSelectorField>
 
@@ -169,6 +170,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
                 value={eventRange.timeRange.to}
                 onChange={setEndTime}
                 placeholder="End Time"
+                dialogTitle="Select End Time"
               />
             </FormSelectorField>
           </div>
