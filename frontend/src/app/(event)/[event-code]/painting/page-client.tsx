@@ -255,6 +255,27 @@ export default function ClientPage({
     />
   );
 
+  const displaySettings = (
+    <div className="bg-panel flex flex-col gap-2 rounded-3xl p-6 text-sm">
+      <div>
+        <p>Days per page</p>
+        <GridPageDaysSelector
+          value={gridPageDays}
+          options={gridPageDaysOptions}
+          onChange={setGridPageDays}
+        />
+      </div>
+      <div>
+        <p>Displaying event in</p>
+        <TimeZoneSelector
+          id="timezone-select"
+          value={timeZone}
+          onChange={setTimeZone}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
       <HeaderSpacer />
@@ -286,24 +307,7 @@ export default function ClientPage({
             setSaveDefaultName={setSaveDefaultName}
           />
 
-          <div className="bg-panel flex flex-col gap-2 rounded-3xl p-6 text-sm">
-            <div>
-              <p>Days per page</p>
-              <GridPageDaysSelector
-                value={gridPageDays}
-                options={gridPageDaysOptions}
-                onChange={setGridPageDays}
-              />
-            </div>
-            <div>
-              <p>Displaying event in</p>
-              <TimeZoneSelector
-                id="timezone-select"
-                value={timeZone}
-                onChange={setTimeZone}
-              />
-            </div>
-          </div>
+          {displaySettings}
         </div>
 
         {/* Right Panel */}
@@ -323,14 +327,7 @@ export default function ClientPage({
           pageDays={gridPageDays}
         />
 
-        <div className="bg-panel rounded-3xl p-6 text-sm md:hidden">
-          Displaying event in
-          <TimeZoneSelector
-            id="timezone-select"
-            value={timeZone}
-            onChange={setTimeZone}
-          />
-        </div>
+        {displaySettings}
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}

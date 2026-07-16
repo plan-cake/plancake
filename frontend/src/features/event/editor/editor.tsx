@@ -219,11 +219,21 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
       <div
         className={cn(
-          "md:hidden",
-          mobileTab === "details" ? "hidden" : "block",
+          "flex-col gap-4 md:hidden",
+          mobileTab === "details" ? "hidden" : "flex",
         )}
       >
         {grid}
+        {gridDisplayed && (
+          <div className="bg-panel rounded-3xl p-6 text-sm">
+            <p>Days per page:</p>
+            <GridPageDaysSelector
+              value={gridPageDays}
+              options={gridPageDaysOptions}
+              onChange={setGridPageDays}
+            />
+          </div>
+        )}
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}
