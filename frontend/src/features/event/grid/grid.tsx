@@ -33,6 +33,7 @@ interface ScheduleGridProps {
   numParticipants?: number;
   hoveredSlot?: string | null;
   setHoveredSlot?: (slotIso: string | null) => void;
+  setGridDisplayed?: (displayed: boolean) => void;
 
   // for "paint" mode
   userAvailability?: AvailabilitySet;
@@ -70,6 +71,7 @@ export default function ScheduleGrid({
   numParticipants = 0,
   hoveredSlot,
   setHoveredSlot = () => {},
+  setGridDisplayed = () => {},
   userAvailability = createEmptyUserAvailability(),
   onToggleSlot = () => {},
   onPageUpdate = () => {},
@@ -115,6 +117,11 @@ export default function ScheduleGrid({
 
     return () => resizeObserver.disconnect();
   });
+
+  const isGridDisplayed = !unselectedRange && !error;
+  useEffect(() => {
+    setGridDisplayed(isGridDisplayed);
+  }, [isGridDisplayed, setGridDisplayed]);
 
   if (unselectedRange)
     return (

@@ -61,6 +61,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   const { title, customCode, eventRange, timeslots } = state;
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
+  const [gridDisplayed, setGridDisplayed] = useState(false);
   const router = useRouter();
 
   const [mobileTab, setMobileTab] = useState<SegmentedControlOption>("details");
@@ -116,6 +117,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       timezone={eventRange.timezone}
       timeslots={timeslots}
       pageDays={gridPageDays}
+      setGridDisplayed={setGridDisplayed}
     />
   );
 
@@ -195,19 +197,21 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           <div className="relative h-full w-full grow">
             <div className="bg-panel absolute inset-0 flex flex-col justify-between gap-2 rounded-3xl px-2 py-4">
               <div className="min-h-0 flex-1 pr-2">{grid}</div>
-              <div className="flex items-center justify-between px-4 text-sm">
-                <p className="opacity-75">
-                  This is a preview! You{"'"}ll add your availability later.
-                </p>
-                <div className="flex flex-none items-center gap-2">
-                  <p className="opacity-75">Days per page:</p>
-                  <GridPageDaysSelector
-                    value={gridPageDays}
-                    options={gridPageDaysOptions}
-                    onChange={setGridPageDays}
-                  />
+              {gridDisplayed && (
+                <div className="flex items-center justify-between pl-4 pr-2 text-sm">
+                  <p className="opacity-75">
+                    This is a preview! You{"'"}ll add your availability later.
+                  </p>
+                  <div className="flex flex-none items-center gap-2">
+                    <p className="opacity-75">Days per page:</p>
+                    <GridPageDaysSelector
+                      value={gridPageDays}
+                      options={gridPageDaysOptions}
+                      onChange={setGridPageDays}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
