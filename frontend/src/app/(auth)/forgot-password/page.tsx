@@ -8,6 +8,7 @@ import AuthPageLayout from "@/components/layout/auth-page";
 import MessagePage from "@/components/layout/message-page";
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
+import InboxLinks from "@/features/auth/components/inbox-links";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
@@ -68,7 +69,9 @@ export default function Page() {
               href="/login"
             />,
           ]}
-        />
+        >
+          <InboxLinks email={email} />
+        </MessagePage>
       ) : (
         <AuthPageLayout
           title="forgot password"
