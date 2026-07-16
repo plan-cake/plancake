@@ -28,7 +28,7 @@ export default function InboxLinks({ email }: { email: string }) {
       buttonStyle="secondary"
       icon={<MicrosoftOutlook />}
       label="Open Outlook"
-      href="https://outlook.live.com/mail/"
+      href="https://outlook.live.com"
       target="_blank"
       tooltip="Opens in a new tab"
       className="justify-center"
