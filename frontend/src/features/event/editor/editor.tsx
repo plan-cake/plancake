@@ -231,7 +231,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         {grid}
         {gridDisplayed && (
           <div className="bg-panel rounded-3xl p-6 text-sm">
-            <p>Days per page:</p>
+            <p>Days per page</p>
             <GridPageDaysSelector
               value={gridPageDays}
               options={gridPageDaysOptions}
