@@ -6,7 +6,7 @@ const GMAIL_DOMAINS = ["gmail.com", "googlemail.com"];
 const OUTLOOK_DOMAINS = ["outlook.com", "hotmail.com", "live.com", "msn.com"];
 
 export default function InboxLinks({ email }: { email: string }) {
-  const domain = email.split("@")[1]?.toLowerCase();
+  const domain = email.split("@")[1]?.toLowerCase() ?? "";
 
   const isGmail = GMAIL_DOMAINS.includes(domain);
   const isOutlook = OUTLOOK_DOMAINS.includes(domain);
