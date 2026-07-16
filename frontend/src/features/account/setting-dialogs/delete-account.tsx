@@ -95,7 +95,7 @@ export default function DeleteAccountDialog() {
         onChange={(value) => {
           setCurrentPassword(value);
         }}
-        outlined
+        style="outlined"
         error={errors.currentPassword || errors.api}
       />
     </FormDialog>

@@ -104,7 +104,7 @@ export default function Page() {
           label="Email*"
           value={email}
           onChange={handleEmailChange}
-          outlined
+          style="outlined"
           error={errors.email || errors.api}
         />,
 
@@ -116,7 +116,7 @@ export default function Page() {
           label="Password*"
           value={password}
           onChange={handlePasswordChange}
-          outlined
+          style="outlined"
           error={errors.password || errors.api}
         />,
       ]}

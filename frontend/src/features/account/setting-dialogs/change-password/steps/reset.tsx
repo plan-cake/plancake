@@ -24,7 +24,7 @@ export default function ResetStep({ flow }: ChangePasswordStepProps) {
               }
             }, 0);
           }}
-          outlined
+          style="outlined"
           error={flow.errors.newPassword || flow.errors.api}
           showPasswordCriteria={flow.showCriteria}
           passwordCriteria={flow.criteria}
@@ -37,7 +37,7 @@ export default function ResetStep({ flow }: ChangePasswordStepProps) {
           label="Retype Password*"
           value={flow.form.confirmPassword}
           onChange={(value) => flow.updateForm("confirmPassword", value)}
-          outlined
+          style="outlined"
           error={flow.errors.confirmPassword || flow.errors.api}
         />
       </div>
