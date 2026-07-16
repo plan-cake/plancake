@@ -23,6 +23,7 @@ interface ScheduleGridProps {
   mode: "paint" | "view" | "preview";
   timeslots: Date[];
   timezone: string;
+  pageDays: number;
   isWeekdayEvent?: boolean;
 
   unselectedRange?: boolean;
@@ -61,6 +62,7 @@ const variants = {
 export default function ScheduleGrid({
   timeslots,
   timezone,
+  pageDays,
   mode = "preview",
   isWeekdayEvent = false,
   unselectedRange = false,
@@ -82,7 +84,7 @@ export default function ScheduleGrid({
     direction,
     paginate,
     error,
-  } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPageUpdate);
+  } = useGridinfo(timeslots, timezone, pageDays, onPageUpdate);
 
   // Initial onPageUpdate callback to report pagination info to parent
   // Also triggers if the user changes between mobile and desktop layouts
