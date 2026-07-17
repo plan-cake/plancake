@@ -197,6 +197,7 @@ def get_event_bounds(event: UserEvent) -> EventBounds:
     end_time = max(ts.time() for ts in all_timeslots)
 
     if event.date_type == UserEvent.EventType.CALENDAR:
+        # Don't do any conversions for calendar events, time zones don't affect them
         return EventBounds(
             start_date=start_date,
             end_date=end_date,
