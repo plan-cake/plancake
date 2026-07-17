@@ -117,7 +117,7 @@ def add_availability(request):
                 EventWeekdayAvailability.objects.filter(
                     event_participant=participant
                 ).delete()
-            else:
+            elif user_event.date_type == UserEvent.EventType.CALENDAR:
                 EventCalendarAvailability.objects.filter(
                     event_participant=participant
                 ).delete()
