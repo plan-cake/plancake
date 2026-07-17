@@ -180,7 +180,7 @@ def get_event_bounds(event: UserEvent) -> EventBounds:
 
     if not all_timeslots:
         logger.critical(
-            f"Event {event.id} has no timeslots when formatting for dashboard."
+            f"Event {event.user_event_id} has no timeslots when formatting for dashboard."
         )
         raise ValueError("Event has no timeslots.")
 

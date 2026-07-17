@@ -356,7 +356,7 @@ def edit_date_event(request):
                 existing_start_date = earliest_timeslot.utc_timeslot
             else:
                 logger.critical(
-                    f"Event {event.id} has no timeslots when editing date event."
+                    f"Event {event.user_event_id} has no timeslots when editing date event."
                 )
                 return GENERIC_ERR_RESPONSE
             # Convert it to local date for comparison
@@ -529,7 +529,7 @@ def edit_calendar_event(request):
                 existing_start_date = earliest_timeslot.date
             else:
                 logger.critical(
-                    f"Event {event.id} has no timeslots when editing calendar event."
+                    f"Event {event.user_event_id} has no timeslots when editing calendar event."
                 )
                 return GENERIC_ERR_RESPONSE
 
