@@ -112,6 +112,13 @@ export const ROUTES = {
      */
     weekCreate: route<EventCode, NewEventData>("/event/week-create/"),
     /**
+     * Creates a 'calendar' type event.
+     * @method POST
+     * @throws 400 - If the timeslots are invalid.
+     * @throws 400 - If the custom code is not available or invalid.
+     */
+    calendarCreate: route<EventCode, NewEventData>("/event/calendar-create/"),
+    /**
      * Checks if a custom event code is available for use.
      * @method POST
      * @throws 400 - If the custom code is not available or invalid.
@@ -137,6 +144,13 @@ export const ROUTES = {
      * @throws 404 - If the user is not the creator of the event.
      */
     weekEdit: route<MessageResponse, EventEditData>("/event/week-edit/"),
+    /**
+     * Edits the details of a 'calendar' type event.
+     * @method POST
+     * @throws 400 - If the timeslots are invalid.
+     * @throws 404 - If the user is not the creator of the event.
+     */
+    calendarEdit: route<MessageResponse, EventEditData>("/event/calendar-edit/"),
     /**
      * Deletes an event.
      * @method POST
