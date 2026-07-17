@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from django.db import transaction
@@ -21,6 +22,7 @@ from api.decorators import (
 )
 from api.models import (
     AvailabilityStatus,
+    EventCalendarAvailability,
     EventDateAvailability,
     EventParticipant,
     EventWeekdayAvailability,
@@ -51,14 +53,16 @@ class InvalidTimeslotError(Exception):
 @validate_output(MessageOutputSerializer)
 def add_availability(request):
     """
-    Adds availability for the current user to an event. This endpoint supports both types
+    Adds availability for the current user to an event. This endpoint supports all types
     of events.
 
     If the current user already added availability for the event, their data will be
     overridden.
 
-    The availability must be supplied in a 2D array, with the outermost array representing
-    days, and the innermost representing timeslots within that day.
+    The availability must be supplied in an array of timeslots that represent the dates
+    and times where the user is available.
+
+    The timeslots must be in ISO format, even for calendar events.
     """
     user = request.user
     event_code = request.validated_data.get("event_code")
@@ -69,6 +73,12 @@ def add_availability(request):
     try:
         with transaction.atomic():
             user_event = event_lookup(event_code)
+
+            if user_event.date_type == UserEvent.EventType.CALENDAR:
+                # Convert the availability to date objects for calendar events
+                availability = [a.date() for a in availability]
+            # Deduplicate any timeslots
+            availability = list(set(availability))
 
             if not check_name_available(user_event, user, display_name):
                 return Response(
@@ -99,8 +109,12 @@ def add_availability(request):
                 EventDateAvailability.objects.filter(
                     event_participant=participant
                 ).delete()
-            else:
+            elif user_event.date_type == UserEvent.EventType.GENERIC:
                 EventWeekdayAvailability.objects.filter(
+                    event_participant=participant
+                ).delete()
+            else:
+                EventCalendarAvailability.objects.filter(
                     event_participant=participant
                 ).delete()
 
@@ -135,6 +149,20 @@ def add_availability(request):
                         )
                     )
                 EventWeekdayAvailability.objects.bulk_create(new_availabilities)
+            elif user_event.date_type == UserEvent.EventType.CALENDAR:
+                timeslot_dict = {t.date: t for t in timeslots}
+                new_availabilities = []
+                for timeslot in availability:
+                    if timeslot not in timeslot_dict:
+                        raise InvalidTimeslotError()
+                    new_availabilities.append(
+                        EventCalendarAvailability(
+                            event_participant=participant,
+                            event_calendar_timeslot=timeslot_dict[timeslot],
+                            status=AvailabilityStatus.AVAILABLE,
+                        )
+                    )
+                EventCalendarAvailability.objects.bulk_create(new_availabilities)
 
             # Update participant updated_at
             participant.save()
@@ -167,7 +195,7 @@ def add_availability(request):
                 joined_at=participant.created_at.isoformat(),
                 updated_at=participant.updated_at.isoformat(),
                 time_zone=participant.time_zone,
-                availability=[time.isoformat() for time in availability],
+                availability=[timeslot.isoformat() for timeslot in availability],
             ),
         )
     )
