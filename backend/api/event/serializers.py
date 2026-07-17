@@ -28,6 +28,14 @@ class EventInfoSerializer(serializers.Serializer):
     time_zone = TimeZoneField(required=True)
 
 
+class CalendarEventInfoSerializer(serializers.Serializer):
+    title = serializers.CharField(required=True, max_length=50)
+    timeslots = serializers.ListField(
+        child=serializers.DateField(), required=True, allow_empty=False
+    )
+    time_zone = TimeZoneField(required=True)
+
+
 class DateEventCreateSerializer(EventInfoSerializer, CustomCodeSerializer):
     pass
 
@@ -36,11 +44,19 @@ class WeekEventCreateSerializer(EventInfoSerializer, CustomCodeSerializer):
     pass
 
 
+class CalendarEventCreateSerializer(CalendarEventInfoSerializer, CustomCodeSerializer):
+    pass
+
+
 class DateEventEditSerializer(EventInfoSerializer, EventCodeSerializer):
     pass
 
 
 class WeekEventEditSerializer(EventInfoSerializer, EventCodeSerializer):
+    pass
+
+
+class CalendarEventEditSerializer(CalendarEventInfoSerializer, EventCodeSerializer):
     pass
 
 

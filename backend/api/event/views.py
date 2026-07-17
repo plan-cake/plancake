@@ -22,6 +22,8 @@ from api.decorators import (
     validate_query_param_input,
 )
 from api.event.serializers import (
+    CalendarEventCreateSerializer,
+    CalendarEventEditSerializer,
     DateEventCreateSerializer,
     DateEventEditSerializer,
     EventCodeSerializer,
@@ -37,10 +39,17 @@ from api.event.utils import (
     generate_code,
     js_weekday,
     touch_url_code,
+    validate_calendar_timeslots,
     validate_date_timeslots,
     validate_weekday_timeslots,
 )
-from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
+from api.models import (
+    EventCalendarTimeslot,
+    EventDateTimeslot,
+    EventWeekdayTimeslot,
+    UrlCode,
+    UserEvent,
+)
 from api.redis_pools import async_pool
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
@@ -200,6 +209,69 @@ def create_week_event(request):
                     local_timeslot=time,
                 )
                 for (weekday, time) in deduplicated_timeslots
+            ]
+        )
+
+    logger.debug(f"Event created with code: {url_code}")
+    return Response({"event_code": url_code}, status=201)
+
+
+@api_endpoint("POST")
+@require_auth
+@validate_json_input(CalendarEventCreateSerializer)
+@validate_output(EventCodeSerializer)
+def create_calendar_event(request):
+    """
+    Creates a 'calendar' type event that spans dates without specific times.
+
+    If successful, the URL code for the event will be returned.
+
+    The "timeslots" for this event type are just dates, so time zones do not affect the
+    slots. However, the creator's time zone is still stored for the event.
+
+    A custom URL code can be specified, subject to availability. If unavailable, an error
+    message is returned. Only alphanumeric characters and dashes are allowed.
+    """
+    user = request.user
+    title = request.validated_data.get("title")
+    timeslots = request.validated_data.get("timeslots")
+    time_zone = request.validated_data.get("time_zone")
+    custom_code = request.validated_data.get("custom_code")
+
+    user_date_local = datetime.now(ZoneInfo(time_zone)).date()
+    errors = validate_calendar_timeslots(timeslots, user_date_local)
+    if errors.keys():
+        return Response({"error": errors}, status=400)
+
+    url_code = None
+    if custom_code:
+        error = check_custom_code(custom_code)
+        if error:
+            return Response({"error": {"custom_code": [error]}}, status=400)
+        url_code = custom_code
+    else:
+        # Generate a random code if not provided
+        try:
+            url_code = generate_code()
+        except Exception:
+            logger.critical("Failed to generate a unique URL code.")
+            return GENERIC_ERR_RESPONSE
+
+    check_rate_limit(request, ThrottleScopes.EVENT_CREATION)
+
+    with transaction.atomic():
+        new_event = UserEvent.objects.create(
+            user_account=user,
+            title=title,
+            date_type=UserEvent.EventType.CALENDAR,
+            time_zone=time_zone,
+        )
+        UrlCode.objects.create(url_code=url_code, user_event=new_event)
+        # Create calendar timeslot objects
+        EventCalendarTimeslot.objects.bulk_create(
+            [
+                EventCalendarTimeslot(user_event=new_event, date=ts)
+                for ts in set(timeslots)
             ]
         )
 
@@ -405,6 +477,96 @@ def edit_week_event(request):
                 EventWeekdayTimeslot.objects.filter(query).delete()
 
             EventWeekdayTimeslot.objects.bulk_create(to_add)
+
+    except UserEvent.DoesNotExist:
+        return EVENT_NOT_FOUND_ERROR
+
+    notify_live_update(
+        LiveUpdateEvent(
+            user_id=user.user_account_id,
+            event_code=event_code,
+            data=LiveUpdateEventEditData(),
+        )
+    )
+
+    logger.debug(f"Event updated with code: {event_code}")
+    return Response({"message": ["Event updated successfully."]}, status=200)
+
+
+@api_endpoint("POST")
+@check_auth
+@validate_json_input(CalendarEventEditSerializer)
+@validate_output(MessageOutputSerializer)
+def edit_calendar_event(request):
+    """
+    Edits a 'calendar' type event, identified by its URL code.
+
+    The event must be originally created by the current user.
+    """
+    user = request.user
+    event_code = request.validated_data.get("event_code")
+    title = request.validated_data.get("title")
+    timeslots = request.validated_data.get("timeslots")
+    time_zone = request.validated_data.get("time_zone")
+
+    if not user:
+        return EVENT_NOT_FOUND_ERROR
+
+    user_date_local = datetime.now(ZoneInfo(time_zone)).date()
+    try:
+        # Do everything inside a transaction to ensure atomicity
+        with transaction.atomic():
+            # Find the event
+            event = UserEvent.objects.get(
+                url_code__url_code__iexact=event_code,
+                user_account=user,
+                date_type=UserEvent.EventType.CALENDAR,
+            )
+            # Get the earliest timeslot
+            earliest_timeslot = (
+                EventCalendarTimeslot.objects.filter(user_event=event)
+                .order_by("date")
+                .first()
+            )
+            existing_start_date: datetime = None
+            if earliest_timeslot:
+                existing_start_date = earliest_timeslot.date
+            else:
+                logger.critical(
+                    f"Event {event.id} has no timeslots when editing calendar event."
+                )
+                return GENERIC_ERR_RESPONSE
+
+            # If the start date is after today, it cannot be moved to a date earlier than today.
+            # If the start date is before today, it cannot be moved earlier at all.
+            earliest_date_local = user_date_local
+            if existing_start_date < user_date_local:
+                earliest_date_local = existing_start_date
+            errors = validate_calendar_timeslots(timeslots, earliest_date_local, True)
+            if errors.keys():
+                return Response({"error": errors}, status=400)
+
+            # Update the event object itself
+            event.title = title
+            event.time_zone = time_zone
+            event.save()
+
+            # Sort out the timeslot difference
+            existing_timeslots = set(
+                EventCalendarTimeslot.objects.filter(user_event=event).values_list(
+                    "date", flat=True
+                )
+            )
+            edited_timeslots = set(timeslots)
+            to_delete = existing_timeslots - edited_timeslots
+            to_add = [
+                EventCalendarTimeslot(user_event=event, date=ts)
+                for ts in edited_timeslots - existing_timeslots
+            ]
+            EventCalendarTimeslot.objects.filter(
+                user_event=event, date__in=to_delete
+            ).delete()
+            EventCalendarTimeslot.objects.bulk_create(to_add)
 
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR

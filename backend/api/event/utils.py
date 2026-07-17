@@ -2,7 +2,7 @@ import logging
 import random
 import re
 import string
-from datetime import datetime
+from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 from django.db.models import Prefetch
@@ -80,7 +80,7 @@ def check_timeslot_times(timeslots):
 
 def validate_date_timeslots(
     timeslots: list[datetime],
-    earliest_date_local: datetime.date,
+    earliest_date_local: date,
     user_time_zone: str,
     editing: bool = False,
 ):
@@ -129,6 +129,37 @@ def validate_weekday_timeslots(timeslots):
     if not check_timeslot_times(timeslots):
         return {"timeslots": ["Timeslots must be on 15-minute intervals."]}
     return {}
+
+
+def validate_calendar_timeslots(
+    timeslots: list[date], earliest_date_local: date, editing: bool = False
+):
+    if not timeslots:
+        return {"timeslots": ["At least one timeslot is required."]}
+
+    start_date = min(timeslots)
+    end_date = max(timeslots)
+
+    errors = {}
+
+    def add_error(message):
+        if "timeslots" not in errors:
+            errors["timeslots"] = []
+        errors["timeslots"].append(message)
+
+    # The earliest date allowed is "today" in the user's local time zone, which is why
+    # this uses a time zone conversion instead of UTC
+    if start_date < earliest_date_local:
+        if editing:
+            add_error(
+                "Event cannot start earlier than today, or be moved earlier if already before today."
+            )
+        else:
+            add_error("Event must start today or in the future.")
+    if (end_date - start_date).days > MAX_EVENT_DAYS:
+        add_error(f"Max event length is {MAX_EVENT_DAYS} days.")
+
+    return errors
 
 
 def event_lookup_prefetch(event_code: str):
