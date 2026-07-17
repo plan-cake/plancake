@@ -65,6 +65,7 @@ from api.utils import (
     format_event_info,
     get_session,
     notify_live_update,
+    to_datetime,
 )
 
 logger = logging.getLogger("api")
@@ -638,6 +639,9 @@ def get_event_details(request):
                 data["timeslots"] = [
                     get_weekday_date(ts.weekday, ts.local_timeslot) for ts in timeslots
                 ]
+            case UserEvent.EventType.CALENDAR:
+                timeslots = event.calendar_timeslots.all()
+                data["timeslots"] = [to_datetime(ts.date) for ts in timeslots]
 
     except UserEvent.DoesNotExist:
         return EVENT_NOT_FOUND_ERROR

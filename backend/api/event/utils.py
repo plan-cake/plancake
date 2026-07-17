@@ -7,7 +7,13 @@ from zoneinfo import ZoneInfo
 
 from django.db.models import Prefetch
 
-from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
+from api.models import (
+    EventCalendarTimeslot,
+    EventDateTimeslot,
+    EventWeekdayTimeslot,
+    UrlCode,
+    UserEvent,
+)
 from api.settings import MAX_EVENT_DAYS, RAND_URL_CODE_ATTEMPTS, RAND_URL_CODE_LENGTH
 
 logger = logging.getLogger("api")
@@ -176,6 +182,10 @@ def event_lookup_prefetch(event_code: str):
         Prefetch(
             "weekday_timeslots",
             queryset=EventWeekdayTimeslot.objects.order_by("weekday", "local_timeslot"),
+        ),
+        Prefetch(
+            "calendar_timeslots",
+            queryset=EventCalendarTimeslot.objects.order_by("date"),
         ),
     ).get(url_code__url_code__iexact=event_code)
 
