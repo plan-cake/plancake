@@ -139,6 +139,8 @@ def get_event_type(date_type):
             return "Date"
         case UserEvent.EventType.GENERIC:
             return "Week"
+        case UserEvent.EventType.CALENDAR:
+            return "Calendar"
 
 
 class EventBounds:
