@@ -11,7 +11,12 @@ from api.availability.serializers import (
     EventAvailabilitySerializer,
     EventCodeSerializer,
 )
-from api.availability.utils import check_name_available, get_timeslots, get_weekday_date
+from api.availability.utils import (
+    check_name_available,
+    get_timeslots,
+    get_weekday_date,
+    to_datetime,
+)
 from api.decorators import (
     api_endpoint,
     check_auth,
@@ -195,7 +200,9 @@ def add_availability(request):
                 joined_at=participant.created_at.isoformat(),
                 updated_at=participant.updated_at.isoformat(),
                 time_zone=participant.time_zone,
-                availability=[timeslot.isoformat() for timeslot in availability],
+                availability=[
+                    to_datetime(timeslot).isoformat() for timeslot in availability
+                ],
             ),
         )
     )
