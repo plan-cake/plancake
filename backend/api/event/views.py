@@ -265,11 +265,9 @@ def create_calendar_event(request):
         )
         UrlCode.objects.create(url_code=url_code, user_event=new_event)
         # Create calendar timeslot objects
+        dateslots = set(ts.date() for ts in timeslots)
         EventCalendarTimeslot.objects.bulk_create(
-            [
-                EventCalendarTimeslot(user_event=new_event, date=ts.date())
-                for ts in set(timeslots)
-            ]
+            [EventCalendarTimeslot(user_event=new_event, date=ds) for ds in dateslots]
         )
 
     logger.debug(f"Event created with code: {url_code}")
