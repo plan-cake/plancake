@@ -118,17 +118,24 @@ export default function ScheduleHeader({
                   )}
                 >
                   <div>
-                    {compact
-                      ? condenseWeekday(weekday)
-                      : isWeekdayEvent
-                        ? weekday.toUpperCase()
-                        : weekday}
+                    <span className={compact ? "lg:hidden" : "hidden"}>
+                      {condenseWeekday(weekday)}
+                    </span>
+                    <span className={compact ? "hidden lg:block" : ""}>
+                      {isWeekdayEvent ? weekday.toUpperCase() : weekday}
+                    </span>
                   </div>
                   {!isWeekdayEvent && (
-                    <div>
-                      {compact ? condenseMonth(month) : month}
-                      {compact ? "/" : " "}
-                      {day.replace(/^0+/, "")}
+                    <div className="flex">
+                      <span className={compact ? "xl:hidden" : "hidden"}>
+                        {condenseMonth(month)}/
+                      </span>
+                      <span
+                        className={compact ? "hidden xl:mr-1 xl:block" : "mr-1"}
+                      >
+                        {month}
+                      </span>
+                      <span>{day.replace(/^0+/, "")}</span>
                     </div>
                   )}
                 </div>
