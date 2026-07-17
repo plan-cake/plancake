@@ -132,13 +132,13 @@ def validate_weekday_timeslots(timeslots):
 
 
 def validate_calendar_timeslots(
-    timeslots: list[date], earliest_date_local: date, editing: bool = False
+    timeslots: list[datetime], earliest_date_local: date, editing: bool = False
 ):
     if not timeslots:
         return {"timeslots": ["At least one timeslot is required."]}
 
-    start_date = min(timeslots)
-    end_date = max(timeslots)
+    start_date = min(ts.date() for ts in timeslots)
+    end_date = max(ts.date() for ts in timeslots)
 
     errors = {}
 

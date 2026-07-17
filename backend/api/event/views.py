@@ -22,16 +22,12 @@ from api.decorators import (
     validate_query_param_input,
 )
 from api.event.serializers import (
-    CalendarEventCreateSerializer,
-    CalendarEventEditSerializer,
-    DateEventCreateSerializer,
-    DateEventEditSerializer,
     EventCodeSerializer,
+    EventCreateSerializer,
     EventDetailSerializer,
+    EventEditSerializer,
     RequiredCustomCodeSerializer,
     TrueCodeSerializer,
-    WeekEventCreateSerializer,
-    WeekEventEditSerializer,
 )
 from api.event.utils import (
     check_custom_code,
@@ -85,7 +81,7 @@ INVALID_TIMESLOT_TIME_ERROR = Response(
 
 @api_endpoint("POST")
 @require_auth
-@validate_json_input(DateEventCreateSerializer)
+@validate_json_input(EventCreateSerializer)
 @validate_output(EventCodeSerializer)
 def create_date_event(request):
     """
@@ -148,7 +144,7 @@ def create_date_event(request):
 
 @api_endpoint("POST")
 @require_auth
-@validate_json_input(WeekEventCreateSerializer)
+@validate_json_input(EventCreateSerializer)
 @validate_output(EventCodeSerializer)
 def create_week_event(request):
     """
@@ -218,7 +214,7 @@ def create_week_event(request):
 
 @api_endpoint("POST")
 @require_auth
-@validate_json_input(CalendarEventCreateSerializer)
+@validate_json_input(EventCreateSerializer)
 @validate_output(EventCodeSerializer)
 def create_calendar_event(request):
     """
@@ -270,7 +266,7 @@ def create_calendar_event(request):
         # Create calendar timeslot objects
         EventCalendarTimeslot.objects.bulk_create(
             [
-                EventCalendarTimeslot(user_event=new_event, date=ts)
+                EventCalendarTimeslot(user_event=new_event, date=ts.date())
                 for ts in set(timeslots)
             ]
         )
@@ -322,7 +318,7 @@ def get_true_code(request):
 
 @api_endpoint("POST")
 @check_auth
-@validate_json_input(DateEventEditSerializer)
+@validate_json_input(EventEditSerializer)
 @validate_output(MessageOutputSerializer)
 def edit_date_event(request):
     """
@@ -418,7 +414,7 @@ def edit_date_event(request):
 
 @api_endpoint("POST")
 @check_auth
-@validate_json_input(WeekEventEditSerializer)
+@validate_json_input(EventEditSerializer)
 @validate_output(MessageOutputSerializer)
 def edit_week_event(request):
     """
@@ -495,7 +491,7 @@ def edit_week_event(request):
 
 @api_endpoint("POST")
 @check_auth
-@validate_json_input(CalendarEventEditSerializer)
+@validate_json_input(EventEditSerializer)
 @validate_output(MessageOutputSerializer)
 def edit_calendar_event(request):
     """
@@ -557,7 +553,7 @@ def edit_calendar_event(request):
                     "date", flat=True
                 )
             )
-            edited_timeslots = set(timeslots)
+            edited_timeslots = set(ts.date() for ts in timeslots)
             to_delete = existing_timeslots - edited_timeslots
             to_add = [
                 EventCalendarTimeslot(user_event=event, date=ts)
