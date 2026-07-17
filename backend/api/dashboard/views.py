@@ -112,6 +112,10 @@ def get_dashboard(request):
                 ),
             ),
             Prefetch(
+                "user_event__calendar_timeslots",
+                queryset=EventCalendarTimeslot.objects.order_by("date"),
+            ),
+            Prefetch(
                 "user_event__participants",
                 queryset=EventParticipant.objects.order_by("created_at"),
             ),
