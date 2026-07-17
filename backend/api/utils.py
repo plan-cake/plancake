@@ -472,3 +472,14 @@ def notify_live_update(event: LiveUpdateEvent):
         f"event_{event.event_code}",
         event.dumps(),
     )
+
+
+def to_datetime(date):
+    """
+    Converts a date object to a datetime object at midnight.
+
+    If the input is already a datetime object, it is returned unchanged.
+    """
+    if isinstance(date, datetime):
+        return date
+    return datetime(date.year, date.month, date.day)

@@ -46,14 +46,3 @@ def check_name_available(event, user, display_name):
 
 def get_weekday_date(weekday, timeslot):
     return datetime(2012, 1, weekday + 1, timeslot.hour, timeslot.minute)
-
-
-def to_datetime(date):
-    """
-    Converts a date object to a datetime object at midnight.
-
-    If the input is already a datetime object, it is returned unchanged.
-    """
-    if isinstance(date, datetime):
-        return date
-    return datetime(date.year, date.month, date.day)

@@ -15,7 +15,6 @@ from api.availability.utils import (
     check_name_available,
     get_timeslots,
     get_weekday_date,
-    to_datetime,
 )
 from api.decorators import (
     api_endpoint,
@@ -43,6 +42,7 @@ from api.utils import (
     check_rate_limit,
     event_lookup,
     notify_live_update,
+    to_datetime,
 )
 
 logger = logging.getLogger("api")
