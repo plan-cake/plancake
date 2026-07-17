@@ -289,7 +289,7 @@ def get_self_availability(request):
                 .order_by("event_date_timeslot__utc_timeslot")
             )
             data = [a.event_date_timeslot.utc_timeslot for a in availabilities]
-        else:
+        elif event.date_type == UserEvent.EventType.GENERIC:
             availabilities = (
                 EventWeekdayAvailability.objects.filter(event_participant=participant)
                 .select_related("event_weekday_timeslot")
@@ -305,6 +305,14 @@ def get_self_availability(request):
                 )
                 for a in availabilities
             ]
+        elif event.date_type == UserEvent.EventType.CALENDAR:
+            availabilities = (
+                EventCalendarAvailability.objects.filter(event_participant=participant)
+                .select_related("event_calendar_timeslot")
+                .order_by("event_calendar_timeslot__date")
+            )
+            # Convert dates to datetimes
+            data = [to_datetime(a.event_calendar_timeslot.date) for a in availabilities]
 
         return Response(
             {
