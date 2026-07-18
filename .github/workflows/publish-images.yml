@@ -55,7 +55,9 @@ jobs:
           tags: ${{ steps.meta-backend.outputs.tags }}
           labels: ${{ steps.meta-backend.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-          cache-from: type=gha,scope=backend-${{ github.ref_name }}
+          cache-from: |
+            type=gha,scope=backend-${{ github.ref_name }}
+            type=gha,scope=backend-main
           cache-to: type=gha,mode=max,scope=backend-${{ github.ref_name }}
 
       # --- FRONTEND ---
@@ -77,5 +79,7 @@ jobs:
           tags: ${{ steps.meta-frontend.outputs.tags }}
           labels: ${{ steps.meta-frontend.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-          cache-from: type=gha,scope=frontend-${{ github.ref_name }}
+          cache-from: |
+            type=gha,scope=frontend-${{ github.ref_name }}
+            type=gha,scope=frontend-main
           cache-to: type=gha,mode=max,scope=frontend-${{ github.ref_name }}
