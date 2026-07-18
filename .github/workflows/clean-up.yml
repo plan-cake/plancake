@@ -21,7 +21,7 @@ jobs:
           cut-off: 1w
           timestamp-to-use: updated_at
           keep-n-most-recent: 3
-          dry-run: true
+          dry-run: false
 
       - name: Clean up Plancake Backend images
         uses: snok/container-retention-policy@v3.1.0
@@ -32,4 +32,4 @@ jobs:
           cut-off: 1w
           timestamp-to-use: updated_at
           keep-n-most-recent: 3
-          dry-run: true
+          dry-run: false
