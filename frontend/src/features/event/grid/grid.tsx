@@ -25,8 +25,6 @@ interface ScheduleGridProps {
   timezone: string;
   isWeekdayEvent?: boolean;
 
-  disableSelect?: boolean;
-
   unselectedRange?: boolean;
 
   // for "view" mode
