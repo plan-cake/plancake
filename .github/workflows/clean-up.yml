@@ -1,0 +1,38 @@
+name: Weekly Image Cleanup
+
+on:
+  schedule:
+    - cron: "0 0 * * 0" # run every sunday at midnight
+  workflow_dispatch:
+
+jobs:
+  clean-registry:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+      - name: Clean up Plancake Frontend images
+        uses: snok/container-retention-policy@v3
+        with:
+          account-type: org
+          token: ${{ secrets.GITHUB_TOKEN }}
+          image-names: plancake-frontend
+          cut-off: 1 week ago
+          timestamp-to-use: updated_at
+          keep-at-least: 3
+          skip-untagged: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          dry-run: true
+
+      - name: Clean up Plancake Backend images
+        uses: snok/container-retention-policy@v3
+        with:
+          account-type: org
+          token: ${{ secrets.GITHUB_TOKEN }}
+          image-names: plancake-backend
+          cut-off: 1 week ago
+          timestamp-to-use: updated_at
+          keep-at-least: 3
+          skip-untagged: false
+          dry-run: true
