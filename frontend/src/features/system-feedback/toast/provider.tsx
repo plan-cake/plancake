@@ -91,17 +91,23 @@ export default function ToastProvider({
     [],
   );
 
-  const removeToast = useCallback((id: number) => {
-    if (id === -1) return;
+  const removeToast = useCallback(
+    (id: number) => {
+      if (id === -1) return;
 
-    setToasts((prevToasts) =>
-      prevToasts.map((t) => (t.id === id ? { ...t, open: false } : t)),
-    );
+      setToasts((prevToasts) =>
+        prevToasts.map((t) => (t.id === id ? { ...t, open: false } : t)),
+      );
 
-    setTimeout(() => {
-      setToasts((prevToasts) => prevToasts.filter((t) => t.id !== id));
-    }, 100);
-  }, []);
+      setTimeout(
+        () => {
+          setToasts((prevToasts) => prevToasts.filter((t) => t.id !== id));
+        },
+        isMobile ? 100 : 250,
+      );
+    },
+    [isMobile],
+  );
 
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>
