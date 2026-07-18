@@ -19,3 +19,17 @@ jobs:
             echo "Error: You can only merge to main from version branches (e.g. v1.2.3)."
             exit 1
           fi
+
+      - name: Check package version
+        if: github.base_ref == 'main'
+        run: |
+          # Extract the version from package.json
+          PACKAGE_VERSION=$(jq -r '.version' frontend/package.json)
+
+          # Extract the version from the branch name
+          BRANCH_VERSION="${{ github.head_ref#v }}"
+
+          if [[ "$PACKAGE_VERSION" != "$BRANCH_VERSION" ]]; then
+            echo "Error: The version in package.json ($PACKAGE_VERSION) does not match the version in the branch name ($BRANCH_VERSION)."
+            exit 1
+          fi
