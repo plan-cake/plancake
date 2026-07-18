@@ -157,7 +157,6 @@ AWS_SES_REGION_NAME = env("AWS_SES_REGION_NAME")
 AWS_SES_REGION_ENDPOINT = env("AWS_SES_REGION_ENDPOINT")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 SEND_EMAILS = env.bool("SEND_EMAILS", default=False)
-CRITICAL_EMAIL_INTERVAL_SECONDS = 1800  # 30 minutes
 
 # Discord Webhook URL
 # Errors will only be sent if this is set.
