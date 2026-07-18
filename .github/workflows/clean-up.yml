@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Clean up Plancake Frontend images
-        uses: snok/container-retention-policy@v3
+        uses: snok/container-retention-policy@v3.1.0
         with:
           account-type: org
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -25,7 +25,7 @@ jobs:
           dry-run: true
 
       - name: Clean up Plancake Backend images
-        uses: snok/container-retention-policy@v3
+        uses: snok/container-retention-policy@v3.1.0
         with:
           account-type: org
           token: ${{ secrets.GITHUB_TOKEN }}
