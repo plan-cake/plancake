@@ -13,6 +13,8 @@ else
 		IMAGE_TAG := v$(PKG_VERSION)
 endif
 
+IMAGE_TAG := latest
+
 # --- COMMANDS ---
 
 help:
@@ -93,4 +95,4 @@ migrate:
 
 # Generate new Django migrations inside the running container
 makemigrations:
-	docker compose exec backend python manage.py makemigrations
+	docker compose exec backend python manage.py makemigrations api
