@@ -332,7 +332,7 @@ export default function ClientPage({
           useCompactHeader={usingMaxGridPageDays}
         />
 
-        {displaySettings}
+        <div className="md:hidden">{displaySettings}</div>
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}
