@@ -533,12 +533,16 @@ def send_templated_email(to_email, template_key: EmailTemplateKey, context) -> b
     except requests.RequestException as e:
         logger.error(f"Error rendering email for template '{template_key}': {e}")
 
-    if html_content:
-        EmailMultiAlternatives(
-            subject=msg_subject,
-            body=text_fallback,
-            alternatives=[(html_content, "text/html")],
-            to=[to_email],
-        ).send()
+    try:
+        if html_content:
+            EmailMultiAlternatives(
+                subject=msg_subject,
+                body=text_fallback,
+                alternatives=[(html_content, "text/html")],
+                to=[to_email],
+            ).send()
+    except Exception as e:
+        logger.error(f"Error sending email: {e}")
+        success = False
 
     return success
