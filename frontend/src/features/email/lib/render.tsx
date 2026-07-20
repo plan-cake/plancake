@@ -27,8 +27,8 @@ export default function renderEmail({
     <Tailwind config={emailTheme}>
       <Html>
         <Head>
-          <meta name="color-scheme" content="light dark" />
-          <meta name="supported-color-schemes" content="light dark" />
+          <meta name="color-scheme" content="light" />
+          <meta name="supported-color-schemes" content="light" />
           <NunitoFont
             url="https://fonts.gstatic.com/s/nunito/v32/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshdTQ3iazbXWjgeg.woff"
             weight={400}
