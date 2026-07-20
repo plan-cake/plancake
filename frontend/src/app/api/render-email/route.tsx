@@ -7,6 +7,7 @@ import { EmailContextError, EmailRenderResponse } from "@/features/email/type";
 export async function POST(req: Request) {
   const authHeader = req.headers.get("Authorization");
   if (
+    !process.env.EMAIL_BRIDGE_SECRET ||
     !authHeader ||
     authHeader !== `Bearer ${process.env.EMAIL_BRIDGE_SECRET}`
   ) {
