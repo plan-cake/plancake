@@ -3,3 +3,5 @@ export type EmailRenderResponse = {
   html: string;
   text: string;
 };
+
+export class EmailContextError extends Error {}

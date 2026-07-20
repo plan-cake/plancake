@@ -1,5 +1,6 @@
 import { emailInUse } from "@/features/email/templates/email-in-use";
-import { EmailRenderResponse } from "@/features/email/type";
+import { emailVerification } from "@/features/email/templates/email-verification";
+import { EmailContextError, EmailRenderResponse } from "@/features/email/type";
 
 export async function POST(req: Request) {
   const authHeader = req.headers.get("Authorization");
@@ -14,12 +15,25 @@ export async function POST(req: Request) {
 
   let data: EmailRenderResponse;
 
-  switch (templateKey) {
-    case "email_in_use":
-      data = await emailInUse();
-      break;
-    default:
-      return new Response("Template not found", { status: 404 });
+  try {
+    switch (templateKey) {
+      case "email_in_use":
+        data = await emailInUse();
+        break;
+      case "email_verification":
+        data = await emailVerification(context);
+        break;
+      default:
+        return new Response("Template not found", { status: 404 });
+    }
+  } catch (e) {
+    if (e instanceof EmailContextError) {
+      return new Response(e.message, { status: 400 });
+    } else {
+      return new Response("Internal Server Error: " + (e as Error).message, {
+        status: 500,
+      });
+    }
   }
 
   return Response.json(data);
