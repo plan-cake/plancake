@@ -8,7 +8,7 @@ export function EmailButton({ href, label }: { href: string; label: string }) {
       href={href}
       className={cn(
         "bg-accent inline-block rounded-full px-4 py-2",
-        "text-background text-md text-center",
+        "text-background text-center text-base",
       )}
     >
       {label}
