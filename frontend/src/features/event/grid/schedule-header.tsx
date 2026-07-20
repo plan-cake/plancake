@@ -39,6 +39,27 @@ const variants = {
   }),
 };
 
+const MONTH_TO_NUM: Record<string, number> = {
+  Jan: 1,
+  Feb: 2,
+  Mar: 3,
+  Apr: 4,
+  May: 5,
+  Jun: 6,
+  Jul: 7,
+  Aug: 8,
+  Sep: 9,
+  Oct: 10,
+  Nov: 11,
+  Dec: 12,
+} as const;
+const condenseMonth = (month: string) => {
+  return MONTH_TO_NUM[month] ?? month;
+};
+const condenseWeekday = (weekday: string) => {
+  return weekday === "Thu" ? "R" : weekday === "Sun" ? "U" : weekday[0];
+};
+
 export default function ScheduleHeader({
   preview = false,
   visibleDays,
@@ -97,17 +118,6 @@ export default function ScheduleHeader({
           >
             {visibleDays.map(({ dayDisplay }, i) => {
               const [weekday, month, day] = dayDisplay.split(" ");
-              const condenseWeekday = (weekday: string) => {
-                return weekday === "Thu"
-                  ? "R"
-                  : weekday === "Sun"
-                    ? "U"
-                    : weekday[0];
-              };
-              const condenseMonth = (month: string) => {
-                const date = new Date(`${month} 1, 2020`);
-                return date.getMonth() + 1;
-              };
 
               return (
                 <div
