@@ -25,6 +25,7 @@ from api.settings import (
     EMAIL_BRIDGE_SECRET,
     GUEST_COOKIE_NAME,
     LONG_SESS_EXP_SECONDS,
+    SEND_EMAILS,
     SESS_EXP_SECONDS,
     TEST_ENVIRONMENT,
     ThrottleScope,
@@ -484,6 +485,9 @@ def send_templated_email(to_email, template_key, context) -> bool:
 
     Returns True if the email was sent successfully, False otherwise.
     """
+    if not SEND_EMAILS:
+        return True
+
     url = BASE_URL
     headers = {
         "Content-Type": "application/json",
