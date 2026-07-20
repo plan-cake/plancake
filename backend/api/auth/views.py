@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime, timedelta
 
 import bcrypt
-from django.core.mail import send_mail
 from django.db import transaction
 from rest_framework.response import Response
 
@@ -31,19 +30,19 @@ from api.models import (
 )
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
-    BASE_URL,
     EMAIL_CODE_EXP_SECONDS,
     PWD_RESET_EXP_SECONDS,
-    SEND_EMAILS,
     ThrottleScopes,
 )
 from api.utils import (
+    EmailTemplateKey,
     MessageOutputSerializer,
     check_rate_limit,
     delete_session_cookie,
     get_client_ip_address,
     get_client_user_agent,
     get_session,
+    send_templated_email,
     set_session_cookie,
 )
 
@@ -83,14 +82,11 @@ def register(request):
     # Check if the email already exists
     if UserAccount.objects.filter(email=email).exists():
         logger.info("Email %s is already in use!", email)
-        if SEND_EMAILS:
-            send_mail(
-                subject="Plancake - Email in Use",
-                message=f"Looks like your email was already used for a Plancake account.\n\nNot you? Nothing to worry about, just ignore this email.",
-                from_email=None,  # Use the default from settings
-                recipient_list=[email],
-                fail_silently=False,
-            )
+        send_templated_email(
+            to_email=email,
+            template_key=EmailTemplateKey.EMAIL_IN_USE,
+            context={},
+        )
     else:
         # Create an unverified user account
         ver_code = str(uuid.uuid4())
@@ -103,14 +99,11 @@ def register(request):
             )
         logger.debug("Verification code for %s: %s", email, ver_code)
 
-        if SEND_EMAILS:
-            send_mail(
-                subject="Plancake - Email Verification",
-                message=f"Welcome to Plancake!\n\nClick this link to verify your email:\n{BASE_URL}/verify-email?code={ver_code}\n\nNot you? Nothing to worry about, just ignore this email.",
-                from_email=None,  # Use the default from settings
-                recipient_list=[email],
-                fail_silently=False,
-            )
+        send_templated_email(
+            to_email=email,
+            template_key=EmailTemplateKey.EMAIL_VERIFICATION,
+            context={"code": ver_code},
+        )
 
     return Response(
         {"message": ["An email has been sent to your address for verification."]},
@@ -147,14 +140,11 @@ def resend_register_email(request):
             unverified_user.verification_code,
         )
 
-        if SEND_EMAILS:
-            send_mail(
-                subject="Plancake - Email Verification",
-                message=f"Welcome to Plancake!\n\nClick this link to verify your email:\n{BASE_URL}/verify-email?code={unverified_user.verification_code}\n\nNot you? Nothing to worry about, just ignore this email.",
-                from_email=None,  # Use the default from settings
-                recipient_list=[email],
-                fail_silently=False,
-            )
+        send_templated_email(
+            to_email=email,
+            template_key=EmailTemplateKey.EMAIL_VERIFICATION,
+            context={"code": unverified_user.verification_code},
+        )
 
     except UnverifiedUserAccount.DoesNotExist:
         logger.info("Unverified user with email %s does not exist!", email)
@@ -333,14 +323,11 @@ def start_password_reset(request):
             )
         logger.debug("Password reset token for %s: %s", email, reset_token)
 
-        if SEND_EMAILS:
-            send_mail(
-                subject="Plancake - Reset Password",
-                message=f"Click this link to reset your password:\n{BASE_URL}/reset-password?token={reset_token}\n\nNot you? Nothing to worry about, just ignore this email.",
-                from_email=None,  # Use the default from settings
-                recipient_list=[email],
-                fail_silently=False,
-            )
+        send_templated_email(
+            to_email=email,
+            template_key=EmailTemplateKey.PASSWORD_RESET,
+            context={"token": reset_token},
+        )
 
     except UserAccount.DoesNotExist:
         logger.info("Password reset failed for %s: User does not exist.", email)
