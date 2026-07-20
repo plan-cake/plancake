@@ -26,6 +26,7 @@ export async function passwordReset({
         <>
           <Text>Forgot your password? Click the button below to reset it.</Text>
           <EmailButton href={RESET_URL} label="Reset Password" />
+          <Text className="opacity-75">{CONTENT.LINK_EXPIRE}</Text>
         </>
       ),
       footerText: CONTENT.CAN_IGNORE,

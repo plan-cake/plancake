@@ -28,6 +28,7 @@ export async function passwordResetCode({
           <Section className="bg-background rounded-2xl p-2">
             <Text className="text-accent text-2xl font-bold">{code}</Text>
           </Section>
+          <Text className="opacity-75">{CONTENT.CODE_EXPIRE}</Text>
           <Text className="mb-0">{CONTENT.CHANGE_PASSWORD}</Text>
         </>
       ),

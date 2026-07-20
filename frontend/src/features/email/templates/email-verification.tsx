@@ -28,6 +28,7 @@ export async function emailVerification({
         <>
           <Text>{CONTENT_TEXT}</Text>
           <EmailButton href={VERIFY_URL} label="Verify Email Address" />
+          <Text className="opacity-75">{CONTENT.LINK_EXPIRE}</Text>
         </>
       ),
       footerText: CONTENT.CAN_IGNORE,
