@@ -137,6 +137,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     <div className="mb-2">
       <p>Days per page</p>
       <GridPageDaysSelector
+        id="grid-page-days-selector"
         value={gridPageDays}
         options={gridPageDaysOptions}
         onChange={setGridPageDays}

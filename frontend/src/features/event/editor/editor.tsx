@@ -217,6 +217,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
                   <div className="flex flex-none items-center gap-2">
                     <p className="opacity-75">Days per page:</p>
                     <GridPageDaysSelector
+                      id="grid-page-days-selector-desktop"
                       value={gridPageDays}
                       options={gridPageDaysOptions}
                       onChange={setGridPageDays}
@@ -242,6 +243,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
             <div>
               <p>Days per page</p>
               <GridPageDaysSelector
+                id="grid-page-days-selector-mobile"
                 value={gridPageDays}
                 options={gridPageDaysOptions}
                 onChange={setGridPageDays}

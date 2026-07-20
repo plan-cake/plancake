@@ -1,17 +1,19 @@
 import Selector from "@/features/selector/components/selector";
 
 export default function GridPageDaysSelector({
+  id,
   value,
   options,
   onChange,
 }: {
+  id: string;
   value: number;
   options: number[];
   onChange: (value: number) => void;
 }) {
   return (
     <Selector
-      id="grid-page-days-selector"
+      id={id}
       value={value}
       options={options.map((option) => ({
         value: option,

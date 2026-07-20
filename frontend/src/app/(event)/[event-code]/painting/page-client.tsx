@@ -262,6 +262,7 @@ export default function ClientPage({
       <div>
         <p>Days per page</p>
         <GridPageDaysSelector
+          id="grid-page-days-selector"
           value={gridPageDays}
           options={gridPageDaysOptions}
           onChange={setGridPageDays}
