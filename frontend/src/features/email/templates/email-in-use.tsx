@@ -1,6 +1,6 @@
 import { Link, Text } from "react-email";
 
-import NOTES from "@/features/email/lib/notes";
+import CONTENT from "@/features/email/lib/content";
 import renderEmail from "@/features/email/lib/render";
 import { EmailRenderResponse } from "@/features/email/type";
 
@@ -25,8 +25,8 @@ export async function emailInUse(): Promise<EmailRenderResponse> {
           </Text>
         </>
       ),
-      footerText: NOTES.IGNORE_EMAIL,
+      footerText: CONTENT.CAN_IGNORE,
     }),
-    text: `${CONTENT_TEXT} Log in at ${LOGIN_URL} instead.\n\n${NOTES.IGNORE_EMAIL}`,
+    text: `${CONTENT_TEXT} Log in at ${LOGIN_URL} instead.\n\n${CONTENT.CAN_IGNORE}`,
   };
 }

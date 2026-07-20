@@ -1,7 +1,7 @@
 import { Text } from "react-email";
 
 import { EmailButton } from "@/features/email/components/button";
-import NOTES from "@/features/email/lib/notes";
+import CONTENT from "@/features/email/lib/content";
 import renderEmail from "@/features/email/lib/render";
 import { EmailContextError, EmailRenderResponse } from "@/features/email/type";
 
@@ -30,8 +30,8 @@ export async function emailVerification({
           <EmailButton href={VERIFY_URL} label="Verify Email Address" />
         </>
       ),
-      footerText: NOTES.IGNORE_EMAIL,
+      footerText: CONTENT.CAN_IGNORE,
     }),
-    text: `${CONTENT_TEXT} Click this link to verify your email: ${VERIFY_URL}\n\n${NOTES.IGNORE_EMAIL}`,
+    text: `${CONTENT_TEXT} Click this link to verify your email: ${VERIFY_URL}\n\n${CONTENT.CAN_IGNORE}`,
   };
 }
