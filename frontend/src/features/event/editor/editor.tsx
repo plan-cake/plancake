@@ -126,6 +126,12 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     />
   );
 
+  const previewText = (
+    <p className="opacity-75">
+      This is a preview! You{"'"}ll add your availability later.
+    </p>
+  );
+
   return (
     <div className="flex min-h-dvh flex-col space-y-4 pl-6 pr-6">
       <HeaderSpacer />
@@ -204,9 +210,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
               <div className="min-h-0 flex-1 pr-2">{grid}</div>
               {gridDisplayed && (
                 <div className="flex items-center justify-between pl-4 pr-2 text-sm">
-                  <p className="opacity-75">
-                    This is a preview! You{"'"}ll add your availability later.
-                  </p>
+                  {previewText}
                   <div className="flex flex-none items-center gap-2">
                     <p className="opacity-75">Days per page:</p>
                     <GridPageDaysSelector
@@ -230,13 +234,16 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       >
         {grid}
         {gridDisplayed && (
-          <div className="bg-panel rounded-3xl p-6 text-sm">
-            <p>Days per page</p>
-            <GridPageDaysSelector
-              value={gridPageDays}
-              options={gridPageDaysOptions}
-              onChange={setGridPageDays}
-            />
+          <div className="bg-panel flex flex-col gap-2 rounded-3xl p-6 text-sm">
+            {previewText}
+            <div>
+              <p>Days per page</p>
+              <GridPageDaysSelector
+                value={gridPageDays}
+                options={gridPageDaysOptions}
+                onChange={setGridPageDays}
+              />
+            </div>
           </div>
         )}
       </div>
