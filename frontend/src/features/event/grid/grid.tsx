@@ -27,14 +27,15 @@ interface ScheduleGridProps {
   useCompactHeader: boolean;
   isWeekdayEvent?: boolean;
 
+  // for "preview" mode
   unselectedRange?: boolean;
+  setGridDisplayed?: (displayed: boolean) => void;
 
   // for "view" mode
   availabilities?: ResultsAvailabilityMap;
   numParticipants?: number;
   hoveredSlot?: string | null;
   setHoveredSlot?: (slotIso: string | null) => void;
-  setGridDisplayed?: (displayed: boolean) => void;
 
   // for "paint" mode
   userAvailability?: AvailabilitySet;
@@ -69,11 +70,11 @@ export default function ScheduleGrid({
   mode = "preview",
   isWeekdayEvent = false,
   unselectedRange = false,
+  setGridDisplayed = () => {},
   availabilities = {},
   numParticipants = 0,
   hoveredSlot,
   setHoveredSlot = () => {},
-  setGridDisplayed = () => {},
   userAvailability = createEmptyUserAvailability(),
   onToggleSlot = () => {},
   onPageUpdate = () => {},
