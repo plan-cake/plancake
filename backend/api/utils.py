@@ -491,6 +491,9 @@ def send_templated_email(to_email, template_key: EmailTemplateKey, context) -> b
     Fetches rendered HTML from Next.js and sends it as an email.
 
     Returns True if the email was sent successfully, False otherwise.
+
+    This function will check the SEND_EMAILS environment variable, and if set to False
+    then the email will not be sent and True will be returned every time.
     """
     if not SEND_EMAILS:
         return True
