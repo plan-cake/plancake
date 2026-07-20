@@ -1,5 +1,6 @@
 import { emailInUse } from "@/features/email/templates/email-in-use";
 import { emailVerification } from "@/features/email/templates/email-verification";
+import { passwordReset } from "@/features/email/templates/password-reset";
 import { EmailContextError, EmailRenderResponse } from "@/features/email/type";
 
 export async function POST(req: Request) {
@@ -22,6 +23,9 @@ export async function POST(req: Request) {
         break;
       case "email_verification":
         data = await emailVerification(context);
+        break;
+      case "password_reset":
+        data = await passwordReset(context);
         break;
       default:
         return new Response("Template not found", { status: 404 });
