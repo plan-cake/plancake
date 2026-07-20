@@ -32,6 +32,11 @@ export async function emailVerification({
       ),
       footerText: CONTENT.CAN_IGNORE,
     }),
-    text: `${CONTENT_TEXT} Click this link to verify your email: ${VERIFY_URL}\n\n${CONTENT.CAN_IGNORE}`,
+    text:
+      CONTENT_TEXT +
+      "\n\n" +
+      `Click this link to verify your email: ${VERIFY_URL}` +
+      "\n\n" +
+      CONTENT.CAN_IGNORE,
   };
 }

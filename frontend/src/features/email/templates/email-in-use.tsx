@@ -27,6 +27,9 @@ export async function emailInUse(): Promise<EmailRenderResponse> {
       ),
       footerText: CONTENT.CAN_IGNORE,
     }),
-    text: `${CONTENT_TEXT} Log in at ${LOGIN_URL} instead.\n\n${CONTENT.CAN_IGNORE}`,
+    text:
+      `${CONTENT_TEXT} Log in at ${LOGIN_URL} instead.` +
+      "\n\n" +
+      CONTENT.CAN_IGNORE,
   };
 }
