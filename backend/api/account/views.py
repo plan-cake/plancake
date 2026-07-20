@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 import bcrypt
 from device_detector import DeviceDetector
-from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Q
 from rest_framework.response import Response
@@ -30,7 +29,6 @@ from api.settings import (
     ACCOUNT_COOKIE_NAME,
     AUTHED_PWD_RESET_EXP_SECONDS,
     LONG_SESS_EXP_SECONDS,
-    SEND_EMAILS,
     SESS_EXP_SECONDS,
     ThrottleScopes,
 )
