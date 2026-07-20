@@ -95,12 +95,14 @@ export default function ScheduleGrid({
   // Also triggers if the user changes between mobile and desktop layouts
   const reportedTotalPages = useRef<number | null>(null);
   useEffect(() => {
+    let effectiveCurrentPage = currentPage;
     if (currentPage >= totalPages) {
       // If out of bounds, go to the last page
+      effectiveCurrentPage = totalPages - 1;
       paginate(totalPages - 1 - currentPage);
     }
     if (reportedTotalPages.current !== totalPages) {
-      onPageUpdate(currentPage, totalPages);
+      onPageUpdate(effectiveCurrentPage, totalPages);
       reportedTotalPages.current = totalPages;
     }
   }, [onPageUpdate, currentPage, totalPages, paginate]);
