@@ -46,8 +46,8 @@ export default function useGridInfo(
 
   const paginate = (newDirection: number) => {
     if (
-      (newDirection === -1 && currentPage > 0) ||
-      (newDirection === 1 && currentPage < view.totalPages - 1)
+      (newDirection < 0 && currentPage > 0) ||
+      (newDirection > 0 && currentPage < view.totalPages - 1)
     ) {
       setCurrentPage([currentPage + newDirection, newDirection]);
       onPaginate(currentPage + newDirection, view.totalPages);
