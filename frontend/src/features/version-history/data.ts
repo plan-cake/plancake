@@ -194,6 +194,17 @@ export function getVersionHistoryData(): VersionHistoryData {
             "Fixed an issue where the mobile results page drawer would not display the footer when opened",
           ],
         },
+        {
+          version: "v0.4.6",
+          releaseDate: { year: 2026, month: 6, day: 20 },
+          changes: [
+            "Added error messages to length-limited text fields",
+            "Added the share menu to dashboard events",
+            "Updated time selector drawer titles",
+            "Fixed the trigger area of the event date selector",
+            "Removed the grid preview dialog from the event editor",
+          ],
+        },
       ],
     },
   ];
