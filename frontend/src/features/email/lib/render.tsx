@@ -41,8 +41,8 @@ export default function renderEmail({
         <Preview>{previewText}</Preview>
 
         <Body className="bg-background text-foreground p-4">
-          <Container className="bg-panel rounded-3xl p-6">
-            <Text className="mt-0 text-center text-xl font-bold">{title}</Text>
+          <Container className="bg-panel rounded-3xl p-6 text-center">
+            <Text className="mt-0 text-xl font-bold">{title}</Text>
             {content}
             {footerText && (
               <Text className="mb-0 text-xs opacity-50">{footerText}</Text>
