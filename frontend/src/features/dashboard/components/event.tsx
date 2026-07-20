@@ -11,9 +11,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { EventType } from "@/core/event/types";
-import DashboardCopyButton from "@/features/dashboard/components/copy-button";
 import DateRangeRow from "@/features/dashboard/components/date-range-row";
 import ParticipantRow from "@/features/dashboard/components/participant-row";
+import DashboardShareButton from "@/features/dashboard/components/share-button";
 import WeekdayRow from "@/features/dashboard/components/weekday-row";
 import { cn } from "@/lib/utils/classname";
 import {
@@ -129,7 +129,7 @@ export default function DashboardEvent({
         </div>
       </div>
       <div data-actions className="mt-2.5 flex items-center gap-2">
-        <DashboardCopyButton code={code} />
+        <DashboardShareButton title={title} code={code} />
         {myEvent && (
           <>
             <button className="cursor-pointer" onClick={navigateToEdit}>

@@ -104,7 +104,7 @@ export default function Page() {
           label="Email*"
           value={email}
           onChange={handleEmailChange}
-          outlined
+          style="outlined"
           error={errors.email || errors.api}
         />,
 
@@ -124,7 +124,7 @@ export default function Page() {
               setShowPasswordCriteria(false);
             }
           }}
-          outlined
+          style="outlined"
           error={errors.password || errors.api}
           showPasswordCriteria={showPasswordCriteria}
           passwordCriteria={passwordCriteria}
@@ -138,7 +138,7 @@ export default function Page() {
           label="Retype Password*"
           value={confirmPassword}
           onChange={handleConfirmPasswordChange}
-          outlined
+          style="outlined"
           error={errors.confirmPassword || errors.api}
         />,
       ]}

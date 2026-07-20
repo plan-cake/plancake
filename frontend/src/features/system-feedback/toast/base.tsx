@@ -107,7 +107,8 @@ export default function BaseToast({
             }
           }}
           className={cn(
-            "z-10 col-start-3 row-span-2 flex h-6 w-6 items-center justify-center rounded-full",
+            "z-10 col-start-3 row-span-2 flex h-6 w-6",
+            "cursor-pointer items-center justify-center rounded-full",
             "hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-white/50",
             !isPersistent &&
               "opacity-0 focus-visible:opacity-100 group-hover:opacity-100",

@@ -13,6 +13,7 @@ import DateRangeDrawer from "@/features/event/editor/date-range/drawer";
 import EventTypeSelect from "@/features/event/editor/date-range/event-type-select";
 import DateRangePopover from "@/features/event/editor/date-range/popover";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { cn } from "@/lib/utils/classname";
 
 export default function DateRangeSelection({
   editing = false,
@@ -34,14 +35,17 @@ export default function DateRangeSelection({
         </label>
         <EventTypeSelect id="event-type-select" disabled={editing} />
       </div>
-      <div className="flex w-full flex-col justify-center gap-1">
+      <div className="flex w-fit flex-col justify-center gap-1">
         <div
-          className={`flex items-center gap-2 font-bold ${errors.dateRange || errors.weekdayRange ? "text-error" : ""}`}
+          className={cn(
+            "flex items-center gap-2 font-bold",
+            errors.dateRange || errors.weekdayRange ? "text-error" : "",
+          )}
         >
           <CalendarRangeIcon className="h-4 w-4" strokeWidth={2} />
           {rangeType === "specific" ? "Possible Dates" : "Possible Days"}
           {(errors.dateRange || errors.weekdayRange) && (
-            <TriangleAlertIcon className="text-error h-4 w-4" strokeWidth={2} />
+            <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
           )}
         </div>
 
