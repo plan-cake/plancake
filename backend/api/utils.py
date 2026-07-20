@@ -479,7 +479,14 @@ def notify_live_update(event: LiveUpdateEvent):
     )
 
 
-def send_templated_email(to_email, template_key, context) -> bool:
+class EmailTemplateKey(str, Enum):
+    EMAIL_IN_USE = "email_in_use"
+    EMAIL_VERIFICATION = "email_verification"
+    PASSWORD_RESET = "password_reset"
+    PASSWORD_RESET_CODE = "password_reset_code"
+
+
+def send_templated_email(to_email, template_key: EmailTemplateKey, context) -> bool:
     """
     Fetches rendered HTML from Next.js and sends it as an email.
 
