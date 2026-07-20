@@ -128,7 +128,10 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
   const previewText = (
     <p className="opacity-75">
-      This is a preview! You{"'"}ll add your availability later.
+      This is a preview!{" "}
+      {type === "edit"
+        ? "Manage availability from the results page."
+        : "You'll add your availability later."}
     </p>
   );
 
