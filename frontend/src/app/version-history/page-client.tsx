@@ -112,7 +112,7 @@ function TimelineSegment({
             isCurrent ? "bg-accent text-white" : "bg-foreground",
           )}
         >
-          <h2 className="text-md px-2 font-bold">{version}</h2>
+          <h2 className="px-2 font-bold">{version}</h2>
         </div>
       ) : (
         <div
