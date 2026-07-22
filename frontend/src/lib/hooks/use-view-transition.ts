@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 export function useViewTransition() {
   const router = useRouter();
 
-  const doViewTransition = (href: string, timeout: number = 2000) => {
+  const doViewTransition = (href: string, timeout: number = 3000) => {
     if (!document.startViewTransition) {
       router.push(href);
       return;
