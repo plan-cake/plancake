@@ -181,7 +181,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none fixed bottom-0 left-[100vw] h-[170px] w-[100vw]"
+            className="pointer-events-none fixed left-0 right-0 top-[100vh] w-[100vw]"
             style={{
               viewTransitionName: "painting-island",
             }}

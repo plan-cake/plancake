@@ -336,7 +336,7 @@ export default function ClientPage({
         </MobileFooterIsland>
         <div
           aria-hidden="true"
-          className="pointer-events-none fixed bottom-0 right-[90vw] h-[127px] w-[100vw] md:hidden"
+          className="pointer-events-none fixed left-0 right-0 top-[100vh] w-[100vw] md:hidden"
           style={{
             viewTransitionName: "results-drawer",
           }}
