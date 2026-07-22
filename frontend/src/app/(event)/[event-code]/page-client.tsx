@@ -6,6 +6,7 @@ import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
 
 import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
+import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import ScheduleGrid from "@/features/event/grid/grid";
@@ -20,6 +21,7 @@ import {
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import ShareMenu from "@/features/share-menu/menu";
+import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -86,13 +88,18 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     currentUser !== null,
   );
 
+  const doViewTransition = useViewTransition();
+
   /* BUTTONS */
   const paintingButton = (
-    <LinkButton
+    <ActionButton
       buttonStyle="primary"
       icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
-      href={`/${eventCode}/painting`}
+      onClick={() => {
+        doViewTransition(`/${eventCode}/painting`);
+      }}
+      loadOnSuccess
     />
   );
 

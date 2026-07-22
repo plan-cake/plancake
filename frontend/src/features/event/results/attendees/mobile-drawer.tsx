@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 import { ShareIcon, SquarePenIcon } from "lucide-react";
 
+import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
-import LinkButton from "@/features/button/components/link";
 import { MorphingDrawer } from "@/features/drawer";
 import PanelHeader from "@/features/event/results/attendees/panel-header";
 import ParticipantList from "@/features/event/results/attendees/participant-list";
@@ -12,6 +12,7 @@ import {
   useParticipantRemoval,
 } from "@/features/event/results/attendees/remove-participant";
 import ShareMenu from "@/features/share-menu/menu";
+import { useViewTransition } from "@/lib/hooks/use-view-transition";
 
 export default function AttendeesDrawer({
   onSnapChange,
@@ -51,13 +52,18 @@ export default function AttendeesDrawer({
     }
   }, [isCollapsed, isRemoving, clearSelectedParticipants, setIsRemoving]);
 
+  const doViewTransition = useViewTransition();
+
   /* BUTTONS */
   const paintingButton = (
-    <LinkButton
+    <ActionButton
       buttonStyle="primary"
       icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
-      href={`/${eventCode}/painting`}
+      onClick={() => {
+        doViewTransition(`/${eventCode}/painting`);
+      }}
+      loadOnSuccess
     />
   );
 

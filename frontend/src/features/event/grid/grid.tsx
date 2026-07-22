@@ -129,7 +129,10 @@ export default function ScheduleGrid({
   if (error) return <GridMessage error={true} message={error} />;
 
   return (
-    <div className="relative grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]">
+    <div
+      className="relative grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]"
+      style={{ viewTransitionName: "grid" }}
+    >
       <ScheduleHeader
         preview={mode === "preview"}
         visibleDays={visibleDays}
