@@ -321,6 +321,7 @@ export default function ClientPage({
         <MobileFooterIsland
           leftButtons={[cancelButton]}
           rightButtons={[submitButton]}
+          viewTransitionName="painting-island"
         >
           <div className="mx-3 -mt-2">
             <DisplayNameInput
@@ -333,6 +334,13 @@ export default function ClientPage({
             />
           </div>
         </MobileFooterIsland>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed bottom-0 right-[90vw] h-[127px] w-[100vw] md:hidden"
+          style={{
+            viewTransitionName: "results-drawer",
+          }}
+        />
       </div>
 
       <ConfirmationDialog

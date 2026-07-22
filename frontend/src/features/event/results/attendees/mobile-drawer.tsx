@@ -106,6 +106,7 @@ export default function AttendeesDrawer({
           {paintingButton}
         </div>
       }
+      viewTransitionName="results-drawer"
     >
       <ParticipantList
         isRemoving={isRemoving}

@@ -179,6 +179,13 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             eventTitle={eventTitle}
             eventCode={eventCode}
           />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed bottom-0 left-[100vw] h-[170px] w-[100vw]"
+            style={{
+              viewTransitionName: "painting-island",
+            }}
+          />
         </div>
 
         {/* Desktop Sidebar */}
