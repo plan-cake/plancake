@@ -130,7 +130,10 @@ export default function ScheduleGrid({
 
   return (
     <div
-      className="relative grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]"
+      className={cn(
+        "relative grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]",
+        mode === "preview" ? "bg-background md:bg-panel" : "bg-background",
+      )}
       style={{ viewTransitionName: "grid" }}
     >
       <ScheduleHeader
