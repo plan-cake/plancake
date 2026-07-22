@@ -36,8 +36,11 @@ export default function AttendeesDrawer({
     clearSelectedParticipants,
   } = useParticipantRemoval();
 
-  /* TABS */
-  const [activeSnap, setActiveSnap] = useState<number | string | null>(0.22);
+  /* SNAP POINTS */
+  const [activeSnap, setActiveSnap] = useState<number | string | null>(0);
+  const [currentSnapPoints, setCurrentSnapPoints] = useState<number[]>([
+    0, 0.22, 0.37,
+  ]);
 
   useEffect(() => {
     onSnapChange(activeSnap);
@@ -67,6 +70,16 @@ export default function AttendeesDrawer({
     />
   );
 
+  useEffect(() => {
+    // Wait for the view transition to finish, then animate the drawer in
+    const timer = setTimeout(() => {
+      setCurrentSnapPoints([0.22, 0.37]);
+      setActiveSnap(0.22);
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <MorphingDrawer
       open
@@ -76,7 +89,7 @@ export default function AttendeesDrawer({
       setActiveSnapPoint={setActiveSnap}
       title="Attendees List"
       description="View attendees for this event"
-      snapPoints={[0.22, 0.37]}
+      snapPoints={currentSnapPoints}
       modal={false}
       floatingAtLowestSnap
       scrollableBody
