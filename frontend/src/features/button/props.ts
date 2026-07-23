@@ -1,5 +1,7 @@
 import { ButtonHTMLAttributes, ReactNode } from "react";
 
+import { Options } from "react-hotkeys-hook";
+
 export type ButtonStyle =
   | "primary"
   | "secondary"
@@ -11,6 +13,16 @@ export type ButtonStyle =
   | "danger";
 
 type ButtonType = "action" | "link" | "empty";
+
+type HotkeyOptions = {
+    /** The keyboard shortcut to trigger the button. */
+    keys: string;
+    /** Additional classNames to apply to the hotkey badge, for further customization. */
+    baseClassName?: string;
+    litClassName?: string;
+    /** Additional options to pass to the useHotkeys hook. */
+    options?: Options;
+  }
 
 export type BaseButtonProps = {
   /**
@@ -90,6 +102,14 @@ export type BaseButtonProps = {
    */
   loadOnSuccess?: boolean;
   /**
+   * The keyboard shortcut to trigger the button. Action buttons will call their onClick
+   * handler, while Link buttons will navigate to their href.
+   * 
+   * Additional props can be provided in for styling and other options to be passed to the
+   * useHotkeys hook.
+   */
+  hotkey?: HotkeyOptions;
+  /**
    * Additional className to apply to the button, for further customization.
    */
   className?: string;
@@ -119,11 +139,15 @@ export type ActionButtonProps = CommonButtonProps & {
   onClick: (e?: React.MouseEvent<HTMLButtonElement>) => Promise<void | boolean> | void | boolean;
   /** @inheritdoc BaseButtonProps */
   loadOnSuccess?: boolean;
+  /** @inheritdoc BaseButtonProps */
+  hotkey?: HotkeyOptions;
 };
 
 export type LinkButtonProps = CommonButtonProps & {
   /** @inheritdoc BaseButtonProps */
   href: string;
+  /** @inheritdoc BaseButtonProps */
+  hotkey?: HotkeyOptions;
 };
 
 export type EmptyButtonProps = CommonButtonProps;

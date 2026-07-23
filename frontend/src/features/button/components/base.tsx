@@ -3,13 +3,16 @@
 import {
   ReactElement,
   cloneElement,
+  forwardRef,
   useEffect,
   useState,
-  forwardRef,
 } from "react";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useHotkeys } from "react-hotkeys-hook";
 
+import HotkeyBadge from "@/components/hotkey-badge";
 import LoadingSpinner from "@/components/loading-spinner";
 import { BaseButtonProps, ButtonStyle } from "@/features/button/props";
 import { cn } from "@/lib/utils/classname";
@@ -33,6 +36,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       href,
       onClick,
       loadOnSuccess = false,
+      hotkey,
       className,
       ...props // for forwardRef
     },
@@ -69,6 +73,24 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       }
     };
 
+    // Hotkey handling
+    const router = useRouter();
+    const hotkeyHandler = () => {
+      switch (_buttontype) {
+        case "action":
+          onClickHandler();
+          break;
+        case "link":
+          if (href) {
+            router.push(href);
+          }
+          break;
+      }
+    };
+    useHotkeys(hotkey?.keys ?? "", hotkeyHandler, {
+      enabled: !!hotkey && !disabled && !isLoading,
+    });
+
     const baseClasses = cn(
       "text-nowrap rounded-full font-medium flex flex-row items-center gap-1 relative",
     );
@@ -100,6 +122,15 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         className: cn("h-6 w-6 p-0.5", loadingHideClass),
       });
 
+    const hotkeyBadge = hotkey && (
+      <div className="ml-1">
+        <HotkeyBadge
+          hotkey={hotkey.keys}
+          keyClassName={hotkey.baseClassName}
+          litKeyClassName={hotkey.litClassName}
+        />
+      </div>
+    );
     const buttonContent = (
       <div
         className={cn(
@@ -114,6 +145,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         {label && (
           <span className={cn(labelClass, loadingHideClass)}>{label}</span>
         )}
+        {hotkeyBadge}
         {isLoading && (
           <LoadingSpinner
             className={cn("centered-absolute h-5 w-5", spinnerClasses)}
