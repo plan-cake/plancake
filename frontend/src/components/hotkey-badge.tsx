@@ -97,6 +97,13 @@ function HotkeySegment({
     };
 
     const handleKeyEvent = (e: KeyboardEvent, isDown: boolean) => {
+      const activeElement = document.activeElement as HTMLElement | null;
+      const isTyping =
+        activeElement &&
+        (["INPUT", "TEXTAREA", "SELECT"].includes(activeElement.tagName) ||
+          activeElement?.isContentEditable);
+      if (isDown && isTyping) return;
+
       if (isModifier) {
         if (hotkey === "mod") setIsLit(isApple ? e.metaKey : e.ctrlKey);
         else if (hotkey === "shift") setIsLit(e.shiftKey);
