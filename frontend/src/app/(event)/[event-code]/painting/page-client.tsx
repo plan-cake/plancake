@@ -236,7 +236,7 @@ export default function ClientPage({
       href={`/${eventCode}`}
     />
   );
-  const submitButton = (
+  const submitButton = (desktop: boolean) => (
     <ActionButton
       buttonStyle="primary"
       label={
@@ -246,6 +246,7 @@ export default function ClientPage({
       }
       onClick={handleSubmitAvailability}
       loadOnSuccess
+      hotkey={desktop ? { keys: "mod+enter" } : undefined}
     />
   );
 
@@ -263,7 +264,7 @@ export default function ClientPage({
         <h1 className="text-2xl font-bold">{eventName}</h1>
         <div className="hidden items-center gap-2 md:flex">
           {cancelButton}
-          {submitButton}
+          {submitButton(true)}
         </div>
       </div>
 
@@ -320,7 +321,7 @@ export default function ClientPage({
       <div className="z-10">
         <MobileFooterIsland
           leftButtons={[cancelButton]}
-          rightButtons={[submitButton]}
+          rightButtons={[submitButton(false)]}
         >
           <div className="mx-3 -mt-2">
             <DisplayNameInput
