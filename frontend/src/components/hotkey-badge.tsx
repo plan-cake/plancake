@@ -12,6 +12,7 @@ import {
   CommandIcon,
   CornerDownLeftIcon,
   DeleteIcon,
+  OptionIcon,
   SpaceIcon,
 } from "lucide-react";
 
@@ -20,6 +21,7 @@ import { isAppleOs } from "@/lib/utils/is-apple-os";
 
 const KEY_ICONS: Record<string, React.ReactNode> = {
   shift: <ArrowBigUpIcon />,
+  option: <OptionIcon />,
   enter: <CornerDownLeftIcon />,
   backspace: <DeleteIcon />,
   tab: <ArrowRightToLineIcon />,
@@ -74,6 +76,8 @@ function HotkeySegment({
   let displayKey = hotkey;
   if (displayKey === "mod") {
     displayKey = isApple ? "command" : "control";
+  } else if (displayKey === "alt") {
+    displayKey = isApple ? "option" : "alt";
   }
 
   let content;
