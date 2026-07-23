@@ -154,9 +154,9 @@ function HotkeySegment({
     <kbd
       className={cn(
         "font-nunito text-sm leading-none",
-        "border-t-1 border-x-1 border-b-3 rounded-md p-1",
+        "border-t-1 border-x-1 border-b-3 rounded-md p-[3px]",
         isLit
-          ? "border-accent text-accent border-b-1 mt-[2px]"
+          ? "border-foreground/50 text-foreground/50 border-b-1 mt-[2px]"
           : "border-foreground text-foreground",
         className,
         isLit && litClassName,
