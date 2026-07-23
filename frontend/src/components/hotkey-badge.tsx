@@ -87,7 +87,9 @@ function HotkeySegment({
       { className: "h-3.5 w-3.5" },
     );
   } else {
-    content = KEY_ABBREVS[displayKey] || displayKey;
+    content =
+      KEY_ABBREVS[displayKey] ||
+      displayKey.charAt(0).toUpperCase() + displayKey.slice(1);
   }
 
   return (
