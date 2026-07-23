@@ -73,6 +73,59 @@ function HotkeySegment({
   isApple: boolean;
   className?: string;
 }) {
+  const [isLit, setIsLit] = useState(false);
+
+  useEffect(() => {
+    const isModifier = ["mod", "shift", "alt"].includes(hotkey);
+    let timeoutId: NodeJS.Timeout;
+
+    const isStandardMatch = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      const code = e.code.toLowerCase();
+      if (hotkey === "space") return key === " " || code === "space";
+      return (
+        key === hotkey ||
+        code === hotkey ||
+        code === `key${hotkey}` ||
+        code === `digit${hotkey}`
+      );
+    };
+
+    const handleKeyEvent = (e: KeyboardEvent, isDown: boolean) => {
+      if (isModifier) {
+        if (hotkey === "mod") setIsLit(isApple ? e.metaKey : e.ctrlKey);
+        else if (hotkey === "shift") setIsLit(e.shiftKey);
+        else if (hotkey === "alt") setIsLit(e.altKey);
+      } else if (isStandardMatch(e)) {
+        setIsLit(isDown);
+        clearTimeout(timeoutId);
+        if (isDown) {
+          // Reset the lit state after a short delay in case keyup is swallowed
+          timeoutId = setTimeout(() => setIsLit(false), 150);
+        }
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => handleKeyEvent(e, true);
+    const handleKeyUp = (e: KeyboardEvent) => handleKeyEvent(e, false);
+
+    const handleBlur = () => {
+      setIsLit(false);
+      clearTimeout(timeoutId);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", handleBlur);
+      clearTimeout(timeoutId);
+    };
+  }, [hotkey, isApple]);
+
   let displayKey = hotkey;
   if (displayKey === "mod") {
     displayKey = isApple ? "command" : "control";
@@ -97,6 +150,7 @@ function HotkeySegment({
       className={cn(
         "font-nunito text-sm leading-none",
         "border-t-1 border-x-1 border-b-3 rounded-md p-1",
+        isLit && "border-accent text-accent",
         className,
       )}
     >
