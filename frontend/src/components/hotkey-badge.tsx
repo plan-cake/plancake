@@ -1,4 +1,6 @@
-import { cloneElement, ReactElement } from "react";
+"use client";
+
+import { cloneElement, ReactElement, useEffect, useState } from "react";
 
 import {
   ArrowBigUpIcon,
@@ -42,41 +44,57 @@ export default function HotkeyBadge({
   keyClassName?: string;
 }) {
   const keys = hotkey.split("+").map((key) => key.trim().toLowerCase());
-  const isApple = isAppleOs();
+
+  const [isApple, setIsApple] = useState(false);
+  useEffect(() => setIsApple(isAppleOs()), []);
 
   return (
     <kbd className="flex items-center gap-1">
-      {keys.map((key) => {
-        if (key === "mod") {
-          key = isApple ? "command" : "control";
-        }
+      {keys.map((key) => (
+        <HotkeySegment
+          key={key}
+          hotkey={key}
+          isApple={isApple}
+          className={keyClassName}
+        />
+      ))}
+    </kbd>
+  );
+}
 
-        let content;
+function HotkeySegment({
+  hotkey,
+  isApple,
+  className,
+}: {
+  hotkey: string;
+  isApple: boolean;
+  className?: string;
+}) {
+  let displayKey = hotkey;
+  if (displayKey === "mod") {
+    displayKey = isApple ? "command" : "control";
+  }
 
-        if (KEY_ICONS.hasOwnProperty(key)) {
-          content = cloneElement(
-            KEY_ICONS[key] as ReactElement<{ className: string }>,
-            {
-              className: "h-3.5 w-3.5",
-            },
-          );
-        } else {
-          content = KEY_ABBREVS[key] || key;
-        }
+  let content;
+  if (KEY_ICONS.hasOwnProperty(displayKey)) {
+    content = cloneElement(
+      KEY_ICONS[displayKey] as ReactElement<{ className: string }>,
+      { className: "h-3.5 w-3.5" },
+    );
+  } else {
+    content = KEY_ABBREVS[displayKey] || displayKey;
+  }
 
-        return (
-          <kbd
-            key={key}
-            className={cn(
-              "font-nunito text-sm leading-none",
-              "border-t-1 border-x-1 border-b-3 rounded-md p-1",
-              keyClassName,
-            )}
-          >
-            {content}
-          </kbd>
-        );
-      })}
+  return (
+    <kbd
+      className={cn(
+        "font-nunito text-sm leading-none",
+        "border-t-1 border-x-1 border-b-3 rounded-md p-1",
+        className,
+      )}
+    >
+      {content}
     </kbd>
   );
 }
