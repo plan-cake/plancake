@@ -91,6 +91,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       enabled: !!hotkey && !disabled && !isLoading,
       preventDefault: true,
       eventListenerOptions: { capture: true },
+      ...hotkey?.options,
     });
 
     const baseClasses = cn(
