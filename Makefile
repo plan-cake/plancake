@@ -1,19 +1,16 @@
 
 .PHONY: help up down restart logs-api logs-web shell-api shell-web migrate makemigrations
 
-# Determine the Docker image tag based on the current Git branch. If the branch is
-# 'main', use 'latest' as the tag. Otherwise, retrieve the version from the frontend
-# package.json and use it as the tag.
+# Determine the Docker image tag based on the current Git branch. If the branch is not
+# "main", use the version from the frontend package.json to identify the Docker image.
+# Otherwise, default to latest.
 CURRENT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
-ifeq ($(CURRENT_BRANCH),main)
-		IMAGE_TAG := latest
-else 
+IMAGE_TAG := latest
+ifneq ($(CURRENT_BRANCH),main)
 		# Get the version from the frontend package.json for identifying the Docker image.
 		PKG_VERSION := $(shell node -p "require('./frontend/package.json').version")
 		IMAGE_TAG := v$(PKG_VERSION)
 endif
-
-IMAGE_TAG := latest
 
 # --- COMMANDS ---
 
