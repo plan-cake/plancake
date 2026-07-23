@@ -96,12 +96,13 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       href={`/${initialData?.customCode}`}
     />
   );
-  const submitButton = (
+  const submitButton = (desktop: boolean) => (
     <ActionButton
       buttonStyle="primary"
       label={type === "edit" ? "Update Event" : "Create Event"}
       onClick={submitEventInfo}
       loadOnSuccess
+      hotkey={desktop ? { keys: "mod+enter" } : undefined}
     />
   );
   const grid = (
@@ -141,7 +142,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         </div>
         <div className="hidden gap-2 md:flex">
           {type === "edit" && cancelButton}
-          {submitButton}
+          {submitButton(true)}
         </div>
       </div>
 
@@ -210,7 +211,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       <div className="z-10">
         <MobileFooterIsland
           leftButtons={type === "edit" ? [cancelButton] : undefined}
-          rightButtons={[submitButton]}
+          rightButtons={[submitButton(false)]}
         >
           <SegmentedControl
             value={mobileTab}
