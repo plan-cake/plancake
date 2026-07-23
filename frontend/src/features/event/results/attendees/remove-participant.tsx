@@ -94,15 +94,21 @@ export function RemoveParticipantDialog({
       onOpenChange={onOpenChange}
       onConfirm={onConfirm}
     >
-      <div className="text-center">
-        {personToRemove === currentUser ? (
-          "Are you sure you want to leave this event?"
-        ) : (
-          <span>
-            Are you sure you want to remove{" "}
-            <span className="font-bold">{personToRemove}</span>?
-          </span>
-        )}
+      <div className="flex flex-col gap-2">
+        <div className="text-center">
+          {personToRemove === currentUser ? (
+            "Are you sure you want to leave this event?"
+          ) : (
+            <span>
+              Are you sure you want to remove{" "}
+              <span className="font-bold">{personToRemove}</span>?
+            </span>
+          )}
+        </div>
+        <div className="hidden text-center text-sm opacity-75 md:block">
+          You can hold shift when selecting a participant to skip this
+          confirmation.
+        </div>
       </div>
     </ConfirmationDialog>
   );
