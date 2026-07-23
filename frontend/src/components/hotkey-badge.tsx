@@ -41,9 +41,11 @@ const KEY_ABBREVS: Record<string, string> = {
 export default function HotkeyBadge({
   hotkey,
   keyClassName,
+  litKeyClassName,
 }: {
   hotkey: string;
   keyClassName?: string;
+  litKeyClassName?: string;
 }) {
   const keys = hotkey.split("+").map((key) => key.trim().toLowerCase());
 
@@ -58,6 +60,7 @@ export default function HotkeyBadge({
           hotkey={key}
           isApple={isApple}
           className={keyClassName}
+          litClassName={litKeyClassName}
         />
       ))}
     </kbd>
@@ -68,10 +71,12 @@ function HotkeySegment({
   hotkey,
   isApple,
   className,
+  litClassName,
 }: {
   hotkey: string;
   isApple: boolean;
   className?: string;
+  litClassName?: string;
 }) {
   const [isLit, setIsLit] = useState(false);
 
@@ -153,6 +158,8 @@ function HotkeySegment({
         isLit
           ? "border-accent text-accent border-b-1 mt-[2px]"
           : "border-foreground text-foreground",
+        className,
+        isLit && litClassName,
       )}
     >
       {content}
