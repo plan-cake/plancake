@@ -106,7 +106,7 @@ function HotkeySegment({
         clearTimeout(timeoutId);
         if (isDown) {
           // Reset the lit state after a short delay in case keyup is swallowed
-          timeoutId = setTimeout(() => setIsLit(false), 150);
+          timeoutId = setTimeout(() => setIsLit(false), 300);
         }
       }
     };
