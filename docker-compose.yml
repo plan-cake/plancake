@@ -10,6 +10,7 @@ services:
     image: ghcr.io/plan-cake/plancake-backend:${IMAGE_TAG:-latest}
     build:
       context: ./backend
+      dockerfile: Dockerfile.dev
     command: ["sh", "./start.sh"]
     volumes:
       - ./backend:/app
