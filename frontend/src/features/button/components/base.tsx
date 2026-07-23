@@ -89,6 +89,8 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
     };
     useHotkeys(hotkey?.keys ?? "", hotkeyHandler, {
       enabled: !!hotkey && !disabled && !isLoading,
+      preventDefault: true,
+      eventListenerOptions: { capture: true },
     });
 
     const baseClasses = cn(
