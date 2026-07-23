@@ -123,7 +123,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       });
 
     const hotkeyBadge = hotkey && (
-      <div className="ml-1">
+      <div className={cn("ml-1", loadingHideClass)}>
         <HotkeyBadge
           hotkey={hotkey.keys}
           keyClassName={hotkey.baseClassName}
