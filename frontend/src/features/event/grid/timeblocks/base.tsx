@@ -57,6 +57,7 @@ export default function BaseTimeBlock({
           <div
             key={`col-backdrop-${idx}`}
             className="bg-background hover:cursor-not-allowed"
+            onMouseEnter={onMouseLeave}
             style={{
               gridRow: "1 / -1",
               gridColumn: idx + 1,
