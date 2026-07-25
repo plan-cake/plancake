@@ -163,10 +163,11 @@ function HotkeySegment({
         "font-nunito text-sm leading-none",
         "border-t-1 border-x-1 border-b-3 rounded-md p-[3px]",
         isLit
-          ? "border-foreground/50 text-foreground/50 border-b-1 mt-[2px]"
-          : "border-foreground text-foreground",
-        className,
-        isLit && litClassName,
+          ? cn(
+              "border-foreground/50 text-foreground/50 border-b-1 mt-[2px]",
+              litClassName,
+            )
+          : cn("border-foreground text-foreground", className),
       )}
     >
       {content}
