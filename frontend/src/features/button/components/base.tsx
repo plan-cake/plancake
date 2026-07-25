@@ -108,13 +108,14 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         ? "cursor-not-allowed"
         : "cursor-pointer";
     const buttonState = isLoading ? "loading" : disabled ? "disabled" : "rest";
-    const [styleClasses, spinnerClasses] = getStyleClasses(
-      buttonStyle,
-      !!icon,
-      !!label,
-      buttonState,
-      shrinkOnMobile,
-    );
+    const [styleClasses, spinnerClasses, [hotkeyClasses, litHotkeyClasses]] =
+      getStyleClasses(
+        buttonStyle,
+        !!icon,
+        !!label,
+        buttonState,
+        shrinkOnMobile,
+      );
     const labelClass = shrinkOnMobile ? "hidden md:block" : "";
 
     // pretty ugly, but it allows the icon to be specified without a className for DRY
@@ -129,8 +130,8 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       <div className={cn("ml-1 hidden md:block", loadingHideClass)}>
         <HotkeyBadge
           hotkey={hotkey.keys}
-          keyClassName={hotkey.baseClassName}
-          litKeyClassName={hotkey.litClassName}
+          keyClassName={cn(hotkeyClasses, hotkey.baseClassName)}
+          litKeyClassName={cn(litHotkeyClasses, hotkey.litClassName)}
         />
       </div>
     );
@@ -208,6 +209,8 @@ function getStyleClasses(
   let paddingShrink = 0;
   let styleClasses;
   let spinnerClasses = "border-white";
+  let hotkeyClasses = "text-white border-white";
+  let litHotkeyClasses = "text-white/50 border-white/50";
   switch (style) {
     case "primary":
       switch (state) {
@@ -244,6 +247,8 @@ function getStyleClasses(
       }
       paddingShrink = 0.5;
       spinnerClasses = "border-foreground";
+      hotkeyClasses = "text-foreground border-foreground";
+      litHotkeyClasses = "text-foreground/50 border-foreground/50";
       break;
     case "frosted glass":
       switch (state) {
@@ -259,6 +264,8 @@ function getStyleClasses(
       }
       paddingShrink = 0.25;
       spinnerClasses = "border-foreground";
+      hotkeyClasses = "text-foreground border-foreground";
+      litHotkeyClasses = "text-foreground/50 border-foreground/50";
       break;
     case "frosted glass inset":
       switch (state) {
@@ -275,6 +282,8 @@ function getStyleClasses(
           break;
       }
       spinnerClasses = "border-foreground";
+      hotkeyClasses = "text-foreground border-foreground";
+      litHotkeyClasses = "text-foreground/50 border-foreground/50";
       break;
     case "bordered semi-transparent":
       switch (state) {
@@ -293,6 +302,8 @@ function getStyleClasses(
           break;
       }
       spinnerClasses = "border-accent-text";
+      hotkeyClasses = "text-accent-text border-accent-text";
+      litHotkeyClasses = "text-accent-text/50 border-accent-text/50";
       break;
     case "semi-transparent":
       switch (state) {
@@ -309,6 +320,8 @@ function getStyleClasses(
           break;
       }
       spinnerClasses = "border-accent-text";
+      hotkeyClasses = "text-accent-text border-accent-text";
+      litHotkeyClasses = "text-accent-text/50 border-accent-text/50";
       break;
     case "transparent":
       switch (state) {
@@ -324,6 +337,8 @@ function getStyleClasses(
           break;
       }
       spinnerClasses = "border-accent";
+      hotkeyClasses = "text-accent border-accent";
+      litHotkeyClasses = "text-accent/50 border-accent/50";
       break;
     case "danger":
       switch (state) {
@@ -345,6 +360,8 @@ function getStyleClasses(
             "bg-gray-200 text-[#ffffff] dark:bg-gray-300/25 dark:text-gray-300 font-bold";
           break;
       }
+      hotkeyClasses = "text-error border-error";
+      litHotkeyClasses = "text-error/50 border-error/50";
       break;
   }
   const paddingClasses = getPaddingClasses(
@@ -353,7 +370,11 @@ function getStyleClasses(
     shrinkOnMobile,
     paddingShrink,
   );
-  return [cn(styleClasses, paddingClasses), spinnerClasses];
+  return [
+    cn(styleClasses, paddingClasses),
+    spinnerClasses,
+    [hotkeyClasses, litHotkeyClasses],
+  ];
 }
 
 // I know this looks bad, but tailwind needs the full class names to be defined
