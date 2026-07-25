@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { XIcon } from "lucide-react";
 import { Drawer } from "vaul";
@@ -27,6 +27,7 @@ export default function BaseDrawer({
   modal = true,
   showOverlay = !frostedGlass && modal,
   nested = false,
+  hideCloseButton = false,
   ...rest
 }: DrawerProps) {
   useDrawerResize();
@@ -34,10 +35,20 @@ export default function BaseDrawer({
 
   const contentRef = useRef<HTMLDivElement>(null);
   const wasDraggingRef = useRef(false);
+  const animatingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
   useVaulStickyFooter(contentRef, isDragging || isAnimating);
+
+  // Animating timeout cleanup
+  useEffect(() => {
+    return () => {
+      if (animatingTimeoutRef.current) {
+        clearTimeout(animatingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   /**
    * CONDITIONAL PROPS BASED ON VARIANT
@@ -187,9 +198,17 @@ export default function BaseDrawer({
                 onClick={() => {
                   if (wasDraggingRef.current) return;
                   if (isPill) {
+                    if (animatingTimeoutRef.current) {
+                      clearTimeout(animatingTimeoutRef.current);
+                    }
+
                     setIsAnimating(true);
                     setSnap(snapPoints?.[1] ?? null);
-                    setIsAnimating(false);
+                    // Let the footer observer update before setting isAnimating to false
+                    animatingTimeoutRef.current = setTimeout(() => {
+                      setIsAnimating(false);
+                      animatingTimeoutRef.current = null;
+                    }, 0);
                   }
                 }}
                 className={cn(
@@ -235,7 +254,7 @@ export default function BaseDrawer({
                     </Drawer.Description>
                   </div>
 
-                  {_type !== "morphing" && (
+                  {_type !== "morphing" && !hideCloseButton && (
                     <div className="absolute right-4 top-3 z-10">
                       <ActionButton
                         buttonStyle="frosted glass"

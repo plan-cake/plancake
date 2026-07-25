@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 import KebabMenu from "@/components/kebab-menu";
 import SegmentedControl from "@/components/segmented-control";
 import EmptyButton from "@/features/button/components/empty";
-import ShrinkingHeaderButton from "@/features/header/components/shrinking-header-button";
+import ShrinkingHeaderButton from "@/features/header/components/buttons/shrinking-header";
 import { useHeaderSize } from "@/features/header/context";
 
 export default function ThemePicker() {

@@ -4,9 +4,9 @@ import { ChangePasswordStepProps } from "@/features/account/setting-dialogs/chan
 
 export default function ResetStep({ flow }: ChangePasswordStepProps) {
   return (
-    <div>
+    <div className="w-full text-center">
       <p>Enter your new password!</p>
-      <div className="mt-[25px] flex flex-col justify-center gap-4">
+      <div className="mt-4 flex flex-col justify-center gap-4">
         <TextInputField
           key="newPassword"
           id="newPassword"
@@ -24,7 +24,7 @@ export default function ResetStep({ flow }: ChangePasswordStepProps) {
               }
             }, 0);
           }}
-          outlined
+          style="outlined"
           error={flow.errors.newPassword || flow.errors.api}
           showPasswordCriteria={flow.showCriteria}
           passwordCriteria={flow.criteria}
@@ -37,7 +37,7 @@ export default function ResetStep({ flow }: ChangePasswordStepProps) {
           label="Retype Password*"
           value={flow.form.confirmPassword}
           onChange={(value) => flow.updateForm("confirmPassword", value)}
-          outlined
+          style="outlined"
           error={flow.errors.confirmPassword || flow.errors.api}
         />
       </div>
