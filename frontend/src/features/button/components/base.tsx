@@ -126,7 +126,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         className: cn("h-6 w-6 p-0.5", loadingHideClass),
       });
 
-    const hotkeyBadge = hotkey && (
+    const hotkeyBadge = hotkey && !hotkey.hideBadge && (
       <div className={cn("ml-1 hidden md:block", loadingHideClass)}>
         <HotkeyBadge
           hotkey={hotkey.keys}

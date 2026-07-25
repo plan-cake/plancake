@@ -15,14 +15,16 @@ export type ButtonStyle =
 type ButtonType = "action" | "link" | "empty";
 
 type HotkeyOptions = {
-    /** The keyboard shortcut to trigger the button. */
-    keys: string;
-    /** Additional classNames to apply to the hotkey badge, for further customization. */
-    baseClassName?: string;
-    litClassName?: string;
-    /** Additional options to pass to the useHotkeys hook. */
-    options?: Options;
-  }
+  /** The keyboard shortcut to trigger the button. */
+  keys: string;
+  /** Additional classNames to apply to the hotkey badge, for further customization. */
+  baseClassName?: string;
+  litClassName?: string;
+  /** Additional options to pass to the useHotkeys hook. */
+  options?: Options;
+  /** If true, the hotkey badge will be hidden. */
+  hideBadge?: boolean;
+};
 
 export type BaseButtonProps = {
   /**
