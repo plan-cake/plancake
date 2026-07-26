@@ -15,6 +15,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import HotkeyBadge from "@/components/hotkey-badge";
 import LoadingSpinner from "@/components/loading-spinner";
 import { BaseButtonProps, ButtonStyle } from "@/features/button/props";
+import Tooltip from "@/features/system-feedback/tooltip/base";
 import { cn } from "@/lib/utils/classname";
 
 type ButtonState = "rest" | "loading" | "disabled";
@@ -31,6 +32,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       icon,
       label,
       shrinkOnMobile = false,
+      tooltip,
       loading = false,
       disabled = false,
       href,
@@ -158,8 +160,10 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       </div>
     );
 
+    let buttonComponent;
+
     if (disabled || isLoading) {
-      return (
+      buttonComponent = (
         <button
           disabled
           type={type}
@@ -170,7 +174,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         </button>
       );
     } else if (_buttontype === "link") {
-      return (
+      buttonComponent = (
         <Link
           ref={ref as React.Ref<HTMLAnchorElement>}
           {...props}
@@ -181,7 +185,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         </Link>
       );
     } else {
-      return (
+      buttonComponent = (
         <button
           type={type}
           ref={ref as React.Ref<HTMLButtonElement>}
@@ -193,6 +197,12 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         </button>
       );
     }
+
+    if (tooltip != null) {
+      buttonComponent = <Tooltip content={tooltip}>{buttonComponent}</Tooltip>;
+    }
+
+    return buttonComponent;
   },
 );
 

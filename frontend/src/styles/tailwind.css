@@ -138,6 +138,9 @@
   --animate-slideOut: slideOut 400ms cubic-bezier(0.16, 1, 0.3, 1);
   --animate-swipeOut: swipeOut 100ms ease-out;
 
+  --animate-tooltipOpen: slideUpAndFade 150ms;
+  --animate-tooltipClose: slideDownAndFadeOut 150ms;
+
   @keyframes hide {
     0% {
       opacity: 1;

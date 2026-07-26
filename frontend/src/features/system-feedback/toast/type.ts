@@ -13,6 +13,7 @@ export type ToastData = ToastOptions & {
   type: ToastType;
   message: string;
   open: boolean;
+  pathOrigin?: string;
 };
 
 export interface ToastErrorMessage {

@@ -68,6 +68,13 @@ export type BaseButtonProps = {
    */
   shrinkOnMobile?: boolean;
   /**
+   * A tooltip to show when the button is hovered. This can be a simple string or a more
+   * complex component for more detailed tooltips.
+   *
+   * This tooltip cannot be shown on devices without hover.
+   */
+  tooltip?: ReactNode;
+  /**
    * If `true`, the button will show a loading spinner and be unclickable.
    *
    * Typically, the loading state is managed internally by the button when `onClick` is
@@ -128,6 +135,8 @@ type CommonButtonProps = {
   label?: string;
   /** @inheritdoc BaseButtonProps */
   shrinkOnMobile?: boolean;
+  /** @inheritdoc BaseButtonProps */
+  tooltip?: ReactNode;
   /** @inheritdoc BaseButtonProps */
   loading?: boolean;
   /** @inheritdoc BaseButtonProps */
