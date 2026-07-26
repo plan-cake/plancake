@@ -128,7 +128,8 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         className: cn("h-6 w-6 p-0.5", loadingHideClass),
       });
 
-    const hotkeyBadge = hotkey && !hotkey.hideBadge && (
+    const { badgeDisplay = "button" } = hotkey ?? {};
+    const hotkeyBadge = hotkey && badgeDisplay === "button" && (
       <div className={cn("ml-1 hidden md:block", loadingHideClass)}>
         <HotkeyBadge
           hotkey={hotkey.keys}
@@ -198,8 +199,23 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       );
     }
 
-    if (tooltip != null) {
-      buttonComponent = <Tooltip content={tooltip}>{buttonComponent}</Tooltip>;
+    if (tooltip != null || (hotkey && badgeDisplay === "tooltip")) {
+      let tooltipContent: React.ReactNode = tooltip;
+      if (hotkey && badgeDisplay === "tooltip") {
+        tooltipContent = (
+          <div className="flex flex-col items-center">
+            {tooltip}
+            <HotkeyBadge
+              hotkey={hotkey!.keys}
+              keyClassName="text-background border-background"
+              litKeyClassName="text-background/50 border-background/50"
+            />
+          </div>
+        );
+      }
+      buttonComponent = (
+        <Tooltip content={tooltipContent}>{buttonComponent}</Tooltip>
+      );
     }
 
     return buttonComponent;
