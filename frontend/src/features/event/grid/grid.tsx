@@ -8,6 +8,7 @@ import {
   ResultsAvailabilityMap,
 } from "@/core/availability/types";
 import { createEmptyUserAvailability } from "@/core/availability/utils";
+import { GRID_ID } from "@/features/event/grid/lib/constants";
 import useGridinfo from "@/features/event/grid/lib/use-grid";
 import ScheduleHeader from "@/features/event/grid/schedule-header";
 import TimeColumn from "@/features/event/grid/time-column";
@@ -135,6 +136,7 @@ export default function ScheduleGrid({
         mode === "preview" ? "bg-background md:bg-panel" : "bg-background",
       )}
       style={{ viewTransitionName: "grid" }}
+      id={GRID_ID}
     >
       <ScheduleHeader
         preview={mode === "preview"}

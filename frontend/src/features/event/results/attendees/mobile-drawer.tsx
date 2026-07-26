@@ -5,6 +5,7 @@ import { ShareIcon, SquarePenIcon } from "lucide-react";
 import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import { MorphingDrawer } from "@/features/drawer";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
 import PanelHeader from "@/features/event/results/attendees/panel-header";
 import ParticipantList from "@/features/event/results/attendees/participant-list";
 import {
@@ -64,7 +65,7 @@ export default function AttendeesDrawer({
       icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
       onClick={() => {
-        doViewTransition(`/${eventCode}/painting`);
+        doViewTransition(`/${eventCode}/painting`, GRID_ID_SELECTOR);
       }}
       loadOnSuccess
     />

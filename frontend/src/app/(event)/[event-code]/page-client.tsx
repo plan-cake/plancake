@@ -10,6 +10,7 @@ import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import ScheduleGrid from "@/features/event/grid/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
 import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
 import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
 import { getResultBanners } from "@/features/event/results/components/banners";
@@ -97,7 +98,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
       onClick={() => {
-        doViewTransition(`/${eventCode}/painting`);
+        doViewTransition(`/${eventCode}/painting`, GRID_ID_SELECTOR);
       }}
       loadOnSuccess
     />
