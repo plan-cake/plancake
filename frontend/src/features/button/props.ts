@@ -144,6 +144,8 @@ type CommonButtonProps = {
   /** @inheritdoc BaseButtonProps */
   disabled?: boolean;
   /** @inheritdoc BaseButtonProps */
+  hotkey?: HotkeyOptions;
+  /** @inheritdoc BaseButtonProps */
   className?: string;
 };
 
@@ -152,15 +154,11 @@ export type ActionButtonProps = CommonButtonProps & {
   onClick: (e?: React.MouseEvent<HTMLButtonElement>) => Promise<void | boolean> | void | boolean;
   /** @inheritdoc BaseButtonProps */
   loadOnSuccess?: boolean;
-  /** @inheritdoc BaseButtonProps */
-  hotkey?: HotkeyOptions;
 };
 
 export type LinkButtonProps = CommonButtonProps & {
   /** @inheritdoc BaseButtonProps */
   href: string;
-  /** @inheritdoc BaseButtonProps */
-  hotkey?: HotkeyOptions;
 };
 
 export type EmptyButtonProps = CommonButtonProps;

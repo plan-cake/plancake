@@ -80,7 +80,9 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
     const hotkeyHandler = () => {
       switch (_buttontype) {
         case "action":
-          onClickHandler();
+        case "empty":
+          // Don't let the mouse event be passed as undefined
+          onClickHandler({} as React.MouseEvent<HTMLButtonElement>);
           break;
         case "link":
           if (href) {
