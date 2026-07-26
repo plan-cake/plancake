@@ -16,6 +16,9 @@ export function useViewTransition() {
     }
 
     const currentPath = window.location.pathname;
+    const previousTarget = targetSelector
+      ? document.querySelector(targetSelector)
+      : null;
 
     const transition = document.startViewTransition(() => {
       return new Promise<void>((resolve, reject) => {
@@ -25,7 +28,8 @@ export function useViewTransition() {
 
           if (targetSelector) {
             // Only resolve if the target element has mounted, bypassing loading.tsx
-            if (document.querySelector(targetSelector)) {
+            const target = document.querySelector(targetSelector);
+            if (target && target !== previousTarget) {
               observer.disconnect();
               clearTimeout(timer);
               resolve();
