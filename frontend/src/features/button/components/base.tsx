@@ -12,9 +12,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 
-import HotkeyBadge from "@/components/hotkey-badge";
 import LoadingSpinner from "@/components/loading-spinner";
 import { BaseButtonProps, ButtonStyle } from "@/features/button/props";
+import HotkeyBadge from "@/features/system-feedback/hotkeys/components/hotkey-badge";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import { cn } from "@/lib/utils/classname";
 
