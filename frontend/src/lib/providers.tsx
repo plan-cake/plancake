@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 
 import HeaderSizeProvider from "@/features/header/provider";
 import { ToastProvider } from "@/features/system-feedback";
+import { PressedKeysProvider } from "@/features/system-feedback/hotkeys/provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -13,9 +14,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <LucideProvider absoluteStrokeWidth={true} strokeWidth={1.5}>
         <HeaderSizeProvider>
           <ToastProvider>
-            <TooltipProvider delayDuration={300} skipDelayDuration={500}>
-              {children}
-            </TooltipProvider>
+            <PressedKeysProvider>
+              <TooltipProvider delayDuration={300} skipDelayDuration={500}>
+                {children}
+              </TooltipProvider>
+            </PressedKeysProvider>
           </ToastProvider>
         </HeaderSizeProvider>
       </LucideProvider>

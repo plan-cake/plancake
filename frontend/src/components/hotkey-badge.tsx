@@ -16,6 +16,7 @@ import {
   SpaceIcon,
 } from "lucide-react";
 
+import { usePressedKeys } from "@/features/system-feedback/hotkeys/context";
 import { cn } from "@/lib/utils/classname";
 import { isAppleOs } from "@/lib/utils/is-apple-os";
 
@@ -78,65 +79,7 @@ function HotkeySegment({
   className?: string;
   litClassName?: string;
 }) {
-  const [isLit, setIsLit] = useState(false);
-
-  useEffect(() => {
-    const isModifier = ["mod", "shift", "alt"].includes(hotkey);
-    let timeoutId: NodeJS.Timeout;
-
-    const isStandardMatch = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase();
-      const code = e.code.toLowerCase();
-      if (hotkey === "space") return key === " " || code === "space";
-      return (
-        key === hotkey ||
-        code === hotkey ||
-        code === `key${hotkey}` ||
-        code === `digit${hotkey}`
-      );
-    };
-
-    const handleKeyEvent = (e: KeyboardEvent, isDown: boolean) => {
-      const activeElement = document.activeElement as HTMLElement | null;
-      const isTyping =
-        activeElement &&
-        (["INPUT", "TEXTAREA", "SELECT"].includes(activeElement.tagName) ||
-          activeElement?.isContentEditable);
-      if (isDown && isTyping) return;
-
-      if (isModifier) {
-        if (hotkey === "mod") setIsLit(isApple ? e.metaKey : e.ctrlKey);
-        else if (hotkey === "shift") setIsLit(e.shiftKey);
-        else if (hotkey === "alt") setIsLit(e.altKey);
-      } else if (isStandardMatch(e)) {
-        setIsLit(isDown);
-        clearTimeout(timeoutId);
-        if (isDown) {
-          // Reset the lit state after a short delay in case keyup is swallowed
-          timeoutId = setTimeout(() => setIsLit(false), 300);
-        }
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => handleKeyEvent(e, true);
-    const handleKeyUp = (e: KeyboardEvent) => handleKeyEvent(e, false);
-
-    const handleBlur = () => {
-      setIsLit(false);
-      clearTimeout(timeoutId);
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("blur", handleBlur);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-      window.removeEventListener("blur", handleBlur);
-      clearTimeout(timeoutId);
-    };
-  }, [hotkey, isApple]);
+  const isLit = usePressedKeys()(hotkey);
 
   let displayKey = hotkey;
   if (displayKey === "mod") {
