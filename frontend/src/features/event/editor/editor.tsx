@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 import { TriangleAlertIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -61,6 +61,41 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
   const [mobileTab, setMobileTab] = useState<SegmentedControlOption>("details");
 
+  // FORM VALIDATION
+  const isFormValid = useMemo(() => {
+    if (!title || !title.trim() || title.length > MAX_TITLE_LENGTH) {
+      return false;
+    }
+
+    if (eventRange.type === "specific") {
+      if (!eventRange.dateRange.from || !eventRange.dateRange.to) {
+        return false;
+      }
+    } else if (eventRange.type === "weekday") {
+      if (!eventRange.weekdays || eventRange.weekdays.length === 0) {
+        return false;
+      }
+    }
+
+    if (!eventRange.timeRange.from || !eventRange.timeRange.to) {
+      return false;
+    } else if (eventRange.timeRange.from >= eventRange.timeRange.to) {
+      return false;
+    }
+
+    if (type === "edit" && initialData) {
+      const isTitleUnchanged = title.trim() === initialData.title.trim();
+      const isRangeUnchanged =
+        JSON.stringify(eventRange) === JSON.stringify(initialData.eventRange);
+
+      if (isTitleUnchanged && isRangeUnchanged) {
+        return false;
+      }
+    }
+
+    return true;
+  }, [title, eventRange, type, initialData]);
+
   // SUBMIT EVENT INFO
   const submitEventInfo = async () => {
     clearAllErrors();
@@ -96,7 +131,16 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       href={`/${initialData?.customCode}`}
     />
   );
-  const submitButton = (
+  const desktopSubmitButton = (
+    <ActionButton
+      buttonStyle="primary"
+      label={type === "edit" ? "Update Event" : "Create Event"}
+      onClick={submitEventInfo}
+      disabled={!isFormValid}
+      loadOnSuccess
+    />
+  );
+  const mobileSubmitButton = (
     <ActionButton
       buttonStyle="primary"
       label={type === "edit" ? "Update Event" : "Create Event"}
@@ -141,7 +185,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         </div>
         <div className="hidden gap-2 md:flex">
           {type === "edit" && cancelButton}
-          {submitButton}
+          {desktopSubmitButton}
         </div>
       </div>
 
@@ -210,7 +254,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       <div className="z-10">
         <MobileFooterIsland
           leftButtons={type === "edit" ? [cancelButton] : undefined}
-          rightButtons={[submitButton]}
+          rightButtons={[mobileSubmitButton]}
         >
           <SegmentedControl
             value={mobileTab}

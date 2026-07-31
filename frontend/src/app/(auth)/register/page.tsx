@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import ActionButton from "@/features/button/components/action";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -23,13 +24,31 @@ export default function Page() {
   const [passwordCriteria, setPasswordCriteria] = useState({});
   const [showPasswordCriteria, setShowPasswordCriteria] = useState(false);
   const router = useRouter();
+  const isMobile = useCheckMobile();
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
-  function passwordIsStrong() {
+  const passwordIsStrong = useCallback(() => {
     return Object.values(passwordCriteria).every((value) => value === true);
-  }
+  }, [passwordCriteria]);
+
+  // FORM VALIDATION
+  const isFormValid = useMemo(() => {
+    if (!email || !email.trim()) {
+      return false;
+    }
+
+    if (!passwordIsStrong()) {
+      return false;
+    }
+
+    if (!confirmPassword || confirmPassword !== password) {
+      return false;
+    }
+
+    return true;
+  }, [email, password, confirmPassword, passwordIsStrong]);
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
@@ -148,6 +167,7 @@ export default function Page() {
           buttonStyle="primary"
           label="Register"
           onClick={handleSubmit}
+          disabled={!isMobile && !isFormValid}
           loadOnSuccess
         />
       </div>

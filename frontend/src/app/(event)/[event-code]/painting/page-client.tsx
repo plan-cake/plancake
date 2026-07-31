@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -88,6 +88,19 @@ export default function ClientPage({
 
   //   return () => removeToast(toastId);
   // }, [addToast, removeToast]);
+
+  // FORM VALIDATION
+  const isFormValid = useMemo(() => {
+    if (!displayName || !displayName.trim() || !!errors.displayName) {
+      return false;
+    }
+
+    if (!userAvailability || userAvailability.size === 0) {
+      return false;
+    }
+
+    return true;
+  }, [displayName, errors.displayName, userAvailability]);
 
   const checkNameAvailability = useDebouncedCallback(async (displayName) => {
     try {
@@ -236,7 +249,20 @@ export default function ClientPage({
       href={`/${eventCode}`}
     />
   );
-  const submitButton = (
+  const desktopSubmitButton = (
+    <ActionButton
+      buttonStyle="primary"
+      label={
+        initialData?.display_name
+          ? "Update Availability"
+          : "Submit Availability"
+      }
+      onClick={handleSubmitAvailability}
+      disabled={!isFormValid}
+      loadOnSuccess
+    />
+  );
+  const mobileSubmitButton = (
     <ActionButton
       buttonStyle="primary"
       label={
@@ -263,7 +289,7 @@ export default function ClientPage({
         <h1 className="text-2xl font-bold">{eventName}</h1>
         <div className="hidden items-center gap-2 md:flex">
           {cancelButton}
-          {submitButton}
+          {desktopSubmitButton}
         </div>
       </div>
 
@@ -320,7 +346,7 @@ export default function ClientPage({
       <div className="z-10">
         <MobileFooterIsland
           leftButtons={[cancelButton]}
-          rightButtons={[submitButton]}
+          rightButtons={[mobileSubmitButton]}
         >
           <div className="mx-3 -mt-2">
             <DisplayNameInput
