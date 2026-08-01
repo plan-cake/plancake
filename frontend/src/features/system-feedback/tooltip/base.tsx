@@ -2,7 +2,7 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@/lib/utils/classname";
 
-export type TooltipSide = "top" | "bottom";
+export type TooltipSide = "top" | "bottom" | "left" | "right";
 
 type TooltipProps = {
   /**
@@ -46,6 +46,10 @@ export default function Tooltip({
             "data-[state=delayed-open]:animate-tooltipOpen",
             "data-[state=instant-open]:animate-tooltipOpen",
             "data-[state=closed]:animate-tooltipClose",
+            "data-[side=bottom]:[&_.tooltip-arrow]:translate-y-[-1px]",
+            "data-[side=top]:[&_.tooltip-arrow]:translate-y-[-1px]",
+            "data-[side=left]:[&_.tooltip-arrow]:translate-y-[-1px]",
+            "data-[side=right]:[&_.tooltip-arrow]:translate-y-[-1px]",
           )}
         >
           <div
@@ -54,7 +58,7 @@ export default function Tooltip({
           >
             {content}
           </div>
-          <TooltipPrimitive.Arrow className="fill-foreground" />
+          <TooltipPrimitive.Arrow className="fill-foreground tooltip-arrow" />
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>
     </TooltipPrimitive.Root>
