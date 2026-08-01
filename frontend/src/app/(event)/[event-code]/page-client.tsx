@@ -15,7 +15,6 @@ import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
 import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
 import AvailabilityFilters from "@/features/event/results/components/availability-filters";
 import { getResultBanners } from "@/features/event/results/components/banners";
-import ShareMenu from "@/features/event/results/components/share-menu";
 import {
   ResultsProvider,
   useResultsContext,
