@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 import HotkeyBadge from "@/features/system-feedback/hotkeys/components/hotkey-badge";
 import { usePressedKeys } from "@/features/system-feedback/hotkeys/context";
 import Tooltip, { TooltipSide } from "@/features/system-feedback/tooltip/base";
@@ -26,6 +30,20 @@ export default function PowerkeyTooltip({
     isPressed(POWERKEY_COMBO[0]) && isPressed(POWERKEY_COMBO[1]);
   const restOfHotkey = hotkey.split("+").slice(2).join("+");
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (secretComboPressed && !disabled) {
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    } else {
+      setIsOpen(false);
+    }
+  }, [secretComboPressed, disabled]);
+
   return (
     <Tooltip
       side={side}
@@ -36,7 +54,7 @@ export default function PowerkeyTooltip({
           litKeyClassName="text-background/50 border-background/50"
         />
       }
-      open={secretComboPressed && !disabled}
+      open={isOpen}
     >
       {children}
     </Tooltip>
