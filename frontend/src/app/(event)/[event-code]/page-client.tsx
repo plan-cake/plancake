@@ -217,10 +217,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           {banners}
           <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4">
             <AttendeesPanel />
-            {renderTimezoneSelector("timezone-select-desktop")}
             <AnimatePresence initial={false}>
               {participants.length > 1 && availabilityFilters}
             </AnimatePresence>
+            {renderTimezoneSelector("timezone-select-desktop")}
           </div>
         </div>
       </div>
