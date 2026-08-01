@@ -22,7 +22,7 @@ import {
 } from "@/features/event/results/context";
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
-import BaseDialog from "@/features/system-feedback/dialog/components/base";
+import ShareMenu from "@/features/share-menu/menu";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -137,9 +137,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   );
 
   const shareButton = (
-    <BaseDialog
-      title="Share Event"
-      description="Share this event with others"
+    <ShareMenu
+      eventTitle={eventTitle}
+      eventCode={eventCode}
       trigger={
         <EmptyButton
           buttonStyle="secondary"
@@ -147,10 +147,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           label="Share Event"
         />
       }
-      showCloseButton
-    >
-      <ShareMenu eventTitle={eventTitle} eventCode={eventCode} />
-    </BaseDialog>
+    />
   );
 
   return (

@@ -4,7 +4,7 @@ import { ShareIcon, SlidersHorizontalIcon, SquarePenIcon } from "lucide-react";
 
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
-import { FloatingDrawer, MorphingDrawer } from "@/features/drawer";
+import { MorphingDrawer, FloatingDrawer } from "@/features/drawer";
 import PanelHeader from "@/features/event/results/attendees/panel-header";
 import ParticipantList from "@/features/event/results/attendees/participant-list";
 import {
@@ -12,7 +12,7 @@ import {
   useParticipantRemoval,
 } from "@/features/event/results/attendees/remove-participant";
 import AvailabilityFilters from "@/features/event/results/components/availability-filters";
-import ShareMenu from "@/features/event/results/components/share-menu";
+import ShareMenu from "@/features/share-menu/menu";
 
 export default function AttendeesDrawer({
   onSnapChange,
@@ -85,8 +85,20 @@ export default function AttendeesDrawer({
     </FloatingDrawer>
   );
 
-  /* SHARE MENU */
-  const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const shareButton = (
+    <ShareMenu
+      trigger={
+        <EmptyButton
+          buttonStyle="semi-transparent"
+          icon={<ShareIcon />}
+          aria-label="Share Event"
+        />
+      }
+      eventTitle={eventTitle}
+      eventCode={eventCode}
+      isNested
+    />
+  );
 
   return (
     <MorphingDrawer
@@ -113,22 +125,7 @@ export default function AttendeesDrawer({
       footerContent={
         <div className="mx-1 flex grow justify-between gap-2">
           <div className="flex gap-2">
-            <FloatingDrawer
-              title="Share Event"
-              description="Share this event with others"
-              open={shareMenuOpen}
-              onOpenChange={setShareMenuOpen}
-              trigger={
-                <EmptyButton
-                  buttonStyle="semi-transparent"
-                  icon={<ShareIcon />}
-                  aria-label="Share Event"
-                />
-              }
-              nested={true}
-            >
-              <ShareMenu eventTitle={eventTitle} eventCode={eventCode} />
-            </FloatingDrawer>
+            {shareButton}
             {numParticipants > 1 && filtersButton}
           </div>
           {paintingButton}

@@ -1,4 +1,5 @@
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
+import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import {
   MAX_DURATION,
   MAX_TITLE_LENGTH,
@@ -19,13 +20,14 @@ export const MESSAGES = {
   ERROR_RESET_TOKEN_INVALID: "Invalid or expired reset token.",
 
   // availability errors
+  ERROR_NAME_LENGTH: `Name must be ${MAX_DISPLAY_NAME_LENGTH} characters or less.`,
   ERROR_NAME_MISSING: "Missing name.",
-  ERROR_NAME_TAKEN: "This name is unavailable. Please choose another.",
+  ERROR_NAME_TAKEN: "This name is unavailable.",
   ERROR_AVAILABILITY_MISSING: "Please select your availability on the grid.",
 
   // event errors
   ERROR_EVENT_NAME_MISSING: "Missing event name.",
-  ERROR_EVENT_NAME_LENGTH: `Event name must be under ${MAX_TITLE_LENGTH} characters.`,
+  ERROR_EVENT_NAME_LENGTH: `Event name must be ${MAX_TITLE_LENGTH} characters or less.`,
   ERROR_EVENT_CODE_TAKEN: "This code is unavailable. Please choose another.",
   ERROR_EVENT_DATES_MISSING: "Please select possible dates for this event.",
   ERROR_EVENT_WEEKDAYS_MISSING: "Please select possible days for this event.",
