@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 echo "Checking for Python dependency updates..."
 pip install -r requirements.txt
