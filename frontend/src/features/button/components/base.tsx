@@ -143,6 +143,13 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         />
       </div>
     );
+    const powerkeyTooltip =
+      hotkey && badgeDisplay === "powerkey tooltip" ? (
+        <PowerkeyTooltip hotkey={hotkey.keys} disabled={tooltipOpen}>
+          <div className="pointer-events-none absolute inset-0" />
+        </PowerkeyTooltip>
+      ) : null;
+
     const buttonContent = (
       <div
         className={cn(
@@ -163,6 +170,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
             className={cn("centered-absolute h-5 w-5", spinnerClasses)}
           />
         )}
+        {powerkeyTooltip}
       </div>
     );
 
@@ -227,17 +235,6 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         >
           {buttonComponent}
         </Tooltip>
-      );
-    }
-
-    if (hotkey && badgeDisplay === "powerkey tooltip") {
-      buttonComponent = (
-        <div className="relative">
-          {buttonComponent}
-          <PowerkeyTooltip hotkey={hotkey.keys} disabled={tooltipOpen}>
-            <div className="pointer-events-none absolute inset-0" />
-          </PowerkeyTooltip>
-        </div>
       );
     }
 
