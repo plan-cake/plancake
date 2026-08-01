@@ -14,6 +14,10 @@ export default function DashboardButton() {
         icon={<LayoutDashboardIcon className="h-5 w-5" />}
         href="/dashboard"
         tooltip="Dashboard"
+        hotkey={{
+          keys: "mod+alt+d",
+          badgeDisplay: "powerkey tooltip",
+        }}
       />
     </ShrinkingHeaderButton>
   );

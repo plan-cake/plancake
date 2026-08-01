@@ -26,6 +26,10 @@ export default function NewEventButton() {
         label="New Event"
         shrinkOnMobile
         href="/new-event"
+        hotkey={{
+          keys: "mod+alt+n",
+          badgeDisplay: "powerkey tooltip",
+        }}
       />
     </ShrinkingHeaderButton>
   );
