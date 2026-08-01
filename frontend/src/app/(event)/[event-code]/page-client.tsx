@@ -104,7 +104,6 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
   const availabilityFilters = (
     <motion.div
-      layout
       key="availability-filters"
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: "auto" }}
@@ -216,16 +215,13 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           )}
         >
           {banners}
-          <motion.div
-            layout
-            className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4"
-          >
+          <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4">
             <AttendeesPanel />
             {renderTimezoneSelector("timezone-select-desktop")}
             <AnimatePresence initial={false}>
               {participants.length > 1 && availabilityFilters}
             </AnimatePresence>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>
