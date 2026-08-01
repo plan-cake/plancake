@@ -33,7 +33,7 @@ export default function PowerkeyTooltip({
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (secretComboPressed && !disabled) {
+    if (secretComboPressed) {
       const timer = setTimeout(() => {
         setIsOpen(true);
       }, 500);
@@ -42,7 +42,7 @@ export default function PowerkeyTooltip({
     } else {
       setIsOpen(false);
     }
-  }, [secretComboPressed, disabled]);
+  }, [secretComboPressed]);
 
   return (
     <Tooltip
@@ -54,7 +54,7 @@ export default function PowerkeyTooltip({
           litKeyClassName="text-background/50 border-background/50"
         />
       }
-      open={isOpen}
+      open={isOpen && !disabled}
     >
       {children}
     </Tooltip>
