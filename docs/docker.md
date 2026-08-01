@@ -69,7 +69,7 @@ docker compose down -v
 The `Makefile` wraps the common Compose commands so contributors don't need to remember Compose flags or env vars. Run `make help` to see the full list. A few worth calling out:
 
 - `make up` vs `make build` — `up` pulls published images (fast, no local build); `build` builds from your working tree (needed if you've changed a Dockerfile or want to test uncommitted backend/frontend changes without publishing).
-- `IMAGE_TAG` — determines which image tag is pulled/built. Currently pinned to `latest`; the intent (see the commented-out logic above it) is to eventually derive this from the branch/`package.json` version so non-`main` branches can pull their own tagged images. That branch-based logic isn't wired up yet — flagging this here as a known follow-up rather than finished behavior.
+- `IMAGE_TAG` — determines which image tag is pulled/built. On `main`, it's `latest`. On any other branch, it's derived from `frontend/package.json`'s version as `v<version>`, so a branch like `v1.2.3` (with a matching `package.json` version) pulls its own tagged images instead of `latest`.
 - `make shell-api` / `make shell-web` — open a shell in the running container for one-off debugging (`python manage.py shell`, inspecting `node_modules`, etc.) without needing to rebuild.
 
 This is the full list current supported commands:
