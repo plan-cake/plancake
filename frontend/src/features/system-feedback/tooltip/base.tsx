@@ -20,6 +20,14 @@ type TooltipProps = {
    */
   maxHeight?: string;
   /**
+   * Controlled open state for the tooltip.
+   */
+  open?: boolean;
+  /**
+   * Callback function that is called when the open state of the tooltip changes.
+   */
+  onOpenChange?: (open: boolean) => void;
+  /**
    * The element that triggers the tooltip when hovered.
    */
   children: React.ReactNode;
@@ -29,10 +37,12 @@ export default function Tooltip({
   side = "bottom",
   content,
   maxHeight,
+  open,
+  onOpenChange,
   children,
 }: TooltipProps) {
   return (
-    <TooltipPrimitive.Root>
+    <TooltipPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
       <TooltipPrimitive.Portal>
         <TooltipPrimitive.Content
