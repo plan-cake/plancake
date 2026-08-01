@@ -26,6 +26,7 @@ jobs:
           cut-off: 1w
           timestamp-to-use: updated_at
           keep-n-most-recent: 3
+          skip-tags: v*.*.*
           dry-run: false
 
       - name: Clean up Plancake Backend images
@@ -37,4 +38,5 @@ jobs:
           cut-off: 1w
           timestamp-to-use: updated_at
           keep-n-most-recent: 3
+          skip-tags: v*.*.*
           dry-run: false
