@@ -5,6 +5,11 @@ on:
     - cron: "0 0 * * 0" # run every sunday at midnight
   workflow_dispatch:
 
+# don't cancel in-progress runs, since this is a weekly cleanup job
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   clean-registry:
     runs-on: ubuntu-latest
