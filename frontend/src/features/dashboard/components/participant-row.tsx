@@ -1,3 +1,4 @@
+import Tooltip from "@/features/system-feedback/tooltip/base";
 import { cn } from "@/lib/utils/classname";
 
 type ParticipantRowProps = {
@@ -9,10 +10,10 @@ export default function ParticipantRow({
   participants,
   numIcons,
 }: ParticipantRowProps) {
-  return (
+  let rowContent = (
     <div
       className={cn(
-        "flex bg-inherit text-sm",
+        "flex w-fit bg-inherit text-sm",
         // Every icon after the first has padding meant to act as a border
         Math.min(numIcons, participants.length) > 1 && "-mb-0.5",
       )}
@@ -49,6 +50,19 @@ export default function ParticipantRow({
       )}
     </div>
   );
+
+  if (participants.length > 0) {
+    rowContent = (
+      <Tooltip
+        content={<TooltipContent participants={participants} />}
+        maxHeight="384px"
+      >
+        {rowContent}
+      </Tooltip>
+    );
+  }
+
+  return rowContent;
 }
 
 function ParticipantIcon({
@@ -98,6 +112,26 @@ function ParticipantIcon({
           iconText
         )}
       </div>
+    </div>
+  );
+}
+
+function TooltipContent({ participants }: { participants: string[] }) {
+  return (
+    <div className="flex flex-col">
+      <div className="text-center font-bold">
+        {participants.length} Attendee{participants.length !== 1 ? "s" : ""}
+      </div>
+      <ul>
+        {participants.map((participant) => (
+          <li
+            key={participant}
+            className="whitespace-nowrap text-center text-sm"
+          >
+            {participant}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

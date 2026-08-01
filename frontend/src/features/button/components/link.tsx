@@ -12,6 +12,7 @@ const LinkButton = forwardRef<Ref, LinkButtonProps>(
       icon,
       label,
       shrinkOnMobile = false,
+      tooltip,
       loading = false,
       disabled = false,
       href,
@@ -27,6 +28,7 @@ const LinkButton = forwardRef<Ref, LinkButtonProps>(
         icon={icon}
         label={label}
         shrinkOnMobile={shrinkOnMobile}
+        tooltip={tooltip}
         loading={loading}
         disabled={disabled}
         href={href}

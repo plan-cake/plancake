@@ -12,6 +12,7 @@ const EmptyButton = forwardRef<Ref, EmptyButtonProps>(
       icon,
       label,
       shrinkOnMobile = false,
+      tooltip,
       loading = false,
       disabled = false,
       className,
@@ -26,6 +27,7 @@ const EmptyButton = forwardRef<Ref, EmptyButtonProps>(
         icon={icon}
         label={label}
         shrinkOnMobile={shrinkOnMobile}
+        tooltip={tooltip}
         loading={loading}
         disabled={disabled}
         className={className}
