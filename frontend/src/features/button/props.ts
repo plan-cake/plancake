@@ -14,7 +14,7 @@ export type ButtonStyle =
 
 type ButtonType = "action" | "link" | "empty";
 
-type HotkeyBadgeDisplay = "button" | "tooltip" | "none";
+type HotkeyBadgeDisplay = "button" | "tooltip" | "powerkey tooltip" | "none";
 
 type HotkeyOptions = {
   /** The keyboard shortcut to trigger the button. */

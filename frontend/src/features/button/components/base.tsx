@@ -15,6 +15,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import LoadingSpinner from "@/components/loading-spinner";
 import { BaseButtonProps, ButtonStyle } from "@/features/button/props";
 import HotkeyBadge from "@/features/system-feedback/hotkeys/components/hotkey-badge";
+import PowerkeyTooltip from "@/features/system-feedback/hotkeys/components/powerkey-tooltip";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import { cn } from "@/lib/utils/classname";
 
@@ -54,6 +55,8 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       throw new Error("Link Button must specify href");
     if (_buttontype === "action" && !onClick)
       throw new Error("Action Button must specify onClick");
+
+    const [tooltipOpen, setTooltipOpen] = useState(false);
 
     const [isLoading, setIsLoading] = useState(loading);
     useEffect(() => {
@@ -216,7 +219,25 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         );
       }
       buttonComponent = (
-        <Tooltip content={tooltipContent}>{buttonComponent}</Tooltip>
+        <Tooltip
+          content={tooltipContent}
+          onOpenChange={(open) => {
+            setTooltipOpen(open);
+          }}
+        >
+          {buttonComponent}
+        </Tooltip>
+      );
+    }
+
+    if (hotkey && badgeDisplay === "powerkey tooltip") {
+      buttonComponent = (
+        <div className="relative">
+          {buttonComponent}
+          <PowerkeyTooltip hotkey={hotkey.keys} disabled={tooltipOpen}>
+            <div className="pointer-events-none absolute inset-0" />
+          </PowerkeyTooltip>
+        </div>
       );
     }
 
