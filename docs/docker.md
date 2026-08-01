@@ -29,11 +29,11 @@ For quick-start commands, read alongside the [root README](../README.md).
 
 ## Images
 
-### Backend (`backend/Dockerfile`)
+### Backend (`backend/Dockerfile` and `backend/Dockerfile.dev`)
 
-Single-stage image based on `python:3.13-slim`. Installs `requirements.txt`, copies the app, and drops to a non-root user before running Uvicorn. This is the production image.
+Single-stage image based on `python:3.13-slim`. Installs `requirements.txt`, copies the app, and drops to a non-root user before running Uvicorn. The production and dev images are very similar, with the only difference being the use of the non-root user.
 
-In Compose, this same image is used for local dev too — `docker-compose.yml` overrides its `command` to run `backend/start.sh` instead (which re-installs dependencies and runs with `--reload`), and bind-mounts the local `./backend` directory over `/app` so code changes are picked up live.
+In Compose, the `Dockerfile.dev` is used for local dev and `docker-compose.yml` overrides its `command` to run `backend/start.sh` instead (which re-installs dependencies and runs with `--reload`), and bind-mounts the local `./backend` directory over `/app` so code changes are picked up live.
 
 ### Frontend (`frontend/Dockerfile` and `frontend/Dockerfile.dev`)
 
