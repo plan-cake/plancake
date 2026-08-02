@@ -1,5 +1,5 @@
 
-.PHONY: help up down restart logs-api logs-web shell-api shell-web migrate makemigrations
+.PHONY: help up build down restart logs-api logs-web shell-api shell-web migrate makemigrations url
 
 # Determine the Docker image tag based on the current Git branch. If the branch is not
 # "main", use the version from the frontend package.json to identify the Docker image.
