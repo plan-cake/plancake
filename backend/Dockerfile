@@ -16,8 +16,8 @@ RUN pip install --upgrade pip \
 COPY . .
 
 # Create a non-root user and switch to it
-RUN addgroup --system appgroup && adduser --system --group user
-USER user
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+USER appuser
 
 EXPOSE 8000
 
