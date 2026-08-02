@@ -1,4 +1,4 @@
-import os from "os";
+const os = require("os");
 
 for (const interfaces of Object.values(os.networkInterfaces())) {
   for (const iface of interfaces ?? []) {
