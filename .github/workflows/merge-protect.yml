@@ -15,6 +15,9 @@ jobs:
   check_branch:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
       - name: Check branch
         if: github.base_ref == 'main'
         run: |
