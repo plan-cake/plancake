@@ -155,7 +155,7 @@ export default function ToastProvider({
                 icon={<Icon className="col-start-1 row-span-2 h-5 w-5" />}
                 isPersistent={toast.isPersistent}
                 duration={toast.duration}
-                isPaused={isHoveringViewport || (isMobile && stackIndex > 0)}
+                isPaused={isMobile ? stackIndex > 0 : isHoveringViewport}
                 onOpenChange={(isOpen) => {
                   if (!isOpen) {
                     if (toast.onDismiss) {
