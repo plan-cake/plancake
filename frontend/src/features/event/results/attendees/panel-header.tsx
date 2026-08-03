@@ -70,7 +70,7 @@ export default function PanelHeader({
       )}
     >
       <div className="flex flex-col items-start">
-        <h2 className="text-md font-semibold">
+        <h2 className="font-semibold">
           {totalParticipants === 0
             ? "No Attendees Yet"
             : isRemoving
