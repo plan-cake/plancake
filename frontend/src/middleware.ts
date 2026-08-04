@@ -38,6 +38,35 @@ export function middleware(request: NextRequest) {
       request.cookies.has(name),
     );
 
+    // Safari's ITP (Intelligent Tracking Prevention) limits the lifetime of cookies set
+    // by direct requests to our API to 7 days. To combat this, we extend cookie lifetimes
+    // with Next.js to a full year on every request. In oversimplified terms, the frontend
+    // is on the main domain which is not subject to the same restrictions.
+
+    // This solution is a temporary fix until we redo our client-side API requests to use
+    // Server Actions, which will route everything through the frontend and bypass the
+    // restriction.
+
+    // This won't allow authentication for expired sessions, it only ensures that valid
+    // sessions are not prematurely expired. The source of truth is handled by the backend
+    // and database.
+
+    existingCookies.forEach((name) => {
+      const cookieValue = request.cookies.get(name)?.value;
+      if (cookieValue) {
+        response.cookies.set({
+          name: name,
+          value: cookieValue,
+          domain: process.env.COOKIE_DOMAIN,
+          path: "/",
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax",
+          maxAge: 60 * 60 * 24 * 365, // 1 year
+        });
+      }
+    });
+
     // We defensively try to DELETE the Host-Only (legacy) cookies on every request.
     // By setting Max-Age=0 and omitting the Domain attribute, we target the Host-Only version.
     // The valid Domain cookie (.example.com) will remain untouched because the browser
