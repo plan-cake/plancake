@@ -51,21 +51,23 @@ export function middleware(request: NextRequest) {
     // sessions are not prematurely expired. The source of truth is handled by the backend
     // and database.
 
-    existingCookies.forEach((name) => {
-      const cookieValue = request.cookies.get(name)?.value;
-      if (cookieValue) {
-        response.cookies.set({
-          name: name,
-          value: cookieValue,
-          domain: process.env.COOKIE_DOMAIN,
-          path: "/",
-          httpOnly: true,
-          secure: true,
-          sameSite: "lax",
-          maxAge: 60 * 60 * 24 * 365, // 1 year
-        });
-      }
-    });
+    if (process.env.COOKIE_DOMAIN) {
+      existingCookies.forEach((name) => {
+        const cookieValue = request.cookies.get(name)?.value;
+        if (cookieValue) {
+          response.cookies.set({
+            name: name,
+            value: cookieValue,
+            domain: process.env.COOKIE_DOMAIN,
+            path: "/",
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax",
+            maxAge: 60 * 60 * 24 * 365, // 1 year
+          });
+        }
+      });
+    }
 
     // We defensively try to DELETE the Host-Only (legacy) cookies on every request.
     // By setting Max-Age=0 and omitting the Domain attribute, we target the Host-Only version.
