@@ -140,6 +140,11 @@ export default function PanelHeader({
             icon={<Undo2Icon />}
             onClick={clearSelectedParticipants}
             disabled={!hasSelection}
+            hotkey={
+              hasSelection
+                ? { keys: "mod+alt+c", badgeDisplay: "powerkey tooltip" }
+                : undefined
+            }
             className={cn(
               "shrink-0 transition-opacity duration-200",
               !hasSelection && "pointer-events-none opacity-0",
@@ -155,6 +160,10 @@ export default function PanelHeader({
               onClick={toggleRemoving}
               aria-label={isRemoving ? "Stop Removing" : "Remove Attendees"}
               tooltip={isRemoving ? "Stop Removing" : "Remove Attendees"}
+              hotkey={{
+                keys: isRemoving ? "mod+alt+enter" : "mod+alt+backspace",
+                badgeDisplay: "powerkey tooltip",
+              }}
               className={cn(
                 "shrink-0",
                 !isRemoving &&

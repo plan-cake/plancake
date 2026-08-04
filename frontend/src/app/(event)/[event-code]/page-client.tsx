@@ -93,15 +93,27 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
       href={`/${eventCode}/painting`}
+      hotkey={{
+        keys: "mod+alt+a",
+        badgeDisplay: "powerkey tooltip",
+      }}
     />
   );
 
-  const editButton = (buttonStyle: HeaderButtonStyle) => (
+  const editButton = (buttonStyle: HeaderButtonStyle, desktop: boolean) => (
     <LinkButton
       buttonStyle={buttonStyle}
       icon={<PencilIcon />}
       label="Edit Event"
       href={`/${eventCode}/edit`}
+      hotkey={
+        desktop
+          ? {
+              keys: "mod+alt+e",
+              badgeDisplay: "powerkey tooltip",
+            }
+          : undefined
+      }
     />
   );
 
@@ -114,6 +126,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           buttonStyle="secondary"
           icon={<ShareIcon />}
           label="Share Event"
+          hotkey={{
+            keys: "mod+alt+s",
+            badgeDisplay: "powerkey tooltip",
+          }}
         />
       }
     />
@@ -129,12 +145,12 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
         {isCreator && (
           <div className="md:hidden">
-            <KebabMenu>{editButton("frosted glass inset")}</KebabMenu>
+            <KebabMenu>{editButton("frosted glass inset", false)}</KebabMenu>
           </div>
         )}
 
         <div className="ml-auto hidden flex-wrap justify-end gap-2 md:flex">
-          {isCreator && editButton("secondary")}
+          {isCreator && editButton("secondary", true)}
           {shareButton}
           {paintingButton}
         </div>
