@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useHotkeys, useHotkeysContext } from "react-hotkeys-hook";
 
@@ -8,12 +8,11 @@ import { isAppleOs } from "@/lib/utils/is-apple-os";
 
 export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   // Shortcut mode toggle
-  const { toggleScope, activeScopes } = useHotkeysContext();
-  const endShortcutMode = () => {
-    if (activeScopes.includes(SHORTCUT_MODE_SCOPE)) {
-      toggleScope(SHORTCUT_MODE_SCOPE);
-    }
-  };
+  const { enableScope, disableScope, activeScopes } = useHotkeysContext();
+  const endShortcutMode = useCallback(
+    () => disableScope(SHORTCUT_MODE_SCOPE),
+    [disableScope],
+  );
   useHotkeys(
     "mod+k",
     () => {
@@ -27,7 +26,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
         activeElement.blur();
       }
 
-      toggleScope(SHORTCUT_MODE_SCOPE);
+      enableScope(SHORTCUT_MODE_SCOPE);
     },
     {
       enableOnContentEditable: true,
@@ -48,16 +47,12 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   );
   useEffect(() => {
     // also cancel shortcut mode if the user clicks anywhere
-    const handleClick = () => {
-      if (activeScopes.includes(SHORTCUT_MODE_SCOPE)) {
-        toggleScope(SHORTCUT_MODE_SCOPE);
-      }
-    };
-    window.addEventListener("click", handleClick);
+    // use a setTimeout to ensure this doesn't double-trigger with a simulated click
+    window.addEventListener("click", endShortcutMode);
     return () => {
-      window.removeEventListener("click", handleClick);
+      window.removeEventListener("click", endShortcutMode);
     };
-  }, [activeScopes, toggleScope]);
+  }, [activeScopes, endShortcutMode]);
 
   // Key press tracking
   const [pressedModifiers, setPressedModifiers] = useState<{
