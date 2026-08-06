@@ -17,6 +17,7 @@ import { BaseButtonProps, ButtonStyle } from "@/features/button/props";
 import HotkeyBadge from "@/features/system-feedback/hotkeys/components/hotkey-badge";
 import PowerkeyTooltip from "@/features/system-feedback/hotkeys/components/powerkey-tooltip";
 import { SHORTCUT_MODE_SCOPE } from "@/features/system-feedback/hotkeys/constants";
+import { useShortcuts } from "@/features/system-feedback/hotkeys/context";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import { cn } from "@/lib/utils/classname";
 
@@ -81,7 +82,12 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
 
     // Hotkey handling
     const router = useRouter();
+    const { endShortcutMode } = useShortcuts();
     const hotkeyHandler = () => {
+      if (hotkey?.type === "shortcut") {
+        endShortcutMode();
+      }
+
       switch (_buttontype) {
         case "action":
         case "empty":

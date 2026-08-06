@@ -9,6 +9,11 @@ import { isAppleOs } from "@/lib/utils/is-apple-os";
 export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   // Shortcut mode toggle
   const { toggleScope, activeScopes } = useHotkeysContext();
+  const endShortcutMode = () => {
+    if (activeScopes.includes(SHORTCUT_MODE_SCOPE)) {
+      toggleScope(SHORTCUT_MODE_SCOPE);
+    }
+  };
   useHotkeys(
     "mod+k",
     () => {
@@ -33,7 +38,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   useHotkeys(
     "esc",
     () => {
-      toggleScope(SHORTCUT_MODE_SCOPE);
+      endShortcutMode();
     },
     {
       enableOnContentEditable: true,
@@ -162,6 +167,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
     <ShortcutsContext.Provider
       value={{
         shortcutMode: activeScopes.includes(SHORTCUT_MODE_SCOPE),
+        endShortcutMode,
         checkKeyPressed,
       }}
     >

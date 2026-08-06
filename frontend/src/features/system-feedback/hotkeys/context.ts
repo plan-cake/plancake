@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 
 type ShortcutsContextValue = {
   shortcutMode: boolean;
+  endShortcutMode: () => void;
   checkKeyPressed: (hotkey: string) => boolean;
 };
 
