@@ -8,7 +8,7 @@ import { isAppleOs } from "@/lib/utils/is-apple-os";
 
 export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   // Shortcut mode toggle
-  const { enableScope, disableScope, activeScopes } = useHotkeysContext();
+  const { disableScope, toggleScope, activeScopes } = useHotkeysContext();
   const endShortcutMode = useCallback(
     () => disableScope(SHORTCUT_MODE_SCOPE),
     [disableScope],
@@ -26,7 +26,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
         activeElement.blur();
       }
 
-      enableScope(SHORTCUT_MODE_SCOPE);
+      toggleScope(SHORTCUT_MODE_SCOPE);
     },
     {
       enableOnContentEditable: true,
