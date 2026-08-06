@@ -6,6 +6,7 @@ import { Modak, Nunito } from "next/font/google";
 
 import { CookieGuard } from "@/components/cookie-guard";
 import Header from "@/features/header/components/header";
+import ShortcutModeIndicator from "@/features/system-feedback/hotkeys/components/shortcut-mode-indicator";
 import ToastListener from "@/features/system-feedback/toast/listener";
 import { Providers } from "@/lib/providers";
 import "@/styles/globals.css";
@@ -86,6 +87,7 @@ export default async function RootLayout({
               </Suspense>
               <Header />
               {children}
+              <ShortcutModeIndicator />
             </CookieGuard>
           </Providers>
           <Analytics />
