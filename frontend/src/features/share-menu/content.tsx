@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef } from "react";
 
-import { ShareIcon } from "lucide-react";
+import { CopyIcon, ShareIcon } from "lucide-react";
 import QRCodeStyling from "qr-code-styling";
 
-import CopyToastButton from "@/components/copy-toast-button";
 import ActionButton from "@/features/button/components/action";
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
@@ -40,10 +39,6 @@ export default function ShareMenuContent({
       />
     ) : null;
 
-  const copyButton = (
-    <CopyToastButton code={eventCode} buttonStyle="secondary" />
-  );
-
   const currentURL =
     typeof window !== "undefined"
       ? `${window.location.origin}/${eventCode}`
@@ -58,6 +53,15 @@ export default function ShareMenuContent({
       addToast("error", MESSAGES.COPY_LINK_FAILURE);
     }
   };
+
+  const copyButton = (
+    <ActionButton
+      buttonStyle="secondary"
+      icon={<CopyIcon />}
+      label="Copy Link"
+      onClick={copyToClipboard}
+    />
+  );
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
