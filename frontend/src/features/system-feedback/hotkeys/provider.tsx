@@ -34,7 +34,6 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
     "esc",
     () => {
       toggleScope(SHORTCUT_MODE_SCOPE);
-      console.log("active scopes", activeScopes);
     },
     {
       enableOnContentEditable: true,
