@@ -4,7 +4,7 @@ import HotkeyBadge from "@/features/system-feedback/hotkeys/components/hotkey-ba
 import { useShortcuts } from "@/features/system-feedback/hotkeys/context";
 import Tooltip, { TooltipSide } from "@/features/system-feedback/tooltip/base";
 
-export default function PowerkeyTooltip({
+export default function ShortcutTooltip({
   side,
   hotkey,
   children,

@@ -15,7 +15,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import LoadingSpinner from "@/components/loading-spinner";
 import { BaseButtonProps, ButtonStyle } from "@/features/button/props";
 import HotkeyBadge from "@/features/system-feedback/hotkeys/components/hotkey-badge";
-import PowerkeyTooltip from "@/features/system-feedback/hotkeys/components/powerkey-tooltip";
+import ShortcutTooltip from "@/features/system-feedback/hotkeys/components/shortcut-tooltip";
 import { SHORTCUT_MODE_SCOPE } from "@/features/system-feedback/hotkeys/constants";
 import { useShortcuts } from "@/features/system-feedback/hotkeys/context";
 import Tooltip from "@/features/system-feedback/tooltip/base";
@@ -154,11 +154,11 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
           />
         </div>
       );
-    const powerkeyTooltip =
+    const shortcutTooltip =
       hotkey && hotkeyType === "shortcut" ? (
-        <PowerkeyTooltip hotkey={hotkey.keys} disabled={tooltipOpen}>
+        <ShortcutTooltip hotkey={hotkey.keys} disabled={tooltipOpen}>
           <div className="pointer-events-none absolute inset-0" />
-        </PowerkeyTooltip>
+        </ShortcutTooltip>
       ) : null;
 
     const buttonContent = (
@@ -181,7 +181,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
             className={cn("centered-absolute h-5 w-5", spinnerClasses)}
           />
         )}
-        {powerkeyTooltip}
+        {shortcutTooltip}
       </div>
     );
 
