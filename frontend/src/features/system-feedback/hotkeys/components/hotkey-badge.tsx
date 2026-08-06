@@ -16,7 +16,7 @@ import {
   SpaceIcon,
 } from "lucide-react";
 
-import { usePressedKeys } from "@/features/system-feedback/hotkeys/context";
+import { useShortcuts } from "@/features/system-feedback/hotkeys/context";
 import { cn } from "@/lib/utils/classname";
 import { isAppleOs } from "@/lib/utils/is-apple-os";
 
@@ -79,7 +79,7 @@ function HotkeySegment({
   className?: string;
   litClassName?: string;
 }) {
-  const isLit = usePressedKeys()(hotkey);
+  const isLit = useShortcuts().checkKeyPressed(hotkey);
 
   let displayKey = hotkey;
   if (displayKey === "mod") {

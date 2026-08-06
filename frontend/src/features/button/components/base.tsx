@@ -16,6 +16,7 @@ import LoadingSpinner from "@/components/loading-spinner";
 import { BaseButtonProps, ButtonStyle } from "@/features/button/props";
 import HotkeyBadge from "@/features/system-feedback/hotkeys/components/hotkey-badge";
 import PowerkeyTooltip from "@/features/system-feedback/hotkeys/components/powerkey-tooltip";
+import { SHORTCUT_MODE_SCOPE } from "@/features/system-feedback/hotkeys/constants";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import { cn } from "@/lib/utils/classname";
 
@@ -98,6 +99,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       enabled: !!hotkey && !disabled && !isLoading,
       preventDefault: true,
       eventListenerOptions: { capture: true },
+      scopes: hotkey?.type === "shortcut" ? [SHORTCUT_MODE_SCOPE] : undefined,
       ...hotkey?.options,
     });
 
@@ -133,18 +135,21 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         className: cn("h-6 w-6 p-0.5", loadingHideClass),
       });
 
-    const { badgeDisplay = "button" } = hotkey ?? {};
-    const hotkeyBadge = hotkey && badgeDisplay === "button" && (
-      <div className={cn("ml-1 hidden md:block", loadingHideClass)}>
-        <HotkeyBadge
-          hotkey={hotkey.keys}
-          keyClassName={cn(hotkeyClasses, hotkey.baseClassName)}
-          litKeyClassName={cn(litHotkeyClasses, hotkey.litClassName)}
-        />
-      </div>
-    );
+    const { badgeDisplay = "button", type: hotkeyType = "normal" } =
+      hotkey ?? {};
+    const hotkeyBadge = hotkey &&
+      hotkeyType === "normal" &&
+      badgeDisplay === "button" && (
+        <div className={cn("ml-1 hidden md:block", loadingHideClass)}>
+          <HotkeyBadge
+            hotkey={hotkey.keys}
+            keyClassName={cn(hotkeyClasses, hotkey.baseClassName)}
+            litKeyClassName={cn(litHotkeyClasses, hotkey.litClassName)}
+          />
+        </div>
+      );
     const powerkeyTooltip =
-      hotkey && badgeDisplay === "powerkey tooltip" ? (
+      hotkey && hotkeyType === "shortcut" ? (
         <PowerkeyTooltip hotkey={hotkey.keys} disabled={tooltipOpen}>
           <div className="pointer-events-none absolute inset-0" />
         </PowerkeyTooltip>
@@ -214,7 +219,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
 
     if (tooltip != null || (hotkey && badgeDisplay === "tooltip")) {
       let tooltipContent: React.ReactNode = tooltip;
-      if (hotkey && badgeDisplay === "tooltip") {
+      if (hotkey && hotkeyType === "normal" && badgeDisplay === "tooltip") {
         tooltipContent = (
           <div className="flex flex-col items-center">
             {tooltip}

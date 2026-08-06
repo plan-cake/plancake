@@ -1,17 +1,20 @@
 import { createContext, useContext } from "react";
 
-type KeyPressedCallback = (hotkey: string) => boolean;
+type ShortcutsContextValue = {
+  shortcutMode: boolean;
+  checkKeyPressed: (hotkey: string) => boolean;
+};
 
-export const PressedKeysContext = createContext<KeyPressedCallback | null>(
+export const ShortcutsContext = createContext<ShortcutsContextValue | null>(
   null,
 );
 
-export function usePressedKeys() {
-  const context = useContext(PressedKeysContext);
+export function useShortcuts() {
+  const context = useContext(ShortcutsContext);
   if (!context) {
-    throw new Error("usePressedKeys must be used within a PressedKeysProvider");
+    throw new Error("useShortcuts must be used within a ShortcutsProvider");
   }
   return context;
 }
 
-export default PressedKeysContext;
+export default ShortcutsContext;

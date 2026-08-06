@@ -1,13 +1,61 @@
 import { useEffect, useRef, useState } from "react";
 
-import PressedKeysContext from "@/features/system-feedback/hotkeys/context";
+import { useHotkeys, useHotkeysContext } from "react-hotkeys-hook";
+
+import { SHORTCUT_MODE_SCOPE } from "@/features/system-feedback/hotkeys/constants";
+import ShortcutsContext from "@/features/system-feedback/hotkeys/context";
 import { isAppleOs } from "@/lib/utils/is-apple-os";
 
-export function PressedKeysProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
+  // Shortcut mode toggle
+  const { toggleScope, activeScopes } = useHotkeysContext();
+  useHotkeys(
+    "mod+k",
+    () => {
+      // remove focus from any input elements
+      const activeElement = document.activeElement as HTMLElement | null;
+      if (
+        activeElement &&
+        (["INPUT", "TEXTAREA", "SELECT"].includes(activeElement.tagName) ||
+          activeElement?.isContentEditable)
+      ) {
+        activeElement.blur();
+      }
+
+      toggleScope(SHORTCUT_MODE_SCOPE);
+    },
+    {
+      enableOnContentEditable: true,
+      enableOnFormTags: true,
+      preventDefault: true,
+    },
+  );
+  useHotkeys(
+    "esc",
+    () => {
+      toggleScope(SHORTCUT_MODE_SCOPE);
+      console.log("active scopes", activeScopes);
+    },
+    {
+      enableOnContentEditable: true,
+      preventDefault: true,
+      scopes: [SHORTCUT_MODE_SCOPE],
+    },
+  );
+  useEffect(() => {
+    // also cancel shortcut mode if the user clicks anywhere
+    const handleClick = () => {
+      if (activeScopes.includes(SHORTCUT_MODE_SCOPE)) {
+        toggleScope(SHORTCUT_MODE_SCOPE);
+      }
+    };
+    window.addEventListener("click", handleClick);
+    return () => {
+      window.removeEventListener("click", handleClick);
+    };
+  }, [activeScopes, toggleScope]);
+
+  // Key press tracking
   const [pressedModifiers, setPressedModifiers] = useState<{
     mod: boolean;
     shift: boolean;
@@ -112,8 +160,13 @@ export function PressedKeysProvider({
   };
 
   return (
-    <PressedKeysContext.Provider value={checkKeyPressed}>
+    <ShortcutsContext.Provider
+      value={{
+        shortcutMode: activeScopes.includes(SHORTCUT_MODE_SCOPE),
+        checkKeyPressed,
+      }}
+    >
       {children}
-    </PressedKeysContext.Provider>
+    </ShortcutsContext.Provider>
   );
 }

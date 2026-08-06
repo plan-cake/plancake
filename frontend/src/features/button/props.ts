@@ -14,9 +14,9 @@ export type ButtonStyle =
 
 type ButtonType = "action" | "link" | "empty";
 
-type HotkeyBadgeDisplay = "button" | "tooltip" | "powerkey tooltip" | "none";
+type HotkeyBadgeDisplay = "button" | "tooltip" | "none";
 
-type HotkeyOptions = {
+type BaseHotkeyOptions = {
   /** The keyboard shortcut to trigger the button. */
   keys: string;
   /** Additional classNames to apply to the hotkey badge, for further customization. */
@@ -24,9 +24,18 @@ type HotkeyOptions = {
   litClassName?: string;
   /** Additional options to pass to the useHotkeys hook. */
   options?: Options;
-  /** Determines how the hotkey badge is displayed. */
-  badgeDisplay?: HotkeyBadgeDisplay;
 };
+
+type HotkeyOptions =
+  | (BaseHotkeyOptions & {
+      type?: "normal";
+      /** Determines how the hotkey badge is displayed. */
+      badgeDisplay?: HotkeyBadgeDisplay;
+    })
+  | (BaseHotkeyOptions & {
+      type: "shortcut";
+      badgeDisplay?: never;
+    });
 
 export type BaseButtonProps = {
   /**

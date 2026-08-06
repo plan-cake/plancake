@@ -94,8 +94,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       label={(currentUser ? "Edit" : "Add") + " Availability"}
       href={`/${eventCode}/painting`}
       hotkey={{
-        keys: "mod+alt+a",
-        badgeDisplay: "powerkey tooltip",
+        keys: "a",
+        type: "shortcut",
       }}
     />
   );
@@ -109,8 +109,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       hotkey={
         desktop
           ? {
-              keys: "mod+alt+e",
-              badgeDisplay: "powerkey tooltip",
+              keys: "e",
+              type: "shortcut",
             }
           : undefined
       }
@@ -127,8 +127,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           icon={<ShareIcon />}
           label="Share Event"
           hotkey={{
-            keys: "mod+alt+s",
-            badgeDisplay: "powerkey tooltip",
+            keys: "s",
+            type: "shortcut",
           }}
         />
       }

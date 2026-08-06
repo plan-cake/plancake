@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import HotkeyBadge from "@/features/system-feedback/hotkeys/components/hotkey-badge";
-import { usePressedKeys } from "@/features/system-feedback/hotkeys/context";
+import { useShortcuts } from "@/features/system-feedback/hotkeys/context";
 import Tooltip, { TooltipSide } from "@/features/system-feedback/tooltip/base";
-
-const POWERKEY_COMBO = ["mod", "alt"];
 
 export default function PowerkeyTooltip({
   side,
@@ -19,42 +15,19 @@ export default function PowerkeyTooltip({
   children: React.ReactNode;
   disabled?: boolean;
 }) {
-  if (!hotkey.startsWith(POWERKEY_COMBO.join("+"))) {
-    throw new Error(
-      "PowerkeyTooltip only supports hotkeys starting with 'mod+alt'",
-    );
-  }
-
-  const isPressed = usePressedKeys();
-  const secretComboPressed =
-    isPressed(POWERKEY_COMBO[0]) && isPressed(POWERKEY_COMBO[1]);
-  const restOfHotkey = hotkey.split("+").slice(2).join("+");
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    if (secretComboPressed) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, 500);
-
-      return () => clearTimeout(timer);
-    } else {
-      setIsOpen(false);
-    }
-  }, [secretComboPressed]);
+  const { shortcutMode } = useShortcuts();
 
   return (
     <Tooltip
       side={side}
       content={
         <HotkeyBadge
-          hotkey={restOfHotkey}
+          hotkey={hotkey}
           keyClassName="text-background border-background"
           litKeyClassName="text-background/50 border-background/50"
         />
       }
-      open={isOpen && !disabled}
+      open={shortcutMode && !disabled}
     >
       {children}
     </Tooltip>

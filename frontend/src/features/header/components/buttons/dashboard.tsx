@@ -15,8 +15,8 @@ export default function DashboardButton() {
         href="/dashboard"
         tooltip="Dashboard"
         hotkey={{
-          keys: "mod+alt+d",
-          badgeDisplay: "powerkey tooltip",
+          keys: "d",
+          type: "shortcut",
         }}
       />
     </ShrinkingHeaderButton>
