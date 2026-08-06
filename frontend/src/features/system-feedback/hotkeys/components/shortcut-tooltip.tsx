@@ -8,11 +8,13 @@ export default function ShortcutTooltip({
   side,
   hotkey,
   children,
+  allowCollisions = false,
   disabled,
 }: {
   side?: TooltipSide;
   hotkey: string;
   children: React.ReactNode;
+  allowCollisions?: boolean;
   disabled?: boolean;
 }) {
   const { shortcutMode } = useShortcuts();
@@ -27,6 +29,7 @@ export default function ShortcutTooltip({
           litKeyClassName="text-background/50 border-background/50"
         />
       }
+      allowCollisions={allowCollisions}
       open={shortcutMode && !disabled}
     >
       {children}

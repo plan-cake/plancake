@@ -20,6 +20,12 @@ type TooltipProps = {
    */
   maxHeight?: string;
   /**
+   * Whether the tooltip should allow collisions with the edge of the screen.
+   *
+   * Default to false.
+   */
+  allowCollisions?: boolean;
+  /**
    * Controlled open state for the tooltip.
    */
   open?: boolean;
@@ -37,6 +43,7 @@ export default function Tooltip({
   side = "bottom",
   content,
   maxHeight,
+  allowCollisions = false,
   open,
   onOpenChange,
   children,
@@ -49,6 +56,7 @@ export default function Tooltip({
           side={side}
           align="center"
           sideOffset={4}
+          avoidCollisions={!allowCollisions}
           className={cn(
             "bg-foreground text-background text-sm",
             "max-w-screen z-[100] rounded-2xl",
