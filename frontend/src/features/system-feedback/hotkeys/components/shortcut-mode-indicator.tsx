@@ -14,9 +14,9 @@ export default function ShortcutModeIndicator() {
     <AnimatePresence>
       {shortcutMode && (
         <motion.div
-          initial={{ opacity: 0, y: 5 }}
+          initial={{ opacity: 0, y: 2 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 5 }}
+          exit={{ opacity: 0, y: 2 }}
           transition={{ duration: 0.15 }}
           className={cn(
             "fixed bottom-4 left-1/2 z-[500] -translate-x-1/2",
