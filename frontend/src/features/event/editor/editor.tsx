@@ -61,8 +61,8 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
   const [mobileTab, setMobileTab] = useState<SegmentedControlOption>("details");
 
-  // FORM VALIDATION
-  const isFormValid = useMemo(() => {
+  // CHECK FIELDS
+  const fieldsFilled = useMemo(() => {
     if (!title || !title.trim() || title.length > MAX_TITLE_LENGTH) {
       return false;
     }
@@ -85,9 +85,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
     if (type === "edit" && initialData) {
       const isTitleUnchanged = title.trim() === initialData.title.trim();
-      const isRangeUnchanged =
-        JSON.stringify(eventRange) === JSON.stringify(initialData.eventRange);
-
+      const isRangeUnchanged = eventRange === initialData.originalEventRange;
       if (isTitleUnchanged && isRangeUnchanged) {
         return false;
       }
@@ -131,12 +129,24 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       href={`/${initialData?.customCode}`}
     />
   );
+
+  const desktopSubmitTooltip = useMemo(() => {
+    if (fieldsFilled) return undefined;
+
+    if (type === "edit") {
+      return "Make changes to update the event.";
+    }
+
+    return "Please fill out all fields.";
+  }, [fieldsFilled, type]);
+
   const desktopSubmitButton = (
     <ActionButton
       buttonStyle="primary"
       label={type === "edit" ? "Update Event" : "Create Event"}
+      tooltip={desktopSubmitTooltip}
       onClick={submitEventInfo}
-      disabled={!isFormValid}
+      disabled={!fieldsFilled}
       loadOnSuccess
     />
   );

@@ -33,8 +33,8 @@ export default function Page() {
     return Object.values(passwordCriteria).every((value) => value === true);
   }, [passwordCriteria]);
 
-  // FORM VALIDATION
-  const isFormValid = useMemo(() => {
+  // CHECK FIELDS
+  const fieldsFilled = useMemo(() => {
     if (!email || !email.trim()) {
       return false;
     }
@@ -166,8 +166,9 @@ export default function Page() {
         <ActionButton
           buttonStyle="primary"
           label="Register"
+          tooltip={fieldsFilled ? undefined : "Please fill out all the fields."}
           onClick={handleSubmit}
-          disabled={!isMobile && !isFormValid}
+          disabled={!isMobile && !fieldsFilled}
           loadOnSuccess
         />
       </div>

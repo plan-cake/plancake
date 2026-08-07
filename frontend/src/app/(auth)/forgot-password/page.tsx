@@ -25,8 +25,8 @@ export default function Page() {
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
-  // FORM VALIDATION
-  const isFormValid = useMemo(() => {
+  // CHECK FIELDS
+  const fieldsFilled = useMemo(() => {
     if (!email || !email.trim()) {
       return false;
     }
@@ -101,8 +101,11 @@ export default function Page() {
             <ActionButton
               buttonStyle="primary"
               label="Send Link"
+              tooltip={
+                fieldsFilled ? undefined : "Enter a valid email address."
+              }
               onClick={handleSubmit}
-              disabled={!isMobile && !isFormValid}
+              disabled={!isMobile && !fieldsFilled}
               loadOnSuccess
             />
           </div>
