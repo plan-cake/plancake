@@ -16,6 +16,7 @@ export type TextInputFieldProps = {
   onChange: (value: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  autoFocus?: boolean;
   style?: FieldStyle;
   error?: string;
   className?: string;
@@ -37,6 +38,7 @@ export default function TextInputField(props: TextInputFieldProps) {
     onChange,
     onFocus,
     onBlur,
+    autoFocus = false,
     error,
     style,
     className,
@@ -125,6 +127,7 @@ export default function TextInputField(props: TextInputFieldProps) {
           type={inputType}
           id={id}
           value={value}
+          autoFocus={autoFocus}
           onChange={(e) => onChange(e.target.value)}
           onFocus={onFocus}
           onBlur={onBlur}
