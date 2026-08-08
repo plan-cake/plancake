@@ -58,10 +58,14 @@ export default function ShortcutModeIndicator() {
                 ease: "easeOut",
                 opacity: { delay: 0.3 },
               }}
+              className="flex flex-col items-center"
             >
               <div className="flex flex-nowrap items-center gap-1 overflow-hidden text-nowrap text-sm opacity-75">
-                Press <HotkeyBadge hotkey="esc" keyClassName="scale-85" /> or
-                click anywhere to exit.
+                Trigger an action with one of the displayed keys.
+              </div>
+              <div className="flex flex-nowrap items-center gap-1 overflow-hidden text-nowrap text-sm opacity-75">
+                Press <HotkeyBadge hotkey="esc" keyClassName="text-xs p-0.5" />{" "}
+                or click anywhere to exit.
               </div>
             </motion.div>
           )}
