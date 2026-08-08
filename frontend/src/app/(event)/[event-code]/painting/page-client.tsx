@@ -229,11 +229,12 @@ export default function ClientPage({
   };
 
   // BUTTONS
-  const cancelButton = (
+  const cancelButton = (desktop: boolean) => (
     <LinkButton
       buttonStyle="transparent"
       label={initialData?.display_name ? "Cancel Edits" : "Cancel"}
       href={`/${eventCode}`}
+      hotkey={desktop ? { keys: "c", type: "shortcut" } : undefined}
     />
   );
   const submitButton = (desktop: boolean) => (
@@ -263,7 +264,7 @@ export default function ClientPage({
       <div className="flex w-full flex-wrap justify-between md:flex-row">
         <h1 className="text-2xl font-bold">{eventName}</h1>
         <div className="hidden items-center gap-2 md:flex">
-          {cancelButton}
+          {cancelButton(true)}
           {submitButton(true)}
         </div>
       </div>
@@ -320,7 +321,7 @@ export default function ClientPage({
       {/* This z-index is necessary to avoid the time column overlapping */}
       <div className="z-10">
         <MobileFooterIsland
-          leftButtons={[cancelButton]}
+          leftButtons={[cancelButton(false)]}
           rightButtons={[submitButton(false)]}
         >
           <div className="mx-3 -mt-2">
