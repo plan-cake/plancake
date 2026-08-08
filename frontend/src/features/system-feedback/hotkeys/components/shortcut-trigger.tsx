@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils/classname";
 
 export default function ShortcutTrigger({
   hotkey,
+  selector,
   onAction,
   tooltipSide,
   allowTooltipCollisions = false,
@@ -17,6 +18,7 @@ export default function ShortcutTrigger({
   className,
 }: {
   hotkey: string;
+  selector?: string;
   onAction?: () => void;
   tooltipSide?: TooltipSide;
   allowTooltipCollisions?: boolean;
@@ -30,7 +32,12 @@ export default function ShortcutTrigger({
     if (onAction) {
       onAction();
     } else {
-      const targetEl = wrapperRef.current?.firstElementChild as HTMLElement;
+      let targetEl: HTMLElement | null = null;
+      if (selector) {
+        targetEl = wrapperRef.current?.querySelector(selector) as HTMLElement;
+      } else {
+        targetEl = wrapperRef.current?.firstElementChild as HTMLElement;
+      }
       if (targetEl) {
         targetEl.click();
       }
