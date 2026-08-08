@@ -40,6 +40,7 @@ export default function ShortcutTrigger({
       }
       if (targetEl) {
         targetEl.click();
+        targetEl.focus();
       }
     }
     endShortcutMode();
@@ -47,6 +48,7 @@ export default function ShortcutTrigger({
 
   useHotkeys(hotkey, handleShortcut, {
     scopes: [SHORTCUT_MODE_SCOPE],
+    preventDefault: true,
   });
 
   return (
