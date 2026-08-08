@@ -53,11 +53,10 @@ export default function ShortcutModeIndicator() {
             <motion.div
               initial={{ opacity: 0, height: 0, width: 100 }}
               animate={{ opacity: 1, height: "auto", width: "auto" }}
-              exit={{ opacity: 0, height: "auto", width: "auto" }}
               transition={{
-                duration: 0.2,
+                duration: 0.3,
                 ease: "easeOut",
-                opacity: { delay: 0.2 },
+                opacity: { delay: 0.3 },
               }}
             >
               <div className="flex flex-nowrap items-center gap-1 overflow-hidden text-nowrap text-sm opacity-75">
