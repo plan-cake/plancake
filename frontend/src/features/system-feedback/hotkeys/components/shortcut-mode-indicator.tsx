@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { ZapIcon } from "lucide-react";
 
@@ -9,6 +11,25 @@ import { cn } from "@/lib/utils/classname";
 
 export default function ShortcutModeIndicator() {
   const { shortcutMode } = useShortcuts();
+  const [subtextVisible, setSubtextVisible] = useState(false);
+  const subtextTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (shortcutMode) {
+      subtextTimeout.current = setTimeout(() => {
+        setSubtextVisible(true);
+      }, 2000);
+    } else {
+      setSubtextVisible(false);
+    }
+
+    return () => {
+      if (subtextTimeout.current) {
+        clearTimeout(subtextTimeout.current);
+        subtextTimeout.current = null;
+      }
+    };
+  }, [shortcutMode]);
 
   return (
     <AnimatePresence>
@@ -28,10 +49,23 @@ export default function ShortcutModeIndicator() {
             <ZapIcon className="h-5 w-5" strokeWidth={2} />
             Shortcut Mode
           </span>
-          <div className="flex items-center gap-1 text-sm opacity-75">
-            Press <HotkeyBadge hotkey="esc" keyClassName="scale-85" /> or click
-            anywhere to exit.
-          </div>
+          {subtextVisible && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, width: 100 }}
+              animate={{ opacity: 1, height: "auto", width: "auto" }}
+              exit={{ opacity: 0, height: "auto", width: "auto" }}
+              transition={{
+                duration: 0.2,
+                ease: "easeOut",
+                opacity: { delay: 0.2 },
+              }}
+            >
+              <div className="flex flex-nowrap items-center gap-1 overflow-hidden text-nowrap text-sm opacity-75">
+                Press <HotkeyBadge hotkey="esc" keyClassName="scale-85" /> or
+                click anywhere to exit.
+              </div>
+            </motion.div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>
