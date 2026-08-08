@@ -22,11 +22,15 @@ export default function EventGrid({ events, onDeleteEvent }: EventGridProps) {
           <DashboardEvent key={data.code} onDelete={onDelete} {...data} />
         );
 
-        if (index < 9) {
+        if (index < 10) {
+          let hotkey = (index + 1).toString();
+          if (index === 9) {
+            hotkey = "0";
+          }
           return (
             <ShortcutTrigger
               key={data.code}
-              hotkey={(index + 1).toString()}
+              hotkey={hotkey}
               tooltipSide="top"
               allowTooltipCollisions
             >
