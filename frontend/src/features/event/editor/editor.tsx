@@ -23,6 +23,7 @@ import { ScheduleGrid } from "@/features/event/grid";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { RateLimitBanner } from "@/features/system-feedback";
+import ShortcutTrigger from "@/features/system-feedback/hotkeys/components/shortcut-trigger";
 import { MESSAGES } from "@/lib/messages";
 import submitEvent from "@/lib/utils/api/submit-event";
 import { cn } from "@/lib/utils/classname";
@@ -126,20 +127,26 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
       <div className="-mb-1 flex w-full items-center justify-between">
         <div className="mb-4 w-full md:w-1/2">
-          <TextInputField
-            id={"event-name"}
-            type="text"
-            label="Event Name"
-            value={title}
-            onChange={setTitle}
-            autoFocus
-            error={errors.title || errors.api}
-            className="text-2xl font-semibold"
-            maxLength={{
-              length: MAX_TITLE_LENGTH,
-              error: MESSAGES.ERROR_EVENT_NAME_LENGTH,
-            }}
-          />
+          <ShortcutTrigger
+            hotkey="n"
+            selector="#event-name"
+            tooltipSide="right"
+          >
+            <TextInputField
+              id={"event-name"}
+              type="text"
+              label="Event Name"
+              value={title}
+              onChange={setTitle}
+              autoFocus
+              error={errors.title || errors.api}
+              className="text-2xl font-semibold"
+              maxLength={{
+                length: MAX_TITLE_LENGTH,
+                error: MESSAGES.ERROR_EVENT_NAME_LENGTH,
+              }}
+            />
+          </ShortcutTrigger>
         </div>
         <div className="hidden gap-2 md:flex">
           {type === "edit" && cancelButton}
@@ -165,23 +172,35 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           </p>
           <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
             <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
-              <TimeSelector
-                id="from-time-dropdown"
-                value={eventRange.timeRange.from}
-                onChange={setStartTime}
-                placeholder="Start Time"
-                dialogTitle="Select Start Time"
-              />
+              <ShortcutTrigger
+                hotkey="s"
+                selector="#from-time-dropdown"
+                tooltipSide="right"
+              >
+                <TimeSelector
+                  id="from-time-dropdown"
+                  value={eventRange.timeRange.from}
+                  onChange={setStartTime}
+                  placeholder="Start Time"
+                  dialogTitle="Select Start Time"
+                />
+              </ShortcutTrigger>
             </FormSelectorField>
 
             <FormSelectorField label="UNTIL" htmlFor="to-time-dropdown">
-              <TimeSelector
-                id="to-time-dropdown"
-                value={eventRange.timeRange.to}
-                onChange={setEndTime}
-                placeholder="End Time"
-                dialogTitle="Select End Time"
-              />
+              <ShortcutTrigger
+                hotkey="e"
+                selector="#to-time-dropdown"
+                tooltipSide="right"
+              >
+                <TimeSelector
+                  id="to-time-dropdown"
+                  value={eventRange.timeRange.to}
+                  onChange={setEndTime}
+                  placeholder="End Time"
+                  dialogTitle="Select End Time"
+                />
+              </ShortcutTrigger>
             </FormSelectorField>
           </div>
         </div>

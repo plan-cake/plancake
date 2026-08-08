@@ -7,6 +7,7 @@ import { useDebouncedCallback } from "use-debounce";
 import InfoPoint from "@/components/info-point";
 import { useEventContext } from "@/core/event/context";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
+import ShortcutTrigger from "@/features/system-feedback/hotkeys/components/shortcut-trigger";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -23,23 +24,30 @@ export default function AdvancedOptions(props: AdvancedOptionsProps) {
   return (
     <Collapsible.Root open={open} onOpenChange={setOpen}>
       <Collapsible.Trigger asChild>
-        <div
-          className={cn(
-            "group flex w-fit cursor-pointer items-center gap-2 rounded-full",
-            "bg-panel p-2 pr-4",
-          )}
+        <ShortcutTrigger
+          hotkey="a"
+          onAction={() => setOpen(!open)}
+          tooltipSide="right"
+          className="w-fit"
         >
           <div
             className={cn(
-              "transition-transform duration-200",
-              "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
-              open && "rotate-90",
+              "group flex w-fit cursor-pointer items-center gap-2 rounded-full",
+              "bg-panel p-2 pr-4",
             )}
           >
-            <ChevronRightIcon className="h-4 w-4" />
+            <div
+              className={cn(
+                "transition-transform duration-200",
+                "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
+                open && "rotate-90",
+              )}
+            >
+              <ChevronRightIcon className="h-4 w-4" />
+            </div>
+            <span>Advanced Options</span>
           </div>
-          <span>Advanced Options</span>
-        </div>
+        </ShortcutTrigger>
       </Collapsible.Trigger>
 
       <Collapsible.Content className="collapsible-content mt-2 flex flex-col gap-2">
@@ -103,13 +111,17 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
         <label htmlFor="timezone-select" className="font-bold">
           Timezone
         </label>
-        <div>
+        <ShortcutTrigger
+          hotkey="z"
+          selector="#timezone-select"
+          tooltipSide="right"
+        >
           <TimeZoneSelector
             id="timezone-select"
             value={eventRange.timezone}
             onChange={setTimezone}
           />
-        </div>
+        </ShortcutTrigger>
       </div>
 
       <div className="flex flex-col gap-1">
@@ -137,20 +149,22 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
             <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
         </div>
-        <input
-          id="custom-code-input"
-          type="text"
-          value={customCode}
-          onChange={handleCustomCodeChange}
-          placeholder="optional"
-          disabled={isEditing}
-          className={cn(
-            "border-b-1 border-foreground/60 w-full focus:outline-none",
-            !isEditing && "text-accent-text",
-            isEditing && "cursor-not-allowed opacity-50",
-            errors.customCode ? "border-error placeholder:text-error" : "",
-          )}
-        />
+        <ShortcutTrigger hotkey="c" tooltipSide="right">
+          <input
+            id="custom-code-input"
+            type="text"
+            value={customCode}
+            onChange={handleCustomCodeChange}
+            placeholder="optional"
+            disabled={isEditing}
+            className={cn(
+              "border-b-1 border-foreground/60 w-full focus:outline-none",
+              !isEditing && "text-accent-text",
+              isEditing && "cursor-not-allowed opacity-50",
+              errors.customCode ? "border-error placeholder:text-error" : "",
+            )}
+          />
+        </ShortcutTrigger>
       </div>
     </>
   );
