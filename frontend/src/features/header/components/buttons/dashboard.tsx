@@ -15,7 +15,7 @@ export default function DashboardButton() {
         href="/dashboard"
         tooltip="Dashboard"
         hotkey={{
-          keys: "d",
+          keys: "shift+d",
           type: "shortcut",
         }}
       />

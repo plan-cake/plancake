@@ -27,7 +27,7 @@ export default function NewEventButton() {
         shrinkOnMobile
         href="/new-event"
         hotkey={{
-          keys: "n",
+          keys: "shift+n",
           type: "shortcut",
         }}
       />
