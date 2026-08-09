@@ -21,6 +21,7 @@ import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import ShareMenu from "@/features/share-menu/menu";
 import { cn } from "@/lib/utils/classname";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 export default function ClientPage({
   eventData,
@@ -65,6 +66,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   };
 
   /* MOBILE DRAWER SPACING */
+  const isMobile = useCheckMobile();
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);
   const getSpacerHeight = () => {
     const defaultHeight = "25svh";
@@ -179,17 +181,16 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         </div>
 
         {/* Mobile Spacer & Drawer */}
-        <div
-          className="w-full md:hidden"
-          style={{ height: getSpacerHeight() }}
-        />
-        <div className="md:hidden">
-          <AttendeesDrawer
-            onSnapChange={setDrawerSnap}
-            eventTitle={eventTitle}
-            eventCode={eventCode}
-          />
-        </div>
+        {isMobile && (
+          <>
+            <div className="w-full" style={{ height: getSpacerHeight() }} />
+            <AttendeesDrawer
+              onSnapChange={setDrawerSnap}
+              eventTitle={eventTitle}
+              eventCode={eventCode}
+            />
+          </>
+        )}
 
         {/* Desktop Sidebar */}
         <div
