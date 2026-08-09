@@ -64,7 +64,12 @@ export default function ShortcutModeIndicator() {
                 Trigger an action with one of the displayed keys.
               </div>
               <div className="flex flex-nowrap items-center gap-1 overflow-hidden text-nowrap text-sm opacity-75">
-                Press <HotkeyBadge hotkey="esc" keyClassName="text-xs p-0.5" />{" "}
+                Press{" "}
+                <HotkeyBadge
+                  hotkey="escape"
+                  keyClassName="text-xs p-0.5"
+                  litKeyClassName="text-xs p-0.5"
+                />{" "}
                 or click anywhere to exit.
               </div>
             </motion.div>

@@ -58,7 +58,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
     },
   );
   useHotkeys(
-    "esc",
+    "escape",
     () => {
       endShortcutMode(true);
     },
