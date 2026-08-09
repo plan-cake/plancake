@@ -23,6 +23,7 @@ import {
   RateLimitBanner,
   useToast,
 } from "@/features/system-feedback";
+import ShortcutTrigger from "@/features/system-feedback/hotkeys/components/shortcut-trigger";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -275,6 +276,7 @@ export default function ClientPage({
         <div className="hidden w-80 shrink-0 space-y-4 md:block">
           <DisplayNameInput
             errors={errors}
+            useShortcut={true}
             session={session}
             displayName={displayName}
             handleNameChange={handleNameChange}
@@ -329,6 +331,7 @@ export default function ClientPage({
           <div className="mx-3 -mt-2">
             <DisplayNameInput
               errors={errors}
+              useShortcut={false}
               session={session}
               displayName={displayName}
               handleNameChange={handleNameChange}
@@ -371,6 +374,7 @@ export default function ClientPage({
 
 function DisplayNameInput({
   errors,
+  useShortcut,
   session,
   displayName,
   handleNameChange,
@@ -378,31 +382,47 @@ function DisplayNameInput({
   setSaveDefaultName,
 }: {
   errors: Record<string, string>;
+  useShortcut: boolean;
   session: Session;
   displayName: string;
   handleNameChange: (name: string) => void;
   saveDefaultName: boolean;
   setSaveDefaultName: (save: boolean) => void;
 }) {
+  const displayNameField = (
+    <TextInputField
+      id="displayName"
+      type="text"
+      label="Display name"
+      style="inline"
+      value={displayName}
+      onChange={handleNameChange}
+      placeholder="add your name"
+      error={errors.displayName}
+      maxLength={{
+        length: MAX_DISPLAY_NAME_LENGTH,
+        error: MESSAGES.ERROR_NAME_LENGTH,
+      }}
+    />
+  );
+
   return (
     <div className="h-fit w-full shrink-0 space-y-4 overflow-y-auto md:w-80">
       <div className="space-y-2">
         <div className="w-fit">
           Hi,{" "}
-          <TextInputField
-            id="displayName"
-            type="text"
-            label="Display name"
-            style="inline"
-            value={displayName}
-            onChange={handleNameChange}
-            placeholder="add your name"
-            error={errors.displayName}
-            maxLength={{
-              length: MAX_DISPLAY_NAME_LENGTH,
-              error: MESSAGES.ERROR_NAME_LENGTH,
-            }}
-          />
+          {useShortcut ? (
+            <ShortcutTrigger
+              hotkey="n"
+              selector="#displayName"
+              tooltipSide="right"
+              className="inline w-fit"
+            >
+              {displayNameField}
+            </ShortcutTrigger>
+          ) : (
+            displayNameField
+          )}
           <br />
           add your availabilities here
         </div>
