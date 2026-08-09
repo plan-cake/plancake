@@ -139,7 +139,6 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
               label="Event Name"
               value={title}
               onChange={setTitle}
-              autoFocus
               error={errors.title || errors.api}
               className="text-2xl font-semibold"
               maxLength={{

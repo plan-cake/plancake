@@ -397,7 +397,6 @@ function DisplayNameInput({
       style="inline"
       value={displayName}
       onChange={handleNameChange}
-      autoFocus
       placeholder="add your name"
       error={errors.displayName}
       maxLength={{
