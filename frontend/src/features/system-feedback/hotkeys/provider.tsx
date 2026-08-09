@@ -34,16 +34,21 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   useHotkeys(
     "mod+k",
     () => {
-      // remove focus from any elements
-      const activeElement = document.activeElement as HTMLElement | null;
-      if (activeElement) {
-        lastFocus.current = activeElement;
-        activeElement.blur();
+      if (shortcutMode) {
+        endShortcutMode(true);
+        return;
+      } else {
+        // remove focus from any elements
+        const activeElement = document.activeElement as HTMLElement | null;
+        if (activeElement) {
+          lastFocus.current = activeElement;
+          activeElement.blur();
+        }
+
+        pathOnActivate.current = pathname;
+
+        toggleScope(SHORTCUT_MODE_SCOPE);
       }
-
-      pathOnActivate.current = pathname;
-
-      toggleScope(SHORTCUT_MODE_SCOPE);
     },
     {
       enableOnContentEditable: true,
