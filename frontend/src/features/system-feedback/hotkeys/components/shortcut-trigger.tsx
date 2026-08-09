@@ -14,6 +14,7 @@ export default function ShortcutTrigger({
   onAction,
   tooltipSide,
   allowTooltipCollisions = false,
+  disabled = false,
   children,
   className,
 }: {
@@ -22,6 +23,7 @@ export default function ShortcutTrigger({
   onAction?: () => void;
   tooltipSide?: TooltipSide;
   allowTooltipCollisions?: boolean;
+  disabled?: boolean;
   children: React.ReactNode;
   className?: string;
 }) {
@@ -49,6 +51,7 @@ export default function ShortcutTrigger({
   useHotkeys(hotkey, handleShortcut, {
     scopes: [SHORTCUT_MODE_SCOPE],
     preventDefault: true,
+    enabled: !disabled,
   });
 
   return (
@@ -58,6 +61,7 @@ export default function ShortcutTrigger({
         hotkey={hotkey}
         side={tooltipSide}
         allowCollisions={allowTooltipCollisions}
+        disabled={disabled}
       >
         <div className="pointer-events-none absolute inset-0" />
       </ShortcutTooltip>
