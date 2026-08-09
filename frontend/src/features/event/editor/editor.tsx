@@ -90,11 +90,12 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   };
 
   // REUSED COMPONENTS
-  const cancelButton = (
+  const cancelButton = (desktop: boolean) => (
     <LinkButton
       buttonStyle="transparent"
       label="Cancel Edits"
       href={`/${initialData?.customCode}`}
+      hotkey={desktop ? { keys: "c", type: "shortcut" } : undefined}
     />
   );
   const submitButton = (desktop: boolean) => (
@@ -149,7 +150,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           </ShortcutTrigger>
         </div>
         <div className="hidden gap-2 md:flex">
-          {type === "edit" && cancelButton}
+          {type === "edit" && cancelButton(true)}
           {submitButton(true)}
         </div>
       </div>
@@ -230,7 +231,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       {/* This z-index is necessary to avoid the time column overlapping */}
       <div className="z-10">
         <MobileFooterIsland
-          leftButtons={type === "edit" ? [cancelButton] : undefined}
+          leftButtons={type === "edit" ? [cancelButton(false)] : undefined}
           rightButtons={[submitButton(false)]}
         >
           <SegmentedControl
