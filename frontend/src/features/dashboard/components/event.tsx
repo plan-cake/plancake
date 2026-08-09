@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { EventType } from "@/core/event/types";
-import DashboardCopyButton from "@/features/dashboard/components/copy-button";
 import DateRangeRow from "@/features/dashboard/components/date-range-row";
 import ParticipantRow from "@/features/dashboard/components/participant-row";
+import DashboardShareButton from "@/features/dashboard/components/share-button";
 import WeekdayRow from "@/features/dashboard/components/weekday-row";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
@@ -184,7 +184,7 @@ export default function DashboardEvent({
         <ParticipantRow participants={participants} numIcons={numIcons} />
       </div>
       <div data-actions className="mt-2.5 flex items-center gap-2">
-        <DashboardCopyButton code={code} />
+        <DashboardShareButton title={title} code={code} />
         {myEvent && (
           <>
             <Tooltip content="Edit Event">
