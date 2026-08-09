@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { usePathname } from "next/navigation";
 import { useHotkeys, useHotkeysContext } from "react-hotkeys-hook";
 
 import { SHORTCUT_MODE_SCOPE } from "@/features/system-feedback/hotkeys/constants";
@@ -13,6 +14,8 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   // Shortcut mode toggle
   const { disableScope, toggleScope, activeScopes } = useHotkeysContext();
   const lastFocus = useRef<HTMLElement | null>(null);
+  const pathname = usePathname();
+  const pathOnActivate = useRef<string | null>(null);
 
   const shortcutMode = activeScopes.includes(SHORTCUT_MODE_SCOPE);
   const isMobile = useCheckMobile();
@@ -37,6 +40,8 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
         lastFocus.current = activeElement;
         activeElement.blur();
       }
+
+      pathOnActivate.current = pathname;
 
       toggleScope(SHORTCUT_MODE_SCOPE);
     },
@@ -82,6 +87,12 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
       endShortcutMode(true);
     }
   }, [isMobile, shortcutMode, endShortcutMode]);
+  useEffect(() => {
+    // cancel shortcut mode if the page changes
+    if (shortcutMode && pathOnActivate.current !== pathname) {
+      endShortcutMode(true);
+    }
+  }, [pathname, shortcutMode, endShortcutMode]);
 
   // Key press tracking
   const [pressedModifiers, setPressedModifiers] = useState<{
