@@ -15,7 +15,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <LucideProvider absoluteStrokeWidth={true} strokeWidth={1.5}>
         <HeaderSizeProvider>
           <ToastProvider>
-            <HotkeysProvider>
+            <HotkeysProvider initiallyActiveScopes={[]}>
               <ShortcutsProvider>
                 <TooltipProvider delayDuration={300} skipDelayDuration={500}>
                   {children}
