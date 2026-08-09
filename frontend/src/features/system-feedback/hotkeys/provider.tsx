@@ -6,12 +6,17 @@ import { useHotkeys, useHotkeysContext } from "react-hotkeys-hook";
 
 import { SHORTCUT_MODE_SCOPE } from "@/features/system-feedback/hotkeys/constants";
 import ShortcutsContext from "@/features/system-feedback/hotkeys/context";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { isAppleOs } from "@/lib/utils/is-apple-os";
 
 export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   // Shortcut mode toggle
-  const lastFocus = useRef<HTMLElement | null>(null);
   const { disableScope, toggleScope, activeScopes } = useHotkeysContext();
+  const lastFocus = useRef<HTMLElement | null>(null);
+
+  const shortcutMode = activeScopes.includes(SHORTCUT_MODE_SCOPE);
+  const isMobile = useCheckMobile();
+
   const endShortcutMode = useCallback(
     (returnFocus: boolean) => {
       if (returnFocus && lastFocus.current) {
@@ -22,6 +27,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
     },
     [disableScope],
   );
+
   useHotkeys(
     "mod+k",
     () => {
@@ -38,6 +44,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
       enableOnContentEditable: true,
       enableOnFormTags: true,
       preventDefault: true,
+      enabled: !isMobile,
     },
   );
   useHotkeys(
@@ -51,10 +58,11 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
       scopes: [SHORTCUT_MODE_SCOPE],
     },
   );
+
   useEffect(() => {
-    // also cancel shortcut mode if the user clicks anywhere
+    // cancel shortcut mode if the user clicks anywhere
     const handleClickCancel = (e: MouseEvent) => {
-      if (!activeScopes.includes(SHORTCUT_MODE_SCOPE)) return;
+      if (!shortcutMode) return;
 
       const target = e.target as HTMLElement;
       const isInteractive = !!target.closest(
@@ -67,7 +75,13 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
     return () => {
       window.removeEventListener("click", handleClickCancel);
     };
-  }, [activeScopes, endShortcutMode]);
+  }, [shortcutMode, endShortcutMode]);
+  useEffect(() => {
+    // cancel shortcut mode if the user changes to mobile view
+    if (isMobile && shortcutMode) {
+      endShortcutMode(true);
+    }
+  }, [isMobile, shortcutMode, endShortcutMode]);
 
   // Key press tracking
   const [pressedModifiers, setPressedModifiers] = useState<{
@@ -176,7 +190,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   return (
     <ShortcutsContext.Provider
       value={{
-        shortcutMode: activeScopes.includes(SHORTCUT_MODE_SCOPE),
+        shortcutMode,
         endShortcutMode,
         checkKeyPressed,
       }}
