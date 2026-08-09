@@ -112,13 +112,6 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
     ];
 
     const handleKeyEvent = (e: KeyboardEvent, isDown: boolean) => {
-      const activeElement = document.activeElement as HTMLElement | null;
-      const isTyping =
-        activeElement &&
-        (["INPUT", "TEXTAREA", "SELECT"].includes(activeElement.tagName) ||
-          activeElement?.isContentEditable);
-      if (isDown && isTyping) return;
-
       setPressedModifiers({
         mod: isAppleOs() ? e.metaKey : e.ctrlKey,
         shift: e.shiftKey,

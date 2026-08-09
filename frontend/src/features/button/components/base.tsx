@@ -106,6 +106,8 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       preventDefault: true,
       eventListenerOptions: { capture: true },
       scopes: hotkey?.type === "shortcut" ? [SHORTCUT_MODE_SCOPE] : undefined,
+      enableOnContentEditable: true,
+      enableOnFormTags: true,
       ...hotkey?.options,
     });
 
