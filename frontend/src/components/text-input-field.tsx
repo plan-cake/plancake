@@ -1,8 +1,11 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 
 import { EyeClosedIcon, EyeIcon, TriangleAlertIcon } from "lucide-react";
 
 import PasswordCriteria from "@/features/auth/components/password-criteria";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 type FieldType = "text" | "email" | "password";
@@ -48,6 +51,9 @@ export default function TextInputField(props: TextInputFieldProps) {
     maxLength,
   } = props;
   const [showPassword, setShowPassword] = useState(false);
+
+  // mobile check for auto focus
+  const isMobile = useCheckMobile();
 
   // determine input type
   const isPassword = type === "password";
@@ -127,7 +133,7 @@ export default function TextInputField(props: TextInputFieldProps) {
           type={inputType}
           id={id}
           value={value}
-          autoFocus={autoFocus}
+          autoFocus={!isMobile && autoFocus}
           onChange={(e) => onChange(e.target.value)}
           onFocus={onFocus}
           onBlur={onBlur}
