@@ -151,6 +151,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         <div className={cn("ml-1 hidden md:block", loadingHideClass)}>
           <HotkeyBadge
             hotkey={hotkey.keys}
+            disabled={disabled}
             keyClassName={cn(hotkeyClasses, hotkey.baseClassName)}
             litKeyClassName={cn(litHotkeyClasses, hotkey.litClassName)}
           />
