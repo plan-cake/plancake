@@ -43,7 +43,7 @@ export default function ShortcutTrigger({
         targetEl.focus();
       }
     }
-    endShortcutMode();
+    endShortcutMode(false);
   };
 
   useHotkeys(hotkey, handleShortcut, {

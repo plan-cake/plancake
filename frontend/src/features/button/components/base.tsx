@@ -85,7 +85,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
     const { endShortcutMode } = useShortcuts();
     const hotkeyHandler = () => {
       if (hotkey?.type === "shortcut") {
-        endShortcutMode();
+        endShortcutMode(false);
       }
 
       switch (_buttontype) {

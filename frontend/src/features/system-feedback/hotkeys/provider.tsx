@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useHotkeys, useHotkeysContext } from "react-hotkeys-hook";
@@ -8,21 +10,25 @@ import { isAppleOs } from "@/lib/utils/is-apple-os";
 
 export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   // Shortcut mode toggle
+  const lastFocus = useRef<HTMLElement | null>(null);
   const { disableScope, toggleScope, activeScopes } = useHotkeysContext();
   const endShortcutMode = useCallback(
-    () => disableScope(SHORTCUT_MODE_SCOPE),
+    (returnFocus: boolean) => {
+      if (returnFocus && lastFocus.current) {
+        lastFocus.current.focus();
+      }
+      lastFocus.current = null;
+      disableScope(SHORTCUT_MODE_SCOPE);
+    },
     [disableScope],
   );
   useHotkeys(
     "mod+k",
     () => {
-      // remove focus from any input elements
+      // remove focus from any elements
       const activeElement = document.activeElement as HTMLElement | null;
-      if (
-        activeElement &&
-        (["INPUT", "TEXTAREA", "SELECT"].includes(activeElement.tagName) ||
-          activeElement?.isContentEditable)
-      ) {
+      if (activeElement) {
+        lastFocus.current = activeElement;
         activeElement.blur();
       }
 
@@ -37,7 +43,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   useHotkeys(
     "esc",
     () => {
-      endShortcutMode();
+      endShortcutMode(true);
     },
     {
       enableOnContentEditable: true,
@@ -47,10 +53,19 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   );
   useEffect(() => {
     // also cancel shortcut mode if the user clicks anywhere
-    // use a setTimeout to ensure this doesn't double-trigger with a simulated click
-    window.addEventListener("click", endShortcutMode);
+    const handleClickCancel = (e: MouseEvent) => {
+      if (!activeScopes.includes(SHORTCUT_MODE_SCOPE)) return;
+
+      const target = e.target as HTMLElement;
+      const isInteractive = !!target.closest(
+        "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])",
+      );
+
+      endShortcutMode(!isInteractive);
+    };
+    window.addEventListener("click", handleClickCancel);
     return () => {
-      window.removeEventListener("click", endShortcutMode);
+      window.removeEventListener("click", handleClickCancel);
     };
   }, [activeScopes, endShortcutMode]);
 
