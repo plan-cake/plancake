@@ -55,7 +55,7 @@ export default function ShortcutModeIndicator() {
               animate={{ opacity: 1, height: "auto", width: "auto" }}
               transition={{
                 duration: 0.3,
-                ease: "easeOut",
+                ease: "circInOut",
                 opacity: { delay: 0.3 },
               }}
               className="flex flex-col items-center"
