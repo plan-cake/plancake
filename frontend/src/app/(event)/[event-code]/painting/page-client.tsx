@@ -288,6 +288,7 @@ export default function ClientPage({
               id="timezone-select"
               value={timeZone}
               onChange={setTimeZone}
+              useShortcut={true}
             />
           </div>
         </div>
@@ -314,6 +315,7 @@ export default function ClientPage({
             id="timezone-select"
             value={timeZone}
             onChange={setTimeZone}
+            useShortcut={false}
           />
         </div>
       </div>

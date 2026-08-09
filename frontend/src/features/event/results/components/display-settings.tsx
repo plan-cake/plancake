@@ -6,10 +6,12 @@ export default function DisplaySettings({
   timezone,
   onTimezoneChange,
   drawerNesting = 0,
+  desktop,
 }: {
   timezone: string;
   onTimezoneChange: (newTZ: string) => void;
   drawerNesting?: number;
+  desktop: boolean;
 }) {
   // const { showOnlyBestTimes, setShowOnlyBestTimes } = useResultsContext();
 
@@ -27,6 +29,7 @@ export default function DisplaySettings({
         value={timezone}
         onChange={onTimezoneChange}
         drawerNesting={drawerNesting}
+        useShortcut={desktop}
       />
       {/* </div> */}
     </>

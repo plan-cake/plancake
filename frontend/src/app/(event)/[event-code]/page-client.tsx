@@ -174,6 +174,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           <DisplaySettings
             timezone={timezone}
             onTimezoneChange={handleTZChange}
+            desktop={false}
           />
         </div>
 
@@ -205,6 +206,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
               <DisplaySettings
                 timezone={timezone}
                 onTimezoneChange={handleTZChange}
+                desktop={true}
               />
             </div>
           </div>

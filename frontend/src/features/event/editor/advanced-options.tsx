@@ -120,6 +120,7 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
             id="timezone-select"
             value={eventRange.timezone}
             onChange={setTimezone}
+            useShortcut={true}
           />
         </ShortcutTrigger>
       </div>
