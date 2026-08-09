@@ -102,13 +102,13 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       }
     };
     useHotkeys(hotkey?.keys ?? "", hotkeyHandler, {
-      enabled: !!hotkey && !disabled && !isLoading,
       preventDefault: true,
       eventListenerOptions: { capture: true },
-      scopes: hotkey?.type === "shortcut" ? [SHORTCUT_MODE_SCOPE] : undefined,
       enableOnContentEditable: true,
       enableOnFormTags: true,
       ...hotkey?.options,
+      enabled: !!hotkey && !disabled && !isLoading,
+      scopes: hotkey?.type === "shortcut" ? [SHORTCUT_MODE_SCOPE] : undefined,
     });
 
     const baseClasses = cn(
