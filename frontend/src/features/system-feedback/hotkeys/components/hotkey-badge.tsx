@@ -41,12 +41,16 @@ const KEY_ABBREVS: Record<string, string> = {
 
 export default function HotkeyBadge({
   hotkey,
+  disabled = false,
   keyClassName,
   litKeyClassName,
+  disabledKeyClassName,
 }: {
   hotkey: string;
+  disabled?: boolean;
   keyClassName?: string;
   litKeyClassName?: string;
+  disabledKeyClassName?: string;
 }) {
   const keys = hotkey.split("+").map((key) => key.trim().toLowerCase());
 
@@ -59,9 +63,11 @@ export default function HotkeyBadge({
         <HotkeySegment
           key={key}
           hotkey={key}
+          disabled={disabled}
           isApple={isApple}
           className={keyClassName}
           litClassName={litKeyClassName}
+          disabledClassName={disabledKeyClassName}
         />
       ))}
     </kbd>
@@ -70,14 +76,18 @@ export default function HotkeyBadge({
 
 function HotkeySegment({
   hotkey,
+  disabled = false,
   isApple,
   className,
   litClassName,
+  disabledClassName,
 }: {
   hotkey: string;
+  disabled: boolean;
   isApple: boolean;
   className?: string;
   litClassName?: string;
+  disabledClassName?: string;
 }) {
   const isLit = useShortcuts().checkKeyPressed(hotkey);
 
@@ -105,12 +115,14 @@ function HotkeySegment({
       className={cn(
         "font-nunito text-sm leading-none",
         "border-t-1 border-x-1 border-b-3 rounded-md p-[3px]",
-        isLit
-          ? cn(
-              "border-foreground/50 text-foreground/50 border-b-1 mt-[2px]",
-              litClassName,
-            )
-          : cn("border-foreground text-foreground", className),
+        disabled
+          ? cn("border-foreground/50 text-foreground/50", disabledClassName)
+          : isLit
+            ? cn(
+                "border-foreground/50 text-foreground/50 border-b-1 mt-[2px]",
+                litClassName,
+              )
+            : cn("border-foreground text-foreground", className),
       )}
     >
       {content}
