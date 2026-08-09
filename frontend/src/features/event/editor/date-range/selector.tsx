@@ -29,6 +29,7 @@ export default function DateRangeSelection({
           hotkey="t"
           selector="#event-type-select"
           tooltipSide="right"
+          disabled={editing}
         >
           <EventTypeSelect id="event-type-select" disabled={editing} />
         </ShortcutTrigger>

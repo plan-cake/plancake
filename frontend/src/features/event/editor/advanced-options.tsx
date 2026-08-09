@@ -150,7 +150,7 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
             <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
         </div>
-        <ShortcutTrigger hotkey="c" tooltipSide="right">
+        <ShortcutTrigger hotkey="c" tooltipSide="right" disabled={isEditing}>
           <input
             id="custom-code-input"
             type="text"
