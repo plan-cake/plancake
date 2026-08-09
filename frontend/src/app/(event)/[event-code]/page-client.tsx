@@ -20,8 +20,8 @@ import {
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import ShareMenu from "@/features/share-menu/menu";
-import { cn } from "@/lib/utils/classname";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
   eventData,
