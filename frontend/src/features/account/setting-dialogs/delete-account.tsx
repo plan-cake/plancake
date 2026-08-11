@@ -44,7 +44,7 @@ export default function DeleteAccountDialog() {
     }
 
     try {
-      await clientPost(ROUTES.auth.deleteAccount, {
+      await clientPost(ROUTES.account.deleteAccount, {
         password: currentPassword,
       });
       addToast("success", MESSAGES.SUCCESS_ACCOUNT_DELETE);
@@ -67,7 +67,13 @@ export default function DeleteAccountDialog() {
       asNestedDrawer={isMobile}
       title="WARNING: DELETING ACCOUNT"
       description={"Delete Account Confirmation"}
-      trigger={<EmptyButton buttonStyle="danger" label="Delete Account" />}
+      trigger={
+        <EmptyButton
+          buttonStyle="danger"
+          label="Delete Account"
+          tooltip="Woah... be careful!"
+        />
+      }
       open={confirmationOpen}
       onOpenChange={handleOpenChange}
       onSubmit={handleDeleteAccount}

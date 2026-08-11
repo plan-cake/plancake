@@ -1,14 +1,20 @@
+import json
 import logging
+from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
+from enum import Enum
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.db.models import Q
+from ipware import get_client_ip
+from redis import Redis
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.throttling import SimpleRateThrottle
 
 from api.availability.utils import get_weekday_date
 from api.models import UserAccount, UserEvent, UserSession
+from api.redis_pools import sync_pool
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
     COOKIE_DOMAIN,
@@ -118,6 +124,13 @@ class TimeZoneField(serializers.CharField):
         except ZoneInfoNotFoundError:
             raise serializers.ValidationError("Invalid time zone.")
         return value
+
+
+def event_lookup(event_code: str):
+    """
+    Looks up an event by its URL code.
+    """
+    return UserEvent.objects.get(url_code__url_code__iexact=event_code)
 
 
 def get_event_type(date_type):
@@ -305,7 +318,157 @@ def check_rate_limit(request, throttle_scope: ThrottleScope) -> None:
 def prune_account_sessions(request):
     """
     Deletes all of the current account's sessions except for the current one.
+
+    This function depends on the user being authenticated and existing in the request
+    object.
     """
     UserSession.objects.filter(user_account=request.user).exclude(
         session_token=request.COOKIES.get(ACCOUNT_COOKIE_NAME)
     ).delete()
+
+
+def get_client_ip_address(request) -> str | None:
+    """
+    Extracts the client's IP address, accounting for possible proxy headers.
+    """
+    client_ip, _ = get_client_ip(request)
+    return client_ip if client_ip else None
+
+
+def get_client_user_agent(request) -> str | None:
+    """
+    Extracts the client's user agent string.
+    """
+    return request.META.get("HTTP_USER_AGENT", None)
+
+
+def update_session_metadata(request, session: UserSession):
+    """
+    Updates the session's metadata (IP address, user agent, and last used time) based on
+    the incoming request.
+    """
+    # Since the session is being updated anyway, we don't have to check if the metadata
+    # has changed before updating it
+    session.ip_address = get_client_ip_address(request)
+    session.user_agent_raw = get_client_user_agent(request)
+    # Auto-updates last_used
+    session.save()
+
+
+class LiveUpdateAction(str, Enum):
+    """
+    Enum for the type of live update action being performed.
+    """
+
+    ADD = "add"
+    UPDATE = "update"
+    REMOVE = "remove"
+    EVENT_EDIT = "event_edit"
+
+
+class LiveUpdateData(ABC):
+    """
+    Base class for data to be sent in a live update.
+    """
+
+    @abstractmethod
+    def __init__(self, action: LiveUpdateAction):
+        self.action = action
+
+    @abstractmethod
+    def to_dict(self):
+        pass
+
+
+class LiveUpdateAddUpdateData(LiveUpdateData):
+    """
+    Data for a live update when a participant is added or updated.
+    """
+
+    def __init__(
+        self,
+        action: LiveUpdateAction,
+        public_id: str,
+        display_name: str,
+        joined_at: str,
+        updated_at: str,
+        time_zone: str,
+        availability: list[str],
+    ):
+        if action not in (LiveUpdateAction.ADD, LiveUpdateAction.UPDATE):
+            raise ValueError("Action must be either ADD or UPDATE for this data class.")
+        self.action = action
+        self.public_id = public_id
+        self.display_name = display_name
+        self.joined_at = joined_at
+        self.updated_at = updated_at
+        self.time_zone = time_zone
+        self.availability = availability
+
+    def to_dict(self):
+        return {
+            "action": self.action,
+            "public_id": self.public_id,
+            "display_name": self.display_name,
+            "joined_at": self.joined_at,
+            "updated_at": self.updated_at,
+            "time_zone": self.time_zone,
+            "availability": self.availability,
+        }
+
+
+class LiveUpdateRemoveData(LiveUpdateData):
+    """
+    Data for a live update when a participant is removed.
+    """
+
+    def __init__(self, public_id: str):
+        self.public_id = public_id
+
+    def to_dict(self):
+        return {
+            "action": LiveUpdateAction.REMOVE,
+            "public_id": self.public_id,
+        }
+
+
+class LiveUpdateEventEditData(LiveUpdateData):
+    """
+    Data for a live update when an event is edited.
+    """
+
+    def __init__(self):
+        pass
+
+    def to_dict(self):
+        return {
+            "action": LiveUpdateAction.EVENT_EDIT,
+        }
+
+
+class LiveUpdateEvent:
+    def __init__(
+        self,
+        user_id: int,
+        event_code: str,
+        data: LiveUpdateData,
+    ):
+        self.user_id = user_id
+        self.event_code = event_code
+        self.data = data
+
+    def dumps(self):
+        return json.dumps(
+            {
+                "user_id": self.user_id,
+                "event_code": self.event_code,
+                "data": self.data.to_dict(),
+            }
+        )
+
+
+def notify_live_update(event: LiveUpdateEvent):
+    Redis(connection_pool=sync_pool).publish(
+        f"event_{event.event_code}",
+        event.dumps(),
+    )

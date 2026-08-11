@@ -13,6 +13,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@microsoft/fetch-event-source": "^2.0.1",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-one-time-password-field": "^0.1.8",
@@ -21,6 +22,7 @@
     "@radix-ui/react-select": "^2.2.4",
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-toast": "^1.2.15",
+    "@radix-ui/react-tooltip": "^1.2.9",
     "@vercel/analytics": "^2.0.1",
     "clsx": "^2.1.1",
     "date-fns-tz": "^3.2.0",

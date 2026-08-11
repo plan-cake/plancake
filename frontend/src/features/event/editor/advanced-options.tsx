@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
+import InfoPoint from "@/components/info-point";
 import { useEventContext } from "@/core/event/context";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { MESSAGES } from "@/lib/messages";
@@ -81,6 +82,26 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
     checkCodeAvailability(newValue);
   };
 
+  const customCodeInfo = (
+    <div className="flex flex-col gap-2">
+      {isEditing ? (
+        <div>The event code cannot be changed after the event is created.</div>
+      ) : (
+        <>
+          <div>You have the option to customize your event link.</div>
+          <div>
+            For example, the link for custom code{" "}
+            <span className="font-bold">breakfast</span> would be:{" "}
+            <span className="underline">
+              {typeof window === "undefined" ? "" : window.location.host}/
+              <span className="font-bold">breakfast</span>
+            </span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+
   return (
     <>
       <div className="flex flex-col gap-1">
@@ -101,16 +122,29 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label
-          htmlFor="custom-code-input"
-          className="flex items-center gap-2 font-bold"
-        >
-          <LinkIcon className="h-4 w-4" strokeWidth={2} />
-          {!isEditing && "Custom"} Event Code
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor="custom-code-input"
+              className="flex items-center gap-2 font-bold"
+            >
+              <LinkIcon className="h-4 w-4" strokeWidth={2} />
+              {!isEditing && "Custom"} Event Code
+            </label>
+            <InfoPoint
+              title="Custom Event Codes"
+              description="More information about custom event codes"
+              tooltipContent={
+                <div className="max-w-3xs p-1">{customCodeInfo}</div>
+              }
+              drawerContent={customCodeInfo}
+              className="h-5 w-5 opacity-75"
+            />
+          </div>
           {errors.customCode && (
             <TriangleAlertIcon className="text-error h-4 w-4" strokeWidth={2} />
           )}
-        </label>
+        </div>
         <input
           id="custom-code-input"
           type="text"

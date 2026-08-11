@@ -5,12 +5,15 @@ import { EventCodePageProps } from "@/features/event/code-page-props";
 import EventEditor from "@/features/event/editor/editor";
 import { getCachedEventDetails } from "@/features/event/editor/fetch-data";
 import { processEventData } from "@/lib/utils/api/processors/process-event-data";
+import checkEventCode from "@/lib/utils/check-event-code";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
 
 export async function generateMetadata({
   params,
 }: EventCodePageProps): Promise<Metadata> {
   const { "event-code": eventCode } = await params;
+
+  await checkEventCode(eventCode, (trueCode) => `/${trueCode}/edit`);
 
   const initialEventData = await getCachedEventDetails(eventCode);
 
