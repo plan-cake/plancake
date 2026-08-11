@@ -1,4 +1,10 @@
-import { CheckIcon, DoorOpenIcon, EraserIcon, Undo2Icon } from "lucide-react";
+import {
+  CheckIcon,
+  DoorOpenIcon,
+  EraserIcon,
+  Undo2Icon,
+  UsersIcon,
+} from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { useResultsContext } from "@/features/event/results/context";
@@ -70,7 +76,8 @@ export default function PanelHeader({
       )}
     >
       <div className="flex flex-col items-start">
-        <h2 className="font-semibold">
+        <h2 className="flex items-center gap-1.5 font-semibold">
+          {!isRemoving && <UsersIcon className="h-4 w-4" strokeWidth={2} />}
           {totalParticipants === 0
             ? "No Attendees Yet"
             : isRemoving

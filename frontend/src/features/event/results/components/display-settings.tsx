@@ -1,4 +1,6 @@
 // import Checkbox from "@/components/checkbox";
+import { GlobeIcon } from "lucide-react";
+
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 // import { useResultsContext } from "@/features/event/results/context";
 
@@ -21,7 +23,10 @@ export default function DisplaySettings({
         onChange={setShowOnlyBestTimes}
       /> */}
       {/* <div className="mt-3"> */}
-      Displaying event in
+      <div className="flex items-center gap-1">
+        <GlobeIcon className="h-3.5 w-3.5" />
+        Displaying event in
+      </div>
       <TimeZoneSelector
         id="timezone-select"
         value={timezone}
