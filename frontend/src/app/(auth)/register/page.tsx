@@ -43,12 +43,12 @@ export default function Page() {
       return false;
     }
 
-    if (!confirmPassword || confirmPassword !== password) {
+    if (!confirmPassword) {
       return false;
     }
 
     return true;
-  }, [email, password, confirmPassword, passwordIsStrong]);
+  }, [email, confirmPassword, passwordIsStrong]);
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
