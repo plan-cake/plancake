@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 
@@ -27,9 +27,9 @@ export default function Page() {
     notFound(); // If no token is provided, show 404 page
   }
 
-  function passwordIsStrong() {
+  const passwordIsStrong = useCallback(() => {
     return Object.values(passwordCriteria).every((value) => value === true);
-  }
+  }, [passwordCriteria]);
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
