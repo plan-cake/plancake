@@ -32,17 +32,13 @@ export default function Page() {
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
   // CHECK FIELDS
-  const fieldsFilled = useMemo(() => {
-    if (!email || !email.trim()) {
-      return false;
-    }
-
-    if (!password) {
-      return false;
-    }
-
-    return true;
-  }, [email, password]);
+  const invalidForm = useMemo(() => {
+    return !email || !email.trim() || !password
+      ? MESSAGES.FORM_NOT_FILLED
+      : Object.keys(errors).length
+        ? MESSAGES.FORM_HAS_ERRORS
+        : undefined;
+  }, [email, password, errors]);
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
@@ -137,9 +133,9 @@ export default function Page() {
         <ActionButton
           buttonStyle="primary"
           label="Login"
-          tooltip={fieldsFilled ? undefined : "Please fill out all the fields."}
+          tooltip={invalidForm}
           onClick={handleSubmit}
-          disabled={!isMobile && !fieldsFilled}
+          disabled={!isMobile && !!invalidForm}
           loadOnSuccess
         />
       </div>

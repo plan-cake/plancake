@@ -33,25 +33,21 @@ export default function Page() {
     return Object.values(passwordCriteria).every((value) => value === true);
   }, [passwordCriteria]);
 
-  // CHECK FIELDS
-  const fieldsFilled = useMemo(() => {
-    if (!newPassword) {
-      return false;
-    }
-
-    if (!passwordIsStrong()) {
-      return false;
-    }
-
-    if (!confirmPassword) {
-      return false;
-    }
-
-    return true;
-  }, [newPassword, passwordIsStrong, confirmPassword]);
-
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
+
+  // CHECK FIELDS
+  const invalidForm = useMemo(() => {
+    return !newPassword
+      ? MESSAGES.FORM_NOT_FILLED
+      : !passwordIsStrong()
+        ? MESSAGES.ERROR_PASSWORD_WEAK
+        : !confirmPassword
+          ? MESSAGES.FORM_NOT_FILLED
+          : Object.keys(errors).length
+            ? MESSAGES.FORM_HAS_ERRORS
+            : undefined;
+  }, [newPassword, passwordIsStrong, confirmPassword, errors]);
 
   const handleConfirmPasswordChange = (value: string) => {
     handleError("confirmPassword", "");
@@ -144,9 +140,9 @@ export default function Page() {
         <ActionButton
           buttonStyle="primary"
           label="Change Password"
-          tooltip={fieldsFilled ? undefined : "Please fill out all the fields."}
+          tooltip={invalidForm}
           onClick={handleSubmit}
-          disabled={!isMobile && !fieldsFilled}
+          disabled={!isMobile && !!invalidForm}
           loadOnSuccess
         />
       </div>

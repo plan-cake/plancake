@@ -26,13 +26,13 @@ export default function Page() {
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
   // CHECK FIELDS
-  const fieldsFilled = useMemo(() => {
-    if (!email || !email.trim()) {
-      return false;
-    }
-
-    return true;
-  }, [email]);
+  const invalidForm = useMemo(() => {
+    return !email || !email.trim()
+      ? "Please enter an email address."
+      : Object.keys(errors).length
+        ? MESSAGES.FORM_HAS_ERRORS
+        : undefined;
+  }, [email, errors]);
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
@@ -101,11 +101,9 @@ export default function Page() {
             <ActionButton
               buttonStyle="primary"
               label="Send Link"
-              tooltip={
-                fieldsFilled ? undefined : "Enter a valid email address."
-              }
+              tooltip={invalidForm}
               onClick={handleSubmit}
-              disabled={!isMobile && !fieldsFilled}
+              disabled={!isMobile && !!invalidForm}
               loadOnSuccess
             />
           </div>

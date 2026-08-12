@@ -34,21 +34,15 @@ export default function Page() {
   }, [passwordCriteria]);
 
   // CHECK FIELDS
-  const fieldsFilled = useMemo(() => {
-    if (!email || !email.trim()) {
-      return false;
-    }
-
-    if (!passwordIsStrong()) {
-      return false;
-    }
-
-    if (!confirmPassword) {
-      return false;
-    }
-
-    return true;
-  }, [email, confirmPassword, passwordIsStrong]);
+  const invalidForm = useMemo(() => {
+    return !email || !email.trim() || !password
+      ? MESSAGES.FORM_NOT_FILLED
+      : !passwordIsStrong()
+        ? MESSAGES.ERROR_PASSWORD_WEAK
+        : !confirmPassword
+          ? MESSAGES.FORM_NOT_FILLED
+          : undefined;
+  }, [email, password, confirmPassword, passwordIsStrong]);
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
@@ -166,9 +160,9 @@ export default function Page() {
         <ActionButton
           buttonStyle="primary"
           label="Register"
-          tooltip={fieldsFilled ? undefined : "Please fill out all the fields."}
+          tooltip={invalidForm}
           onClick={handleSubmit}
-          disabled={!isMobile && !fieldsFilled}
+          disabled={!isMobile && !!invalidForm}
           loadOnSuccess
         />
       </div>

@@ -74,4 +74,8 @@ export const MESSAGES = {
   INFO_NO_IDEAL_TIMES: "There are no times where everyone is available.",
   INFO_NO_IDEAL_TIMES_BANNER:
     "There are no times where everyone is available. Times with an indicator are the best options.",
+
+  // form error messages
+  FORM_NOT_FILLED: "Please fill out all fields.",
+  FORM_HAS_ERRORS: "Please fix the displayed errors.",
 };
