@@ -257,6 +257,11 @@ export default function ClientPage({
           ? "Update Availability"
           : "Submit Availability"
       }
+      tooltip={
+        desktop && !isFormValid
+          ? "Please fill out your name and availability."
+          : undefined
+      }
       onClick={handleSubmitAvailability}
       disabled={desktop && !isFormValid}
       loadOnSuccess
