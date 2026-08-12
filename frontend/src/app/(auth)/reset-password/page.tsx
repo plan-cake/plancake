@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 
@@ -8,6 +8,7 @@ import AuthPageLayout from "@/components/layout/auth-page";
 import TextInputField from "@/components/text-input-field";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import ActionButton from "@/features/button/components/action";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -20,6 +21,7 @@ export default function Page() {
   const [passwordCriteria, setPasswordCriteria] = useState({});
   const [showPasswordCriteria, setShowPasswordCriteria] = useState(false);
   const router = useRouter();
+  const isMobile = useCheckMobile();
 
   const searchParams = useSearchParams();
   const pwdResetToken = searchParams.get("token");
@@ -30,6 +32,23 @@ export default function Page() {
   const passwordIsStrong = useCallback(() => {
     return Object.values(passwordCriteria).every((value) => value === true);
   }, [passwordCriteria]);
+
+  // CHECK FIELDS
+  const fieldsFilled = useMemo(() => {
+    if (!newPassword) {
+      return false;
+    }
+
+    if (!passwordIsStrong()) {
+      return false;
+    }
+
+    if (!confirmPassword) {
+      return false;
+    }
+
+    return true;
+  }, [newPassword, passwordIsStrong, confirmPassword]);
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
@@ -125,7 +144,9 @@ export default function Page() {
         <ActionButton
           buttonStyle="primary"
           label="Change Password"
+          tooltip={fieldsFilled ? undefined : "Please fill out all the fields."}
           onClick={handleSubmit}
+          disabled={!isMobile && !fieldsFilled}
           loadOnSuccess
         />
       </div>
