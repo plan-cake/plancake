@@ -62,37 +62,28 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   const [mobileTab, setMobileTab] = useState<SegmentedControlOption>("details");
 
   // CHECK FIELDS
-  const fieldsFilled = useMemo(() => {
-    if (!title || !title.trim() || title.length > MAX_TITLE_LENGTH) {
-      return false;
-    }
+  const invalidForm = useMemo(() => {
+    const eventNotEdited =
+      type === "edit" &&
+      initialData &&
+      title.trim() === initialData.title.trim() &&
+      eventRange === initialData.originalEventRange;
 
-    if (eventRange.type === "specific") {
-      if (!eventRange.dateRange.from || !eventRange.dateRange.to) {
-        return false;
-      }
-    } else if (eventRange.type === "weekday") {
-      if (!eventRange.weekdays || eventRange.weekdays.length === 0) {
-        return false;
-      }
-    }
-
-    if (!eventRange.timeRange.from || !eventRange.timeRange.to) {
-      return false;
-    } else if (eventRange.timeRange.from >= eventRange.timeRange.to) {
-      return false;
-    }
-
-    if (type === "edit" && initialData) {
-      const isTitleUnchanged = title.trim() === initialData.title.trim();
-      const isRangeUnchanged = eventRange === initialData.originalEventRange;
-      if (isTitleUnchanged && isRangeUnchanged) {
-        return false;
-      }
-    }
-
-    return true;
-  }, [title, eventRange, type, initialData]);
+    return !title ||
+      !title.trim() ||
+      (eventRange.type === "specific" &&
+        (!eventRange.dateRange.from || !eventRange.dateRange.to)) ||
+      (eventRange.type === "weekday" &&
+        (!eventRange.weekdays || eventRange.weekdays.length === 0)) ||
+      !eventRange.timeRange.from ||
+      !eventRange.timeRange.to
+      ? MESSAGES.FORM_NOT_FILLED
+      : eventNotEdited
+        ? "Please make changes to update the event."
+        : Object.keys(errors).length || title.length > MAX_TITLE_LENGTH
+          ? MESSAGES.FORM_HAS_ERRORS
+          : undefined;
+  }, [title, eventRange, type, initialData, errors]);
 
   // SUBMIT EVENT INFO
   const submitEventInfo = async () => {
@@ -130,31 +121,13 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     />
   );
 
-  const desktopSubmitTooltip = useMemo(() => {
-    if (fieldsFilled) return undefined;
-
-    if (type === "edit") {
-      return "Make changes to update the event.";
-    }
-
-    return "Please fill out all the fields.";
-  }, [fieldsFilled, type]);
-
-  const desktopSubmitButton = (
+  const submitButton = (desktop: boolean) => (
     <ActionButton
       buttonStyle="primary"
       label={type === "edit" ? "Update Event" : "Create Event"}
-      tooltip={desktopSubmitTooltip}
+      tooltip={desktop && invalidForm ? invalidForm : undefined}
       onClick={submitEventInfo}
-      disabled={!fieldsFilled}
-      loadOnSuccess
-    />
-  );
-  const mobileSubmitButton = (
-    <ActionButton
-      buttonStyle="primary"
-      label={type === "edit" ? "Update Event" : "Create Event"}
-      onClick={submitEventInfo}
+      disabled={desktop && !!invalidForm}
       loadOnSuccess
     />
   );
@@ -195,7 +168,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         </div>
         <div className="hidden gap-2 md:flex">
           {type === "edit" && cancelButton}
-          {desktopSubmitButton}
+          {submitButton(true)}
         </div>
       </div>
 
@@ -264,7 +237,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       <div className="z-10">
         <MobileFooterIsland
           leftButtons={type === "edit" ? [cancelButton] : undefined}
-          rightButtons={[mobileSubmitButton]}
+          rightButtons={[submitButton(false)]}
         >
           <SegmentedControl
             value={mobileTab}
