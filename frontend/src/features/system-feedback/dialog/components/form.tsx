@@ -13,6 +13,8 @@ export default function FormDialog({
   description,
   onSubmit,
   submitLabel = "Save",
+  submitDisabled = false,
+  submitTooltip,
   cancelLabel = "Cancel",
   children,
   trigger,
@@ -79,6 +81,8 @@ export default function FormDialog({
             type="submit"
             buttonStyle={config.buttonStyle}
             label={submitLabel}
+            tooltip={submitTooltip}
+            disabled={submitDisabled}
           />
         </div>
       </form>
