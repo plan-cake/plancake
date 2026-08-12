@@ -64,6 +64,8 @@ export default function ChangePasswordDialog() {
       open={flow.open}
       onOpenChange={flow.handleOpenChange}
       onSubmit={onConfirmHandler}
+      submitTooltip={flow.invalidForm}
+      submitDisabled={!isMobile && !!flow.invalidForm}
     >
       {dialogContent}
     </FormDialog>
