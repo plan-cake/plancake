@@ -249,7 +249,7 @@ export default function ClientPage({
       href={`/${eventCode}`}
     />
   );
-  const desktopSubmitButton = (
+  const submitButton = (desktop: boolean) => (
     <ActionButton
       buttonStyle="primary"
       label={
@@ -258,19 +258,7 @@ export default function ClientPage({
           : "Submit Availability"
       }
       onClick={handleSubmitAvailability}
-      disabled={!isFormValid}
-      loadOnSuccess
-    />
-  );
-  const mobileSubmitButton = (
-    <ActionButton
-      buttonStyle="primary"
-      label={
-        initialData?.display_name
-          ? "Update Availability"
-          : "Submit Availability"
-      }
-      onClick={handleSubmitAvailability}
+      disabled={desktop && !isFormValid}
       loadOnSuccess
     />
   );
@@ -289,7 +277,7 @@ export default function ClientPage({
         <h1 className="text-2xl font-bold">{eventName}</h1>
         <div className="hidden items-center gap-2 md:flex">
           {cancelButton}
-          {desktopSubmitButton}
+          {submitButton(true)}
         </div>
       </div>
 
@@ -346,7 +334,7 @@ export default function ClientPage({
       <div className="z-10">
         <MobileFooterIsland
           leftButtons={[cancelButton]}
-          rightButtons={[mobileSubmitButton]}
+          rightButtons={[submitButton(false)]}
         >
           <div className="mx-3 -mt-2">
             <DisplayNameInput
