@@ -137,7 +137,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       return "Make changes to update the event.";
     }
 
-    return "Please fill out all fields.";
+    return "Please fill out all the fields.";
   }, [fieldsFilled, type]);
 
   const desktopSubmitButton = (
