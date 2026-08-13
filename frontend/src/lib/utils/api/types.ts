@@ -147,7 +147,8 @@ export type ActiveSession = {
 }
 
 export type ActiveSessionList = {
-  sessions: ActiveSession[];
+  current_session: ActiveSession;
+  other_sessions: ActiveSession[];
 }
 
 export type SessionId = {

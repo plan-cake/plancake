@@ -30,8 +30,9 @@ class ActiveSessionSerializer(serializers.Serializer):
 
 
 class ActiveSessionListSerializer(serializers.Serializer):
-    sessions = serializers.ListField(
-        child=ActiveSessionSerializer(), required=True, allow_empty=False
+    current_session = ActiveSessionSerializer(required=True)
+    other_sessions = serializers.ListField(
+        child=ActiveSessionSerializer(), required=True, allow_empty=True
     )
 
 
