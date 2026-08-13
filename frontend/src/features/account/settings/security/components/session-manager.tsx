@@ -59,7 +59,7 @@ function Session({
         <div
           className={cn(
             "bg-panel h-fit rounded-full p-2",
-            session.is_current && "bg-accent text-white",
+            session.is_current && "bg-accent/50 text-accent-text",
           )}
         >
           {session.device_type === "desktop" ? (
