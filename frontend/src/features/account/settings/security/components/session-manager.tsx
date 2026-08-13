@@ -19,8 +19,8 @@ export default function SessionManager({
       <div>
         <h2 className="text-lg font-bold">Active Devices</h2>
         <p className="mt-1 text-sm leading-tight opacity-75">
-          If there are any devices you don{"'"}t recognize, remove it and change
-          your password.
+          If there are any devices you don{"'"}t recognize, remove them and
+          change your password.
         </p>
       </div>
 
