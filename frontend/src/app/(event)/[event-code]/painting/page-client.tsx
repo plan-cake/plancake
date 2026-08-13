@@ -124,7 +124,7 @@ export default function ClientPage({
 
   const handleNameChange = (value: string) => {
     setDisplayName(value);
-    if (value === "") {
+    if (value.trim() === "") {
       checkNameAvailability.cancel();
       handleError("displayName", MESSAGES.ERROR_NAME_MISSING);
     } else if (value.length > MAX_DISPLAY_NAME_LENGTH) {
