@@ -63,11 +63,33 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
   // CHECK FIELDS
   const invalidForm = useMemo(() => {
-    const eventNotEdited =
-      type === "edit" &&
-      initialData &&
-      title.trim() === initialData.title.trim() &&
-      eventRange === initialData.originalEventRange;
+    let eventNotEdited = false;
+    if (type === "edit" && initialData && initialData.originalEventRange) {
+      const sameTitle = title.trim() === initialData.title.trim();
+      const sameType = eventRange.type === initialData.originalEventRange.type;
+      const sameTimeRange =
+        eventRange.timeRange.from ===
+          initialData.originalEventRange.timeRange.from &&
+        eventRange.timeRange.to ===
+          initialData.originalEventRange.timeRange.to &&
+        eventRange.timezone === initialData.originalEventRange.timezone;
+
+      const sameDate =
+        eventRange.type === "specific" &&
+        initialData.originalEventRange.type === "specific" &&
+        eventRange.dateRange.from ===
+          initialData.originalEventRange.dateRange.from &&
+        eventRange.dateRange.to === initialData.originalEventRange.dateRange.to;
+
+      const sameWeekdays =
+        eventRange.type === "weekday" &&
+        initialData.originalEventRange.type === "weekday" &&
+        JSON.stringify(eventRange.weekdays) ===
+          JSON.stringify(initialData.originalEventRange.weekdays);
+
+      eventNotEdited =
+        sameTitle && sameType && sameTimeRange && (sameDate || sameWeekdays);
+    }
 
     return !title ||
       !title.trim() ||
