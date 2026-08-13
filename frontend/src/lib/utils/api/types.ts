@@ -141,6 +141,7 @@ export type ActiveSession = {
   os_version: string | null;
   client_name: string | null;
   client_version: string | null;
+  created_at: string;
   last_used: string;
   is_current: boolean;
 }

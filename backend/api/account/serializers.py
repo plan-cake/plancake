@@ -24,6 +24,7 @@ class ActiveSessionSerializer(serializers.Serializer):
     client_version = serializers.CharField(
         required=False, allow_null=True, default=None
     )
+    created_at = serializers.DateTimeField(required=True)
     last_used = serializers.DateTimeField(required=True)
     is_current = serializers.BooleanField(required=True)
 

@@ -112,6 +112,7 @@ def get_active_sessions(request):
     for session in sessions:
         session_data = {
             "public_id": session.public_id,
+            "created_at": session.created_at,
             "last_used": session.last_used,
             "is_current": session.session_token
             == request.COOKIES.get(ACCOUNT_COOKIE_NAME),
