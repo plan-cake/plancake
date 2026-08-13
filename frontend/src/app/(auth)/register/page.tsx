@@ -52,6 +52,12 @@ export default function Page() {
     setEmail(value);
   };
 
+  const handlePasswordChange = (value: string) => {
+    handleError("password", "");
+    handleError("api", "");
+    setPassword(value);
+  };
+
   const handleConfirmPasswordChange = (value: string) => {
     handleError("confirmPassword", "");
     handleError("api", "");
@@ -131,7 +137,7 @@ export default function Page() {
           label="Password*"
           value={password}
           onChange={(value) => {
-            setPassword(value);
+            handlePasswordChange(value);
           }}
           onFocus={() => setShowPasswordCriteria(true)}
           onBlur={() => {

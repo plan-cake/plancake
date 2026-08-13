@@ -49,6 +49,12 @@ export default function Page() {
             : undefined;
   }, [newPassword, passwordIsStrong, confirmPassword, errors]);
 
+  const handleNewPasswordChange = (value: string) => {
+    handleError("password", "");
+    handleError("api", "");
+    setNewPassword(value);
+  };
+
   const handleConfirmPasswordChange = (value: string) => {
     handleError("confirmPassword", "");
     handleError("api", "");
@@ -108,7 +114,7 @@ export default function Page() {
           label="New Password*"
           value={newPassword}
           onChange={(value) => {
-            setNewPassword(value);
+            handleNewPasswordChange(value);
           }}
           onFocus={() => setShowPasswordCriteria(true)}
           onBlur={() => {
