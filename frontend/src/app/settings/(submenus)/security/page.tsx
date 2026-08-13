@@ -21,7 +21,7 @@ export default async function Page() {
         </div>
       </div>
 
-      <SessionManager sessions={activeSessions.sessions} />
+      <SessionManager sessions={activeSessions} />
     </div>
   );
 }
