@@ -72,19 +72,18 @@ export function timeslotToISOString(
   }
 }
 
-
 /**
  * Checks if two timezones are equivalent even if they represent different locations.
- * 
+ *
  * For example, "America/New_York" and "America/Detroit" are equal because they are both
  * in Eastern Time.
- * 
+ *
  * IMPORTANT: This function also checks if the timezones have the same DST rules by
  * comparing offsets in January and July.
- * 
+ *
  * For example, "America/New_York" and "America/Caracas" are NOT equal because Caracas
  * does not observe DST, despite both having the same offset during part of the year.
- * 
+ *
  * @param tz1 The first timezone to compare
  * @param tz2 The second timezone to compare
  * @returns `true` if the timezones are equivalent, `false` otherwise
@@ -206,4 +205,27 @@ export function convert12To24(time12: string): string {
 
   const date = parse(time12, "hh:mm a", new Date());
   return format(date, "HH:mm");
+}
+
+/* TIME AGO UTILS */
+
+/**
+ * Formats a time difference in seconds into a simplified readable string.
+ * @param secondsAgo The number of seconds ago.
+ * @param largestUnit The largest time unit to display.
+ * @returns A string representing the time difference.
+ */
+export function formatTimeAgo(secondsAgo: number): string {
+  if (secondsAgo < 60) {
+    return "just now";
+  } else if (secondsAgo < 60 * 60) {
+    const minutes = Math.floor(secondsAgo / 60);
+    return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+  } else if (secondsAgo < 60 * 60 * 24) {
+    const hours = Math.floor(secondsAgo / (60 * 60));
+    return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+  } else {
+    const days = Math.floor(secondsAgo / (60 * 60 * 24));
+    return `${days} day${days !== 1 ? "s" : ""} ago`;
+  }
 }
