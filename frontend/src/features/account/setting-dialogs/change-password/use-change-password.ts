@@ -70,9 +70,11 @@ export function useChangePasswordFlow() {
           ? MESSAGES.ERROR_PASSWORD_WEAK
           : !form.confirmPassword
             ? MESSAGES.FORM_NOT_FILLED
-            : Object.keys(errors).length
-              ? MESSAGES.FORM_HAS_ERRORS
-              : undefined;
+            : form.newPassword !== form.confirmPassword
+              ? MESSAGES.ERROR_PASSWORD_MISMATCH
+              : Object.keys(errors).length
+                ? MESSAGES.FORM_HAS_ERRORS
+                : undefined;
     }
     if (step === "OTP") {
       return !form.resetCode
@@ -88,9 +90,11 @@ export function useChangePasswordFlow() {
           ? MESSAGES.ERROR_PASSWORD_WEAK
           : !form.confirmPassword
             ? MESSAGES.FORM_NOT_FILLED
-            : Object.keys(errors).length
-              ? MESSAGES.FORM_HAS_ERRORS
-              : undefined;
+            : form.newPassword !== form.confirmPassword
+              ? MESSAGES.ERROR_PASSWORD_MISMATCH
+              : Object.keys(errors).length
+                ? MESSAGES.FORM_HAS_ERRORS
+                : undefined;
     }
     return undefined;
   }, [step, form, passwordIsStrong, errors]);

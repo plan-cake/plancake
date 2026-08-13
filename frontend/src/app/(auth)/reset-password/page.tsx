@@ -44,9 +44,11 @@ export default function Page() {
         ? MESSAGES.ERROR_PASSWORD_WEAK
         : !confirmPassword
           ? MESSAGES.FORM_NOT_FILLED
-          : Object.keys(errors).length
-            ? MESSAGES.FORM_HAS_ERRORS
-            : undefined;
+          : newPassword !== confirmPassword
+            ? MESSAGES.ERROR_PASSWORD_MISMATCH
+            : Object.keys(errors).length
+              ? MESSAGES.FORM_HAS_ERRORS
+              : undefined;
   }, [newPassword, passwordIsStrong, confirmPassword, errors]);
 
   const handleNewPasswordChange = (value: string) => {

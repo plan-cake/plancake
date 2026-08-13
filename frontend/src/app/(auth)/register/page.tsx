@@ -41,9 +41,11 @@ export default function Page() {
         ? MESSAGES.ERROR_PASSWORD_WEAK
         : !confirmPassword
           ? MESSAGES.FORM_NOT_FILLED
-          : Object.keys(errors).length
-            ? MESSAGES.FORM_HAS_ERRORS
-            : undefined;
+          : password !== confirmPassword
+            ? MESSAGES.ERROR_PASSWORD_MISMATCH
+            : Object.keys(errors).length
+              ? MESSAGES.FORM_HAS_ERRORS
+              : undefined;
   }, [email, password, confirmPassword, passwordIsStrong, errors]);
 
   const handleEmailChange = (value: string) => {
