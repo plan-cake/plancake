@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useOptimistic, useRef, useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { toZonedTime } from "date-fns-tz";
@@ -12,7 +12,10 @@ import {
   TabletIcon,
 } from "lucide-react";
 
-import EmptyButton from "@/features/button/components/empty";
+import { removeSession } from "@/features/account/settings/security/remove-session";
+import ActionButton from "@/features/button/components/action";
+import { ConfirmationDialog, useToast } from "@/features/system-feedback";
+import { MESSAGES } from "@/lib/messages";
 import { ActiveSessionList, type ActiveSession } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
 import { formatTimeAgo } from "@/lib/utils/date-time-format";
@@ -24,27 +27,84 @@ export default function SessionManager({
 }) {
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+  const [optimisticSessions, removeOptimisticSession] = useOptimistic(
+    sessions,
+    (state, sessionToRemove: string) => {
+      return {
+        current_session: state.current_session,
+        other_sessions: state.other_sessions.filter(
+          (s) => s.public_id !== sessionToRemove,
+        ),
+      };
+    },
+  );
+
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const sessionToRemove = useRef<string | null>(null);
+  const { addToast } = useToast();
+
+  const handleRemoveSession = async (publicId: string) => {
+    // Immediate UI update
+    startTransition(() => {
+      removeOptimisticSession(publicId);
+    });
+
+    // Server Action
+    const result = await removeSession(publicId);
+
+    if (!result.success) {
+      addToast("error", result.error || MESSAGES.ERROR_GENERIC);
+    } else {
+      addToast("success", MESSAGES.SUCCESS_SESSION_REMOVE);
+    }
+  };
+
+  const onRemoveSession = (publicId: string) => {
+    sessionToRemove.current = publicId;
+    setConfirmationOpen(true);
+  };
+
   return (
     <div className="bg-panel flex flex-col gap-4 rounded-3xl border-none p-6 md:p-8">
       <div>
-        <h2 className="text-lg font-bold">Active Devices</h2>
+        <h2 className="text-lg font-bold">Active Sessions</h2>
         <p className="mt-1 text-sm leading-tight opacity-75">
-          If there are any devices you don{"'"}t recognize, remove them and
-          change your password.
+          These devices have access to your account. If there are any you don
+          {"'"}t recognize, remove them and change your password.
         </p>
       </div>
 
-      <Session session={sessions.current_session} userTz={userTimeZone} />
+      <Session
+        session={optimisticSessions.current_session}
+        userTz={userTimeZone}
+      />
       <div className="bg-foreground/10 h-px w-full" />
       <div className="flex flex-col gap-2">
-        {sessions.other_sessions.map((session) => (
+        {optimisticSessions.other_sessions.map((session) => (
           <Session
             key={session.public_id}
             session={session}
             userTz={userTimeZone}
+            onRemove={() => {
+              onRemoveSession(session.public_id);
+            }}
           />
         ))}
       </div>
+
+      <ConfirmationDialog
+        type="delete"
+        autoClose={true}
+        title="Remove Session"
+        description="Are you sure you want to log out of this device?"
+        open={confirmationOpen}
+        onOpenChange={setConfirmationOpen}
+        onConfirm={() => {
+          if (!sessionToRemove.current) return false;
+          handleRemoveSession(sessionToRemove.current);
+          return true;
+        }}
+      />
     </div>
   );
 }
@@ -52,9 +112,11 @@ export default function SessionManager({
 function Session({
   session,
   userTz,
+  onRemove,
 }: {
   session: ActiveSession;
   userTz: string;
+  onRemove?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -146,11 +208,12 @@ function Session({
                 })}
               </p>
             </div>
-            {!session.is_current && (
-              <EmptyButton
-                buttonStyle="primary"
+            {onRemove && (
+              <ActionButton
+                buttonStyle="danger"
                 label="Remove"
-                className="mx-auto w-fit md:ml-0"
+                className="mx-auto w-fit md:mx-0"
+                onClick={onRemove}
               />
             )}
           </div>
