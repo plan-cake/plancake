@@ -7,16 +7,15 @@ import { toZonedTime } from "date-fns-tz";
 import {
   ChevronDownIcon,
   CircleQuestionMark,
-  EllipsisIcon,
   Laptop2Icon,
   SmartphoneIcon,
   TabletIcon,
 } from "lucide-react";
 
+import EmptyButton from "@/features/button/components/empty";
 import { ActiveSessionList, type ActiveSession } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
 import { formatTimeAgo } from "@/lib/utils/date-time-format";
-import EmptyButton from "@/features/button/components/empty";
 
 export default function SessionManager({
   sessions,
@@ -35,20 +34,16 @@ export default function SessionManager({
         </p>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <Session session={sessions.current_session} userTz={userTimeZone} />
-
-        <div className="bg-foreground/10 h-px w-full" />
-
-        <div className="flex flex-col gap-2">
-          {sessions.other_sessions.map((session) => (
-            <Session
-              key={session.public_id}
-              session={session}
-              userTz={userTimeZone}
-            />
-          ))}
-        </div>
+      <Session session={sessions.current_session} userTz={userTimeZone} />
+      <div className="bg-foreground/10 h-px w-full" />
+      <div className="flex flex-col gap-2">
+        {sessions.other_sessions.map((session) => (
+          <Session
+            key={session.public_id}
+            session={session}
+            userTz={userTimeZone}
+          />
+        ))}
       </div>
     </div>
   );
