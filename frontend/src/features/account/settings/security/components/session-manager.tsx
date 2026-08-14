@@ -7,8 +7,10 @@ import { toZonedTime } from "date-fns-tz";
 import {
   ChevronDownIcon,
   CircleQuestionMark,
+  EllipsisIcon,
   Laptop2Icon,
   SmartphoneIcon,
+  TabletIcon,
 } from "lucide-react";
 
 import { ActiveSessionList, type ActiveSession } from "@/lib/utils/api/types";
@@ -79,6 +81,8 @@ function Session({
                 <Laptop2Icon className="h-5 w-5" />
               ) : session.device_type === "smartphone" ? (
                 <SmartphoneIcon className="h-5 w-5" />
+              ) : session.device_type === "tablet" ? (
+                <TabletIcon className="h-5 w-5" />
               ) : (
                 <CircleQuestionMark className="h-5 w-5" />
               )}
