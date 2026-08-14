@@ -61,6 +61,11 @@ function Session({
   const lastUsedLocal = toZonedTime(new Date(session.last_used + "Z"), userTz);
   const lastUsedSecondsAgo = (Date.now() - lastUsedLocal.getTime()) / 1000;
 
+  const createdAtLocal = toZonedTime(
+    new Date(session.created_at + "Z"),
+    userTz,
+  );
+
   return (
     <div className="bg-background w-full rounded-3xl p-2">
       <Collapsible.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -133,10 +138,7 @@ function Session({
               )}
               <p className="opacity-75">
                 Logged in on{" "}
-                {toZonedTime(
-                  new Date(session.created_at + "Z"),
-                  userTz,
-                ).toLocaleString(undefined, {
+                {createdAtLocal.toLocaleString(undefined, {
                   month: "short",
                   day: "numeric",
                   hour: "numeric",
