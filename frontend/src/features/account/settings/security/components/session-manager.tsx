@@ -25,6 +25,9 @@ import { MESSAGES } from "@/lib/messages";
 import { ActiveSessionList, type ActiveSession } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
 import { formatTimeAgo } from "@/lib/utils/date-time-format";
+import { pruneSessions } from "@/features/account/settings/security/prune-sessions";
+
+type SessionAction = { type: "remove"; publicId: string } | { type: "prune" };
 
 export default function SessionManager({
   sessions,
@@ -42,26 +45,53 @@ export default function SessionManager({
 
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const [optimisticSessions, removeOptimisticSession] = useOptimistic(
+  const [optimisticSessions, setOptimisticSessions] = useOptimistic(
     sessions,
-    (state, sessionToRemove: string) => {
-      return {
-        current_session: state.current_session,
-        other_sessions: state.other_sessions.filter(
-          (s) => s.public_id !== sessionToRemove,
-        ),
-      };
+    (state, action: SessionAction) => {
+      switch (action.type) {
+        case "remove":
+          return {
+            current_session: state.current_session,
+            other_sessions: state.other_sessions.filter(
+              (s) => s.public_id !== action.publicId,
+            ),
+          };
+        case "prune":
+          return {
+            current_session: state.current_session,
+            other_sessions: [],
+          };
+        default:
+          return state;
+      }
     },
   );
 
-  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [pruneConfirmationOpen, setPruneConfirmationOpen] = useState(false);
+  const [removeConfirmationOpen, setRemoveConfirmationOpen] = useState(false);
   const sessionToRemove = useRef<string | null>(null);
   const { addToast } = useToast();
+
+  const handlePruneSessions = async () => {
+    // Immediate UI update
+    startTransition(() => {
+      setOptimisticSessions({ type: "prune" });
+    });
+
+    // Server Action
+    const result = await pruneSessions();
+
+    if (!result.success) {
+      addToast("error", result.error || MESSAGES.ERROR_GENERIC);
+    } else {
+      addToast("success", MESSAGES.SUCCESS_SESSION_PRUNE);
+    }
+  };
 
   const handleRemoveSession = async (publicId: string) => {
     // Immediate UI update
     startTransition(() => {
-      removeOptimisticSession(publicId);
+      setOptimisticSessions({ type: "remove", publicId });
     });
 
     // Server Action
@@ -76,7 +106,7 @@ export default function SessionManager({
 
   const onRemoveSession = (publicId: string) => {
     sessionToRemove.current = publicId;
-    setConfirmationOpen(true);
+    setRemoveConfirmationOpen(true);
   };
 
   return (
@@ -109,16 +139,37 @@ export default function SessionManager({
         ))}
       </div>
 
+      <ActionButton
+        buttonStyle="danger"
+        label="Remove All Other Sessions"
+        className="mx-auto w-fit"
+        onClick={() => {
+          setPruneConfirmationOpen(true);
+        }}
+      />
+
       <ConfirmationDialog
         type="delete"
         autoClose={true}
         title="Remove Session"
         description="Are you sure you want to log out of this device?"
-        open={confirmationOpen}
-        onOpenChange={setConfirmationOpen}
+        open={removeConfirmationOpen}
+        onOpenChange={setRemoveConfirmationOpen}
         onConfirm={() => {
           if (!sessionToRemove.current) return false;
           handleRemoveSession(sessionToRemove.current);
+          return true;
+        }}
+      />
+      <ConfirmationDialog
+        type="delete"
+        autoClose={true}
+        title="Remove All Other Sessions"
+        description="Are you sure you want to log out of all other devices? You will remain logged in here."
+        open={pruneConfirmationOpen}
+        onOpenChange={setPruneConfirmationOpen}
+        onConfirm={() => {
+          handlePruneSessions();
           return true;
         }}
       />
