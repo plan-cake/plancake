@@ -18,6 +18,7 @@ import {
   TabletIcon,
 } from "lucide-react";
 
+import { pruneSessions } from "@/features/account/settings/security/prune-sessions";
 import { removeSession } from "@/features/account/settings/security/remove-session";
 import ActionButton from "@/features/button/components/action";
 import { ConfirmationDialog, useToast } from "@/features/system-feedback";
@@ -25,7 +26,6 @@ import { MESSAGES } from "@/lib/messages";
 import { ActiveSessionList, type ActiveSession } from "@/lib/utils/api/types";
 import { cn } from "@/lib/utils/classname";
 import { formatTimeAgo } from "@/lib/utils/date-time-format";
-import { pruneSessions } from "@/features/account/settings/security/prune-sessions";
 
 type SessionAction = { type: "remove"; publicId: string } | { type: "prune" };
 
@@ -125,28 +125,36 @@ export default function SessionManager({
         userTz={userTimeZone}
       />
       <div className="bg-foreground/10 h-px w-full" />
-      <div className="flex flex-col gap-2">
-        {optimisticSessions.other_sessions.map((session) => (
-          <Session
-            key={session.public_id}
-            session={session}
-            now={now}
-            userTz={userTimeZone}
-            onRemove={() => {
-              onRemoveSession(session.public_id);
+      {optimisticSessions.other_sessions.length > 0 ? (
+        <>
+          <div className="flex flex-col gap-2">
+            {optimisticSessions.other_sessions.map((session) => (
+              <Session
+                key={session.public_id}
+                session={session}
+                now={now}
+                userTz={userTimeZone}
+                onRemove={() => {
+                  onRemoveSession(session.public_id);
+                }}
+              />
+            ))}
+          </div>
+
+          <ActionButton
+            buttonStyle="danger"
+            label="Remove All Other Sessions"
+            className="mx-auto w-fit"
+            onClick={() => {
+              setPruneConfirmationOpen(true);
             }}
           />
-        ))}
-      </div>
-
-      <ActionButton
-        buttonStyle="danger"
-        label="Remove All Other Sessions"
-        className="mx-auto w-fit"
-        onClick={() => {
-          setPruneConfirmationOpen(true);
-        }}
-      />
+        </>
+      ) : (
+        <p className="text-center text-sm opacity-75">
+          No other active sessions.
+        </p>
+      )}
 
       <ConfirmationDialog
         type="delete"
