@@ -136,7 +136,23 @@ export type DisplayName = {
 
 export type ActiveSession = {
   public_id: string;
-  device_type: string | null;
+  device_type:
+    | "desktop"
+    | "smartphone"
+    | "tablet"
+    | "feature phone"
+    | "console"
+    | "tv"
+    | "car browser"
+    | "smart display "
+    | "camera"
+    | "portable media player"
+    | "phablet"
+    | "smart speaker"
+    | "wearable"
+    | "peripheral"
+    | ""
+    | null;
   os_name: string | null;
   os_version: string | null;
   client_name: string | null;
