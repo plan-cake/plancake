@@ -1,6 +1,12 @@
 "use client";
 
-import { startTransition, useOptimistic, useRef, useState } from "react";
+import {
+  startTransition,
+  useEffect,
+  useOptimistic,
+  useRef,
+  useState,
+} from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { toZonedTime } from "date-fns-tz";
@@ -25,6 +31,15 @@ export default function SessionManager({
 }: {
   sessions: ActiveSessionList;
 }) {
+  const [now, setNow] = useState(Date.now());
+  // This updates the "last used" timestamps every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
+
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const [optimisticSessions, removeOptimisticSession] = useOptimistic(
@@ -76,6 +91,7 @@ export default function SessionManager({
 
       <Session
         session={optimisticSessions.current_session}
+        now={now}
         userTz={userTimeZone}
       />
       <div className="bg-foreground/10 h-px w-full" />
@@ -84,6 +100,7 @@ export default function SessionManager({
           <Session
             key={session.public_id}
             session={session}
+            now={now}
             userTz={userTimeZone}
             onRemove={() => {
               onRemoveSession(session.public_id);
@@ -111,17 +128,19 @@ export default function SessionManager({
 
 function Session({
   session,
+  now,
   userTz,
   onRemove,
 }: {
   session: ActiveSession;
+  now: number;
   userTz: string;
   onRemove?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const lastUsedLocal = toZonedTime(new Date(session.last_used + "Z"), userTz);
-  const lastUsedSecondsAgo = (Date.now() - lastUsedLocal.getTime()) / 1000;
+  const lastUsedSecondsAgo = (now - lastUsedLocal.getTime()) / 1000;
 
   const createdAtLocal = toZonedTime(
     new Date(session.created_at + "Z"),
