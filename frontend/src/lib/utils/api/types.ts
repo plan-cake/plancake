@@ -144,7 +144,7 @@ export type ActiveSession = {
     | "console"
     | "tv"
     | "car browser"
-    | "smart display "
+    | "smart display"
     | "camera"
     | "portable media player"
     | "phablet"
