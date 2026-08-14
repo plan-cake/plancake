@@ -64,7 +64,11 @@ function Session({
   return (
     <div className="bg-background w-full rounded-3xl p-2">
       <Collapsible.Root open={isOpen} onOpenChange={setIsOpen}>
-        <Collapsible.Trigger className="group flex w-full justify-between gap-2 text-left">
+        <Collapsible.Trigger
+          className={
+            "group flex w-full cursor-pointer justify-between gap-2 text-left"
+          }
+        >
           <div className="flex gap-2">
             <div
               className={cn(
