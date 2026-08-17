@@ -78,7 +78,7 @@ export default async function RootLayout({
       className={`${modak.variable} ${nunito.variable}`}
     >
       <body className="font-sans antialiased">
-        <div className="mx-auto flex min-h-dvh max-w-[1440px] flex-col">
+        <div className="mx-auto flex min-h-dvh max-w-[1440px] flex-col [overflow-x:clip]">
           <Providers>
             <CookieGuard>
               <Suspense fallback={null}>
