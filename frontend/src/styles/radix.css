@@ -109,6 +109,7 @@ html body[data-scroll-locked] {
     otherwise the content will shift to the left anyway when opening a modal.
   */
   --removed-body-scroll-bar-size: 0px !important;
+
   margin-right: 0px !important;
   padding-right: 0px !important;
 }
