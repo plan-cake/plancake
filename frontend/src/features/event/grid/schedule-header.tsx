@@ -55,7 +55,7 @@ export default function ScheduleHeader({
     <div
       className={cn(
         preview ? "md:bg-panel top-0" : cn(topMarginClass, "bg-background"),
-        scrollbarPresent && "pr-4",
+        scrollbarPresent && "pr-3",
         "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
       )}
       style={{
