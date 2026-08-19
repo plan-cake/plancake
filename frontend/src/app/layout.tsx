@@ -88,7 +88,7 @@ export default async function RootLayout({
               </Suspense>
               <Header />
               {/* The main content is wrapped to allow skip to content functionality. */}
-              <div id="main-content" className="outline-none">
+              <div id="main-content" className="outline-hidden">
                 {children}
               </div>
             </CookieGuard>
