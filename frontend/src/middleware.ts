@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const protectedRoutes = ["/settings"];
+const protectedRoutes = ["/settings", "/guest-import"];
 
 export function middleware(request: NextRequest) {
   // Clone the request headers and inject the exact pathname into a custom header.

@@ -80,6 +80,7 @@ class UserLogin(models.Model):
 
 class UserEvent(models.Model):
     user_event_id = models.AutoField(primary_key=True)
+    public_id = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
     user_account = models.ForeignKey(
         UserAccount, on_delete=models.CASCADE, related_name="events"
     )
