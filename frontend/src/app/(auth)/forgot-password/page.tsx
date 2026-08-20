@@ -8,7 +8,7 @@ import LinkText from "@/components/link-text";
 import OTPField from "@/components/otp-field";
 import TextInputField from "@/components/text-input-field";
 import InboxLinks from "@/features/auth/components/inbox-links";
-import { useResetPasswordFlow } from "@/features/auth/use-reset-password";
+import { useResetPasswordFlow } from "@/features/auth/hooks/use-reset-password";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
