@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
+import { useSettingsAccount } from "@/features/account/settings/context";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import { useToast } from "@/features/system-feedback";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
@@ -17,6 +18,7 @@ export type ChangePasswordStepProps = {
 export function useChangePasswordFlow() {
   const { addToast } = useToast();
   const { errors, handleError, clearAllErrors } = useFormErrors();
+  const { email } = useSettingsAccount();
 
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<AuthedChangePasswordStep>("CHANGE");
@@ -66,7 +68,7 @@ export function useChangePasswordFlow() {
   const handleForgotPassword = async () => {
     clearAllErrors();
     try {
-      await clientPost(ROUTES.account.startAuthedPasswordReset);
+      await clientPost(ROUTES.auth.startPasswordReset, { email });
       setStep("OTP");
       addToast("success", "Password reset code sent to your email.");
     } catch (e) {
@@ -83,7 +85,8 @@ export function useChangePasswordFlow() {
       return false;
     }
     try {
-      await clientPost(ROUTES.account.checkAuthedPasswordResetCode, {
+      await clientPost(ROUTES.auth.checkPasswordResetCode, {
+        email,
         reset_code: codeToVerify,
       });
       setStep("RESET");
@@ -110,7 +113,8 @@ export function useChangePasswordFlow() {
       );
 
     try {
-      await clientPost(ROUTES.account.authedPasswordReset, {
+      await clientPost(ROUTES.auth.resetPassword, {
+        email,
         reset_code: form.resetCode,
         new_password: form.newPassword,
         prune_sessions: form.pruneSessions,
