@@ -193,7 +193,7 @@ def verify_email(request):
         logger.info("Account successfully created for %s.", unverified_user.email)
 
     except UnverifiedUserAccount.DoesNotExist:
-        logger.info("Verification code is invalid.")
+        logger.info("Verification code or email is invalid for %s.", email)
         return Response(
             {"error": {"verification_code": ["Invalid verification code."]}}, status=404
         )
@@ -349,6 +349,11 @@ def start_password_reset(request):
     )
 
 
+INVALID_RESET_CODE_RESPONSE = Response(
+    {"error": {"general": ["Invalid reset code."]}}, status=400
+)
+
+
 @api_endpoint("POST")
 @validate_json_input(CodeCheckSerializer)
 @validate_output(MessageOutputSerializer)
@@ -362,10 +367,6 @@ def check_password_reset_code(request):
 
     check_rate_limit(request, ThrottleScopes.CODE_CHECK)
 
-    INVALID_RESPONSE = Response(
-        {"error": {"general": ["Invalid email or reset code."]}}, status=400
-    )
-
     try:
         user = UserAccount.objects.get(email=email)
         PasswordResetCode.objects.get(
@@ -377,13 +378,13 @@ def check_password_reset_code(request):
         logger.info(
             "Password reset code check failed for %s: User does not exist.", email
         )
-        return INVALID_RESPONSE
+        return INVALID_RESET_CODE_RESPONSE
     except PasswordResetCode.DoesNotExist:
         logger.info(
             "Password reset code check failed for %s: Invalid or expired reset code.",
             email,
         )
-        return INVALID_RESPONSE
+        return INVALID_RESET_CODE_RESPONSE
 
     return Response({"message": ["Password reset code is valid."]}, status=200)
 
@@ -417,6 +418,8 @@ def reset_password(request):
             user.email,
             email,
         )
+        # This is the one time it's okay to say the email does not match because the user
+        # is already authenticated.
         return Response(
             {"error": {"email": ["Provided email does not match account."]}},
             status=400,
@@ -470,16 +473,11 @@ def reset_password(request):
     except PasswordResetCode.DoesNotExist:
         if has_account_auth:
             logger.info("Password reset failed for %s: Invalid reset code.", user.email)
-            return Response(
-                {"error": {"reset_code": ["Invalid reset code."]}}, status=404
-            )
         else:
             logger.info(
                 "Password reset failed for %s: Invalid reset code or email.", email
             )
-            return Response(
-                {"error": {"reset_code": ["Invalid email or reset code."]}}, status=404
-            )
+        return INVALID_RESET_CODE_RESPONSE
 
     return Response({"message": ["Password reset successfully."]}, status=200)
 
