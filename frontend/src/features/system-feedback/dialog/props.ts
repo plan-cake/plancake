@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 import type { DialogType } from "@/features/system-feedback";
 
 type CommonDialogProps = {
@@ -106,6 +108,9 @@ export type FormDialogProps = CommonDialogProps & {
 
   /** Whether the submit button is disabled */
   submitDisabled?: boolean;
+
+  /** Optional tooltip for the submit button */
+  submitTooltip?: ReactNode;
 
   /** Text for the cancel button (Defaults to "Cancel") */
   cancelLabel?: string;

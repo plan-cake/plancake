@@ -79,6 +79,7 @@ export default function BaseDialog({
 
       <Dialog.Portal>
         <Dialog.Overlay
+          onClick={(e) => e.stopPropagation()}
           className={cn(
             "dialog-overlay fixed inset-0 z-40 bg-gray-700/40 transition-opacity",
             overlayClassName,
@@ -86,6 +87,7 @@ export default function BaseDialog({
         />
         <Dialog.Content asChild>
           <div
+            onClick={(e) => e.stopPropagation()}
             className={cn(
               "dialog-content fixed inset-0 z-40 m-auto flex flex-col gap-2 overflow-hidden",
               "bg-panel rounded-3xl p-6 shadow-md focus:outline-none",

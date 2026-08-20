@@ -1,9 +1,15 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { ChevronRightIcon } from "lucide-react";
+import {
+  ArrowDownIcon,
+  ChevronRightIcon,
+  ListChevronsDownUpIcon,
+  ListChevronsUpDownIcon,
+} from "lucide-react";
 
+import ActionButton from "@/features/button/components/action";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import { useHeaderSize } from "@/features/header/context";
 import {
@@ -27,57 +33,130 @@ export default function ClientPage({
     bottomRef.current?.scrollIntoView({ behavior: "instant" });
   }, []);
 
+  // Section expansion management
+  const allVersions = useMemo(() => {
+    const versions = new Set<string>();
+    versionHistoryData.forEach((version) => {
+      if (version.bugFixes && version.bugFixes.length > 0) {
+        versions.add(version.version);
+      }
+      if (version.minorVersions && version.minorVersions.length > 0) {
+        version.minorVersions.forEach((minor) => versions.add(minor.version));
+      }
+    });
+    return versions;
+  }, [versionHistoryData]);
+  const [expandedVersions, setExpandedVersions] = useState<Set<string>>(
+    new Set(),
+  );
+  const allExpanded = expandedVersions.size === allVersions.size;
+
+  const toggleVersion = (version: string) => {
+    setExpandedVersions((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(version)) {
+        newSet.delete(version);
+      } else {
+        newSet.add(version);
+      }
+      return newSet;
+    });
+  };
+
+  const handleToggleAll = () => {
+    if (allExpanded) {
+      setExpandedVersions(new Set());
+    } else {
+      setExpandedVersions(new Set(allVersions));
+    }
+  };
+
   return (
-    <div className="flex min-h-screen flex-col gap-2">
+    <div className="flex min-h-screen flex-col">
       <HeaderSpacer />
       <div
         className={cn(
           topMarginClass,
-          "bg-background z-15 sticky flex w-full px-6 py-2",
+          "flex w-full items-center justify-between",
+          "bg-background z-15 sticky px-6 pb-2 pt-4",
         )}
       >
         <h1 className="text-2xl font-bold">Version History</h1>
       </div>
-      <div className="mx-auto flex w-full flex-col gap-8 px-8">
-        {versionHistoryData.map((version, index) => {
-          const isCurrent = index === versionHistoryData.length - 1;
-          const hasMinorVersions =
-            version.minorVersions && version.minorVersions.length > 0;
+      <div className="flex flex-col gap-4 px-6">
+        <div className="flex justify-between">
+          <ActionButton
+            buttonStyle="semi-transparent"
+            icon={
+              allExpanded ? (
+                <ListChevronsDownUpIcon />
+              ) : (
+                <ListChevronsUpDownIcon />
+              )
+            }
+            label={allExpanded ? "Collapse All" : "Expand All"}
+            onClick={handleToggleAll}
+          />
+          <ActionButton
+            buttonStyle="semi-transparent"
+            icon={<ArrowDownIcon />}
+            label="Scroll to Latest"
+            shrinkOnMobile
+            onClick={() => {
+              // State logic within the button cancels the scroll unless it's delayed
+              setTimeout(() => {
+                bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+              }, 0);
+            }}
+          />
+        </div>
+        <div className="mx-auto flex w-full flex-col gap-8 px-2">
+          {versionHistoryData.map((version, index) => {
+            const isCurrent = index === versionHistoryData.length - 1;
+            const hasMinorVersions =
+              version.minorVersions && version.minorVersions.length > 0;
 
-          return (
-            <div
-              className={
-                isCurrent ? "bg-panel outline-panel outline-16 rounded-xl" : ""
-              }
-              key={version.version}
-            >
-              <MajorVersion
+            return (
+              <div
+                className={
+                  isCurrent
+                    ? "bg-panel outline-panel outline-16 rounded-xl"
+                    : ""
+                }
                 key={version.version}
-                versionData={version}
-                isCurrent={isCurrent}
-                isLast={isCurrent && !hasMinorVersions}
-                extendLine={!isCurrent && !hasMinorVersions}
-              />
-              {version.minorVersions &&
-                version.minorVersions.map((minorVersion, minorIndex) => {
-                  const isLastMinor =
-                    minorIndex === version.minorVersions!.length - 1;
+              >
+                <MajorVersion
+                  key={version.version}
+                  versionData={version}
+                  isCurrent={isCurrent}
+                  isLast={isCurrent && !hasMinorVersions}
+                  extendLine={!isCurrent && !hasMinorVersions}
+                  isExpanded={expandedVersions.has(version.version)}
+                  toggleExpanded={toggleVersion}
+                />
+                {version.minorVersions &&
+                  version.minorVersions.map((minorVersion, minorIndex) => {
+                    const isLastMinor =
+                      minorIndex === version.minorVersions!.length - 1;
 
-                  return (
-                    <MinorVersion
-                      key={minorVersion.version}
-                      versionData={minorVersion}
-                      isCurrent={isCurrent}
-                      isLast={isCurrent && isLastMinor}
-                      extendLine={!isCurrent && isLastMinor}
-                    />
-                  );
-                })}
-            </div>
-          );
-        })}
-        {/* Bottom div as a scroll reference, also adding bottom padding */}
-        <div ref={bottomRef} />
+                    return (
+                      <MinorVersion
+                        key={minorVersion.version}
+                        versionData={minorVersion}
+                        isCurrent={isCurrent}
+                        isLast={isCurrent && isLastMinor}
+                        extendLine={!isCurrent && isLastMinor}
+                        isExpanded={expandedVersions.has(minorVersion.version)}
+                        toggleExpanded={toggleVersion}
+                      />
+                    );
+                  })}
+              </div>
+            );
+          })}
+          {/* Bottom div as a scroll reference, also adding bottom padding */}
+          <div ref={bottomRef} />
+        </div>
       </div>
     </div>
   );
@@ -112,7 +191,7 @@ function TimelineSegment({
             isCurrent ? "bg-accent text-white" : "bg-foreground",
           )}
         >
-          <h2 className="text-md px-2 font-bold">{version}</h2>
+          <h2 className="px-2 font-bold">{version}</h2>
         </div>
       ) : (
         <div
@@ -131,14 +210,16 @@ function MajorVersion({
   isCurrent,
   isLast,
   extendLine,
+  isExpanded,
+  toggleExpanded,
 }: {
   versionData: MajorVersionData;
   isCurrent: boolean;
   isLast: boolean;
   extendLine: boolean;
+  isExpanded: boolean;
+  toggleExpanded: (version: string) => void;
 }) {
-  const [bugsOpen, setBugsOpen] = useState(false);
-
   const releaseDate = new Date(
     Date.UTC(
       versionData.releaseDate.year,
@@ -177,8 +258,8 @@ function MajorVersion({
         </ul>
         {versionData.bugFixes && versionData.bugFixes.length > 0 && (
           <Collapsible.Root
-            open={bugsOpen}
-            onOpenChange={setBugsOpen}
+            open={isExpanded}
+            onOpenChange={() => toggleExpanded(versionData.version)}
             className="ml-3"
           >
             <Collapsible.Trigger asChild>
@@ -188,7 +269,7 @@ function MajorVersion({
                   className={cn(
                     "transition-transform duration-200",
                     "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
-                    bugsOpen && "rotate-90",
+                    isExpanded && "rotate-90",
                   )}
                 >
                   <ChevronRightIcon className="h-4 w-4" />
@@ -214,14 +295,16 @@ function MinorVersion({
   isCurrent,
   isLast,
   extendLine,
+  isExpanded,
+  toggleExpanded,
 }: {
   versionData: MinorVersionData;
   isCurrent: boolean;
   isLast: boolean;
   extendLine: boolean;
+  isExpanded: boolean;
+  toggleExpanded: (version: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
-
   const releaseDate = new Date(
     Date.UTC(
       versionData.releaseDate.year,
@@ -243,7 +326,10 @@ function MinorVersion({
         extend={extendLine}
       />
       <div className="px-4">
-        <Collapsible.Root open={open} onOpenChange={setOpen}>
+        <Collapsible.Root
+          open={isExpanded}
+          onOpenChange={() => toggleExpanded(versionData.version)}
+        >
           <Collapsible.Trigger asChild className="cursor-pointer">
             <div className="group flex items-center gap-2">
               <span className="font-bold">{versionData.version}</span>
@@ -254,7 +340,7 @@ function MinorVersion({
                 className={cn(
                   "transition-transform duration-200",
                   "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
-                  open && "rotate-90",
+                  isExpanded && "rotate-90",
                 )}
               >
                 <ChevronRightIcon className="h-4 w-4" />

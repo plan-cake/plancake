@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useSettingsAccount } from "@/features/account/settings/context";
 import PasswordValidation from "@/features/auth/components/password-validation";
@@ -63,6 +63,43 @@ export function useChangePasswordFlow() {
       clearAllErrors();
     }
   };
+
+  const invalidForm = useMemo(() => {
+    if (step === "CHANGE") {
+      return !form.currentPassword || !form.newPassword
+        ? MESSAGES.FORM_NOT_FILLED
+        : !passwordIsStrong
+          ? MESSAGES.ERROR_PASSWORD_WEAK
+          : !form.confirmPassword
+            ? MESSAGES.FORM_NOT_FILLED
+            : form.newPassword !== form.confirmPassword
+              ? MESSAGES.ERROR_PASSWORD_MISMATCH
+              : Object.keys(errors).length
+                ? MESSAGES.FORM_HAS_ERRORS
+                : undefined;
+    }
+    if (step === "OTP") {
+      return !form.resetCode
+        ? "Please enter the reset code."
+        : Object.keys(errors).length
+          ? MESSAGES.FORM_HAS_ERRORS
+          : undefined;
+    }
+    if (step === "RESET") {
+      return !form.newPassword
+        ? MESSAGES.FORM_NOT_FILLED
+        : !passwordIsStrong
+          ? MESSAGES.ERROR_PASSWORD_WEAK
+          : !form.confirmPassword
+            ? MESSAGES.FORM_NOT_FILLED
+            : form.newPassword !== form.confirmPassword
+              ? MESSAGES.ERROR_PASSWORD_MISMATCH
+              : Object.keys(errors).length
+                ? MESSAGES.FORM_HAS_ERRORS
+                : undefined;
+    }
+    return undefined;
+  }, [step, form, passwordIsStrong, errors]);
 
   // --- API FUNCTIONS ---
   const handleForgotPassword = async () => {
@@ -179,6 +216,7 @@ export function useChangePasswordFlow() {
     setStep,
     form,
     updateForm,
+    invalidForm,
     errors,
     criteria,
     showCriteria,

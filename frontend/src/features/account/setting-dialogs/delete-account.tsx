@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -24,6 +24,15 @@ export default function DeleteAccountDialog() {
   const [currentPassword, setCurrentPassword] = useState("");
 
   const [confirmationOpen, setConfirmationOpen] = useState(false);
+
+  // CHECK FIELDS
+  const invalidForm = useMemo(() => {
+    return !currentPassword
+      ? MESSAGES.FORM_NOT_FILLED
+      : Object.keys(errors).length
+        ? MESSAGES.FORM_HAS_ERRORS
+        : undefined;
+  }, [currentPassword, errors]);
 
   const handleOpenChange = (open: boolean) => {
     setConfirmationOpen(open);
@@ -75,6 +84,8 @@ export default function DeleteAccountDialog() {
       onOpenChange={handleOpenChange}
       onSubmit={handleDeleteAccount}
       submitLabel="Delete Account"
+      submitDisabled={!isMobile && !!invalidForm}
+      submitTooltip={invalidForm}
     >
       <div className="text-center">
         <p>
@@ -94,6 +105,7 @@ export default function DeleteAccountDialog() {
         value={currentPassword}
         onChange={(value) => {
           setCurrentPassword(value);
+          handleError("currentPassword", "");
         }}
         style="outlined"
         error={errors.currentPassword || errors.api}

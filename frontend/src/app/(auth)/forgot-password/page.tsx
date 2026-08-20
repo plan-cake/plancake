@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Link from "next/link";
 
@@ -11,6 +11,7 @@ import TextInputField from "@/components/text-input-field";
 import InboxLinks from "@/features/auth/components/inbox-links";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -20,9 +21,19 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 export default function Page() {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+  const isMobile = useCheckMobile();
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
+
+  // CHECK FIELDS
+  const invalidForm = useMemo(() => {
+    return !email || !email.trim()
+      ? "Please enter an email address."
+      : Object.keys(errors).length
+        ? MESSAGES.FORM_HAS_ERRORS
+        : undefined;
+  }, [email, errors]);
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
@@ -93,7 +104,9 @@ export default function Page() {
             <ActionButton
               buttonStyle="primary"
               label="Send Link"
+              tooltip={invalidForm}
               onClick={handleSubmit}
+              disabled={!isMobile && !!invalidForm}
               loadOnSuccess
             />
           </div>
