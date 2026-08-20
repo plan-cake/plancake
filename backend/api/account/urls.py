@@ -9,8 +9,5 @@ urlpatterns = [
     path("terminate-session/", views.terminate_session),
     path("prune-sessions/", views.prune_sessions),
     path("change-password/", views.change_password),
-    path("start-authed-password-reset/", views.start_authed_password_reset),
-    path("check-authed-password-reset-code/", views.check_authed_password_reset_code),
-    path("authed-password-reset/", views.authed_password_reset),
     path("delete-account/", views.delete_account),
 ]
