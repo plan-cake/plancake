@@ -35,9 +35,9 @@ class UserAccount(models.Model):
 
 
 class UnverifiedUserAccount(models.Model):
-    verification_code = models.CharField(max_length=6, primary_key=True)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, primary_key=True)
     password_hash = models.CharField(max_length=255)
+    verification_code = models.CharField(max_length=6)
     created_at = DateTimeNoTZField(auto_now_add=True)
 
 
