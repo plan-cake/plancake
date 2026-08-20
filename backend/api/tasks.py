@@ -9,7 +9,6 @@ from api.models import (
     UserSession,
 )
 from api.settings import (
-    AUTHED_PWD_RESET_EXP_SECONDS,
     EMAIL_CODE_EXP_SECONDS,
     LONG_SESS_EXP_SECONDS,
     PWD_RESET_EXP_SECONDS,
