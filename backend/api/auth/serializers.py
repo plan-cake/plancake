@@ -26,7 +26,7 @@ class RegisterAccountSerializer(EmailSerializer, PasswordSerializer):
     pass
 
 
-class EmailVerifySerializer(serializers.Serializer):
+class EmailVerifySerializer(EmailSerializer):
     verification_code = serializers.CharField(required=True)
 
 

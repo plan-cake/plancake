@@ -162,19 +162,21 @@ def resend_register_email(request):
 @validate_output(MessageOutputSerializer)
 def verify_email(request):
     """
-    Verifies the email address of an unverified user account.
+    Verifies an unverified user account given an email and verification code.
 
-    If the verification code is valid, it creates a verified user account with the
+    If the given information is valid, it creates a verified user account with the
     information given when initially registering.
 
     This endpoint does NOT automatically log in the user after verifying.
     """
+    email = request.validated_data.get("email")
     ver_code = request.validated_data.get("verification_code")
 
     check_rate_limit(request, ThrottleScopes.CODE_CHECK)
 
     try:
         unverified_user = UnverifiedUserAccount.objects.get(
+            email=email,
             verification_code=ver_code,
             created_at__gte=datetime.now() - timedelta(seconds=EMAIL_CODE_EXP_SECONDS),
         )
