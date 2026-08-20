@@ -1,6 +1,4 @@
 import logging
-import random
-import string
 import uuid
 from datetime import datetime, timedelta
 
@@ -17,7 +15,7 @@ from api.auth.serializers import (
     PasswordResetSerializer,
     RegisterAccountSerializer,
 )
-from api.auth.utils import list_failed_criteria, validate_password
+from api.auth.utils import generate_auth_code, list_failed_criteria, validate_password
 from api.decorators import (
     api_endpoint,
     check_auth,
@@ -94,7 +92,7 @@ def register(request):
         )
     else:
         # Create an unverified user account
-        ver_code = str(uuid.uuid4())
+        ver_code = generate_auth_code()
         with transaction.atomic():
             UnverifiedUserAccount.objects.filter(email=email).delete()
             UnverifiedUserAccount.objects.create(
@@ -322,7 +320,7 @@ def start_password_reset(request):
 
     try:
         user = UserAccount.objects.get(email=email)
-        reset_code = "".join(random.SystemRandom().choices(string.digits, k=6))
+        reset_code = generate_auth_code()
         with transaction.atomic():
             PasswordResetCode.objects.update_or_create(
                 user_account=user,
