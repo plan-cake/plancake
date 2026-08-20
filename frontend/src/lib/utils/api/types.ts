@@ -152,13 +152,3 @@ export type ActiveSessionList = {
 export type SessionId = {
   session_id: string;
 }
-
-export type AuthedPasswordResetCode = {
-  reset_code: string;
-}
-
-export type AuthedPasswordResetData = {
-  reset_code: string;
-  new_password: string;
-  prune_sessions?: boolean;
-}

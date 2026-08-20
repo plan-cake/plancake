@@ -1,8 +1,7 @@
 import {
   AccountData,
+  ActiveSessionList,
   AllAvailability,
-  AuthedPasswordResetCode,
-  AuthedPasswordResetData,
   AvailabilityAddData,
   CustomCode,
   DashboardData,
@@ -20,10 +19,9 @@ import {
   PasswordResetData,
   RegisterData,
   SelfAvailability,
-  VerificationCode,
-  ActiveSessionList,
   SessionId,
   TrueCode,
+  VerificationCode
 } from "@/lib/utils/api/types";
 
 /**
@@ -240,28 +238,6 @@ export const ROUTES = {
      * @throws 400 - If the new password is the same as the old password.
      */
     changePassword: route<MessageResponse, PasswordChangeData>("/account/change-password/"),
-    /**
-     * Starts the password reset process for a logged-in user by sending an email.
-     * @method POST
-     * @throws 401 - If the user is not logged in.
-     */
-    startAuthedPasswordReset: route<MessageResponse>("/account/start-authed-password-reset/"),
-    /**
-     * Checks the validity of a password reset code for a logged-in user.
-     * @method POST
-     * @throws 401 - If the user is not logged in.
-     * @throws 400 - If the reset code is invalid.
-     */
-    checkAuthedPasswordResetCode: route<MessageResponse, AuthedPasswordResetCode>("/account/check-authed-password-reset-code/"),
-    /**
-     * Resets the password for a logged-in user.
-     * @method POST
-     * @throws 401 - If the user is not logged in.
-     * @throws 400 - If the reset code is invalid.
-     * @throws 400 - If the new password is not strong enough.
-     * @throws 400 - If the new password is the same as the old password.
-     */
-    authedPasswordReset: route<MessageResponse, AuthedPasswordResetData>("/account/authed-password-reset/"),
     /**
      * Deletes the current user account, including all created events and participation
      * data.
