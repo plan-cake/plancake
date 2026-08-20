@@ -163,14 +163,19 @@ export default function Page() {
           ]}
           rateLimitError={flow.errors.rate_limit}
         >
-          <div className="flex w-full justify-end">
-            <ActionButton
-              buttonStyle="primary"
-              label="Change Password"
-              tooltip={flow.invalidForm}
-              onClick={flow.handleResetPassword}
-              disabled={!isMobile && !!flow.invalidForm}
-            />
+          <div className="flex flex-col items-center gap-4">
+            <div className="text-sm opacity-75">
+              This will sign out your account on all devices.
+            </div>
+            <div className="flex w-full justify-end">
+              <ActionButton
+                buttonStyle="primary"
+                label="Change Password"
+                tooltip={flow.invalidForm}
+                onClick={flow.handleResetPassword}
+                disabled={!isMobile && !!flow.invalidForm}
+              />
+            </div>
           </div>
         </AuthPageLayout>
       );

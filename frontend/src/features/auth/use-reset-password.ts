@@ -21,7 +21,6 @@ export function useResetPasswordFlow() {
     resetCode: "",
     newPassword: "",
     confirmPassword: "",
-    pruneSessions: false,
   });
 
   const updateForm = (field: keyof typeof form, value: string | boolean) => {
@@ -121,7 +120,7 @@ export function useResetPasswordFlow() {
         email: form.email,
         reset_code: form.resetCode,
         new_password: form.newPassword,
-        prune_sessions: form.pruneSessions,
+        prune_sessions: true,
       });
       setStep("SUCCESS");
       return true;
