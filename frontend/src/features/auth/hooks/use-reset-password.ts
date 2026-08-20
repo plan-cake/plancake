@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
 import PasswordValidation from "@/features/auth/components/password-validation";
-import { useToast } from "@/features/system-feedback";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -11,7 +10,6 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 export type PasswordResetStep = "EMAIL" | "OTP" | "RESET" | "SUCCESS";
 
 export function useResetPasswordFlow() {
-  const { addToast } = useToast();
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
   const [step, setStep] = useState<PasswordResetStep>("EMAIL");
@@ -75,7 +73,6 @@ export function useResetPasswordFlow() {
     try {
       await clientPost(ROUTES.auth.startPasswordReset, { email: form.email });
       setStep("OTP");
-      addToast("success", "Password reset code sent to your email.");
       return true;
     } catch (e) {
       handleError("toast", (e as ApiErrorResponse).formattedMessage);

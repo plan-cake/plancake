@@ -107,7 +107,6 @@ export function useChangePasswordFlow() {
     try {
       await clientPost(ROUTES.auth.startPasswordReset, { email });
       setStep("OTP");
-      addToast("success", "Password reset code sent to your email.");
     } catch (e) {
       handleError("toast", (e as ApiErrorResponse).formattedMessage);
     }
