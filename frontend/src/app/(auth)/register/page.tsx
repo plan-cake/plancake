@@ -1,192 +1,176 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 import AuthPageLayout from "@/components/layout/auth-page";
+import MessagePage from "@/components/layout/message-page";
 import LinkText from "@/components/link-text";
+import OTPField from "@/components/otp-field";
 import TextInputField from "@/components/text-input-field";
-import PasswordValidation from "@/features/auth/components/password-validation";
+import InboxLinks from "@/features/auth/components/inbox-links";
+import { useRegisterFlow } from "@/features/auth/hooks/use-register";
 import ActionButton from "@/features/button/components/action";
+import LinkButton from "@/features/button/components/link";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
-import { useFormErrors } from "@/lib/hooks/use-form-errors";
-import { MESSAGES } from "@/lib/messages";
-import { clientPost } from "@/lib/utils/api/client-fetch";
-import { ROUTES } from "@/lib/utils/api/endpoints";
-import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
+import { cn } from "@/lib/utils/classname";
 
 export default function Page() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordCriteria, setPasswordCriteria] = useState({});
-  const [showPasswordCriteria, setShowPasswordCriteria] = useState(false);
-  const router = useRouter();
   const isMobile = useCheckMobile();
+  const flow = useRegisterFlow();
 
-  // TOASTS AND ERROR STATES
-  const { errors, handleError, clearAllErrors } = useFormErrors();
+  switch (flow.step) {
+    case "REGISTRATION":
+      return (
+        <AuthPageLayout
+          title="register"
+          rateLimitError={flow.errors.rate_limit}
+          fields={[
+            // Email
+            <TextInputField
+              key="email"
+              id="email"
+              type="email"
+              label="Email*"
+              value={flow.form.email}
+              onChange={(value) => flow.updateForm("email", value)}
+              style="outlined"
+              error={flow.errors.email || flow.errors.api}
+            />,
 
-  const passwordIsStrong = useCallback(() => {
-    return Object.values(passwordCriteria).every((value) => value === true);
-  }, [passwordCriteria]);
+            // Password
+            <TextInputField
+              key="password"
+              id="password"
+              type="password"
+              label="Password*"
+              value={flow.form.password}
+              onChange={(value) => {
+                flow.updateForm("password", value);
+              }}
+              onFocus={() => flow.setShowCriteria(true)}
+              onBlur={() => {
+                if (!flow.form.password || flow.passwordIsStrong) {
+                  flow.setShowCriteria(false);
+                }
+              }}
+              style="outlined"
+              error={flow.errors.password || flow.errors.api}
+              showPasswordCriteria={flow.showCriteria}
+              passwordCriteria={flow.criteria}
+            />,
 
-  // CHECK FIELDS
-  const invalidForm = useMemo(() => {
-    return !email || !email.trim() || !password
-      ? MESSAGES.FORM_NOT_FILLED
-      : !passwordIsStrong()
-        ? MESSAGES.ERROR_PASSWORD_WEAK
-        : !confirmPassword
-          ? MESSAGES.FORM_NOT_FILLED
-          : password !== confirmPassword
-            ? MESSAGES.ERROR_PASSWORD_MISMATCH
-            : Object.keys(errors).length
-              ? MESSAGES.FORM_HAS_ERRORS
-              : undefined;
-  }, [email, password, confirmPassword, passwordIsStrong, errors]);
+            // Retype Password
+            <TextInputField
+              key="confirmPassword"
+              id="confirmPassword"
+              type="password"
+              label="Retype Password*"
+              value={flow.form.confirmPassword}
+              onChange={(value) => flow.updateForm("confirmPassword", value)}
+              style="outlined"
+              error={flow.errors.confirmPassword || flow.errors.api}
+            />,
+          ]}
+        >
+          <div className="flex w-full justify-end">
+            <ActionButton
+              buttonStyle="primary"
+              label="Register"
+              tooltip={flow.invalidForm}
+              onClick={flow.handleRegister}
+              disabled={!isMobile && !!flow.invalidForm}
+            />
+          </div>
+          <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
+            <Link href="/forgot-password">
+              <LinkText>Forgot password?</LinkText>
+            </Link>
+            <div>
+              Already have an account?{" "}
+              <Link href="/login">
+                <LinkText>Login!</LinkText>
+              </Link>
+            </div>
+          </div>
+        </AuthPageLayout>
+      );
+    case "OTP":
+      return (
+        <div className="flex h-screen items-center justify-center">
+          <MessagePage
+            title="Check Your Email"
+            description="We sent a verification code to your email."
+            buttons={[
+              <LinkButton
+                key="0"
+                buttonStyle="transparent"
+                label="Back to Login"
+                href="/login"
+              />,
+              <ActionButton
+                key="1"
+                buttonStyle="primary"
+                label="Verify Code"
+                onClick={() => flow.handleVerifyOTP()}
+              />,
+            ]}
+          >
+            <InboxLinks email={flow.form.email} />
+            <div className="flex flex-col items-center justify-center gap-2">
+              <p
+                className={cn(
+                  "text-error -mt-2 text-sm",
+                  !flow.errors.resetCode && "hidden",
+                )}
+              >
+                {flow.errors.resetCode}
+              </p>
 
-  const handleEmailChange = (value: string) => {
-    handleError("email", "");
-    handleError("api", "");
-    setEmail(value);
-  };
+              <OTPField
+                length={6}
+                value={flow.form.verificationCode}
+                error={!!flow.errors.verificationCode}
+                onValueChange={(val) => {
+                  flow.updateForm("verificationCode", val);
 
-  const handlePasswordChange = (value: string) => {
-    handleError("password", "");
-    handleError("api", "");
-    setPassword(value);
-  };
-
-  const handleConfirmPasswordChange = (value: string) => {
-    handleError("confirmPassword", "");
-    handleError("api", "");
-    setConfirmPassword(value);
-  };
-
-  useEffect(() => {
-    const { criteria } = PasswordValidation(password);
-    setPasswordCriteria(criteria);
-  }, [password]);
-
-  const handleSubmit = async () => {
-    clearAllErrors();
-
-    if (!email) {
-      handleError("email", MESSAGES.ERROR_EMAIL_MISSING);
-      return false;
-    }
-    if (!password) {
-      handleError("password", MESSAGES.ERROR_PASSWORD_MISSING);
-      return false;
-    }
-    if (!passwordIsStrong()) {
-      handleError("password", MESSAGES.ERROR_PASSWORD_WEAK);
-      return false;
-    }
-    if (confirmPassword !== password) {
-      handleError("confirmPassword", MESSAGES.ERROR_PASSWORD_MISMATCH);
-      return false;
-    }
-
-    try {
-      await clientPost(ROUTES.auth.register, { email, password });
-      sessionStorage.setItem("register_email", email);
-      router.push("/register/email-sent");
-      return true;
-    } catch (e) {
-      const error = e as ApiErrorResponse;
-      if (error.rateLimited) {
-        handleError("rate_limit", error.formattedMessage);
-      } else if (error.formattedMessage.includes("Email:")) {
-        handleError("email", error.formattedMessage.split("Email:")[1].trim());
-      } else if (error.formattedMessage.includes("Password:")) {
-        handleError(
-          "password",
-          error.formattedMessage.split("Password:")[1].trim(),
-        );
-      } else {
-        handleError("api", error.formattedMessage);
-      }
-      return false;
-    }
-  };
-
-  return (
-    <AuthPageLayout
-      title="register"
-      rateLimitError={errors.rate_limit}
-      fields={[
-        // Email
-        <TextInputField
-          key="email"
-          id="email"
-          type="email"
-          label="Email*"
-          value={email}
-          onChange={handleEmailChange}
-          style="outlined"
-          error={errors.email || errors.api}
-        />,
-
-        // Password
-        <TextInputField
-          key="password"
-          id="password"
-          type="password"
-          label="Password*"
-          value={password}
-          onChange={(value) => {
-            handlePasswordChange(value);
-          }}
-          onFocus={() => setShowPasswordCriteria(true)}
-          onBlur={() => {
-            if (!password || passwordIsStrong()) {
-              setShowPasswordCriteria(false);
-            }
-          }}
-          style="outlined"
-          error={errors.password || errors.api}
-          showPasswordCriteria={showPasswordCriteria}
-          passwordCriteria={passwordCriteria}
-        />,
-
-        // Retype Password
-        <TextInputField
-          key="confirmPassword"
-          id="confirmPassword"
-          type="password"
-          label="Retype Password*"
-          value={confirmPassword}
-          onChange={handleConfirmPasswordChange}
-          style="outlined"
-          error={errors.confirmPassword || errors.api}
-        />,
-      ]}
-    >
-      <div className="flex w-full justify-end">
-        <ActionButton
-          buttonStyle="primary"
-          label="Register"
-          tooltip={invalidForm}
-          onClick={handleSubmit}
-          disabled={!isMobile && !!invalidForm}
-          loadOnSuccess
-        />
-      </div>
-      <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
-        <Link href="/forgot-password">
-          <LinkText>Forgot password?</LinkText>
-        </Link>
-        <div>
-          Already have an account?{" "}
-          <Link href="/login">
-            <LinkText>Login!</LinkText>
-          </Link>
+                  // Auto submit OTP on the 6th character, giving a small delay for the UI
+                  // to update and show the last character entered
+                  if (val.length === 6) {
+                    setTimeout(() => {
+                      flow.handleVerifyOTP(val);
+                    }, 10);
+                  }
+                }}
+              />
+            </div>
+            <div className="flex justify-center text-sm">
+              <button
+                type="button"
+                onClick={flow.handleResendEmail}
+                className="cursor-pointer border-none bg-transparent p-0"
+              >
+                <LinkText>Resend Code</LinkText>
+              </button>
+            </div>
+          </MessagePage>
         </div>
-      </div>
-    </AuthPageLayout>
-  );
+      );
+    case "SUCCESS":
+      return (
+        <div className="flex h-screen items-center justify-center">
+          <MessagePage
+            title="Email Verified"
+            description="Welcome to Plancake!"
+            buttons={[
+              <LinkButton
+                key="0"
+                buttonStyle="primary"
+                label="Go to Login"
+                href="/login"
+              />,
+            ]}
+          />
+        </div>
+      );
+  }
 }
