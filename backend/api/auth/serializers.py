@@ -13,6 +13,15 @@ class NewPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True)
 
 
+class ResetCodeSerializer(serializers.Serializer):
+    reset_code = serializers.RegexField(
+        regex=r"^\d{6}$",
+        required=True,
+        min_length=6,
+        max_length=6,
+    )
+
+
 class RegisterAccountSerializer(EmailSerializer, PasswordSerializer):
     pass
 
@@ -25,8 +34,14 @@ class LoginSerializer(RegisterAccountSerializer):
     remember_me = serializers.BooleanField(default=False, required=False)
 
 
-class PasswordResetSerializer(NewPasswordSerializer):
-    reset_token = serializers.CharField(required=True)
+class CodeCheckSerializer(EmailSerializer, ResetCodeSerializer):
+    pass
+
+
+class PasswordResetSerializer(
+    EmailSerializer, NewPasswordSerializer, ResetCodeSerializer
+):
+    prune_sessions = serializers.BooleanField(default=False, required=False)
 
 
 class PasswordChangeSerializer(PasswordSerializer, NewPasswordSerializer):

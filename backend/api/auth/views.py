@@ -1,4 +1,6 @@
 import logging
+import random
+import string
 import uuid
 from datetime import datetime, timedelta
 
@@ -8,6 +10,7 @@ from rest_framework.response import Response
 
 from api.auth.serializers import (
     AccountDetailsSerializer,
+    CodeCheckSerializer,
     EmailSerializer,
     EmailVerifySerializer,
     LoginSerializer,
@@ -17,12 +20,13 @@ from api.auth.serializers import (
 from api.auth.utils import list_failed_criteria, validate_password
 from api.decorators import (
     api_endpoint,
+    check_auth,
     require_account_auth,
     validate_json_input,
     validate_output,
 )
 from api.models import (
-    PasswordResetToken,
+    PasswordResetCode,
     UnverifiedUserAccount,
     UserAccount,
     UserLogin,
@@ -42,6 +46,7 @@ from api.utils import (
     get_client_ip_address,
     get_client_user_agent,
     get_session,
+    prune_account_sessions,
     send_templated_email,
     set_session_cookie,
 )
@@ -315,18 +320,18 @@ def start_password_reset(request):
 
     try:
         user = UserAccount.objects.get(email=email)
-        reset_token = str(uuid.uuid4())
+        reset_code = "".join(random.SystemRandom().choices(string.digits, k=6))
         with transaction.atomic():
-            PasswordResetToken.objects.filter(user_account=user).delete()
-            PasswordResetToken.objects.create(
-                reset_token=reset_token, user_account=user
+            PasswordResetCode.objects.update_or_create(
+                user_account=user,
+                defaults={"reset_code": reset_code, "created_at": datetime.now()},
             )
-        logger.debug("Password reset token for %s: %s", email, reset_token)
+        logger.debug("Password reset code for %s: %s", email, reset_code)
 
         send_templated_email(
             to_email=email,
-            template_key=EmailTemplateKey.PASSWORD_RESET,
-            context={"token": reset_token},
+            template_key=EmailTemplateKey.PASSWORD_RESET_CODE,
+            context={"code": reset_code},
         )
 
     except UserAccount.DoesNotExist:
@@ -343,19 +348,77 @@ def start_password_reset(request):
 
 
 @api_endpoint("POST")
+@validate_json_input(CodeCheckSerializer)
+@validate_output(MessageOutputSerializer)
+def check_password_reset_code(request):
+    """
+    Checks if the provided password reset code is valid for the account associated with
+    the provided email address.
+    """
+    email = request.validated_data.get("email")
+    reset_code = request.validated_data.get("reset_code")
+
+    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
+
+    INVALID_RESPONSE = Response(
+        {"error": {"general": ["Invalid email or reset code."]}}, status=400
+    )
+
+    try:
+        user = UserAccount.objects.get(email=email)
+        PasswordResetCode.objects.get(
+            user_account=user,
+            reset_code=reset_code,
+            created_at__gte=datetime.now() - timedelta(seconds=PWD_RESET_EXP_SECONDS),
+        )
+    except UserAccount.DoesNotExist:
+        logger.info(
+            "Password reset code check failed for %s: User does not exist.", email
+        )
+        return INVALID_RESPONSE
+    except PasswordResetCode.DoesNotExist:
+        logger.info(
+            "Password reset code check failed for %s: Invalid or expired reset code.",
+            email,
+        )
+        return INVALID_RESPONSE
+
+    return Response({"message": ["Password reset code is valid."]}, status=200)
+
+
+@api_endpoint("POST")
+@check_auth
 @validate_json_input(PasswordResetSerializer)
 @validate_output(MessageOutputSerializer)
 def reset_password(request):
     """
-    Resets the password for a user account given a valid password reset token.
+    Resets the password for a user account given a valid combination of email and password
+    reset token.
 
-    Also removes all currently active sessions as a security measure. This means that you
-    probably shouldn't call this endpoint while the user is currently logged in.
+    If "prune_sessions" is true, all active sessions for this account will be removed,
+    unless the user is logged into an account. If that is the case, the current session
+    will be preserved.
     """
-    reset_token = request.validated_data.get("reset_token")
+    user = request.user
+    email = request.validated_data.get("email")
+    reset_code = request.validated_data.get("reset_code")
     new_password = request.validated_data.get("new_password")
+    prune_sessions = request.validated_data.get("prune_sessions")
 
     check_rate_limit(request, ThrottleScopes.CODE_CHECK)
+
+    has_account_auth = user is not None and not user.is_guest
+
+    if has_account_auth and user.email != email:
+        logger.info(
+            "Password reset failed: Authenticated user email %s does not match provided email %s.",
+            user.email,
+            email,
+        )
+        return Response(
+            {"error": {"email": ["Provided email does not match account."]}},
+            status=400,
+        )
 
     is_strong, criteria = validate_password(new_password)
     if not is_strong:
@@ -366,12 +429,13 @@ def reset_password(request):
 
     try:
         with transaction.atomic():
-            reset_token_obj = PasswordResetToken.objects.get(
-                reset_token=reset_token,
+            reset_code_obj = PasswordResetCode.objects.get(
+                user_account__email=email,
+                reset_code=reset_code,
                 created_at__gte=datetime.now()
                 - timedelta(seconds=PWD_RESET_EXP_SECONDS),
             )
-            user = reset_token_obj.user_account
+            user = reset_code_obj.user_account
 
             # Check if the new password is actually new
             if bcrypt.checkpw(new_password.encode(), user.password_hash.encode()):
@@ -391,16 +455,29 @@ def reset_password(request):
                 new_password.encode(), bcrypt.gensalt()
             ).decode()
             user.save()
-            reset_token_obj.delete()  # Make sure to remove the reset token after use
+            reset_code_obj.delete()  # Make sure to remove the reset code after use
 
-            # Remove all active sessions for the user
-            UserSession.objects.filter(user_account=user).delete()
+            if prune_sessions:
+                if has_account_auth:
+                    # Remove all active sessions except the current one
+                    prune_account_sessions(request)
+                else:
+                    # Remove all active sessions for the user
+                    UserSession.objects.filter(user_account=user).delete()
 
-    except PasswordResetToken.DoesNotExist:
-        logger.info("Password reset failed: Invalid reset token.")
-        return Response(
-            {"error": {"reset_token": ["Invalid reset token."]}}, status=404
-        )
+    except PasswordResetCode.DoesNotExist:
+        if has_account_auth:
+            logger.info("Password reset failed for %s: Invalid reset code.", user.email)
+            return Response(
+                {"error": {"reset_code": ["Invalid reset code."]}}, status=404
+            )
+        else:
+            logger.info(
+                "Password reset failed for %s: Invalid reset code or email.", email
+            )
+            return Response(
+                {"error": {"reset_code": ["Invalid email or reset code."]}}, status=404
+            )
 
     return Response({"message": ["Password reset successfully."]}, status=200)
 
