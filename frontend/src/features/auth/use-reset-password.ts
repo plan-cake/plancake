@@ -84,9 +84,9 @@ export function useResetPasswordFlow() {
     }
   };
 
-  const handleVerifyOTP = async () => {
+  const handleVerifyOTP = async (code?: string) => {
     clearAllErrors();
-    const codeToVerify = form.resetCode;
+    const codeToVerify = code || form.resetCode;
 
     if (!codeToVerify) {
       handleError("resetCode", "Please enter the code.");
