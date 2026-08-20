@@ -77,8 +77,8 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${modak.variable} ${nunito.variable}`}
     >
-      <body className="font-sans antialiased">
-        <div className="mx-auto flex min-h-dvh max-w-[1440px] flex-col [overflow-x:clip]">
+      <body className="overflow-x-clip font-sans antialiased">
+        <div className="mx-auto flex min-h-dvh w-full max-w-[1440px] flex-col">
           <Providers>
             <CookieGuard>
               <Suspense fallback={null}>
