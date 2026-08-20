@@ -20,8 +20,8 @@ export default function Hero() {
   });
 
   // 1. Stretched the circle expansion to end at 1.0 instead of 0.75
-  const circleScale = useTransform(scrollYProgress, [0.1, 1], [0.1, 1]);
-  const clipRadiusVmax = useTransform(scrollYProgress, [0.1, 1], [7, 70]);
+  const circleScale = useTransform(scrollYProgress, [0.1, 1], [0.085, 1]);
+  const clipRadiusVmax = useTransform(scrollYProgress, [0.1, 1], [6, 70]);
   const clipPath = useTransform(
     clipRadiusVmax,
     (r) => `circle(${r}vmax at ${clipCenter.x}px ${clipCenter.y}px)`,
@@ -52,7 +52,7 @@ export default function Hero() {
   const imageY = useTransform(scrollYProgress, [0.2, 1], ["100%", "80%"]);
 
   return (
-    <div className="relative">
+    <div className="relative left-1/2 w-[100vw] -translate-x-1/2">
       <div ref={trackRef} className="bg-lion relative z-10 h-[220vh]">
         <div ref={stickyRef} className="sticky top-0 h-screen w-full">
           <div className="bg-background absolute inset-0 flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
@@ -137,13 +137,12 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
-
       <div className="from-lion to-background relative z-0 w-full bg-gradient-to-b">
         <div
           aria-hidden
           className="pointer-events-none mx-auto w-[90vw] max-w-[1296px]"
         >
-          <div className="w-full pb-[50%]" />
+          <div className="w-full pb-[70%]" />
         </div>
       </div>
     </div>
