@@ -482,7 +482,6 @@ def notify_live_update(event: LiveUpdateEvent):
 class EmailTemplateKey(str, Enum):
     EMAIL_IN_USE = "email_in_use"
     EMAIL_VERIFICATION = "email_verification"
-    PASSWORD_RESET = "password_reset"
     PASSWORD_RESET_CODE = "password_reset_code"
 
 
