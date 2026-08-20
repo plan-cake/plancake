@@ -35,7 +35,7 @@ class UserAccount(models.Model):
 
 
 class UnverifiedUserAccount(models.Model):
-    verification_code = models.CharField(max_length=255, primary_key=True)
+    verification_code = models.CharField(max_length=6, primary_key=True)
     email = models.EmailField(unique=True)
     password_hash = models.CharField(max_length=255)
     created_at = DateTimeNoTZField(auto_now_add=True)
@@ -57,19 +57,11 @@ class UserSession(models.Model):
         indexes = [models.Index(fields=["is_extended", "last_used"])]
 
 
-class PasswordResetToken(models.Model):
-    reset_token = models.CharField(max_length=255, primary_key=True)
-    user_account = models.ForeignKey(
-        UserAccount, on_delete=models.CASCADE, related_name="password_reset_tokens"
-    )
-    created_at = DateTimeNoTZField(auto_now_add=True)
-
-
-class AuthedPasswordResetCode(models.Model):
+class PasswordResetCode(models.Model):
     user_account = models.OneToOneField(
         UserAccount,
         on_delete=models.CASCADE,
-        related_name="authed_password_reset_code",
+        related_name="password_reset_code",
         primary_key=True,
     )
     reset_code = models.CharField(max_length=6)
