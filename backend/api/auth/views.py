@@ -104,7 +104,7 @@ def register(request):
 
         send_templated_email(
             to_email=email,
-            template_key=EmailTemplateKey.EMAIL_VERIFICATION,
+            template_key=EmailTemplateKey.EMAIL_VERIFICATION_CODE,
             context={"code": ver_code},
         )
 
@@ -145,7 +145,7 @@ def resend_register_email(request):
 
         send_templated_email(
             to_email=email,
-            template_key=EmailTemplateKey.EMAIL_VERIFICATION,
+            template_key=EmailTemplateKey.EMAIL_VERIFICATION_CODE,
             context={"code": unverified_user.verification_code},
         )
 

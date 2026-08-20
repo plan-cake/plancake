@@ -1,5 +1,5 @@
 import { emailInUse } from "@/features/email/templates/email-in-use";
-import { emailVerification } from "@/features/email/templates/email-verification";
+import { emailVerificationCode } from "@/features/email/templates/email-verification-code";
 import { passwordResetCode } from "@/features/email/templates/password-reset-code";
 import { EmailContextError, EmailRenderResponse } from "@/features/email/type";
 
@@ -22,8 +22,8 @@ export async function POST(req: Request) {
       case "email_in_use":
         data = await emailInUse();
         break;
-      case "email_verification":
-        data = await emailVerification(context);
+      case "email_verification_code":
+        data = await emailVerificationCode(context);
         break;
       case "password_reset_code":
         data = await passwordResetCode(context);
