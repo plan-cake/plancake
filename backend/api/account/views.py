@@ -9,9 +9,10 @@ from rest_framework.response import Response
 
 from api.account.serializers import (
     ActiveSessionListSerializer,
+    PasswordChangeSerializer,
+    PasswordSerializer,
     SessionIdSerializer,
 )
-from api.auth.serializers import PasswordChangeSerializer, PasswordSerializer
 from api.auth.utils import list_failed_criteria, validate_password
 from api.availability.serializers import DisplayNameSerializer
 from api.decorators import (
