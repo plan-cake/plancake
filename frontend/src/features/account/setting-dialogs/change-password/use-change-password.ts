@@ -208,7 +208,7 @@ export function useChangePasswordFlow() {
     } catch (e) {
       const error = e as ApiErrorResponse;
       if (error.status === 404)
-        handleError("api", MESSAGES.ERROR_RESET_TOKEN_INVALID);
+        handleError("api", MESSAGES.ERROR_RESET_CODE_INVALID);
       else if (error.data?.error?.["password"])
         handleError("currentPassword", MESSAGES.ERROR_PASSWORD_WRONG);
       else if (error.data?.error?.["new_password"])

@@ -60,7 +60,7 @@ def register(request):
     Registers a new user account as an "unverified user" that cannot be used until the
     email address is verified.
 
-    If the email address is available, it will send an email with a link to verify.
+    If the email address is available, it will send an email with a code to verify.
 
     If the email address is already used for an unverified user, it will update the
     verification code and send a new email.
@@ -304,13 +304,13 @@ def check_account_auth(request):
 @validate_output(MessageOutputSerializer)
 def start_password_reset(request):
     """
-    Starts the password reset process by sending a password reset link to the specified
+    Starts the password reset process by sending a password reset code to the specified
     email.
 
     If the email address is not associated with a user account, nothing will happen.
 
     To resend the email, this endpoint can be called again with the same input. A new
-    reset token will be generated and the old one invalidated.
+    reset code will be generated and the old one invalidated.
     """
     email = request.validated_data.get("email")
 
@@ -392,7 +392,7 @@ def check_password_reset_code(request):
 def reset_password(request):
     """
     Resets the password for a user account given a valid combination of email and password
-    reset token.
+    reset code.
 
     If "prune_sessions" is true, all active sessions for this account will be removed,
     unless the user is logged into an account. If that is the case, the current session
