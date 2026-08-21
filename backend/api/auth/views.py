@@ -192,9 +192,7 @@ def verify_email(request):
 
     except UnverifiedUserAccount.DoesNotExist:
         logger.info("Verification code or email is invalid for %s.", email)
-        return Response(
-            {"error": {"verification_code": ["Invalid verification code."]}}, status=404
-        )
+        return Response({"error": {"verification_code": ["Invalid code."]}}, status=404)
 
     return Response({"message": ["Email verified successfully."]}, status=200)
 
@@ -348,7 +346,7 @@ def start_password_reset(request):
 
 
 INVALID_RESET_CODE_RESPONSE = Response(
-    {"error": {"general": ["Invalid reset code."]}}, status=400
+    {"error": {"general": ["Invalid code."]}}, status=400
 )
 
 
