@@ -346,7 +346,7 @@ def start_password_reset(request):
 
 
 INVALID_RESET_CODE_RESPONSE = Response(
-    {"error": {"general": ["Invalid code."]}}, status=400
+    {"error": {"general": ["Invalid code."]}}, status=404
 )
 
 
