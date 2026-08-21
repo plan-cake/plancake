@@ -72,7 +72,7 @@ export default function FormDialog({
     >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center gap-6"
+        className="flex flex-col items-center gap-4"
       >
         {children}
 
