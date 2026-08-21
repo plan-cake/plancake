@@ -138,7 +138,6 @@ export function useRegisterFlow() {
 
   return {
     step,
-    setStep,
     form,
     updateForm,
     invalidForm,

@@ -154,7 +154,6 @@ export function useResetPasswordFlow() {
 
   return {
     step,
-    setStep,
     form,
     updateForm,
     invalidForm,

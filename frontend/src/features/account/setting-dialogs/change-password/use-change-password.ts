@@ -221,7 +221,6 @@ export function useChangePasswordFlow() {
   return {
     open,
     step,
-    setStep,
     form,
     updateForm,
     invalidForm,
