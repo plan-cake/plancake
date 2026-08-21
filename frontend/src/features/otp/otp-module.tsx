@@ -1,4 +1,6 @@
-import { forwardRef } from "react";
+"use client";
+
+import { forwardRef, useEffect, useState } from "react";
 
 import LinkText from "@/components/link-text";
 import InboxLinks from "@/features/auth/components/inbox-links";
@@ -11,9 +13,11 @@ export type OTPModuleProps = Omit<OTPFieldProps, "onValueChange"> & {
   email: string;
   relevantError: string | undefined;
   onVerify: (code: string) => void;
-  onResend: () => void;
+  onResend: () => boolean | Promise<boolean>;
   className?: string;
 };
+
+const EMAIL_RESEND_COOLDOWN_SEC = 30;
 
 const OTPModule = forwardRef<HTMLDivElement, OTPModuleProps>(
   (
@@ -29,6 +33,16 @@ const OTPModule = forwardRef<HTMLDivElement, OTPModuleProps>(
     },
     ref,
   ) => {
+    const [resendCooldown, setResendCooldown] = useState(
+      EMAIL_RESEND_COOLDOWN_SEC,
+    );
+
+    useEffect(() => {
+      if (resendCooldown <= 0) return;
+      const timer = setTimeout(() => setResendCooldown((s) => s - 1), 1000);
+      return () => clearTimeout(timer);
+    }, [resendCooldown]);
+
     return (
       <div className={cn("flex flex-col gap-2", className)}>
         <div className="text-center">
@@ -65,10 +79,21 @@ const OTPModule = forwardRef<HTMLDivElement, OTPModuleProps>(
           <span className="opacity-75">Didn{"'"}t get anything? </span>
           <button
             type="button"
-            onClick={onResend}
-            className="cursor-pointer border-none bg-transparent p-0"
+            onClick={async () => {
+              if (resendCooldown > 0) return;
+
+              if (await onResend()) {
+                setResendCooldown(EMAIL_RESEND_COOLDOWN_SEC);
+              }
+            }}
+            disabled={resendCooldown > 0}
+            className={resendCooldown > 0 ? "opacity-50" : undefined}
           >
-            <LinkText>Resend Code</LinkText>
+            {resendCooldown > 0 ? (
+              `Resend in ${resendCooldown}s`
+            ) : (
+              <LinkText>Resend Code</LinkText>
+            )}
           </button>
         </div>
       </div>

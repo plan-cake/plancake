@@ -110,8 +110,10 @@ export function useChangePasswordFlow() {
       if (resend) {
         addToast("success", "Email resent.");
       }
+      return true;
     } catch (e) {
       handleError("toast", (e as ApiErrorResponse).formattedMessage);
+      return false;
     }
   };
 

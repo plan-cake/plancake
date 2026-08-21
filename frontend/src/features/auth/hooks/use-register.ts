@@ -86,8 +86,10 @@ export function useRegisterFlow() {
         email: form.email,
       });
       addToast("success", "Email resent.");
+      return true;
     } catch (e) {
       handleError("toast", (e as ApiErrorResponse).formattedMessage);
+      return false;
     }
   };
 
