@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import TextInputField from "@/components/text-input-field";
 import EmptyButton from "@/features/button/components/empty";
 import { FormDialog, useToast } from "@/features/system-feedback";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -14,6 +15,7 @@ import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function DeleteAccountDialog() {
+  const isMobile = useCheckMobile();
   const router = useRouter();
 
   // TOASTS AND ERROR STATES

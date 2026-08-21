@@ -26,7 +26,6 @@ import {
   SelfAvailability,
   SessionId,
   TrueCode,
-  VerificationCode,
 } from "@/lib/utils/api/types";
 
 /**
