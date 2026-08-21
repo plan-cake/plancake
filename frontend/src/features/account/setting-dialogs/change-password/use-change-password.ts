@@ -179,23 +179,22 @@ export function useChangePasswordFlow() {
 
   const handleChangePassword = async () => {
     clearAllErrors();
-    if (!form.currentPassword)
-      return (
-        handleError("currentPassword", MESSAGES.ERROR_PASSWORD_MISSING),
-        false
-      );
-    if (!form.newPassword)
-      return (
-        handleError("newPassword", MESSAGES.ERROR_PASSWORD_MISSING),
-        false
-      );
-    if (!passwordIsStrong)
-      return (handleError("newPassword", MESSAGES.ERROR_PASSWORD_WEAK), false);
-    if (form.newPassword !== form.confirmPassword)
-      return (
-        handleError("confirmPassword", MESSAGES.ERROR_PASSWORD_MISMATCH),
-        false
-      );
+    if (!form.currentPassword) {
+      handleError("currentPassword", MESSAGES.ERROR_PASSWORD_MISSING);
+      return false;
+    }
+    if (!form.newPassword) {
+      handleError("newPassword", MESSAGES.ERROR_PASSWORD_MISSING);
+      return false;
+    }
+    if (!passwordIsStrong) {
+      handleError("newPassword", MESSAGES.ERROR_PASSWORD_WEAK);
+      return false;
+    }
+    if (form.newPassword !== form.confirmPassword) {
+      handleError("confirmPassword", MESSAGES.ERROR_PASSWORD_MISMATCH);
+      return false;
+    }
 
     try {
       await clientPost(ROUTES.account.changePassword, {
