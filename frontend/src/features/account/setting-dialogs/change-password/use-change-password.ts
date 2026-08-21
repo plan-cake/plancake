@@ -102,11 +102,14 @@ export function useChangePasswordFlow() {
   }, [step, form, passwordIsStrong, errors]);
 
   // --- API FUNCTIONS ---
-  const handleForgotPassword = async () => {
+  const handleForgotPassword = async (resend: boolean) => {
     clearAllErrors();
     try {
       await clientPost(ROUTES.auth.startPasswordReset, { email });
       setStep("OTP");
+      if (resend) {
+        addToast("success", "Email resent.");
+      }
     } catch (e) {
       handleError("toast", (e as ApiErrorResponse).formattedMessage);
     }

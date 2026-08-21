@@ -41,7 +41,7 @@ export default function Page() {
               label="Send Link"
               tooltip={flow.invalidForm}
               disabled={!isMobile && !!flow.invalidForm}
-              onClick={flow.handleEmailSubmit}
+              onClick={() => flow.handleEmailSubmit(false)}
             />
           </div>
           <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
@@ -83,7 +83,7 @@ export default function Page() {
               email={flow.form.email}
               relevantError={flow.errors.resetCode || flow.errors.api}
               onVerify={flow.handleVerifyOTP}
-              onResend={flow.handleEmailSubmit}
+              onResend={() => flow.handleEmailSubmit(true)}
             />
           </MessagePage>
         </div>

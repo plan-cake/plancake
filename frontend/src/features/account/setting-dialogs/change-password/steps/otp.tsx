@@ -12,7 +12,7 @@ export default function OtpStep({ flow }: ChangePasswordStepProps) {
       relevantError={flow.errors.resetCode || flow.errors.api}
       onValueChange={(val) => flow.updateForm("resetCode", val)}
       onVerify={(code) => flow.handleVerifyOTP(code)}
-      onResend={flow.handleForgotPassword}
+      onResend={() => flow.handleForgotPassword(true)}
     />
   );
 }

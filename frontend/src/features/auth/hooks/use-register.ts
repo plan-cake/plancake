@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import PasswordValidation from "@/features/auth/components/password-validation";
+import { useToast } from "@/features/system-feedback/toast/context";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -10,6 +11,7 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 export type RegisterStep = "REGISTRATION" | "OTP" | "SUCCESS";
 
 export function useRegisterFlow() {
+  const { addToast } = useToast();
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
   const [step, setStep] = useState<RegisterStep>("REGISTRATION");
@@ -83,6 +85,7 @@ export function useRegisterFlow() {
       await clientPost(ROUTES.auth.resendRegisterEmail, {
         email: form.email,
       });
+      addToast("success", "Email resent.");
     } catch (e) {
       handleError("toast", (e as ApiErrorResponse).formattedMessage);
     }
