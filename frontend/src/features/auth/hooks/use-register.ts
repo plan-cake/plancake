@@ -67,6 +67,23 @@ export function useRegisterFlow() {
   const handleRegister = async () => {
     clearAllErrors();
 
+    if (!form.email || !form.email.trim()) {
+      handleError("email", MESSAGES.ERROR_EMAIL_MISSING);
+      return false;
+    }
+    if (!form.password) {
+      handleError("password", MESSAGES.ERROR_PASSWORD_MISSING);
+      return false;
+    }
+    if (!passwordIsStrong) {
+      handleError("password", MESSAGES.ERROR_PASSWORD_WEAK);
+      return false;
+    }
+    if (form.password !== form.confirmPassword) {
+      handleError("confirmPassword", MESSAGES.ERROR_PASSWORD_MISMATCH);
+      return false;
+    }
+
     try {
       await clientPost(ROUTES.auth.register, {
         email: form.email,

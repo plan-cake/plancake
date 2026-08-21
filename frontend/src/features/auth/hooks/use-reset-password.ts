@@ -72,6 +72,12 @@ export function useResetPasswordFlow() {
   // API FUNCTIONS
   const handleEmailSubmit = async (resend: boolean) => {
     clearAllErrors();
+
+    if (!form.email || !form.email.trim()) {
+      handleError("email", MESSAGES.ERROR_EMAIL_MISSING);
+      return false;
+    }
+
     try {
       await clientPost(ROUTES.auth.startPasswordReset, { email: form.email });
       setStep("OTP");
@@ -116,6 +122,10 @@ export function useResetPasswordFlow() {
 
     if (!form.newPassword) {
       handleError("newPassword", MESSAGES.ERROR_PASSWORD_MISSING);
+      return false;
+    }
+    if (!passwordIsStrong) {
+      handleError("newPassword", MESSAGES.ERROR_PASSWORD_WEAK);
       return false;
     }
     if (form.newPassword !== form.confirmPassword) {
