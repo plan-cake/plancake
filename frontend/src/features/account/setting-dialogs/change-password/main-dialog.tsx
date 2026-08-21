@@ -40,8 +40,8 @@ export default function ChangePasswordDialog() {
     onConfirmHandler = flow.handleChangePassword;
     dialogContent = <ChangeStep flow={flow} />;
   } else if (displayStep === "OTP") {
-    dialogTitle = "Enter Reset Code";
-    dialogDescriptionText = "Please enter the code sent to your email.";
+    dialogTitle = "Verify It's You";
+    dialogDescriptionText = "We sent a code to your email, input it below.";
     submitLabel = "Verify Code";
     onConfirmHandler = () => flow.handleVerifyOTP();
     dialogContent = <OtpStep flow={flow} />;

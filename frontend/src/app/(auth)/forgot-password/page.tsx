@@ -5,14 +5,12 @@ import Link from "next/link";
 import AuthPageLayout from "@/components/layout/auth-page";
 import MessagePage from "@/components/layout/message-page";
 import LinkText from "@/components/link-text";
-import OTPField from "@/components/otp-field";
 import TextInputField from "@/components/text-input-field";
-import InboxLinks from "@/features/auth/components/inbox-links";
 import { useResetPasswordFlow } from "@/features/auth/hooks/use-reset-password";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
+import OTPModule from "@/features/otp/otp-module";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
-import { cn } from "@/lib/utils/classname";
 
 export default function Page() {
   const isMobile = useCheckMobile();
@@ -63,8 +61,7 @@ export default function Page() {
       return (
         <div className="flex h-screen items-center justify-center">
           <MessagePage
-            title="Check Your Email"
-            description="We sent a verification code to your email."
+            title="Verify It's You"
             buttons={[
               <LinkButton
                 key="0"
@@ -80,43 +77,14 @@ export default function Page() {
               />,
             ]}
           >
-            <InboxLinks email={flow.form.email} />
-            <div className="flex flex-col items-center justify-center gap-2">
-              <p
-                className={cn(
-                  "text-error -mt-2 text-sm",
-                  !flow.errors.resetCode && "hidden",
-                )}
-              >
-                {flow.errors.resetCode}
-              </p>
-
-              <OTPField
-                length={6}
-                value={flow.form.resetCode}
-                error={!!flow.errors.resetCode}
-                onValueChange={(val) => {
-                  flow.updateForm("resetCode", val);
-
-                  // Auto submit OTP on the 6th character, giving a small delay for the UI
-                  // to update and show the last character entered
-                  if (val.length === 6) {
-                    setTimeout(() => {
-                      flow.handleVerifyOTP(val);
-                    }, 10);
-                  }
-                }}
-              />
-            </div>
-            <div className="flex justify-center text-sm">
-              <button
-                type="button"
-                onClick={flow.handleEmailSubmit}
-                className="cursor-pointer border-none bg-transparent p-0"
-              >
-                <LinkText>Resend Code</LinkText>
-              </button>
-            </div>
+            <OTPModule
+              value={flow.form.resetCode}
+              onValueChange={(val) => flow.updateForm("resetCode", val)}
+              email={flow.form.email}
+              relevantError={flow.errors.resetCode || flow.errors.api}
+              onVerify={flow.handleVerifyOTP}
+              onResend={flow.handleEmailSubmit}
+            />
           </MessagePage>
         </div>
       );
