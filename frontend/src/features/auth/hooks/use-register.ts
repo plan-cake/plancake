@@ -103,8 +103,13 @@ export function useRegisterFlow() {
       });
       setStep("SUCCESS");
       return true;
-    } catch {
-      handleError("verificationCode", "Invalid code. Try Again.");
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      handleError(
+        "verificationCode",
+        error.formattedMessage.split("Verification Code: ")[1] ||
+          error.formattedMessage,
+      );
       return false;
     }
   };

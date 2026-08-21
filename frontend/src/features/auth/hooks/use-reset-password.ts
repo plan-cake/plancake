@@ -95,8 +95,13 @@ export function useResetPasswordFlow() {
       });
       setStep("RESET");
       return true;
-    } catch {
-      handleError("resetCode", "Invalid code. Try Again.");
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      handleError(
+        "resetCode",
+        error.formattedMessage.split("Reset Code: ")[1] ||
+          error.formattedMessage,
+      );
       return false;
     }
   };
