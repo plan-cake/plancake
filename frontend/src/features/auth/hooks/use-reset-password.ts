@@ -86,7 +86,12 @@ export function useResetPasswordFlow() {
       }
       return true;
     } catch (e) {
-      handleError("toast", (e as ApiErrorResponse).formattedMessage);
+      const error = e as ApiErrorResponse;
+      if (error.rateLimited) {
+        handleError("rate_limit", error.formattedMessage);
+      } else {
+        handleError("toast", error.formattedMessage);
+      }
       return false;
     }
   };
@@ -145,8 +150,10 @@ export function useResetPasswordFlow() {
       const error = e as ApiErrorResponse;
       if (error.data?.error?.["new_password"]) {
         handleError("newPassword", MESSAGES.ERROR_PASSWORD_REUSE);
+      } else if (error.rateLimited) {
+        handleError("rate_limit", error.formattedMessage);
       } else {
-        handleError("api", error.formattedMessage);
+        handleError("toast", error.formattedMessage);
       }
       return false;
     }

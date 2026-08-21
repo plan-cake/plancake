@@ -92,7 +92,12 @@ export function useRegisterFlow() {
       setStep("OTP");
       return true;
     } catch (e) {
-      handleError("toast", (e as ApiErrorResponse).formattedMessage);
+      const error = e as ApiErrorResponse;
+      if (error.rateLimited) {
+        handleError("rate_limit", error.formattedMessage);
+      } else {
+        handleError("toast", error.formattedMessage);
+      }
       return false;
     }
   };
