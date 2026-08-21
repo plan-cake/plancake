@@ -38,7 +38,7 @@ export default function Page() {
           <div className="flex justify-end">
             <ActionButton
               buttonStyle="primary"
-              label="Send Link"
+              label="Submit"
               tooltip={flow.invalidForm}
               disabled={!isMobile && !!flow.invalidForm}
               onClick={() => flow.handleEmailSubmit(false)}
