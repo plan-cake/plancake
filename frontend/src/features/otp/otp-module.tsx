@@ -61,7 +61,8 @@ const OTPModule = forwardRef<HTMLDivElement, OTPModuleProps>(
             className="mt-2"
           />
         </div>
-        <div className="flex justify-center text-sm">
+        <div className="justify-center text-center text-sm">
+          <span className="opacity-75">Didn{"'"}t get anything? </span>
           <button
             type="button"
             onClick={onResend}
