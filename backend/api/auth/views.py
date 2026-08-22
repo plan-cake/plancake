@@ -430,7 +430,7 @@ def reset_password(request):
 
     try:
         with transaction.atomic():
-            reset_code_obj = PasswordResetCode.objects.get(
+            reset_code_obj = PasswordResetCode.objects.select_for_update().get(
                 user_account__email=email,
                 reset_code=reset_code,
                 created_at__gte=datetime.now()
