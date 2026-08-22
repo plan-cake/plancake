@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
 
 import ClientPage from "@/app/(event)/[event-code]/page-client";
 import { EventCodePageProps } from "@/features/event/code-page-props";
@@ -10,6 +9,7 @@ import handleErrorResponse from "@/lib/utils/api/handle-api-error";
 import { processAvailabilityData } from "@/lib/utils/api/processors/process-availability-data";
 import { processEventData } from "@/lib/utils/api/processors/process-event-data";
 import { serverGet } from "@/lib/utils/api/server-fetch";
+import checkEventCode from "@/lib/utils/check-event-code";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
 
 export async function generateMetadata({
@@ -37,9 +37,7 @@ export async function generateMetadata({
 export default async function Page({ params }: EventCodePageProps) {
   const { "event-code": eventCode } = await params;
 
-  if (!eventCode) {
-    notFound();
-  }
+  await checkEventCode(eventCode, (trueCode) => `/${trueCode}`);
 
   const [initialEventData, initialAvailabilityData] = await Promise.all([
     getCachedEventDetails(eventCode),
@@ -74,6 +72,7 @@ export default async function Page({ params }: EventCodePageProps) {
       }}
       initialAvailabilityData={{
         eventType: eventRange.type,
+        timezone: eventRange.timezone,
         participants: availabilityData.participants,
         availability: availabilityData.availability,
         currentUser: availabilityData.user_display_name,

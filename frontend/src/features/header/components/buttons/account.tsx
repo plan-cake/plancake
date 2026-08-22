@@ -75,6 +75,7 @@ export default function AccountButton({
             buttonStyle="frosted glass inset"
             icon={<UserIcon />}
             aria-label="Account Menu"
+            tooltip="Account"
           />
         }
       >

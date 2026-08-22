@@ -1,3 +1,4 @@
+ahocorasick_rs==1.0.3
 amqp==5.3.1
 asgiref==3.8.1
 bcrypt==4.3.0
@@ -10,12 +11,14 @@ click-didyoumean==0.3.1
 click-plugins==1.1.1.2
 click-repl==0.3.0
 colorama==0.4.6
+device_detector==6.2.0
 Django==5.2
 django-cors-headers==4.9.0
 django-environ==0.12.0
+django-ipware==7.0.1
 django-ses==4.4.0
 djangorestframework==3.16.0
-gunicorn==23.0.0
+h11==0.16.0
 isort==8.0.1
 jmespath==1.0.1
 kombu==5.5.4
@@ -24,12 +27,16 @@ prompt_toolkit==3.0.51
 psycopg==3.2.7
 psycopg2-binary==2.9.10
 python-dateutil==2.9.0.post0
+python-ipware==3.0.0
+PyYAML==6.0.3
 redis==6.2.0
+regex==2026.4.4
 s3transfer==0.13.1
 six==1.17.0
 sqlparse==0.5.3
 typing_extensions==4.13.2
 tzdata==2025.2
 urllib3==2.5.0
+uvicorn==0.44.0
 vine==5.1.0
 wcwidth==0.2.13

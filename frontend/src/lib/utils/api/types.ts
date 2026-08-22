@@ -56,6 +56,10 @@ export type CustomCode = {
   custom_code: string;
 }
 
+export type TrueCode = {
+  true_code: string;
+}
+
 export type EventEditData = {
   title: string;
   timeslots: string[];
@@ -97,7 +101,13 @@ export type SelfAvailability = {
 
 export type AllAvailability = {
   user_display_name: string | null;
-  participants: string[];
+  participants: {
+    public_id: string;
+    display_name: string;
+    joined_at: string;
+    updated_at: string;
+    time_zone: string;
+  }[];
   availability: {
     [timeslot: string]: string[];
   }
@@ -122,6 +132,25 @@ export type DashboardData = {
 
 export type DisplayName = {
   display_name: string;
+}
+
+export type ActiveSession = {
+  public_id: string;
+  device_type: string | null;
+  os_name: string | null;
+  os_version: string | null;
+  client_name: string | null;
+  client_version: string | null;
+  last_used: string;
+  is_current: boolean;
+}
+
+export type ActiveSessionList = {
+  sessions: ActiveSession[];
+}
+
+export type SessionId = {
+  session_id: string;
 }
 
 export type AuthedPasswordResetCode = {
