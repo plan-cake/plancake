@@ -142,7 +142,7 @@ export default function Hero() {
           aria-hidden
           className="pointer-events-none mx-auto w-[90vw] max-w-[1296px]"
         >
-          <div className="w-full pb-[70%]" />
+          <div className="w-full pb-[75%] sm:pb-[60%] md:pb-[50%]" />
         </div>
       </div>
     </div>

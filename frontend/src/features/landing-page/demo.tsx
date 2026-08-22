@@ -371,13 +371,13 @@ export default function Demo() {
     activeStep !== null ? DRAWER_STEPS[activeStep] : null;
 
   return (
-    <div className="mb-50 bg-panel rounded-4xl my-20 flex flex-col overflow-visible p-12">
+    <div className="bg-panel rounded-4xl flex flex-col overflow-visible p-12">
       {/* Text Row */}
-      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between md:gap-6">
-        <h2 className="text-2xl font-bold leading-snug sm:text-4xl md:text-5xl">
-          The perfect recipe
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-6">
+        <h2 className="font-display text-foreground text-5xl tracking-wide md:text-6xl">
+          the perfect recipe
         </h2>
-        <p className="max-w-md text-lg opacity-80 md:text-xl">
+        <p className="text-foreground/80 max-w-md text-lg md:text-xl">
           Four simple steps to stack up your next group event without the messy
           back-and-forth.
         </p>

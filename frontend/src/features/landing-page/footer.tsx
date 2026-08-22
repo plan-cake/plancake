@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import Logo from "@/components/logo";
 import LinkButton from "@/features/button/components/link";
+import { cn } from "@/lib/utils/classname";
 
 const NAV_SECTIONS = [
   {
@@ -24,9 +25,16 @@ const NAV_SECTIONS = [
 
 export default function Footer() {
   return (
-    <footer className="bg-lion ring-bone ring-100 relative rounded-t-full lg:left-1/2 lg:aspect-[2/1] lg:w-[min(90vw,1440px)] lg:-translate-x-1/2">
+    <footer
+      className={cn(
+        "bg-lion ring-bone ring-100 relative mt-16",
+        "[border-radius:50%_50%_0_0/100px_100px_0_0]",
+        "md:[border-radius:50%_50%_0_0/150px_150px_0_0]",
+        "lg:left-1/2 lg:aspect-[2/1] lg:w-[min(90vw,1440px)] lg:-translate-x-1/2 lg:rounded-none lg:rounded-t-full",
+      )}
+    >
       <div className="mx-auto max-w-7xl px-4 pt-16 text-center sm:px-6 lg:absolute lg:inset-x-0 lg:top-[25%] lg:px-8 lg:pt-0">
-        <h2 className="bubble-text text-violet relative mb-8 text-6xl lg:text-8xl">
+        <h2 className="font-display text-violet relative mb-8 text-6xl tracking-wide lg:text-8xl">
           PLAN TODAY
         </h2>
         <div className="relative flex justify-center">
@@ -38,7 +46,6 @@ export default function Footer() {
           />
         </div>
       </div>
-
       <div className="text-violet mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 lg:absolute lg:inset-x-0 lg:bottom-0 lg:px-8 lg:pt-0">
         <div className="flex flex-col items-center gap-10 text-center md:flex-row md:items-start md:justify-between md:text-left">
           <div className="flex flex-col items-center gap-3 md:items-start">
