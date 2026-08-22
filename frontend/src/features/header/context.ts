@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 
 import { MotionValue } from "framer-motion";
 
-export const HeaderSizeContext = createContext<{
+export const HeaderContext = createContext<{
   isFullSize: boolean;
   shrinkAmount: MotionValue;
   expand: () => void;
@@ -18,12 +18,12 @@ export const HeaderSizeContext = createContext<{
   setActiveMenu: () => {},
 });
 
-export function useHeaderSize() {
-  const context = useContext(HeaderSizeContext);
+export function useHeader() {
+  const context = useContext(HeaderContext);
   if (!context) {
-    throw new Error("useHeaderSize must be used within a HeaderSizeProvider");
+    throw new Error("useHeader must be used within a HeaderProvider");
   }
   return context;
 }
 
-export default HeaderSizeContext;
+export default HeaderContext;

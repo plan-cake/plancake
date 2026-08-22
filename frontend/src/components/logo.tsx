@@ -2,7 +2,7 @@
 
 import { motion, useTransform } from "framer-motion";
 
-import { useHeaderSize } from "@/features/header/context";
+import { useHeader } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
 export default function Logo({
@@ -10,7 +10,7 @@ export default function Logo({
 }: {
   shrinkOnScroll?: boolean;
 }) {
-  const { shrinkAmount } = useHeaderSize();
+  const { shrinkAmount } = useHeader();
 
   const smallStyle = useTransform(shrinkAmount, [0, 1], {
     opacity: [0, 1],

@@ -10,11 +10,11 @@ import {
   useTransform,
 } from "framer-motion";
 
-import { HeaderSizeContext } from "@/features/header/context";
+import { HeaderContext } from "@/features/header/context";
 
 const SCROLL_THRESHOLD = 100;
 
-export default function HeaderSizeProvider({
+export default function HeaderProvider({
   children,
 }: {
   children: React.ReactNode;
@@ -81,7 +81,7 @@ export default function HeaderSizeProvider({
   }, [scrollY, scrollAnchor]);
 
   return (
-    <HeaderSizeContext.Provider
+    <HeaderContext.Provider
       value={{
         isFullSize,
         shrinkAmount: smoothShrinkAmount,
@@ -91,6 +91,6 @@ export default function HeaderSizeProvider({
       }}
     >
       {children}
-    </HeaderSizeContext.Provider>
+    </HeaderContext.Provider>
   );
 }

@@ -4,7 +4,7 @@ import { cloneElement, ReactElement } from "react";
 
 import { motion, useTransform } from "framer-motion";
 
-import { useHeaderSize } from "@/features/header/context";
+import { useHeader } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
 type HeaderButtonStyle = "frosted glass inset" | "primary";
@@ -20,7 +20,7 @@ export default function ShrinkingHeaderButton({
   label?: string;
   children: React.ReactNode;
 }) {
-  const { isFullSize, shrinkAmount } = useHeaderSize();
+  const { isFullSize, shrinkAmount } = useHeader();
 
   const iconStyle = useTransform(shrinkAmount, [0, 1], {
     height: [24, 0],

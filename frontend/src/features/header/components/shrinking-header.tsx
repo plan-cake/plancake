@@ -8,7 +8,7 @@ import DashboardButton from "@/features/header/components/buttons/dashboard";
 import NewEventButton from "@/features/header/components/buttons/new-event";
 import LogoArea from "@/features/header/components/logo-area";
 import ThemePicker from "@/features/header/components/theme-picker";
-import { useHeaderSize } from "@/features/header/context";
+import { useHeader } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
 export default function ShrinkingHeader({
@@ -18,7 +18,7 @@ export default function ShrinkingHeader({
 }) {
   const [mounted, setMounted] = useState(false);
 
-  const { isFullSize, shrinkAmount, expand, activeMenu } = useHeaderSize();
+  const { isFullSize, shrinkAmount, expand, activeMenu } = useHeader();
 
   const headerButtonSpacing = useTransform(shrinkAmount, [0, 1], {
     padding: [8, 4],
