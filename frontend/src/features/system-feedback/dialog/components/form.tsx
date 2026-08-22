@@ -48,12 +48,13 @@ export default function FormDialog({
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+      if (submitDisabled) return;
       const success = await onSubmit();
       if (success) {
         handleOpenChange(false);
       }
     },
-    [onSubmit, handleOpenChange],
+    [submitDisabled, onSubmit, handleOpenChange],
   );
 
   return (
