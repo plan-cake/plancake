@@ -8,6 +8,7 @@ import OTPField, { OTPFieldProps } from "@/features/otp/otp-field";
 import { cn } from "@/lib/utils/classname";
 
 export type OTPModuleProps = Omit<OTPFieldProps, "onValueChange"> & {
+  length?: number;
   value: string;
   onValueChange: (val: string) => void;
   email: string;
@@ -22,6 +23,7 @@ const EMAIL_RESEND_COOLDOWN_SEC = 30;
 const OTPModule = forwardRef<HTMLDivElement, OTPModuleProps>(
   (
     {
+      length = 6,
       value,
       onValueChange,
       email,
@@ -58,15 +60,15 @@ const OTPModule = forwardRef<HTMLDivElement, OTPModuleProps>(
           <OTPField
             ref={ref}
             {...otpProps}
-            length={6}
+            length={length}
             value={value}
             error={!!relevantError}
             onValueChange={(val) => {
               onValueChange(val);
 
-              // Auto submit OTP on the 6th character, giving a small delay for the UI
+              // Auto submit OTP on the last character, giving a small delay for the UI
               // to update and show the last character entered
-              if (val.length === 6) {
+              if (val.length === length) {
                 setTimeout(() => {
                   onVerify(val);
                 }, 10);
