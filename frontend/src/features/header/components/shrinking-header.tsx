@@ -45,7 +45,7 @@ export default function ShrinkingHeader({
           expand();
         }}
       >
-        <LogoArea isShrunk={!isFullSize} />
+        <LogoArea />
 
         <motion.div
           animate={{ scale: activeMenu ? 0.95 : 1 }}

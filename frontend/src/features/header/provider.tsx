@@ -3,7 +3,6 @@
 import { useCallback, useState } from "react";
 
 import {
-  animate,
   useMotionValue,
   useMotionValueEvent,
   useScroll,
@@ -30,24 +29,34 @@ export default function HeaderSizeProvider({
     mass: 0.1,
   });
 
-  // 56 -> 92
+  const handleScrollChange = useCallback(
+    (value: number) => {
+      // Clamp value to page height
+      value = Math.max(
+        0,
+        Math.min(value, document.body.scrollHeight - window.innerHeight),
+      );
 
-  useMotionValueEvent(scrollY, "change", (value) => {
-    // Clamp value to page height
-    value = Math.max(
-      0,
-      Math.min(value, document.body.scrollHeight - window.innerHeight),
-    );
+      const scrollOffset = value - scrollAnchor.get();
 
-    const scrollOffset = value - scrollAnchor.get();
+      if (scrollOffset > SCROLL_THRESHOLD) {
+        scrollAnchor.set(value - SCROLL_THRESHOLD);
+      } else if (scrollOffset < 0) {
+        scrollAnchor.set(value);
+      }
 
-    if (scrollOffset > SCROLL_THRESHOLD) {
-      scrollAnchor.set(value - SCROLL_THRESHOLD);
-    } else if (scrollOffset < 0) {
-      scrollAnchor.set(value);
-    }
+      shrinkAmount.set(
+        Math.min(Math.max(scrollOffset / SCROLL_THRESHOLD, 0), 1),
+      );
+    },
+    [scrollAnchor, shrinkAmount],
+  );
 
-    shrinkAmount.set(Math.min(Math.max(scrollOffset / SCROLL_THRESHOLD, 0), 1));
+  useMotionValueEvent(scrollY, "change", handleScrollChange);
+
+  useMotionValueEvent(scrollAnchor, "change", handleScrollChange);
+
+  useMotionValueEvent(smoothShrinkAmount, "change", () => {
     setIsFullSize(smoothShrinkAmount.get() === 0);
   });
 
@@ -55,13 +64,7 @@ export default function HeaderSizeProvider({
 
   const expand = useCallback(() => {
     scrollAnchor.set(scrollY.get());
-
-    animate(shrinkAmount, 0, {
-      damping: 15,
-      stiffness: 300,
-      mass: 0.1,
-    });
-  }, [scrollY, scrollAnchor, shrinkAmount]);
+  }, [scrollY, scrollAnchor]);
 
   return (
     <HeaderSizeContext.Provider
