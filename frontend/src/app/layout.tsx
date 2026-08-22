@@ -30,11 +30,7 @@ export function generateMetadata(): Metadata {
 
   return {
     title: "Plancake - Stacking up perfect plans",
-
-    // text that appears below your link in search engines
     description: description,
-
-    // keywords for SEO optimization
     keywords: [
       "Plancake",
       "scheduling",
@@ -49,12 +45,9 @@ export function generateMetadata(): Metadata {
       "Doodle",
       "mobile friendly scheduler",
     ],
-
     appleWebApp: {
       title: "Plancake",
     },
-
-    // for link previews on social media
     openGraph: {
       title: "Plancake - Stacking up perfect plans",
       description: description,
@@ -77,18 +70,20 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${modak.variable} ${nunito.variable}`}
     >
-      <body className="overflow-x-clip font-sans antialiased">
-        <div className="mx-auto flex min-h-dvh w-full max-w-[1440px] flex-col">
-          <Providers>
-            <CookieGuard>
-              <Suspense fallback={null}>
-                <ToastListener />
-              </Suspense>
-              <Header />
-              {children}
-            </CookieGuard>
-          </Providers>
-          <Analytics />
+      <body className="font-sans antialiased">
+        <div className="relative w-full overflow-x-clip">
+          <div className="mx-auto flex min-h-dvh w-full max-w-[1440px] flex-col">
+            <Providers>
+              <CookieGuard>
+                <Suspense fallback={null}>
+                  <ToastListener />
+                </Suspense>
+                <Header />
+                {children}
+              </CookieGuard>
+            </Providers>
+            <Analytics />
+          </div>
         </div>
       </body>
     </html>
