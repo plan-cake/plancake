@@ -81,7 +81,11 @@ export default function Page() {
               value={flow.form.resetCode}
               onValueChange={(val) => flow.updateForm("resetCode", val)}
               email={flow.form.email}
-              relevantError={flow.errors.resetCode || flow.errors.api}
+              relevantError={
+                flow.errors.resetCode ||
+                flow.errors.api ||
+                flow.errors.rate_limit
+              }
               onVerify={flow.handleVerifyOTP}
               onResend={() => flow.handleEmailSubmit(true)}
             />

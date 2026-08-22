@@ -134,11 +134,15 @@ export function useChangePasswordFlow() {
       return false;
     } catch (e) {
       const error = e as ApiErrorResponse;
-      handleError(
-        "resetCode",
-        error.formattedMessage.split("Reset Code: ")[1] ||
-          error.formattedMessage,
-      );
+      if (error.rateLimited) {
+        handleError("rate_limit", error.formattedMessage);
+      } else {
+        handleError(
+          "resetCode",
+          error.formattedMessage.split("Reset Code: ")[1] ||
+            error.formattedMessage,
+        );
+      }
       return false;
     }
   };

@@ -116,7 +116,11 @@ export default function Page() {
               value={flow.form.verificationCode}
               onValueChange={(val) => flow.updateForm("verificationCode", val)}
               email={flow.form.email}
-              relevantError={flow.errors.verificationCode || flow.errors.api}
+              relevantError={
+                flow.errors.verificationCode ||
+                flow.errors.api ||
+                flow.errors.rate_limit
+              }
               onVerify={flow.handleVerifyOTP}
               onResend={flow.handleResendEmail}
             />

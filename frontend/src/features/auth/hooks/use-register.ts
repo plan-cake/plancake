@@ -132,11 +132,15 @@ export function useRegisterFlow() {
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
-      handleError(
-        "verificationCode",
-        error.formattedMessage.split("Verification Code: ")[1] ||
-          error.formattedMessage,
-      );
+      if (error.rateLimited) {
+        handleError("rate_limit", error.formattedMessage);
+      } else {
+        handleError(
+          "verificationCode",
+          error.formattedMessage.split("Verification Code: ")[1] ||
+            error.formattedMessage,
+        );
+      }
       return false;
     }
   };
