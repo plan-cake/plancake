@@ -2,21 +2,17 @@
 
 import { createContext, useContext } from "react";
 
-import { HeaderHeightClass, HeaderMarginClass } from "@/features/header/type";
+import { MotionValue } from "framer-motion";
 
 export const HeaderSizeContext = createContext<{
-  isShrunk: boolean;
-  heightClass: HeaderHeightClass;
-  topMarginClass: HeaderMarginClass;
-  shrink: () => void;
+  isFullSize: boolean;
+  shrinkAmount: MotionValue;
   expand: () => void;
   activeMenu: string | null;
   setActiveMenu: (menu: string | null) => void;
 }>({
-  isShrunk: false,
-  heightClass: "header-transition-[height] h-23",
-  topMarginClass: "header-transition-[top] top-23",
-  shrink: () => {},
+  isFullSize: true,
+  shrinkAmount: new MotionValue(0),
   expand: () => {},
   activeMenu: null,
   setActiveMenu: () => {},

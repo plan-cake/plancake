@@ -1,18 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { motion } from "framer-motion";
+import { motion, useTransform } from "framer-motion";
 
 import DashboardButton from "@/features/header/components/buttons/dashboard";
 import NewEventButton from "@/features/header/components/buttons/new-event";
 import LogoArea from "@/features/header/components/logo-area";
 import ThemePicker from "@/features/header/components/theme-picker";
 import { useHeaderSize } from "@/features/header/context";
-import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
-
-const SCROLL_THRESHOLD = 50;
 
 export default function ShrinkingHeader({
   children: accountButton,
@@ -21,86 +18,42 @@ export default function ShrinkingHeader({
 }) {
   const [mounted, setMounted] = useState(false);
 
-  const isMobile = useCheckMobile();
-  const lastScrollPoint = useRef(0);
-  const scrollCheckpoint = useRef(0);
+  const { isFullSize, shrinkAmount, expand, activeMenu } = useHeaderSize();
 
-  const { isShrunk, heightClass, shrink, expand, activeMenu } = useHeaderSize();
+  const headerButtonSpacing = useTransform(shrinkAmount, [0, 1], {
+    padding: [8, 4],
+    gap: ["8px", "4px"],
+  });
 
   useEffect(() => {
     setMounted(true);
-
-    if (!isMobile) {
-      expand();
-      return;
-    }
-
-    const handleScroll = () => {
-      const currentScrollPoint = Math.min(
-        Math.max(window.scrollY, 0),
-        document.documentElement.scrollHeight - window.innerHeight,
-      );
-      const scrollingDown = currentScrollPoint > lastScrollPoint.current;
-      lastScrollPoint.current = currentScrollPoint;
-
-      if (currentScrollPoint <= 0) {
-        expand();
-        return;
-      }
-
-      if (isShrunk) {
-        if (scrollingDown) {
-          scrollCheckpoint.current = currentScrollPoint;
-        } else if (
-          currentScrollPoint <
-          scrollCheckpoint.current - SCROLL_THRESHOLD
-        ) {
-          expand();
-        }
-      } else {
-        if (!scrollingDown) {
-          scrollCheckpoint.current = currentScrollPoint;
-        } else if (
-          currentScrollPoint >
-          scrollCheckpoint.current + SCROLL_THRESHOLD
-        ) {
-          shrink();
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [isMobile, isShrunk, shrink, expand]);
+  }, []);
 
   if (!mounted) return null;
 
   return (
-    <header className={cn(heightClass, "fixed top-0 z-40 w-full pt-4")}>
+    <header className={cn("fixed top-0 z-40 w-full pt-4")}>
       <nav
         className={cn(
           "flex w-full max-w-[1440px] justify-between px-4",
-          isShrunk ? "cursor-pointer" : "",
+          !isFullSize ? "cursor-pointer" : "",
         )}
         onClickCapture={(e) => {
-          if (!isShrunk) return;
+          if (isFullSize) return;
           e.preventDefault();
           e.stopPropagation();
           expand();
         }}
       >
-        <LogoArea isShrunk={isShrunk} />
+        <LogoArea isShrunk={!isFullSize} />
 
         <motion.div
           animate={{ scale: activeMenu ? 0.95 : 1 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className={cn(
             "relative isolate flex h-fit items-center rounded-full",
-            "header-transition-[gap,padding]",
-            isShrunk ? "gap-1 p-1" : "gap-2 p-2",
           )}
+          style={headerButtonSpacing}
         >
           <div
             className="frosted-glass pointer-events-none absolute inset-0 -z-10 rounded-full"
