@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 
 import ActionButton from "@/features/button/components/action";
+import { FloatingDrawer } from "@/features/drawer";
 import ScheduleGrid from "@/features/event/grid/grid";
 import ParticipantChip from "@/features/event/results/attendees/participant-chip";
 import OrbitImages from "@/features/landing-page/orbit-images";
@@ -13,15 +14,18 @@ import {
 } from "@/features/landing-page/utils";
 import { cn } from "@/lib/utils/classname";
 
-// Reusable node component that handles the orbiting pill and its hover card
+// Reusable node component that handles the orbiting pill, its desktop hover
+// card, and (on touch devices, which can't hover) opening the step's drawer.
 function OrbitNode({
   stepNumber,
   label,
   hoverCard,
+  onSelect,
 }: {
   stepNumber: number;
   label: string;
   hoverCard: React.ReactNode;
+  onSelect: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [opensLeft, setOpensLeft] = useState(false);
@@ -47,8 +51,15 @@ function OrbitNode({
       onMouseEnter={handleMouseEnter}
     >
       <button
+        onClick={() => {
+          // Devices that can't hover (touch) get a drawer instead; hover
+          // devices already have the popout below.
+          if (!window.matchMedia("(hover: hover)").matches) {
+            onSelect();
+          }
+        }}
         className={cn(
-          "bg-background hover:bg-lion dark:hover:bg-bone-100 hover:text-violet text-foreground",
+          "bg-lion hover:ring-10 hover:ring-bone/50 text-violet hover:cursor-pointer",
           "flex items-center gap-2 whitespace-nowrap rounded-full p-4 font-semibold",
           "hover:cursor-pointer",
         )}
@@ -91,6 +102,7 @@ export default function Demo() {
     useState<string[]>(PARTICIPANTS);
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
   const [allowSubmit, setAllowSubmit] = useState(false);
+  const [activeStep, setActiveStep] = useState<number | null>(null);
 
   const paintSlot = (slotIso: string, togglingOn: boolean) => {
     setUserAvailability((prev) => {
@@ -218,38 +230,139 @@ export default function Demo() {
     </div>
   );
 
+  // Ordered so that, combined with rotation={0} below, stepNumber 1 lands at
+  // 12 o'clock and the rest read clockwise (1 → 2 → 3 → 4).
   const orbitNodes = [
-    <OrbitNode key="1" stepNumber={1} label="Create Event" hoverCard={step1} />,
-    <OrbitNode key="4" stepNumber={4} label="View Results" hoverCard={step4} />,
+    <OrbitNode
+      key="4"
+      stepNumber={4}
+      label="View Results"
+      hoverCard={step4}
+      onSelect={() => setActiveStep(4)}
+    />,
     <OrbitNode
       key="3"
       stepNumber={3}
       label="Add Availability"
       hoverCard={step3}
+      onSelect={() => setActiveStep(3)}
     />,
-    <OrbitNode key="2" stepNumber={2} label="Share Link" hoverCard={step2} />,
+    <OrbitNode
+      key="2"
+      stepNumber={2}
+      label="Share Link"
+      hoverCard={step2}
+      onSelect={() => setActiveStep(2)}
+    />,
+    <OrbitNode
+      key="1"
+      stepNumber={1}
+      label="Create Event"
+      hoverCard={step1}
+      onSelect={() => setActiveStep(1)}
+    />,
   ];
 
+  // Drawer versions of the same four steps for touch devices, which can't
+  // hover to see the popout above. Same content, but with normal (not
+  // color-inverted) text since the drawer isn't a dark bubble.
+  const DRAWER_STEPS: Record<
+    number,
+    { title: string; description: string; body?: React.ReactNode }
+  > = {
+    1: {
+      title: "Create your event",
+      description: "Pick a range of dates and times you think might work.",
+    },
+    2: {
+      title: "Share with your friends",
+      description: "Anyone can join from the event link, no account required.",
+    },
+    3: {
+      title: "Paint your availability",
+      description:
+        "Click and drag on the grid to fill in the times you're free.",
+      body: (
+        <div className="bg-background text-foreground rounded-2xl p-4">
+          <ScheduleGrid
+            mode="paint"
+            staticHeader
+            timeslots={TIMESLOTS}
+            timezone="America/New_York"
+            userAvailability={userAvailability}
+            onToggleSlot={paintSlot}
+          />
+          <div className="flex items-center justify-center pt-2">
+            <ActionButton
+              buttonStyle="primary"
+              label="Submit"
+              onClick={handleAvailabilitySubmit}
+              disabled={!allowSubmit}
+            />
+          </div>
+        </div>
+      ),
+    },
+    4: {
+      title: "Watch the results stack up",
+      description:
+        "See which times work best for everyone as soon as they respond.",
+      body: (
+        <div className="bg-background text-foreground rounded-2xl p-4">
+          <ScheduleGrid
+            mode="view"
+            staticHeader
+            timeslots={TIMESLOTS}
+            timezone="America/New_York"
+            availabilities={availabilities}
+            numParticipants={4}
+            hoveredSlot={hoveredSlot}
+            setHoveredSlot={handleResultsHover}
+          />
+          <div className="pointer-events-none flex flex-wrap items-center justify-center gap-2 px-2 pt-2">
+            {PARTICIPANTS.map((p) => (
+              <ParticipantChip
+                key={p}
+                areSelected={false}
+                index={0}
+                isAvailable={currentlyAvailable.includes(p)}
+                isRemoving={false}
+                isSelected={false}
+                onClick={() => {}}
+                onHoverChange={() => {}}
+                onRemove={() => {}}
+                person={p}
+              />
+            ))}
+          </div>
+        </div>
+      ),
+    },
+  };
+
+  const activeDrawerStep =
+    activeStep !== null ? DRAWER_STEPS[activeStep] : null;
+
   return (
-    <div className="mb-50 my-20 flex flex-col items-end gap-12 overflow-visible md:flex-row">
-      {/* Text Column */}
-      <div className="w-full shrink-0 md:w-[25%]">
+    <div className="mb-50 bg-panel rounded-4xl my-20 flex flex-col overflow-visible p-12">
+      {/* Text Row */}
+      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <h2 className="text-4xl font-bold lg:text-5xl">The perfect recipe</h2>
-        <p className="mt-6 max-w-md text-xl opacity-80">
+        <p className="max-w-md text-xl opacity-80">
           Four simple steps to stack up your next group event without the messy
           back-and-forth.
         </p>
       </div>
 
-      {/* Orbit Column */}
-      <div className="relative flex w-full flex-1 items-center justify-center">
-        <div className="w-full min-w-[800px]">
+      {/* Orbit Row */}
+      <div className="relative flex w-full items-center justify-center">
+        <div className="mx-auto w-full max-w-[900px]">
           <OrbitImages
             images={orbitNodes}
             shape="ellipse"
             baseWidth={900}
-            radiusX={350}
-            radiusY={140}
+            radiusX={300}
+            radiusY={230}
             rotation={-20}
             duration={45}
             itemSize={160}
@@ -257,10 +370,31 @@ export default function Demo() {
             direction="normal"
             fill
             showPath
+            // pathColor="var(--color-bone)"
+            // pathWidth={20}
+            // pathDasharray="0"
+            // pathFill="var(--color-lion)"
             paused={true}
           />
         </div>
       </div>
+
+      <div className="flex-shrink-0" />
+
+      <FloatingDrawer
+        title={activeDrawerStep?.title ?? ""}
+        open={activeStep !== null}
+        onOpenChange={(open) => !open && setActiveStep(null)}
+        description={activeDrawerStep?.description ?? ""}
+        contentClassName="h-fit"
+      >
+        {activeDrawerStep && (
+          <div className="flex flex-col gap-4">
+            <p className="text-foreground/70">{activeDrawerStep.description}</p>
+            {activeDrawerStep.body}
+          </div>
+        )}
+      </FloatingDrawer>
     </div>
   );
 }

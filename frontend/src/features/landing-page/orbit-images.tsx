@@ -39,6 +39,7 @@ interface OrbitImagesProps {
   pathColor?: string;
   pathWidth?: number;
   pathDasharray?: string; // Added for the dashed line effect
+  pathFill?: string;
   easing?: "linear" | "easeIn" | "easeOut" | "easeInOut";
   paused?: boolean;
   centerContent?: ReactNode;
@@ -124,6 +125,7 @@ export default function OrbitImages({
   pathColor = "rgba(150, 150, 150, 0.3)",
   pathWidth = 2,
   pathDasharray = "6 6", // Dotted path
+  pathFill = "none",
   easing = "linear",
   paused = false,
   centerContent,
@@ -168,6 +170,18 @@ export default function OrbitImages({
     radius,
   ]);
 
+  // Design-space bounds of the orbit, padded by itemSize since items are
+  // centered on the path and stick out past it in every direction. The
+  // orbit is centered within the baseWidth×baseWidth canvas, so there's an
+  // equal empty margin above and below it that the tightly-cropped
+  // container needs to cancel out via a negative top offset.
+  const orbitBoundsHeight = useMemo(() => {
+    const boundsHeight = shape === "circle" ? radius * 2 : radiusY * 2;
+    return boundsHeight + itemSize;
+  }, [shape, radius, radiusY, itemSize]);
+
+  const orbitMarginY = (baseWidth - orbitBoundsHeight) / 2;
+
   useLayoutEffect(() => {
     if (!responsive || !containerRef.current) return;
     const updateScale = () => {
@@ -199,7 +213,9 @@ export default function OrbitImages({
       ? width
       : "100%";
   const containerHeight = responsive
-    ? "auto"
+    ? scale !== null
+      ? orbitBoundsHeight * scale
+      : 0
     : typeof height === "number"
       ? height
       : typeof width === "number"
@@ -213,23 +229,20 @@ export default function OrbitImages({
       style={{
         width: containerWidth,
         height: containerHeight,
-        aspectRatio: responsive ? "3 / 1" : undefined,
       }}
       aria-hidden="true"
     >
       <div
-        className={
-          responsive ? "absolute left-1/2 top-1/2" : "relative h-full w-full"
-        }
+        className={responsive ? "relative" : "relative h-full w-full"}
         style={{
           width: responsive ? baseWidth : "100%",
           height: responsive ? baseWidth : "100%",
+          top:
+            responsive && scale !== null ? -orbitMarginY * scale : undefined,
           transform:
-            responsive && scale !== null
-              ? `translate(-50%, -50%) scale(${scale})`
-              : undefined,
+            responsive && scale !== null ? `scale(${scale})` : undefined,
           visibility: responsive && scale === null ? "hidden" : undefined,
-          transformOrigin: "center center",
+          transformOrigin: responsive ? "top left" : undefined,
         }}
       >
         <div
@@ -248,7 +261,7 @@ export default function OrbitImages({
             >
               <path
                 d={path}
-                fill="none"
+                fill={pathFill}
                 stroke={pathColor}
                 strokeWidth={pathWidth / (scale ?? 1)}
                 strokeDasharray={pathDasharray}
