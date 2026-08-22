@@ -122,7 +122,7 @@ export default function KebabMenu({
                 "left-1/2 origin-top -translate-x-1/2",
               "flex min-w-[200px] flex-col gap-2",
               "frosted-glass overflow-hidden rounded-3xl p-4 shadow-lg",
-              nested && "scale-110",
+              nested && "scale-[calc(1/0.95)]",
             )}
             onClick={(e) => {
               const target = e.target as HTMLElement;
