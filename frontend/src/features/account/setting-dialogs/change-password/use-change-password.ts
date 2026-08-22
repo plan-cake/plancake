@@ -121,7 +121,7 @@ export function useChangePasswordFlow() {
     clearAllErrors();
     const codeToVerify = code ?? form.resetCode;
 
-    if (!form.resetCode) {
+    if (!codeToVerify) {
       handleError("resetCode", "Please enter the code.");
       return false;
     }
