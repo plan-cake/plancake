@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import ActionButton from "@/features/button/components/action";
 import { FloatingDrawer } from "@/features/drawer";
@@ -14,18 +14,21 @@ import {
 } from "@/features/landing-page/utils";
 import { cn } from "@/lib/utils/classname";
 
-// Reusable node component that handles the orbiting pill, its desktop hover
-// card, and (on touch devices, which can't hover) opening the step's drawer.
+const BASE_FONT_PX = 16;
+const MIN_FONT_PX = 12;
+
 function OrbitNode({
   stepNumber,
   label,
   hoverCard,
   onSelect,
+  orbitScale,
 }: {
   stepNumber: number;
   label: string;
   hoverCard: React.ReactNode;
   onSelect: () => void;
+  orbitScale: number | null;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [opensLeft, setOpensLeft] = useState(false);
@@ -44,6 +47,11 @@ function OrbitNode({
     }
   };
 
+  const counterScale =
+    orbitScale && orbitScale > 0
+      ? Math.max(1, MIN_FONT_PX / (BASE_FONT_PX * orbitScale))
+      : 1;
+
   return (
     <div
       ref={containerRef}
@@ -58,9 +66,14 @@ function OrbitNode({
             onSelect();
           }
         }}
+        style={
+          counterScale !== 1
+            ? { transform: `scale(${counterScale})`, transformOrigin: "center" }
+            : undefined
+        }
         className={cn(
           "bg-lion hover:ring-10 hover:ring-bone/50 text-violet hover:cursor-pointer",
-          "flex items-center gap-2 whitespace-nowrap rounded-full p-4 font-semibold",
+          "flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 font-semibold",
           "hover:cursor-pointer",
         )}
       >
@@ -103,6 +116,16 @@ export default function Demo() {
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
   const [allowSubmit, setAllowSubmit] = useState(false);
   const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [orbitScale, setOrbitScale] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   const paintSlot = (slotIso: string, togglingOn: boolean) => {
     setUserAvailability((prev) => {
@@ -239,6 +262,7 @@ export default function Demo() {
       label="View Results"
       hoverCard={step4}
       onSelect={() => setActiveStep(4)}
+      orbitScale={orbitScale}
     />,
     <OrbitNode
       key="3"
@@ -246,6 +270,7 @@ export default function Demo() {
       label="Add Availability"
       hoverCard={step3}
       onSelect={() => setActiveStep(3)}
+      orbitScale={orbitScale}
     />,
     <OrbitNode
       key="2"
@@ -253,6 +278,7 @@ export default function Demo() {
       label="Share Link"
       hoverCard={step2}
       onSelect={() => setActiveStep(2)}
+      orbitScale={orbitScale}
     />,
     <OrbitNode
       key="1"
@@ -260,6 +286,7 @@ export default function Demo() {
       label="Create Event"
       hoverCard={step1}
       onSelect={() => setActiveStep(1)}
+      orbitScale={orbitScale}
     />,
   ];
 
@@ -346,34 +373,33 @@ export default function Demo() {
   return (
     <div className="mb-50 bg-panel rounded-4xl my-20 flex flex-col overflow-visible p-12">
       {/* Text Row */}
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <h2 className="text-4xl font-bold lg:text-5xl">The perfect recipe</h2>
-        <p className="max-w-md text-xl opacity-80">
+      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between md:gap-6">
+        <h2 className="text-2xl font-bold leading-snug sm:text-4xl md:text-5xl">
+          The perfect recipe
+        </h2>
+        <p className="max-w-md text-lg opacity-80 md:text-xl">
           Four simple steps to stack up your next group event without the messy
           back-and-forth.
         </p>
       </div>
 
       {/* Orbit Row */}
-      <div className="relative flex w-full items-center justify-center">
+      <div className="relative mt-4 flex w-full items-center justify-center">
         <div className="mx-auto w-full max-w-[900px]">
           <OrbitImages
             images={orbitNodes}
             shape="ellipse"
             baseWidth={900}
             radiusX={300}
-            radiusY={230}
+            radiusY={isMobile ? 320 : 230}
             rotation={-20}
             duration={45}
             itemSize={160}
             responsive={true}
+            onScaleChange={setOrbitScale}
             direction="normal"
             fill
             showPath
-            // pathColor="var(--color-bone)"
-            // pathWidth={20}
-            // pathDasharray="0"
-            // pathFill="var(--color-lion)"
             paused={true}
           />
         </div>
@@ -390,7 +416,9 @@ export default function Demo() {
       >
         {activeDrawerStep && (
           <div className="flex flex-col gap-4">
-            <p className="text-foreground/70">{activeDrawerStep.description}</p>
+            <p className="text-foreground/70 text-center">
+              {activeDrawerStep.description}
+            </p>
             {activeDrawerStep.body}
           </div>
         )}

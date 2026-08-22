@@ -44,6 +44,8 @@ interface OrbitImagesProps {
   paused?: boolean;
   centerContent?: ReactNode;
   responsive?: boolean;
+  /** Fires with the current responsive scale factor (null until measured). */
+  onScaleChange?: (scale: number | null) => void;
 }
 
 interface OrbitItemProps {
@@ -130,6 +132,7 @@ export default function OrbitImages({
   paused = false,
   centerContent,
   responsive = false,
+  onScaleChange,
 }: OrbitImagesProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState<number | null>(null);
@@ -186,13 +189,15 @@ export default function OrbitImages({
     if (!responsive || !containerRef.current) return;
     const updateScale = () => {
       if (!containerRef.current) return;
-      setScale(containerRef.current.clientWidth / baseWidth);
+      const nextScale = containerRef.current.clientWidth / baseWidth;
+      setScale(nextScale);
+      onScaleChange?.(nextScale);
     };
     updateScale();
     const observer = new ResizeObserver(updateScale);
     observer.observe(containerRef.current);
     return () => observer.disconnect();
-  }, [responsive, baseWidth]);
+  }, [responsive, baseWidth, onScaleChange]);
 
   const progress = useMotionValue(0);
 
@@ -237,8 +242,7 @@ export default function OrbitImages({
         style={{
           width: responsive ? baseWidth : "100%",
           height: responsive ? baseWidth : "100%",
-          top:
-            responsive && scale !== null ? -orbitMarginY * scale : undefined,
+          top: responsive && scale !== null ? -orbitMarginY * scale : undefined,
           transform:
             responsive && scale !== null ? `scale(${scale})` : undefined,
           visibility: responsive && scale === null ? "hidden" : undefined,
