@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   useMotionValue,
   useMotionValueEvent,
   useScroll,
   useSpring,
+  useTransform,
 } from "framer-motion";
 
 import { HeaderSizeContext } from "@/features/header/context";
@@ -28,6 +29,14 @@ export default function HeaderSizeProvider({
     stiffness: 300,
     mass: 0.1,
   });
+  const headerHeight = useTransform(smoothShrinkAmount, [0, 1], [88, 52]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      "--header-height",
+      `${headerHeight.get()}px`,
+    );
+  }, [headerHeight]);
 
   const handleScrollChange = useCallback(
     (value: number) => {
@@ -57,6 +66,11 @@ export default function HeaderSizeProvider({
   useMotionValueEvent(scrollAnchor, "change", handleScrollChange);
 
   useMotionValueEvent(smoothShrinkAmount, "change", () => {
+    document.documentElement.style.setProperty(
+      "--header-height",
+      `${headerHeight.get()}px`,
+    );
+
     setIsFullSize(smoothShrinkAmount.get() === 0);
   });
 

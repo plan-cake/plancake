@@ -32,7 +32,9 @@ export default function ShrinkingHeader({
   if (!mounted) return null;
 
   return (
-    <header className={cn("fixed top-0 z-40 w-full pt-4")}>
+    <header
+      className={cn("fixed top-0 z-40 h-[var(--header-height)] w-full pt-4")}
+    >
       <nav
         className={cn(
           "flex w-full max-w-[1440px] justify-between px-4",

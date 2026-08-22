@@ -11,7 +11,6 @@ import {
 
 import ActionButton from "@/features/button/components/action";
 import HeaderSpacer from "@/features/header/components/header-spacer";
-import { useHeaderSize } from "@/features/header/context";
 import {
   MajorVersionData,
   MinorVersionData,
@@ -25,8 +24,6 @@ export default function ClientPage({
   versionHistoryData: VersionHistoryData;
 }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
-
-  const { topMarginClass } = useHeaderSize();
 
   // On load, scroll to the bottom
   useEffect(() => {
@@ -76,9 +73,9 @@ export default function ClientPage({
       <HeaderSpacer />
       <div
         className={cn(
-          topMarginClass,
+          "sticky top-[var(--header-height)]",
           "flex w-full items-center justify-between",
-          "bg-background z-15 sticky px-6 pb-2 pt-4",
+          "bg-background z-15 px-6 pb-2 pt-4",
         )}
       >
         <h1 className="text-2xl font-bold">Version History</h1>
