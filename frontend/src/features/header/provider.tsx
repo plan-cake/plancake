@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
+  MotionValue,
   useMotionValue,
   useMotionValueEvent,
   useScroll,
@@ -12,14 +13,22 @@ import {
 import { usePathname } from "next/navigation";
 
 import { HeaderContext } from "@/features/header/context";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 const SCROLL_THRESHOLD = 100;
+const HEADER_HEIGHT = 88;
+const SHRUNK_HEADER_HEIGHT = 52;
 
 export default function HeaderProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const isMobile = useCheckMobile();
+  const shrinkDisabled =
+    !isMobile ||
+    document.body.scrollHeight <= window.innerHeight + SCROLL_THRESHOLD;
+
   const lastPathnameRef = useRef<string | null>(null);
   const pathname = usePathname();
 
@@ -34,14 +43,21 @@ export default function HeaderProvider({
     stiffness: 300,
     mass: 0.1,
   });
-  const headerHeight = useTransform(smoothShrinkAmount, [0, 1], [88, 52]);
 
-  useEffect(() => {
+  const headerHeight = useTransform(
+    smoothShrinkAmount,
+    [0, 1],
+    [HEADER_HEIGHT, SHRUNK_HEADER_HEIGHT],
+  );
+  const updateCssHeaderHeight = useCallback(() => {
     document.documentElement.style.setProperty(
       "--header-height",
-      `${headerHeight.get()}px`,
+      `${shrinkDisabled ? HEADER_HEIGHT : headerHeight.get()}px`,
     );
-  }, [headerHeight]);
+  }, [headerHeight, shrinkDisabled]);
+  useEffect(() => {
+    updateCssHeaderHeight();
+  }, [updateCssHeaderHeight, shrinkDisabled]);
 
   const handleScrollChange = useCallback(
     (value: number) => {
@@ -71,11 +87,7 @@ export default function HeaderProvider({
   useMotionValueEvent(scrollAnchor, "change", handleScrollChange);
 
   useMotionValueEvent(smoothShrinkAmount, "change", () => {
-    document.documentElement.style.setProperty(
-      "--header-height",
-      `${headerHeight.get()}px`,
-    );
-
+    updateCssHeaderHeight();
     setIsFullSize(smoothShrinkAmount.get() === 0);
   });
 
@@ -95,8 +107,8 @@ export default function HeaderProvider({
   return (
     <HeaderContext.Provider
       value={{
-        isFullSize,
-        shrinkAmount: smoothShrinkAmount,
+        isFullSize: shrinkDisabled || isFullSize,
+        shrinkAmount: shrinkDisabled ? new MotionValue(0) : smoothShrinkAmount,
         expand,
         activeMenu,
         setActiveMenu,
