@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   useMotionValue,
@@ -9,6 +9,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 import { HeaderContext } from "@/features/header/context";
 
@@ -19,8 +20,10 @@ export default function HeaderProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [isFullSize, setIsFullSize] = useState(true);
+  const lastPathnameRef = useRef<string | null>(null);
+  const pathname = usePathname();
 
+  const [isFullSize, setIsFullSize] = useState(true);
   const { scrollY } = useScroll();
   const scrollAnchor = useMotionValue(0);
   const shrinkAmount = useMotionValue(0);
@@ -79,6 +82,15 @@ export default function HeaderProvider({
   const expand = useCallback(() => {
     scrollAnchor.set(scrollY.get());
   }, [scrollY, scrollAnchor]);
+
+  // Reset when the page changes
+  useEffect(() => {
+    if (lastPathnameRef.current === pathname) return;
+    lastPathnameRef.current = pathname;
+
+    scrollAnchor.set(0);
+    shrinkAmount.set(0);
+  }, [pathname, scrollAnchor, shrinkAmount, smoothShrinkAmount]);
 
   return (
     <HeaderContext.Provider
