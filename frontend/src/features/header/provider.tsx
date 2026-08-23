@@ -81,7 +81,7 @@ export default function HeaderProvider({
 
       updateShrinkAmount();
 
-      // Set a timeout to "round" the shink amount after the user stops scrolling
+      // Set a timeout to "round" the shrink amount after the user stops scrolling
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
       }
@@ -92,7 +92,7 @@ export default function HeaderProvider({
         } else {
           scrollAnchor.set(scrollY.get());
         }
-      }, 500);
+      }, 250);
     },
     [scrollAnchor, updateShrinkAmount, scrollY, shrinkAmount],
   );
