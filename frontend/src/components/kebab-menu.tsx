@@ -115,9 +115,9 @@ export default function KebabMenu({
             layoutId={"popover-morph-" + id}
             transition={morphTransition}
             className={cn(
-              "absolute top-1 z-[100]",
-              anchorPoint === "top-right" && "right-2 origin-top-right",
-              anchorPoint === "top-left" && "left-2 origin-top-left",
+              "absolute top-0 z-[100]",
+              anchorPoint === "top-right" && "right-0 origin-top-right",
+              anchorPoint === "top-left" && "left-0 origin-top-left",
               anchorPoint === "top-center" &&
                 "left-1/2 origin-top -translate-x-1/2",
               "flex min-w-[200px] flex-col gap-2",
