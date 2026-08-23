@@ -37,8 +37,7 @@ export default function HeaderProvider({
   const [isFullSize, setIsFullSize] = useState(true);
   const { scrollY } = useScroll();
   const scrollAnchor = useMotionValue(0);
-  const shrinkAmount = useMotionValue(0);
-  const smoothShrinkAmount = useSpring(shrinkAmount, {
+  const shrinkAmount = useSpring(0, {
     damping: 15,
     stiffness: 300,
     mass: 0.1,
@@ -46,7 +45,7 @@ export default function HeaderProvider({
   const scrollTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null);
 
   const headerHeight = useTransform(
-    smoothShrinkAmount,
+    shrinkAmount,
     [0, 1],
     [HEADER_HEIGHT, SHRUNK_HEADER_HEIGHT],
   );
@@ -108,9 +107,9 @@ export default function HeaderProvider({
   useMotionValueEvent(scrollAnchor, "change", () => {
     updateShrinkAmount(scrollY.get());
   });
-  useMotionValueEvent(smoothShrinkAmount, "change", () => {
+  useMotionValueEvent(shrinkAmount, "change", () => {
     updateCssHeaderHeight();
-    setIsFullSize(smoothShrinkAmount.get() === 0);
+    setIsFullSize(shrinkAmount.get() === 0);
   });
 
   const expand = useCallback(() => {
@@ -130,7 +129,7 @@ export default function HeaderProvider({
     <HeaderContext.Provider
       value={{
         isFullSize: shrinkDisabled || isFullSize,
-        shrinkAmount: shrinkDisabled ? new MotionValue(0) : smoothShrinkAmount,
+        shrinkAmount: shrinkDisabled ? new MotionValue(0) : shrinkAmount,
         expand,
         activeMenu,
         setActiveMenu,
