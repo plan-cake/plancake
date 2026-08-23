@@ -99,7 +99,10 @@ export default function HeaderProvider({
 
   useMotionValueEvent(scrollY, "change", handleScrollChange);
   useMotionValueEvent(scrollAnchor, "change", updateShrinkAmount);
-  useMotionValueEvent(shrinkAmount, "change", () => {
+  useMotionValueEvent(shrinkAmount, "change", (value) => {
+    if (value > 0) {
+      setActiveMenu(null);
+    }
     updateCssHeaderHeight();
     setIsFullSize(shrinkAmount.get() === 0);
   });
