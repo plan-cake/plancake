@@ -43,6 +43,7 @@ export default function HeaderProvider({
     stiffness: 300,
     mass: 0.1,
   });
+  const scrollTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null);
 
   const headerHeight = useTransform(
     smoothShrinkAmount,
@@ -59,6 +60,17 @@ export default function HeaderProvider({
     updateCssHeaderHeight();
   }, [updateCssHeaderHeight, shrinkDisabled]);
 
+  const updateShrinkAmount = useCallback(
+    (scrollYValue: number) => {
+      const value = scrollYValue;
+      const scrollOffset = value - scrollAnchor.get();
+      shrinkAmount.set(
+        Math.min(Math.max(scrollOffset / SCROLL_THRESHOLD, 0), 1),
+      );
+    },
+    [scrollAnchor, shrinkAmount],
+  );
+
   const handleScrollChange = useCallback(
     (value: number) => {
       // Clamp value to page height
@@ -68,31 +80,41 @@ export default function HeaderProvider({
       );
 
       const scrollOffset = value - scrollAnchor.get();
-
       if (scrollOffset > SCROLL_THRESHOLD) {
         scrollAnchor.set(value - SCROLL_THRESHOLD);
       } else if (scrollOffset < 0) {
         scrollAnchor.set(value);
       }
 
-      shrinkAmount.set(
-        Math.min(Math.max(scrollOffset / SCROLL_THRESHOLD, 0), 1),
-      );
+      updateShrinkAmount(value);
+
+      // Set a timeout to "round" the shink amount after the user stops scrolling
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      scrollTimeoutRef.current = setTimeout(() => {
+        if (shrinkAmount.get() === 0 || shrinkAmount.get() === 1) return;
+        if (scrollY.get() - scrollAnchor.get() >= SCROLL_THRESHOLD / 2) {
+          scrollAnchor.set(scrollY.get() - SCROLL_THRESHOLD);
+        } else {
+          scrollAnchor.set(scrollY.get());
+        }
+      }, 500);
     },
-    [scrollAnchor, shrinkAmount],
+    [scrollAnchor, updateShrinkAmount, scrollY, shrinkAmount],
   );
 
   useMotionValueEvent(scrollY, "change", handleScrollChange);
-
-  useMotionValueEvent(scrollAnchor, "change", handleScrollChange);
-
+  useMotionValueEvent(scrollAnchor, "change", () => {
+    updateShrinkAmount(scrollY.get());
+  });
   useMotionValueEvent(smoothShrinkAmount, "change", () => {
     updateCssHeaderHeight();
     setIsFullSize(smoothShrinkAmount.get() === 0);
   });
 
   const expand = useCallback(() => {
-    scrollAnchor.set(scrollY.get());
+    scrollAnchor.set(scrollY.get() - SCROLL_THRESHOLD);
   }, [scrollY, scrollAnchor]);
 
   // Reset when the page changes
@@ -102,7 +124,7 @@ export default function HeaderProvider({
 
     scrollAnchor.set(0);
     shrinkAmount.set(0);
-  }, [pathname, scrollAnchor, shrinkAmount, smoothShrinkAmount]);
+  }, [pathname, shrinkAmount, scrollAnchor]);
 
   return (
     <HeaderContext.Provider
