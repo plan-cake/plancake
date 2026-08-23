@@ -5,9 +5,10 @@ import LinkText from "@/components/link-text";
 import Logo from "@/components/logo";
 import { useHeader } from "@/features/header/context";
 import { getCurrentVersion } from "@/features/version-history/data";
+import { cn } from "@/lib/utils/classname";
 
 export default function LogoArea() {
-  const { shrinkAmount } = useHeader();
+  const { isFullSize, shrinkAmount } = useHeader();
 
   const versionStyle = useTransform(shrinkAmount, [0, 1], {
     opacity: [1, 0],
@@ -19,7 +20,11 @@ export default function LogoArea() {
         <Logo shrinkOnScroll />
       </Link>
       <motion.div style={versionStyle}>
-        <Link href="/version-history" className="text-xs">
+        <Link
+          href="/version-history"
+          className={cn("text-xs", !isFullSize && "pointer-events-none")}
+          tabIndex={isFullSize ? undefined : -1}
+        >
           <LinkText unbolded>{getCurrentVersion()}</LinkText>
         </Link>
       </motion.div>
