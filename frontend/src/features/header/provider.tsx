@@ -108,8 +108,8 @@ export default function HeaderProvider({
   });
 
   const expand = useCallback(() => {
-    scrollAnchor.set(scrollY.get());
-  }, [scrollY, scrollAnchor]);
+    scrollAnchor.set(typeof window !== undefined ? window.scrollY : 0);
+  }, [scrollAnchor]);
 
   // Reset when the page changes
   useEffect(() => {

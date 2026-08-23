@@ -11,6 +11,7 @@ import {
 
 import ActionButton from "@/features/button/components/action";
 import HeaderSpacer from "@/features/header/components/header-spacer";
+import { useHeader } from "@/features/header/context";
 import {
   MajorVersionData,
   MinorVersionData,
@@ -24,11 +25,15 @@ export default function ClientPage({
   versionHistoryData: VersionHistoryData;
 }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const { expand } = useHeader();
 
   // On load, scroll to the bottom
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "instant" });
-  }, []);
+
+    // Also expand the header on load
+    expand();
+  }, [expand]);
 
   // Section expansion management
   const allVersions = useMemo(() => {
