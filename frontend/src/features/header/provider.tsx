@@ -38,8 +38,8 @@ export default function HeaderProvider({
   const { scrollY } = useScroll();
   const scrollAnchor = useMotionValue(0);
   const shrinkAmount = useSpring(0, {
-    damping: 15,
-    stiffness: 300,
+    damping: 150,
+    stiffness: 3000,
     mass: 0.1,
   });
   const scrollTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null);
