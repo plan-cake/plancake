@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import { motion, useTransform } from "framer-motion";
+import { LayoutGroup, motion, useTransform } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 import DashboardButton from "@/features/header/components/buttons/dashboard";
 import NewEventButton from "@/features/header/components/buttons/new-event";
@@ -19,6 +20,7 @@ export default function ShrinkingHeader({
   const [mounted, setMounted] = useState(false);
 
   const { isFullSize, shrinkAmount, expand, activeMenu } = useHeader();
+  const pathname = usePathname();
 
   const headerButtonSpacing = useTransform(shrinkAmount, [0, 1], {
     padding: [8, 4],
@@ -49,34 +51,34 @@ export default function ShrinkingHeader({
       >
         <LogoArea />
 
-        <motion.div
-          animate={{ scale: activeMenu ? 0.95 : 1 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className={cn(
-            "relative isolate flex h-fit items-center rounded-full",
-          )}
-          style={headerButtonSpacing}
-        >
-          <div
-            className="frosted-glass pointer-events-none absolute inset-0 -z-10 rounded-full"
-            aria-hidden="true"
-          />
-
-          <NewEventButton />
-          <ThemePicker />
-          <DashboardButton />
-
-          {accountButton}
-
-          <div
+        {/* Adding this key prevents Framer from trying to animate on page switch */}
+        <LayoutGroup key={pathname} id="header-layout-group">
+          <motion.div
+            animate={{ scale: activeMenu ? 0.95 : 1 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn(
-              "bg-violet/20 pointer-events-none absolute inset-0 rounded-full",
-              "transition-opacity duration-300 ease-in-out",
-              activeMenu ? "opacity-100" : "opacity-0",
+              "relative isolate flex h-fit items-center rounded-full",
             )}
-            aria-hidden="true"
-          />
-        </motion.div>
+            style={headerButtonSpacing}
+          >
+            <div
+              className="frosted-glass pointer-events-none absolute inset-0 -z-10 rounded-full"
+              aria-hidden="true"
+            />
+            <NewEventButton />
+            <ThemePicker />
+            <DashboardButton />
+            {accountButton}
+            <div
+              className={cn(
+                "bg-violet/20 pointer-events-none absolute inset-0 rounded-full",
+                "transition-opacity duration-300 ease-in-out",
+                activeMenu ? "opacity-100" : "opacity-0",
+              )}
+              aria-hidden="true"
+            />
+          </motion.div>
+        </LayoutGroup>
       </nav>
     </header>
   );
