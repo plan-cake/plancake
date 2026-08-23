@@ -23,6 +23,8 @@ export default function HeaderProvider({
   const lastPathnameRef = useRef<string | null>(null);
   const pathname = usePathname();
 
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+
   const [isFullSize, setIsFullSize] = useState(true);
   const { scrollY } = useScroll();
   const scrollAnchor = useMotionValue(0);
@@ -76,8 +78,6 @@ export default function HeaderProvider({
 
     setIsFullSize(smoothShrinkAmount.get() === 0);
   });
-
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   const expand = useCallback(() => {
     scrollAnchor.set(scrollY.get());
