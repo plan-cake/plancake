@@ -39,12 +39,10 @@ export default function ClientPage({
   const allVersions = useMemo(() => {
     const versions = new Set<string>();
     versionHistoryData.forEach((version) => {
-      if (version.bugFixes && version.bugFixes.length > 0) {
+      if (version.bugFixes.length > 0) {
         versions.add(version.version);
       }
-      if (version.minorVersions && version.minorVersions.length > 0) {
-        version.minorVersions.forEach((minor) => versions.add(minor.version));
-      }
+      version.minorVersions.forEach((minor) => versions.add(minor.version));
     });
     return versions;
   }, [versionHistoryData]);
@@ -115,8 +113,7 @@ export default function ClientPage({
         <div className="mx-auto flex w-full flex-col gap-8 px-2">
           {versionHistoryData.map((version, index) => {
             const isCurrent = index === versionHistoryData.length - 1;
-            const hasMinorVersions =
-              version.minorVersions && version.minorVersions.length > 0;
+            const hasMinorVersions = version.minorVersions.length > 0;
 
             return (
               <div
@@ -136,23 +133,22 @@ export default function ClientPage({
                   isExpanded={expandedVersions.has(version.version)}
                   toggleExpanded={toggleVersion}
                 />
-                {version.minorVersions &&
-                  version.minorVersions.map((minorVersion, minorIndex) => {
-                    const isLastMinor =
-                      minorIndex === version.minorVersions!.length - 1;
+                {version.minorVersions.map((minorVersion, minorIndex) => {
+                  const isLastMinor =
+                    minorIndex === version.minorVersions.length - 1;
 
-                    return (
-                      <MinorVersion
-                        key={minorVersion.version}
-                        versionData={minorVersion}
-                        isCurrent={isCurrent}
-                        isLast={isCurrent && isLastMinor}
-                        extendLine={!isCurrent && isLastMinor}
-                        isExpanded={expandedVersions.has(minorVersion.version)}
-                        toggleExpanded={toggleVersion}
-                      />
-                    );
-                  })}
+                  return (
+                    <MinorVersion
+                      key={minorVersion.version}
+                      versionData={minorVersion}
+                      isCurrent={isCurrent}
+                      isLast={isCurrent && isLastMinor}
+                      extendLine={!isCurrent && isLastMinor}
+                      isExpanded={expandedVersions.has(minorVersion.version)}
+                      toggleExpanded={toggleVersion}
+                    />
+                  );
+                })}
               </div>
             );
           })}
@@ -258,7 +254,7 @@ function MajorVersion({
             <li key={change}>- {change}</li>
           ))}
         </ul>
-        {versionData.bugFixes && versionData.bugFixes.length > 0 && (
+        {versionData.bugFixes.length > 0 && (
           <Collapsible.Root
             open={isExpanded}
             onOpenChange={() => toggleExpanded(versionData.version)}
@@ -280,7 +276,7 @@ function MajorVersion({
             </Collapsible.Trigger>
             <Collapsible.Content className="collapsible-content">
               <ul>
-                {versionData.bugFixes!.map((bugFix) => (
+                {versionData.bugFixes.map((bugFix) => (
                   <li key={bugFix}>- {bugFix}</li>
                 ))}
               </ul>

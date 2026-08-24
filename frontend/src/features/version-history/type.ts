@@ -17,8 +17,8 @@ export type MajorVersionData = {
     version: MajorVersionNumber;
     releaseDate: ReleaseDate;
     changes: string[];
-    bugFixes?: string[];
-    minorVersions?: MinorVersionData[];
+    bugFixes: string[];
+    minorVersions: MinorVersionData[];
 };
 
 export type VersionHistoryData = MajorVersionData[];

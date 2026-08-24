@@ -6,6 +6,7 @@ export function getVersionHistoryData(): VersionHistoryData {
       version: "v0.1",
       releaseDate: { year: 2025, month: 9, day: 19 },
       changes: ["Initial beta release"],
+      bugFixes: [],
       minorVersions: [
         {
           version: "v0.1.1",
@@ -213,7 +214,7 @@ export function getVersionHistoryData(): VersionHistoryData {
 export function getCurrentVersion(): string {
   const history = getVersionHistoryData();
   const latestMajor = history[history.length - 1];
-  if (latestMajor.minorVersions && latestMajor.minorVersions.length > 0) {
+  if (latestMajor.minorVersions.length > 0) {
     return latestMajor.minorVersions[latestMajor.minorVersions.length - 1]
       .version;
   }
@@ -223,7 +224,7 @@ export function getCurrentVersion(): string {
 export function getMinimalCurrentVersion(): string {
   const history = getVersionHistoryData();
   const latestMajor = history[history.length - 1];
-  if (latestMajor.minorVersions && latestMajor.minorVersions.length > 0) {
+  if (latestMajor.minorVersions.length > 0) {
     return latestMajor.minorVersions[latestMajor.minorVersions.length - 1]
       .version;
   }
