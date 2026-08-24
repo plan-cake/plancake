@@ -219,3 +219,13 @@ export function getCurrentVersion(): string {
   }
   return `${latestMajor.version}.0`;
 }
+
+export function getMinimalCurrentVersion(): string {
+  const history = getVersionHistoryData();
+  const latestMajor = history[history.length - 1];
+  if (latestMajor.minorVersions && latestMajor.minorVersions.length > 0) {
+    return latestMajor.minorVersions[latestMajor.minorVersions.length - 1]
+      .version;
+  }
+  return `${latestMajor.version}`;
+}
