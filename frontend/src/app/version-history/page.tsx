@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import ClientPage from "@/app/version-history/page-client";
 import {
   getMinimalCurrentVersion,
-  getVersionHistoryData,
+  VERSION_DATA,
 } from "@/features/version-history/data";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
 
@@ -17,7 +17,7 @@ export function generateMetadata(): Metadata {
 export default function Page() {
   return (
     <ClientPage
-      versionHistoryData={getVersionHistoryData()}
+      versionHistoryData={VERSION_DATA}
       currentVersion={getMinimalCurrentVersion()}
     />
   );
