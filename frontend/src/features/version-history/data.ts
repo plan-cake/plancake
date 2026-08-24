@@ -3,13 +3,13 @@ import { VersionHistoryData } from "@/features/version-history/type";
 export const VERSION_DATA: VersionHistoryData = [
   {
     version: "v0.1",
-    releaseDate: { year: 2025, month: 9, day: 19 },
+    releaseDate: { year: 2025, month: 10, day: 19 },
     changes: ["Initial beta release"],
     bugFixes: [],
     minorVersions: [
       {
         version: "v0.1.1",
-        releaseDate: { year: 2025, month: 9, day: 22 },
+        releaseDate: { year: 2025, month: 10, day: 22 },
         changes: [
           "Fixed broken redirect after event creation",
           "Fixed event editing error preventing updates",
@@ -17,7 +17,7 @@ export const VERSION_DATA: VersionHistoryData = [
       },
       {
         version: "v0.1.2",
-        releaseDate: { year: 2025, month: 10, day: 2 },
+        releaseDate: { year: 2025, month: 11, day: 2 },
         changes: [
           "Updated all buttons on the site to be more responsive",
           "Fixed an issue where painting the grid up to midnight would fill entire days",
@@ -29,7 +29,7 @@ export const VERSION_DATA: VersionHistoryData = [
   },
   {
     version: "v0.2",
-    releaseDate: { year: 2026, month: 0, day: 16 },
+    releaseDate: { year: 2026, month: 1, day: 16 },
     changes: [
       "Added functionality for event participant removal",
       "Added a version history page",
@@ -42,7 +42,7 @@ export const VERSION_DATA: VersionHistoryData = [
     minorVersions: [
       {
         version: "v0.2.1",
-        releaseDate: { year: 2026, month: 0, day: 21 },
+        releaseDate: { year: 2026, month: 1, day: 21 },
         changes: [
           "Added custom titles and descriptions on link previews",
           "Added animations and page indicators for events with multi-page grids",
@@ -52,7 +52,7 @@ export const VERSION_DATA: VersionHistoryData = [
       },
       {
         version: "v0.2.2",
-        releaseDate: { year: 2026, month: 1, day: 2 },
+        releaseDate: { year: 2026, month: 2, day: 2 },
         changes: [
           "Added banners to results page for event status and participation levels",
           "Updated toasts to support persistent and temporary messages",
@@ -63,7 +63,7 @@ export const VERSION_DATA: VersionHistoryData = [
   },
   {
     version: "v0.3",
-    releaseDate: { year: 2026, month: 1, day: 14 },
+    releaseDate: { year: 2026, month: 2, day: 14 },
     changes: [
       "Added event participant previews to the dashboard",
       "Added a nickname to accounts for autofill when filling out availability",
@@ -81,7 +81,7 @@ export const VERSION_DATA: VersionHistoryData = [
     minorVersions: [
       {
         version: "v0.3.1",
-        releaseDate: { year: 2026, month: 1, day: 26 },
+        releaseDate: { year: 2026, month: 2, day: 26 },
         changes: [
           "Added an icon for iOS home screen bookmarks",
           "Updated the date picker for more intuitive date range selection",
@@ -92,7 +92,7 @@ export const VERSION_DATA: VersionHistoryData = [
       },
       {
         version: "v0.3.2",
-        releaseDate: { year: 2026, month: 2, day: 5 },
+        releaseDate: { year: 2026, month: 3, day: 5 },
         changes: [
           "Added a reminder to view all grid pages when filling out availability",
           "Updated dashboard to dynamically show more participants on each event",
@@ -107,7 +107,7 @@ export const VERSION_DATA: VersionHistoryData = [
       },
       {
         version: "v0.3.3",
-        releaseDate: { year: 2026, month: 2, day: 27 },
+        releaseDate: { year: 2026, month: 3, day: 27 },
         changes: [
           "Added functionality for the header to shrink on mobile",
           "Added check marks to checkboxes for clarity",
@@ -123,7 +123,7 @@ export const VERSION_DATA: VersionHistoryData = [
   },
   {
     version: "v0.4",
-    releaseDate: { year: 2026, month: 3, day: 6 },
+    releaseDate: { year: 2026, month: 4, day: 6 },
     changes: [
       "Added the ability to delete events on the dashboard",
       "Added the account settings page",
@@ -139,7 +139,7 @@ export const VERSION_DATA: VersionHistoryData = [
     minorVersions: [
       {
         version: "v0.4.1",
-        releaseDate: { year: 2026, month: 3, day: 9 },
+        releaseDate: { year: 2026, month: 4, day: 9 },
         changes: [
           "Updated the header on the attendees panel to display more relevant information",
           "Updated drawer components to have close buttons for accessibility",
@@ -152,7 +152,7 @@ export const VERSION_DATA: VersionHistoryData = [
       },
       {
         version: "v0.4.2",
-        releaseDate: { year: 2026, month: 3, day: 10 },
+        releaseDate: { year: 2026, month: 4, day: 10 },
         changes: [
           "Fixed the formatting of hovered timeslots for weekday events",
           "Fixed the banner message prompting users to add availability on mobile",
@@ -161,7 +161,7 @@ export const VERSION_DATA: VersionHistoryData = [
       },
       {
         version: "v0.4.3",
-        releaseDate: { year: 2026, month: 4, day: 9 },
+        releaseDate: { year: 2026, month: 5, day: 9 },
         changes: [
           "Added icons to the results grid to indicate the best times",
           "Added a share button to the results page",
@@ -174,7 +174,7 @@ export const VERSION_DATA: VersionHistoryData = [
       },
       {
         version: "v0.4.4",
-        releaseDate: { year: 2026, month: 5, day: 12 },
+        releaseDate: { year: 2026, month: 6, day: 12 },
         changes: [
           "Added a share menu to the results page",
           "Added a strict check for cookies being enabled",
@@ -185,7 +185,7 @@ export const VERSION_DATA: VersionHistoryData = [
       },
       {
         version: "v0.4.5",
-        releaseDate: { year: 2026, month: 5, day: 29 },
+        releaseDate: { year: 2026, month: 6, day: 29 },
         changes: [
           "Added animations to the password strength criteria",
           "Updated confirmation dialogs to display as drawers on mobile",
@@ -196,7 +196,7 @@ export const VERSION_DATA: VersionHistoryData = [
       },
       {
         version: "v0.4.6",
-        releaseDate: { year: 2026, month: 6, day: 20 },
+        releaseDate: { year: 2026, month: 7, day: 20 },
         changes: [
           "Added error messages to length-limited text fields",
           "Added the share menu to dashboard events",

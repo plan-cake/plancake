@@ -3,7 +3,7 @@ type MinorVersionNumber = `${MajorVersionNumber}.${number}`;
 
 type ReleaseDate = {
     year: number; // full year, e.g., 2025
-    month: number; // 0-indexed month, e.g., 0 for January
+    month: number; // 1-indexed month, e.g., 1 for January
     day: number; // day of the month, e.g., 15
 };
 

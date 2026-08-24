@@ -221,7 +221,7 @@ function MajorVersion({
   const releaseDate = new Date(
     Date.UTC(
       versionData.releaseDate.year,
-      versionData.releaseDate.month,
+      versionData.releaseDate.month - 1, // Adjust to 0-indexed month
       versionData.releaseDate.day,
     ),
   );
@@ -306,7 +306,7 @@ function MinorVersion({
   const releaseDate = new Date(
     Date.UTC(
       versionData.releaseDate.year,
-      versionData.releaseDate.month,
+      versionData.releaseDate.month - 1, // Adjust to 0-indexed month
       versionData.releaseDate.day,
     ),
   );
