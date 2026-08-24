@@ -209,20 +209,11 @@ export const VERSION_DATA: VersionHistoryData = [
   },
 ] as const;
 
-export function getCurrentVersion(): string {
-  const latestMajor = VERSION_DATA[VERSION_DATA.length - 1];
+export function getCurrentVersion(threeDigit = true): string {
+  const latestMajor = VERSION_DATA.at(-1)!;
   if (latestMajor.minorVersions.length > 0) {
     return latestMajor.minorVersions[latestMajor.minorVersions.length - 1]
       .version;
   }
-  return `${latestMajor.version}.0`;
-}
-
-export function getMinimalCurrentVersion(): string {
-  const latestMajor = VERSION_DATA[VERSION_DATA.length - 1];
-  if (latestMajor.minorVersions.length > 0) {
-    return latestMajor.minorVersions[latestMajor.minorVersions.length - 1]
-      .version;
-  }
-  return `${latestMajor.version}`;
+  return `${latestMajor.version}${threeDigit ? ".0" : ""}`;
 }
