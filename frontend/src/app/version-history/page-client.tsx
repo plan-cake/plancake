@@ -1,12 +1,15 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { cloneElement, useEffect, useMemo, useRef, useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
 import {
   ArrowDownIcon,
+  BugIcon,
   ChevronRightIcon,
   ListChevronsDownUpIcon,
   ListChevronsUpDownIcon,
+  PlusCircleIcon,
+  WrenchIcon,
 } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
@@ -39,9 +42,6 @@ export default function ClientPage({
   const allVersions = useMemo(() => {
     const versions = new Set<string>();
     versionHistoryData.forEach((version) => {
-      if (version.bugFixes.length > 0) {
-        versions.add(version.version);
-      }
       version.minorVersions.forEach((minor) => versions.add(minor.version));
     });
     return versions;
@@ -130,8 +130,6 @@ export default function ClientPage({
                   isCurrent={isCurrent}
                   isLast={isCurrent && !hasMinorVersions}
                   extendLine={!isCurrent && !hasMinorVersions}
-                  isExpanded={expandedVersions.has(version.version)}
-                  toggleExpanded={toggleVersion}
                 />
                 {version.minorVersions.map((minorVersion, minorIndex) => {
                   const isLastMinor =
@@ -208,15 +206,11 @@ function MajorVersion({
   isCurrent,
   isLast,
   extendLine,
-  isExpanded,
-  toggleExpanded,
 }: {
   versionData: MajorVersionData;
   isCurrent: boolean;
   isLast: boolean;
   extendLine: boolean;
-  isExpanded: boolean;
-  toggleExpanded: (version: string) => void;
 }) {
   const releaseDate = new Date(
     Date.UTC(
@@ -249,40 +243,7 @@ function MajorVersion({
             <div className="border-foreground/50 w-full rounded-full border-t" />
           )}
         </div>
-        <ul>
-          {versionData.changes.map((change) => (
-            <li key={change}>- {change}</li>
-          ))}
-        </ul>
-        {versionData.bugFixes.length > 0 && (
-          <Collapsible.Root
-            open={isExpanded}
-            onOpenChange={() => toggleExpanded(versionData.version)}
-            className="ml-3"
-          >
-            <Collapsible.Trigger asChild>
-              <div className="group mt-2 flex cursor-pointer items-center gap-2">
-                <span className="font-semibold">Bug Fixes</span>
-                <div
-                  className={cn(
-                    "transition-transform duration-200",
-                    "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
-                    isExpanded && "rotate-90",
-                  )}
-                >
-                  <ChevronRightIcon className="h-4 w-4" />
-                </div>
-              </div>
-            </Collapsible.Trigger>
-            <Collapsible.Content className="collapsible-content">
-              <ul>
-                {versionData.bugFixes.map((bugFix) => (
-                  <li key={bugFix}>- {bugFix}</li>
-                ))}
-              </ul>
-            </Collapsible.Content>
-          </Collapsible.Root>
-        )}
+        <ChangeList versionData={versionData} />
       </div>
     </div>
   );
@@ -346,14 +307,72 @@ function MinorVersion({
             </div>
           </Collapsible.Trigger>
           <Collapsible.Content className="collapsible-content">
-            <ul>
-              {versionData.changes.map((change) => (
-                <li key={change}>- {change}</li>
-              ))}
-            </ul>
+            <ChangeList versionData={versionData} />
           </Collapsible.Content>
         </Collapsible.Root>
       </div>
+    </div>
+  );
+}
+
+function ChangeList({
+  versionData,
+}: {
+  versionData: MajorVersionData | MinorVersionData;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <ChangeSection
+        icon={<PlusCircleIcon />}
+        title="Added"
+        changes={versionData.added}
+      />
+      <ChangeSection
+        icon={<WrenchIcon />}
+        title="Changed"
+        changes={versionData.changed}
+      />
+      <ChangeSection
+        icon={<BugIcon />}
+        title="Fixed"
+        changes={versionData.fixed}
+      />
+    </div>
+  );
+}
+
+function ChangeSection({
+  icon,
+  title,
+  changes,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  changes: string[];
+}) {
+  if (changes.length === 0) return null;
+
+  const iconElement = cloneElement(
+    icon as React.ReactElement<{ className: string }>,
+    {
+      className: "h-3.5 w-3.5",
+    },
+  );
+
+  return (
+    // The 1px gap is to match the title-list gap to the item-item gap with line height
+    <div className="flex flex-col gap-[1px]">
+      <div className="flex items-center gap-1.5 opacity-75">
+        {iconElement}
+        <h3>{title}</h3>
+      </div>
+      <ul className="flex flex-col gap-1 pl-2">
+        {changes.map((change) => (
+          <li key={change} className="leading-tight">
+            - {change}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
