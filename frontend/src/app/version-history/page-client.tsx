@@ -21,8 +21,10 @@ import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
   versionHistoryData,
+  currentVersion,
 }: {
   versionHistoryData: VersionHistoryData;
+  currentVersion: string;
 }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -47,7 +49,7 @@ export default function ClientPage({
     return versions;
   }, [versionHistoryData]);
   const [expandedVersions, setExpandedVersions] = useState<Set<string>>(
-    new Set(),
+    new Set([currentVersion]),
   );
   const allExpanded = expandedVersions.size === allVersions.size;
 
