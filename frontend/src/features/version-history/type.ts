@@ -20,6 +20,7 @@ export type MinorVersionData = VersionData & {
 
 export type MajorVersionData = VersionData & {
   version: MajorVersionNumber;
+  tag?: string;
   minorVersions: MinorVersionData[];
 };
 

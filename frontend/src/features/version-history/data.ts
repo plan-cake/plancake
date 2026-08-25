@@ -4,6 +4,7 @@ export const VERSION_DATA: VersionHistoryData = [
   {
     version: "v0.1",
     releaseDate: { year: 2025, month: 10, day: 19 },
+    tag: "Beta Release",
     added: [],
     changed: [],
     fixed: [],

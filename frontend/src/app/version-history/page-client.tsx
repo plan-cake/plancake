@@ -259,6 +259,12 @@ function Version({
       versionData.fixed.length > 0
     );
   }, [versionData]);
+  const versionTag = useMemo(() => {
+    if (isMajor && (versionData as MajorVersionData).tag) {
+      return (versionData as MajorVersionData).tag;
+    }
+    return undefined;
+  }, [isMajor, versionData]);
 
   const header = (
     <div className="group flex items-center gap-2">
@@ -277,13 +283,17 @@ function Version({
           <ChevronRightIcon className="h-4 w-4" />
         </div>
       )}
-      {isMajor && !isCurrent && (
+      {versionTag && (
         <div
           className={cn(
-            "border-foreground/50 w-full rounded-full border-t",
-            !hasChanges && "ml-2",
+            "bg-lion text-violet text-nowrap rounded-full px-1.5 py-0.5 text-xs font-semibold",
           )}
-        />
+        >
+          {versionTag}
+        </div>
+      )}
+      {isMajor && !isCurrent && (
+        <div className="border-foreground/50 w-full rounded-full border-t" />
       )}
     </div>
   );
