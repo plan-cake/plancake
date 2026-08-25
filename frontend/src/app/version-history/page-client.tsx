@@ -322,11 +322,11 @@ function ChangeList({
   versionData: MajorVersionData | MinorVersionData;
 }) {
   return (
-    <div className="flex flex-col gap-1">
+    <ul className="flex flex-col gap-1">
       <ChangeSection icon={<PlusCircleIcon />} changes={versionData.added} />
       <ChangeSection icon={<WrenchIcon />} changes={versionData.changed} />
       <ChangeSection icon={<BugIcon />} changes={versionData.fixed} />
-    </div>
+    </ul>
   );
 }
 
@@ -347,13 +347,13 @@ function ChangeSection({
   );
 
   return (
-    <ul className="flex flex-col gap-1 pl-2">
+    <>
       {changes.map((change) => (
         <li key={change} className="flex items-start gap-2">
           <div className="mt-[3px]">{iconElement}</div>
           <div className="leading-tight">{change}</div>
         </li>
       ))}
-    </ul>
+    </>
   );
 }
