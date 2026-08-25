@@ -234,7 +234,7 @@ function MajorVersion({
         isLast={isLast}
         extend={extendLine}
       />
-      <div className="w-full px-4">
+      <div className="flex w-full flex-col gap-1 px-4">
         <div className="flex items-center gap-4">
           <span className="text-foreground/50 shrink-0 italic">
             {releaseDateString}
@@ -288,6 +288,7 @@ function MinorVersion({
         <Collapsible.Root
           open={isExpanded}
           onOpenChange={() => toggleExpanded(versionData.version)}
+          className="flex flex-col gap-1"
         >
           <Collapsible.Trigger asChild className="cursor-pointer">
             <div className="group flex items-center gap-2">
@@ -322,31 +323,17 @@ function ChangeList({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <ChangeSection
-        icon={<PlusCircleIcon />}
-        title="Added"
-        changes={versionData.added}
-      />
-      <ChangeSection
-        icon={<WrenchIcon />}
-        title="Changed"
-        changes={versionData.changed}
-      />
-      <ChangeSection
-        icon={<BugIcon />}
-        title="Fixed"
-        changes={versionData.fixed}
-      />
+      <ChangeSection icon={<PlusCircleIcon />} changes={versionData.added} />
+      <ChangeSection icon={<WrenchIcon />} changes={versionData.changed} />
+      <ChangeSection icon={<BugIcon />} changes={versionData.fixed} />
     </div>
   );
 }
 
 function ChangeSection({
   icon,
-  title,
   changes,
 }: {
-  title: string;
   icon: React.ReactNode;
   changes: string[];
 }) {
@@ -355,24 +342,18 @@ function ChangeSection({
   const iconElement = cloneElement(
     icon as React.ReactElement<{ className: string }>,
     {
-      className: "h-3.5 w-3.5",
+      className: "h-3.5 w-3.5 shrink-0",
     },
   );
 
   return (
-    // The 1px gap is to match the title-list gap to the item-item gap with line height
-    <div className="flex flex-col gap-[1px]">
-      <div className="flex items-center gap-1.5 opacity-75">
-        {iconElement}
-        <h3>{title}</h3>
-      </div>
-      <ul className="flex flex-col gap-1 pl-2">
-        {changes.map((change) => (
-          <li key={change} className="leading-tight">
-            - {change}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="flex flex-col gap-1 pl-2">
+      {changes.map((change) => (
+        <li key={change} className="flex items-start gap-2">
+          <div className="mt-[3px]">{iconElement}</div>
+          <div className="leading-tight">{change}</div>
+        </li>
+      ))}
+    </ul>
   );
 }
