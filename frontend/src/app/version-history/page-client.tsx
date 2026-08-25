@@ -124,21 +124,25 @@ export default function ClientPage({
                 }
                 key={version.version}
               >
-                <MajorVersion
+                <Version
                   key={version.version}
                   versionData={version}
+                  isMajor={true}
                   isCurrent={isCurrent}
                   isLast={isCurrent && !hasMinorVersions}
                   extendLine={!isCurrent && !hasMinorVersions}
+                  isExpanded={expandedVersions.has(version.version)}
+                  toggleExpanded={toggleVersion}
                 />
                 {version.minorVersions.map((minorVersion, minorIndex) => {
                   const isLastMinor =
                     minorIndex === version.minorVersions.length - 1;
 
                   return (
-                    <MinorVersion
+                    <Version
                       key={minorVersion.version}
                       versionData={minorVersion}
+                      isMajor={false}
                       isCurrent={isCurrent}
                       isLast={isCurrent && isLastMinor}
                       extendLine={!isCurrent && isLastMinor}
@@ -201,63 +205,17 @@ function TimelineSegment({
   );
 }
 
-function MajorVersion({
+function Version({
   versionData,
-  isCurrent,
-  isLast,
-  extendLine,
-}: {
-  versionData: MajorVersionData;
-  isCurrent: boolean;
-  isLast: boolean;
-  extendLine: boolean;
-}) {
-  const releaseDate = new Date(
-    Date.UTC(
-      versionData.releaseDate.year,
-      versionData.releaseDate.month - 1, // Adjust to 0-indexed month
-      versionData.releaseDate.day,
-    ),
-  );
-  const releaseDateString = releaseDate.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  });
-
-  return (
-    <div className="flex">
-      <TimelineSegment
-        version={versionData.version}
-        isCurrent={isCurrent}
-        isLast={isLast}
-        extend={extendLine}
-      />
-      <div className="flex w-full flex-col gap-1 px-4">
-        <div className="flex items-center gap-4">
-          <span className="text-foreground/50 shrink-0 italic">
-            {releaseDateString}
-          </span>
-          {!isCurrent && (
-            <div className="border-foreground/50 w-full rounded-full border-t" />
-          )}
-        </div>
-        <ChangeList versionData={versionData} />
-      </div>
-    </div>
-  );
-}
-
-function MinorVersion({
-  versionData,
+  isMajor,
   isCurrent,
   isLast,
   extendLine,
   isExpanded,
   toggleExpanded,
 }: {
-  versionData: MinorVersionData;
+  versionData: MajorVersionData | MinorVersionData;
+  isMajor: boolean;
   isCurrent: boolean;
   isLast: boolean;
   extendLine: boolean;
@@ -271,46 +229,83 @@ function MinorVersion({
       versionData.releaseDate.day,
     ),
   );
-  const releaseDateString = releaseDate.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC",
-  });
+  const releaseDateString = releaseDate.toLocaleDateString(
+    undefined,
+    isMajor
+      ? {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          timeZone: "UTC",
+        }
+      : {
+          month: "short",
+          day: "numeric",
+          timeZone: "UTC",
+        },
+  );
+
+  const hasChanges = useMemo(() => {
+    return (
+      versionData.added.length > 0 ||
+      versionData.changed.length > 0 ||
+      versionData.fixed.length > 0
+    );
+  }, [versionData]);
+
+  const header = (
+    <div className="group flex items-center gap-2">
+      {!isMajor && <span className="font-bold">{versionData.version}</span>}
+      <span className="text-foreground/50 shrink-0 italic">
+        {releaseDateString}
+      </span>
+      {hasChanges && (
+        <div
+          className={cn(
+            "transition-transform duration-200",
+            "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
+            isExpanded && "rotate-90",
+          )}
+        >
+          <ChevronRightIcon className="h-4 w-4" />
+        </div>
+      )}
+      {isMajor && !isCurrent && (
+        <div
+          className={cn(
+            "border-foreground/50 w-full rounded-full border-t",
+            !hasChanges && "ml-2",
+          )}
+        />
+      )}
+    </div>
+  );
 
   return (
-    <div className="mt-4 flex">
+    <div className={cn("flex", !isMajor && "mt-4")}>
       <TimelineSegment
+        version={isMajor ? versionData.version : undefined}
         isCurrent={isCurrent}
         isLast={isLast}
         extend={extendLine}
       />
-      <div className="px-4">
-        <Collapsible.Root
-          open={isExpanded}
-          onOpenChange={() => toggleExpanded(versionData.version)}
-          className="flex flex-col gap-1"
-        >
-          <Collapsible.Trigger asChild className="cursor-pointer">
-            <div className="group flex items-center gap-2">
-              <span className="font-bold">{versionData.version}</span>
-              <span className="text-foreground/50 italic">
-                {releaseDateString}
-              </span>
-              <div
-                className={cn(
-                  "transition-transform duration-200",
-                  "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
-                  isExpanded && "rotate-90",
-                )}
-              >
-                <ChevronRightIcon className="h-4 w-4" />
-              </div>
-            </div>
-          </Collapsible.Trigger>
-          <Collapsible.Content className="collapsible-content">
-            <ChangeList versionData={versionData} />
-          </Collapsible.Content>
-        </Collapsible.Root>
+      <div className="w-full px-4">
+        {hasChanges ? (
+          <Collapsible.Root
+            open={isExpanded}
+            onOpenChange={() => toggleExpanded(versionData.version)}
+            className="flex flex-col gap-1"
+          >
+            <Collapsible.Trigger asChild className="cursor-pointer">
+              {header}
+            </Collapsible.Trigger>
+            <Collapsible.Content className="collapsible-content">
+              <ChangeList versionData={versionData} />
+            </Collapsible.Content>
+          </Collapsible.Root>
+        ) : (
+          header
+        )}
       </div>
     </div>
   );
