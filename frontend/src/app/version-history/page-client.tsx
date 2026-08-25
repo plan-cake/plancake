@@ -42,6 +42,13 @@ export default function ClientPage({
   const allVersions = useMemo(() => {
     const versions = new Set<string>();
     versionHistoryData.forEach((version) => {
+      if (
+        version.added.length > 0 ||
+        version.changed.length > 0 ||
+        version.fixed.length > 0
+      ) {
+        versions.add(version.version);
+      }
       version.minorVersions.forEach((minor) => versions.add(minor.version));
     });
     return versions;
