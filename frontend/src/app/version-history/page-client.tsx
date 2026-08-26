@@ -266,8 +266,10 @@ function Version({
     return undefined;
   }, [isMajor, versionData]);
 
+  const HeaderType = hasChanges ? "button" : "div";
+
   const header = (
-    <div className="group flex items-center gap-2">
+    <HeaderType className="group flex w-full items-center gap-2">
       {!isMajor && <span className="font-bold">{versionData.version}</span>}
       {versionTag && (
         <div
@@ -295,7 +297,7 @@ function Version({
       {isMajor && !isCurrent && (
         <div className="border-foreground/50 w-full rounded-full border-t" />
       )}
-    </div>
+    </HeaderType>
   );
 
   return (
