@@ -65,31 +65,20 @@ function SpecificDateRangeDisplay({
   const isMobile = useCheckMobile();
 
   const earliestDate =
-    editing && originalEventRange?.dateRange.from
-      ? parseISO(originalEventRange.dateRange.from)
+    editing && originalEventRange?.dates.size
+      ? parseISO(
+          Array.from(originalEventRange.dates).reduce((min, cur) =>
+            cur < min ? cur : min,
+          ),
+        )
       : new Date();
-  const startDate = eventRange.dateRange.from
-    ? parseISO(eventRange.dateRange.from)
-    : null;
-  const endDate = eventRange.dateRange.to
-    ? parseISO(eventRange.dateRange.to)
-    : null;
+  const dateObjects = new Set<Date>(
+    Array.from(eventRange.dates, (iso) => parseISO(iso)),
+  );
 
   if (isMobile) {
-    return (
-      <DateRangeDrawer
-        earliestDate={earliestDate}
-        startDate={startDate}
-        endDate={endDate}
-      />
-    );
+    return <DateRangeDrawer earliestDate={earliestDate} dates={dateObjects} />;
   } else {
-    return (
-      <DateRangePopover
-        earliestDate={earliestDate}
-        startDate={startDate}
-        endDate={endDate}
-      />
-    );
+    return <DateRangePopover earliestDate={earliestDate} dates={dateObjects} />;
   }
 }

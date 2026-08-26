@@ -10,20 +10,15 @@ import { cn } from "@/lib/utils/classname";
 
 export default function DateRangePopover({
   earliestDate,
-  startDate,
-  endDate,
+  dates,
 }: SpecificDateRangeDisplayProps) {
-  const { errors, setDateRange } = useEventContext();
+  const { errors, setDates } = useEventContext();
   const [open, setOpen] = useState(false);
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger className="hover:cursor-pointer">
-        <SpecificDateRangeDisplay
-          startDate={startDate}
-          endDate={endDate}
-          open={open}
-        />
+        <SpecificDateRangeDisplay dates={dates} open={open} />
       </Popover.Trigger>
 
       <Popover.Portal>
@@ -40,11 +35,8 @@ export default function DateRangePopover({
           <Calendar
             earliestDate={earliestDate}
             className="w-fit"
-            selectedRange={{
-              from: startDate || undefined,
-              to: endDate || undefined,
-            }}
-            setDateRange={setDateRange}
+            selectedDates={dates}
+            setDates={setDates}
             dateRangeError={errors.dateRange}
           />
         </Popover.Content>

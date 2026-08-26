@@ -1,24 +1,36 @@
+import { useMemo } from "react";
+
 import { format } from "date-fns";
 import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils/classname";
 
 type SpecificDateRangeDisplayProps = {
-  startDate: Date | null;
-  endDate: Date | null;
+  dates: Set<Date>;
   open?: boolean;
 };
 
 export default function SpecificDateRangeDisplay({
-  startDate,
-  endDate,
+  dates,
   open = false,
 }: SpecificDateRangeDisplayProps) {
+  const firstDate = useMemo(() => {
+    return dates.size > 0
+      ? Array.from(dates).reduce((min, cur) => (cur < min ? cur : min))
+      : null;
+  }, [dates]);
+
+  const lastDate = useMemo(() => {
+    return dates.size > 0
+      ? Array.from(dates).reduce((max, cur) => (cur > max ? cur : max))
+      : null;
+  }, [dates]);
+
   return (
     <form className="flex w-full flex-col gap-y-2 md:flex-row md:gap-4">
       <SpecificDateDisplay
         mobileLabel="FROM"
-        date={startDate}
+        date={firstDate}
         placeholder="Start Date"
         ariaLabel="Start date"
         open={open}
@@ -28,7 +40,7 @@ export default function SpecificDateRangeDisplay({
 
       <SpecificDateDisplay
         mobileLabel="UNTIL"
-        date={endDate}
+        date={lastDate}
         placeholder="End Date"
         ariaLabel="End date"
         open={open}

@@ -1,5 +1,4 @@
-import { EventRange } from "@/core/event/types";
-import { createWeekdayArray } from "@/core/event/weekday-utils";
+import { ALL_WEEKDAYS, EventRange, Weekday } from "@/core/event/types";
 import { EventDetails } from "@/lib/utils/api/types";
 import {
   getTimezoneDetails,
@@ -25,42 +24,58 @@ export function processEventData(eventData: EventDetails): {
 
   let eventRange: EventRange;
 
-  const start = getTimezoneDetails({
-    time: eventData.start_time,
-    date: eventData.start_date!,
-    fromTZ: isWeekEvent ? eventData.time_zone : undefined,
-    toTZ: eventData.time_zone,
+  // Get all the event range data from the timeslots
+  const dates = new Set<string>();
+  const weekdays = new Set<Weekday>();
+  let startTime: string | null = null;
+  let endTime: string | null = null;
+  timeslots.forEach((ts) => {
+    const [tsDate, tsTime] = ts.toISOString().split("T");
+    const { date, time, weekday } = getTimezoneDetails({
+      date: tsDate,
+      time: tsTime,
+      fromTZ: isWeekEvent ? eventData.time_zone : undefined,
+      toTZ: eventData.time_zone,
+    });
+    dates.add(date);
+    weekdays.add(ALL_WEEKDAYS[weekday]);
+    if (!startTime || time < startTime) {
+      startTime = time;
+    }
+    if (!endTime || time > endTime) {
+      endTime = time;
+    }
   });
 
-  const end = getTimezoneDetails({
-    time: eventData.end_time,
-    date: eventData.end_date!,
-    fromTZ: isWeekEvent ? eventData.time_zone : undefined,
-    toTZ: eventData.time_zone,
-  });
+  // Move endTime ahead by 15 minutes and intentionally allow 23:45 to move to 24:00 to
+  // represent the second midnight of the day
+  const [endHour, endMinute] = endTime!.split(":").map(Number);
+  if (endMinute === 45) {
+    endTime = `${String(endHour + 1).padStart(2, "0")}:00`;
+  } else {
+    endTime = `${String(endHour).padStart(2, "0")}:${String(
+      endMinute + 15,
+    ).padStart(2, "0")}`;
+  }
 
   if (eventData.event_type === "Date") {
     eventRange = {
       type: "specific",
       timezone: eventData.time_zone,
-      dateRange: {
-        from: start.date,
-        to: end.date,
-      },
+      dates: dates,
       timeRange: {
-        from: start.time,
-        to: end.time,
+        from: startTime,
+        to: endTime,
       },
     };
   } else {
-    const weekdays = createWeekdayArray(start.weekday, end.weekday);
     eventRange = {
       type: "weekday",
       timezone: eventData.time_zone,
       weekdays: weekdays,
       timeRange: {
-        from: start.time,
-        to: end.time,
+        from: startTime,
+        to: endTime,
       },
     };
   }

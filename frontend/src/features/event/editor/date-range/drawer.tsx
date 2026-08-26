@@ -15,10 +15,9 @@ import SpecificDateRangeDisplay from "@/features/event/editor/date-range/specifi
 
 export default function DateRangeDrawer({
   earliestDate,
-  startDate,
-  endDate,
+  dates,
 }: SpecificDateRangeDisplayProps) {
-  const { errors, setDateRange } = useEventContext();
+  const { errors, setDates } = useEventContext();
 
   const [open, setOpen] = useState(false);
   const calendarRef = useRef<CalendarHandle>(null);
@@ -43,11 +42,7 @@ export default function DateRangeDrawer({
       description="Select a date range using the calendar below"
       trigger={
         <div onClick={() => setOpen(!open)}>
-          <SpecificDateRangeDisplay
-            startDate={startDate}
-            endDate={endDate}
-            open={open}
-          />
+          <SpecificDateRangeDisplay dates={dates} open={open} />
         </div>
       }
       headerContent={
@@ -70,11 +65,8 @@ export default function DateRangeDrawer({
         ref={calendarRef}
         earliestDate={earliestDate}
         className="w-fit"
-        selectedRange={{
-          from: startDate || undefined,
-          to: endDate || undefined,
-        }}
-        setDateRange={setDateRange}
+        selectedDates={dates}
+        setDates={setDates}
         dateRangeError={errors.dateRange}
       />
     </StandardDrawer>
