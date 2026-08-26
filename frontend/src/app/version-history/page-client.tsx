@@ -269,6 +269,15 @@ function Version({
   const header = (
     <div className="group flex items-center gap-2">
       {!isMajor && <span className="font-bold">{versionData.version}</span>}
+      {versionTag && (
+        <div
+          className={cn(
+            "bg-lion text-violet text-nowrap rounded-full px-1.5 py-0.5 text-xs font-semibold",
+          )}
+        >
+          {versionTag}
+        </div>
+      )}
       <span className="text-foreground/50 shrink-0 italic">
         {releaseDateString}
       </span>
@@ -281,15 +290,6 @@ function Version({
           )}
         >
           <ChevronRightIcon className="h-4 w-4" />
-        </div>
-      )}
-      {versionTag && (
-        <div
-          className={cn(
-            "bg-lion text-violet text-nowrap rounded-full px-1.5 py-0.5 text-xs font-semibold",
-          )}
-        >
-          {versionTag}
         </div>
       )}
       {isMajor && !isCurrent && (
