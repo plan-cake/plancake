@@ -104,15 +104,15 @@ function processTimeslots(timeslots: Date[], timezone: string) {
   const startHour = start.getHours();
   const endHour = end.getHours();
 
-  const timeblocks = [];
+  const timeBlocks = [];
   if (endHour < startHour) {
-    timeblocks.push({ startHour: 0, endHour: endHour });
-    timeblocks.push({ startHour: startHour, endHour: 23 });
+    timeBlocks.push({ startHour: 0, endHour: endHour });
+    timeBlocks.push({ startHour: startHour, endHour: 23 });
   } else {
-    timeblocks.push({ startHour: startHour, endHour: endHour });
+    timeBlocks.push({ startHour: startHour, endHour: endHour });
   }
 
-  return { timeblocks, days, slotsByDay };
+  return { timeBlocks, days, slotsByDay };
 }
 
 /**
@@ -132,6 +132,7 @@ function organizeGridView(
 ) {
   if (!data) {
     return {
+      dateBlocks: [],
       timeBlocks: [],
       visibleDays: [],
       totalPages: 1,
@@ -139,7 +140,7 @@ function organizeGridView(
     };
   }
 
-  const { days, slotsByDay, timeblocks } = data;
+  const { days, slotsByDay, timeBlocks } = data;
 
   /* PAGINATION LOGIC */
   const totalPages = Math.max(1, Math.ceil(days.length / daysPerPage));
@@ -148,12 +149,12 @@ function organizeGridView(
   const visibleDays = days.slice(startIndex, startIndex + daysPerPage);
 
   /* PROCESS TIMEBLOCKS */
-  const timeBlocks = timeblocks.map((block) =>
+  const processedTimeBlocks = timeBlocks.map((block) =>
     processTimeblock(block, visibleDays, slotsByDay),
   );
 
   return {
-    timeBlocks,
+    timeBlocks: processedTimeBlocks,
     visibleDays,
     totalPages,
     error: null,
