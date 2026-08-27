@@ -10,7 +10,7 @@ export default function InteractiveTimeBlock({
   availability,
   onToggle,
 }: InteractiveTimeBlockProps) {
-  const dragHandlers = useScheduleDrag(onToggle, "paint");
+  const dragHandlers = useScheduleDrag(onToggle, "paint", timeslots);
 
   return (
     <BaseTimeBlock

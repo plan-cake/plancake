@@ -10,7 +10,7 @@ export type TimeBlockProps = {
   onMouseLeave?: () => void;
 };
 
-type TimeSlot = {
+export type TimeSlot = {
   iso: string;
   coords: { row: number; column: number };
   cellClasses: string[];
