@@ -75,7 +75,7 @@ export default function ScheduleGrid({
   const isMobile = useCheckMobile();
 
   const {
-    timeBlocks,
+    dateBlocks,
     visibleDays,
     currentPage,
     totalPages,
@@ -151,7 +151,7 @@ export default function ScheduleGrid({
         )}
       >
         <div className="z-5 pointer-events-none absolute left-0 top-2 flex w-full flex-col gap-4">
-          {timeBlocks.map((block, i) => (
+          {dateBlocks[0]?.timeBlocks.map((block, i) => (
             <TimeColumn
               key={`labels-${i}`}
               numQuarterHours={block.numQuarterHours}
@@ -171,41 +171,60 @@ export default function ScheduleGrid({
               animate="center"
               exit="exit"
               transition={{ type: "tween", ease: "easeInOut" }}
-              className="flex flex-col gap-4"
+              className="flex gap-4"
             >
-              {timeBlocks.map((block, i) => {
-                const commonProps = {
-                  numQuarterHours: block.numQuarterHours,
-                  numVisibleDays: visibleDays.length,
-                  timeslots: block.timeslots,
-                  hasPrev: hasPrevPage,
-                  hasNext: hasNextPage,
-                };
+              {dateBlocks.map((dBlock, dIndex) => {
+                const isFirstDateBlock = dIndex === 0;
+                const isLastDateBlock = dIndex === dateBlocks.length - 1;
 
-                if (mode === "preview") {
-                  return <PreviewTimeBlock key={i} {...commonProps} />;
-                } else if (mode === "paint") {
-                  return (
-                    <InteractiveTimeBlock
-                      key={i}
-                      {...commonProps}
-                      availability={userAvailability}
-                      onToggle={onToggleSlot}
-                    />
-                  );
-                } else if (mode === "view") {
-                  return (
-                    <ResultsTimeBlock
-                      key={i}
-                      {...commonProps}
-                      hoveredSlot={hoveredSlot}
-                      availabilities={availabilities}
-                      numParticipants={numParticipants}
-                      highestMatchCount={getHighestMatchCount(availabilities)}
-                      onHoverSlot={setHoveredSlot}
-                    />
-                  );
-                }
+                return (
+                  <div
+                    key={dIndex}
+                    className="flex flex-col gap-4"
+                    style={{
+                      flex: dBlock.numDays,
+                    }}
+                  >
+                    {dBlock.timeBlocks.map((tBlock, tIndex) => {
+                      const commonProps = {
+                        numQuarterHours: tBlock.numQuarterHours,
+                        numVisibleDays: dBlock.numDays,
+                        timeslots: tBlock.timeslots,
+                        hasPrev: isFirstDateBlock && hasPrevPage,
+                        hasNext: isLastDateBlock && hasNextPage,
+                      };
+
+                      if (mode === "preview") {
+                        return (
+                          <PreviewTimeBlock key={tIndex} {...commonProps} />
+                        );
+                      } else if (mode === "paint") {
+                        return (
+                          <InteractiveTimeBlock
+                            key={tIndex}
+                            {...commonProps}
+                            availability={userAvailability}
+                            onToggle={onToggleSlot}
+                          />
+                        );
+                      } else if (mode === "view") {
+                        return (
+                          <ResultsTimeBlock
+                            key={tIndex}
+                            {...commonProps}
+                            hoveredSlot={hoveredSlot}
+                            availabilities={availabilities}
+                            numParticipants={numParticipants}
+                            highestMatchCount={getHighestMatchCount(
+                              availabilities,
+                            )}
+                            onHoverSlot={setHoveredSlot}
+                          />
+                        );
+                      }
+                    })}
+                  </div>
+                );
               })}
             </motion.div>
           </AnimatePresence>

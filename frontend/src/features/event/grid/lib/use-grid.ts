@@ -65,6 +65,7 @@ export default function useGridInfo(
  * grid components.
  *
  * @returns:
+ * - dateBlocks: Array of dateblocks for the visible date ranges
  * - timeblocks: Array of timeblocks with start and end hours
  * - days: Array of unique days the timeslots span
  * - slotsByDay: Map of day string to array of timeslots on that day
@@ -112,15 +113,53 @@ function processTimeslots(timeslots: Date[], timezone: string) {
     timeBlocks.push({ startHour: startHour, endHour: endHour });
   }
 
-  return { timeBlocks, days, slotsByDay };
+  /* DATEBLOCKS */
+  const dateBlocks = [];
+  days.sort((a, b) => (a.dayKey < b.dayKey ? -1 : 1));
+  let lastBlock: { start: number; end: number } | null = null;
+  for (let i = 0; i < days.length; i++) {
+    const day = days[i];
+    if (lastBlock) {
+      const lastDate = new Date(days[lastBlock.end].dayKey);
+      const currentDate = new Date(day.dayKey);
+      const diffDays =
+        (currentDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+
+      if (diffDays > 1) {
+        dateBlocks.push({
+          startDay: lastBlock.start,
+          endDay: lastBlock.end,
+        });
+        lastBlock = {
+          start: i,
+          end: i,
+        };
+      }
+    } else {
+      lastBlock = {
+        start: i,
+        end: i,
+      };
+    }
+
+    lastBlock.end = i;
+  }
+  if (lastBlock && lastBlock.start && lastBlock.end) {
+    dateBlocks.push({
+      startDay: lastBlock.start,
+      endDay: lastBlock.end,
+    });
+  }
+
+  return { dateBlocks, timeBlocks, days, slotsByDay };
 }
 
 /**
  * Organizes the processed timeslot data into a view suitable for the grid,
- * applying pagination and preparing timeblocks for the visible days.
+ * applying pagination and preparing dateblocks and timeblocks for the visible days.
  *
  * @returns:
- * - timeBlocks: Array of processed timeblocks for the visible days
+ * - dateBlocks: Array of processed dateblocks with timeblocks for the visible days
  * - visibleDays: Array of days to be displayed on the current page
  * - totalPages: Total number of pages based on daysPerPage
  * - error: Error message if applicable
@@ -140,21 +179,42 @@ function organizeGridView(
     };
   }
 
-  const { days, slotsByDay, timeBlocks } = data;
+  const { days, slotsByDay, dateBlocks, timeBlocks } = data;
 
   /* PAGINATION LOGIC */
   const totalPages = Math.max(1, Math.ceil(days.length / daysPerPage));
   const safePage = Math.min(Math.max(0, currentPage), totalPages - 1);
   const startIndex = safePage * daysPerPage;
+  const endIndex = startIndex + daysPerPage - 1;
   const visibleDays = days.slice(startIndex, startIndex + daysPerPage);
+  const processedDateBlocks = [];
 
-  /* PROCESS TIMEBLOCKS */
-  const processedTimeBlocks = timeBlocks.map((block) =>
-    processTimeblock(block, visibleDays, slotsByDay),
-  );
+  for (const block of dateBlocks) {
+    if (block.startDay > endIndex || block.endDay < startIndex) {
+      continue;
+    }
+
+    const startDay = Math.max(block.startDay, startIndex);
+    const endDay = Math.min(block.endDay, endIndex);
+    const pastStart = block.startDay < startIndex;
+    const pastEnd = block.endDay > endIndex;
+    const blockDays = days.slice(startDay, endDay + 1);
+
+    /* PROCESS TIMEBLOCKS */
+    const processedTimeBlocks = timeBlocks.map((block) =>
+      processTimeblock(block, blockDays, slotsByDay),
+    );
+
+    processedDateBlocks.push({
+      numDays: blockDays.length,
+      pastStart,
+      pastEnd,
+      timeBlocks: processedTimeBlocks,
+    });
+  }
 
   return {
-    timeBlocks: processedTimeBlocks,
+    dateBlocks: processedDateBlocks,
     visibleDays,
     totalPages,
     error: null,
