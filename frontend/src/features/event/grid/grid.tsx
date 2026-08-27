@@ -278,35 +278,35 @@ export default function ScheduleGrid({
               {hasNextPage && !lastBlockPastEnd && <div className="w-4" />}
 
               {hasNextPage && (
-              <div className="flex flex-col gap-4">
-                {dateBlocks[0]?.timeBlocks.map((_, i) => (
-                  <div
-                    key={`border-right-${i}`}
-                    className={cn(
-                      "pointer-events-none relative grid",
-                      "divide-foreground/75 border-foreground/75 divide-y divide-dashed border border-r-0",
-                      lastBlockPastEnd && "border-l-0",
-                    )}
-                    style={{
-                      gridTemplateColumns: `${SIDE_WIDTH}px`,
-                      gridTemplateRows: `repeat(${numQuarterHours[i]}, minmax(20px, 1fr))`,
-                      maskImage:
-                        "linear-gradient(to right, black, transparent)",
-                      WebkitMaskImage:
-                        "linear-gradient(to right, black, transparent)",
-                    }}
-                  >
-                    {Array.from({ length: numQuarterHours[i] }).map(
-                      (_, idx) => (
-                        <div
-                          key={`border-right-${idx}`}
-                          style={{ gridRow: idx + 1, gridColumn: 1 }}
-                        />
-                      ),
-                    )}
-                  </div>
-                ))}
-              </div>
+                <div className="flex flex-col gap-4">
+                  {dateBlocks[0]?.timeBlocks.map((_, i) => (
+                    <div
+                      key={`border-right-${i}`}
+                      className={cn(
+                        "pointer-events-none relative grid",
+                        "divide-foreground/75 border-foreground/75 divide-y divide-dashed border border-r-0",
+                        lastBlockPastEnd && "border-l-0",
+                      )}
+                      style={{
+                        gridTemplateColumns: `${SIDE_WIDTH}px`,
+                        gridTemplateRows: `repeat(${numQuarterHours[i]}, minmax(20px, 1fr))`,
+                        maskImage:
+                          "linear-gradient(to right, black, transparent)",
+                        WebkitMaskImage:
+                          "linear-gradient(to right, black, transparent)",
+                      }}
+                    >
+                      {Array.from({ length: numQuarterHours[i] }).map(
+                        (_, idx) => (
+                          <div
+                            key={`border-right-${idx}`}
+                            style={{ gridRow: idx + 1, gridColumn: 1 }}
+                          />
+                        ),
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
             </motion.div>
           </AnimatePresence>
