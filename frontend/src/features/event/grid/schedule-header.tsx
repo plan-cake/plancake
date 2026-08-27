@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
@@ -63,10 +63,14 @@ export default function ScheduleHeader({
 
     for (let i = 0; i < dateBlocks.length; i++) {
       const block = dateBlocks[i];
-      if (currentPage !== 0 && !block.pastStart) {
+      if (currentPage !== 0 && i === 0 && !block.pastStart) {
         gapIndices.add(-1);
       }
-      if (currentPage !== totalPages - 1 && !block.pastEnd) {
+      if (
+        currentPage !== totalPages - 1 &&
+        i === dateBlocks.length - 1 &&
+        !block.pastEnd
+      ) {
         gapIndices.add(visibleDays.length - 1);
       }
       if (i > 0) {
@@ -122,11 +126,8 @@ export default function ScheduleHeader({
               const [weekday, month, day] = dayDisplay.split(" ");
 
               return (
-                <>
-                  <div
-                    key={i}
-                    className="flex flex-1 flex-col items-center justify-center text-sm font-medium leading-tight"
-                  >
+                <Fragment key={`header-fragment-${i}`}>
+                  <div className="flex flex-1 flex-col items-center justify-center text-sm font-medium leading-tight">
                     <div>
                       {isWeekdayEvent ? weekday.toUpperCase() : weekday}
                     </div>
@@ -137,8 +138,8 @@ export default function ScheduleHeader({
                     )}
                   </div>
 
-                  {gaps.has(i) && <div key={`gap-${i}`} className="w-4" />}
-                </>
+                  {gaps.has(i) && <div className="w-4" />}
+                </Fragment>
               );
             })}
           </motion.div>
