@@ -1,7 +1,5 @@
 import { useCallback, useMemo, useReducer } from "react";
 
-import { format } from "date-fns";
-
 import { DEFAULT_RANGE_SPECIFIC } from "@/core/event/lib/default-range";
 import { expandEventRange } from "@/core/event/lib/expand-event-range";
 import { EventInfoReducer } from "@/core/event/reducers/info-reducer";
@@ -111,21 +109,16 @@ export function useEventInfo(initialData?: EventInformation) {
   );
 
   const setDates = useCallback(
-    (dates: Set<Date>) => {
+    (dates: Set<string>) => {
       if (checkDateRange(dates)) {
         handleError("dateRange", MESSAGES.ERROR_EVENT_RANGE_TOO_LONG);
       } else {
         handleError("dateRange", "");
       }
 
-      const formattedDates = new Set<string>();
-      dates.forEach((date) => {
-        formattedDates.add(format(date, "yyyy-MM-dd"));
-      });
-
       dispatch({
         type: "SET_DATE_RANGE",
-        payload: formattedDates,
+        payload: dates,
       });
     },
     [handleError],

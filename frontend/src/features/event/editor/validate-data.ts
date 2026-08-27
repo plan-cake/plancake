@@ -47,7 +47,7 @@ export async function validateEventData(
   return errors;
 }
 
-export function checkDateRange(dates: Set<Date>): boolean {
+export function checkDateRange(dates: Set<string>): boolean {
   return dates.size > MAX_DAYS;
 }
 
