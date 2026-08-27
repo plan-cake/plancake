@@ -80,6 +80,7 @@ export default function ScheduleGrid({
 
   const {
     dateBlocks,
+    dateBlockGaps,
     visibleDays,
     currentPage,
     totalPages,
@@ -121,8 +122,6 @@ export default function ScheduleGrid({
   // Dateblocks logic
   const numQuarterHours =
     dateBlocks[0]?.timeBlocks?.map((block) => block.numQuarterHours) || [];
-  const firstBlockPastStart = dateBlocks[0]?.pastStart || false;
-  const lastBlockPastEnd = dateBlocks[dateBlocks.length - 1]?.pastEnd || false;
 
   if (unselectedRange)
     return (
@@ -145,7 +144,7 @@ export default function ScheduleGrid({
         visibleDays={visibleDays}
         currentPage={currentPage}
         totalPages={totalPages}
-        dateBlocks={dateBlocks}
+        dateBlockGaps={dateBlockGaps}
         scrollbarPresent={scrollbarPresent}
         isWeekdayEvent={isWeekdayEvent}
         onPrevPage={() => paginate(-1)}
@@ -192,7 +191,7 @@ export default function ScheduleGrid({
                       !hasPrevPage && "invisible",
                       "pointer-events-none relative grid",
                       "divide-foreground/75 border-foreground/75 divide-y divide-dashed border border-l-0",
-                      firstBlockPastStart && "border-r-0",
+                      !dateBlockGaps.startGap && "border-r-0",
                     )}
                     style={{
                       gridTemplateColumns: `${TIME_LABEL_WIDTH}px`,
@@ -214,7 +213,7 @@ export default function ScheduleGrid({
                 ))}
               </div>
 
-              {hasPrevPage && !firstBlockPastStart && <div className="w-2" />}
+              {dateBlockGaps.startGap && <div className="w-2" />}
 
               {dateBlocks.map((dBlock, dIndex) => {
                 const isFirstDateBlock = dIndex === 0;
@@ -275,7 +274,7 @@ export default function ScheduleGrid({
                 );
               })}
 
-              {hasNextPage && !lastBlockPastEnd && <div className="w-2" />}
+              {dateBlockGaps.endGap && <div className="w-2" />}
 
               {hasNextPage && (
                 <div className="flex flex-col gap-2">
@@ -285,7 +284,7 @@ export default function ScheduleGrid({
                       className={cn(
                         "pointer-events-none relative grid",
                         "divide-foreground/75 border-foreground/75 divide-y divide-dashed border border-r-0",
-                        lastBlockPastEnd && "border-l-0",
+                        !dateBlockGaps.endGap && "border-l-0",
                       )}
                       style={{
                         gridTemplateColumns: `${SIDE_WIDTH}px`,

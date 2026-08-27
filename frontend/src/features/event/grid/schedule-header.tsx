@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo } from "react";
+import { Fragment } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
@@ -18,7 +18,11 @@ interface ScheduleHeaderProps {
   visibleDays: { dayKey: string; dayDisplay: string }[];
   currentPage: number;
   totalPages: number;
-  dateBlocks: { numDays: number; pastStart: boolean; pastEnd: boolean }[];
+  dateBlockGaps: {
+    startGap: boolean;
+    endGap: boolean;
+    middleGaps: Set<number>;
+  };
   scrollbarPresent?: boolean;
   isWeekdayEvent?: boolean;
   onPrevPage: () => void;
@@ -46,7 +50,7 @@ export default function ScheduleHeader({
   visibleDays,
   currentPage,
   totalPages,
-  dateBlocks,
+  dateBlockGaps,
   scrollbarPresent = false,
   isWeekdayEvent = false,
   onPrevPage,
@@ -54,32 +58,6 @@ export default function ScheduleHeader({
   direction = 0,
 }: ScheduleHeaderProps) {
   const { topMarginClass } = useHeaderSize();
-
-  // Which indexed dates need gaps after them to match the date blocks
-  // -1 means before the first block
-  const gaps = useMemo(() => {
-    const gapIndices = new Set<number>();
-    let runningTotalDays = 0;
-
-    for (let i = 0; i < dateBlocks.length; i++) {
-      const block = dateBlocks[i];
-      if (currentPage !== 0 && i === 0 && !block.pastStart) {
-        gapIndices.add(-1);
-      }
-      if (
-        currentPage !== totalPages - 1 &&
-        i === dateBlocks.length - 1 &&
-        !block.pastEnd
-      ) {
-        gapIndices.add(visibleDays.length - 1);
-      }
-      if (i > 0) {
-        runningTotalDays += dateBlocks[i - 1].numDays;
-        gapIndices.add(runningTotalDays - 1);
-      }
-    }
-    return gapIndices;
-  }, [dateBlocks, currentPage, visibleDays.length, totalPages]);
 
   return (
     <div
@@ -120,7 +98,7 @@ export default function ScheduleHeader({
             transition={{ type: "tween", ease: "easeInOut" }}
             className="absolute inset-0 flex h-full w-full items-center"
           >
-            {gaps.has(-1) && <div className="w-2" />}
+            {dateBlockGaps.startGap && <div className="w-2" />}
 
             {visibleDays.map(({ dayDisplay }, i) => {
               const [weekday, month, day] = dayDisplay.split(" ");
@@ -138,10 +116,12 @@ export default function ScheduleHeader({
                     )}
                   </div>
 
-                  {gaps.has(i) && <div className="w-2" />}
+                  {dateBlockGaps.middleGaps.has(i) && <div className="w-2" />}
                 </Fragment>
               );
             })}
+
+            {dateBlockGaps.endGap && <div className="w-2" />}
           </motion.div>
         </AnimatePresence>
       </div>

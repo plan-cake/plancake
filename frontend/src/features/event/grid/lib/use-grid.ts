@@ -172,6 +172,11 @@ function organizeGridView(
   if (!data) {
     return {
       dateBlocks: [],
+      dateBlockGaps: {
+        startGap: false,
+        endGap: false,
+        middleGaps: new Set<number>(),
+      },
       timeBlocks: [],
       visibleDays: [],
       totalPages: 1,
@@ -188,33 +193,50 @@ function organizeGridView(
   const endIndex = startIndex + daysPerPage - 1;
   const visibleDays = days.slice(startIndex, startIndex + daysPerPage);
   const processedDateBlocks = [];
+  const dateBlockGaps = {
+    startGap: false,
+    endGap: false,
+    middleGaps: new Set<number>(),
+  };
 
-  for (const block of dateBlocks) {
-    if (block.startDay > endIndex || block.endDay < startIndex) {
-      continue;
-    }
+  const currentBlocks = dateBlocks.filter((block) => {
+    return block.startDay <= endIndex && block.endDay >= startIndex;
+  });
+
+  let runningDayCount = 0;
+  for (let i = 0; i < currentBlocks.length; i++) {
+    const block = currentBlocks[i];
 
     const startDay = Math.max(block.startDay, startIndex);
     const endDay = Math.min(block.endDay, endIndex);
-    const pastStart = block.startDay < startIndex;
-    const pastEnd = block.endDay > endIndex;
     const blockDays = days.slice(startDay, endDay + 1);
+    const isLastBlock = i === currentBlocks.length - 1;
 
     /* PROCESS TIMEBLOCKS */
     const processedTimeBlocks = timeBlocks.map((block) =>
       processTimeblock(block, blockDays, slotsByDay),
     );
 
+    if (!isLastBlock) {
+      runningDayCount += blockDays.length;
+      dateBlockGaps.middleGaps.add(runningDayCount - 1);
+    }
+    if (i === 0 && block.startDay === startDay && safePage > 0) {
+      dateBlockGaps.startGap = true;
+    }
+    if (isLastBlock && block.endDay === endDay && safePage < totalPages - 1) {
+      dateBlockGaps.endGap = true;
+    }
+
     processedDateBlocks.push({
       numDays: blockDays.length,
-      pastStart,
-      pastEnd,
       timeBlocks: processedTimeBlocks,
     });
   }
 
   return {
     dateBlocks: processedDateBlocks,
+    dateBlockGaps,
     visibleDays,
     totalPages,
     error: null,
