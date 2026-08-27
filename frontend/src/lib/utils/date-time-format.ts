@@ -146,7 +146,7 @@ export function formatDateTime(
 // in the same month, omit the month from the 'to' date. Otherwise, the
 // full range is shown.
 export function formatDateRange(fromDate: string, toDate: string): string {
-  const dateFormat = "MMMM d";
+  const dateFormat = "MMM d";
   const fromFormatted = formatDate(fromDate, dateFormat);
   const toFormatted = formatDate(toDate, dateFormat);
 
@@ -155,7 +155,7 @@ export function formatDateRange(fromDate: string, toDate: string): string {
   } else if (fromDate.slice(0, 7) === toDate.slice(0, 7)) {
     const fromDay = parse(fromDate, "yyyy-MM-dd", new Date()).getDate();
     const toDay = parse(toDate, "yyyy-MM-dd", new Date()).getDate();
-    const monthStr = formatDate(fromDate, "MMMM");
+    const monthStr = formatDate(fromDate, "MMM");
     return `${monthStr} ${fromDay}-${toDay}`;
   }
   return `${fromFormatted} - ${toFormatted}`;
