@@ -97,7 +97,7 @@
   --calendar-accent: var(--color-accent);
   --calendar-accent-background: color-mix(
     in srgb,
-    var(--color-accent) 20%,
+    var(--color-accent) 15%,
     transparent
   );
 

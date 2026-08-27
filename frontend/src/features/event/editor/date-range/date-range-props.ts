@@ -4,5 +4,5 @@ export type DateRangeProps = {
 
 export type SpecificDateRangeDisplayProps = {
   earliestDate: Date;
-  dates: Set<Date>;
+  dates: Set<string>;
 };

@@ -72,13 +72,14 @@ function SpecificDateRangeDisplay({
           ),
         )
       : new Date();
-  const dateObjects = new Set<Date>(
-    Array.from(eventRange.dates, (iso) => parseISO(iso)),
-  );
 
   if (isMobile) {
-    return <DateRangeDrawer earliestDate={earliestDate} dates={dateObjects} />;
+    return (
+      <DateRangeDrawer earliestDate={earliestDate} dates={eventRange.dates} />
+    );
   } else {
-    return <DateRangePopover earliestDate={earliestDate} dates={dateObjects} />;
+    return (
+      <DateRangePopover earliestDate={earliestDate} dates={eventRange.dates} />
+    );
   }
 }
