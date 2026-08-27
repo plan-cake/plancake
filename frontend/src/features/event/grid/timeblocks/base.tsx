@@ -16,6 +16,7 @@ export default function BaseTimeBlock({
         gridTemplateColumns: `repeat(${visibleDaysCount}, 1fr)`,
         gridTemplateRows: `repeat(${numQuarterHours}, minmax(20px, 1fr))`,
       }}
+      onMouseLeave={onMouseLeave}
     >
       {Array.from({ length: visibleDaysCount }).map((_, idx) => (
         <div
