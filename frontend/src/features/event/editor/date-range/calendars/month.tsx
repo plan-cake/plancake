@@ -90,6 +90,10 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
       },
     }));
 
+    const getDateString = (date: Date) => {
+      return date.toISOString().split("T")[0];
+    };
+
     /**
      * Just toggles the day within the set.
      */
@@ -97,12 +101,8 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
       if (!dates) {
         setDates(new Set());
       } else {
-        setDates(new Set(dates.map((date) => date.toISOString())));
+        setDates(new Set(dates.map((date) => getDateString(date))));
       }
-    };
-
-    const getDateString = (date: Date) => {
-      return date.toISOString().split("T")[0];
     };
 
     /**
