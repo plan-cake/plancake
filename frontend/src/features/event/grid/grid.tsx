@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { TriangleAlertIcon } from "lucide-react";
@@ -221,9 +221,8 @@ export default function ScheduleGrid({
                 const isLastDateBlock = dIndex === dateBlocks.length - 1;
 
                 return (
-                  <>
+                  <Fragment key={`date-block-fragment-${dIndex}`}>
                     <div
-                      key={`date-block-${dIndex}`}
                       className="flex flex-col gap-4"
                       style={{
                         flex: dBlock.numDays,
@@ -272,7 +271,7 @@ export default function ScheduleGrid({
                       })}
                     </div>
                     {!isLastDateBlock && <div className="w-4" />}
-                  </>
+                  </Fragment>
                 );
               })}
 
