@@ -89,7 +89,7 @@ export default function ScheduleHeader({
         "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
       )}
       style={{
-        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 10}px`,
+        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 0}px`,
       }}
     >
       {currentPage > 0 ? (
