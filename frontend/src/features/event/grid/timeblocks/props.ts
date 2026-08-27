@@ -7,8 +7,6 @@ export type TimeBlockProps = {
   numQuarterHours: number;
   visibleDaysCount: number;
   children: React.ReactNode;
-  hasPrev?: boolean;
-  hasNext?: boolean;
   onMouseLeave?: () => void;
 };
 
@@ -22,8 +20,6 @@ type CommonBlockProps = {
   numQuarterHours: number;
   numVisibleDays: number;
   timeslots: TimeSlot[];
-  hasPrev?: boolean;
-  hasNext?: boolean;
 };
 
 export type PreviewTimeBlockProps = CommonBlockProps;

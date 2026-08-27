@@ -9,8 +9,6 @@ export default function InteractiveTimeBlock({
   numVisibleDays,
   availability,
   onToggle,
-  hasNext = false,
-  hasPrev = false,
 }: InteractiveTimeBlockProps) {
   const dragHandlers = useScheduleDrag(onToggle, "paint");
 
@@ -18,8 +16,6 @@ export default function InteractiveTimeBlock({
     <BaseTimeBlock
       numQuarterHours={numQuarterHours}
       visibleDaysCount={numVisibleDays}
-      hasNext={hasNext}
-      hasPrev={hasPrev}
     >
       {timeslots.map(({ iso, coords, cellClasses: baseClasses }) => {
         const { row: gridRow, column: gridColumn } = coords;

@@ -13,15 +13,11 @@ export default function ResultsTimeBlock({
   highestMatchCount,
   hoveredSlot,
   onHoverSlot,
-  hasNext = false,
-  hasPrev = false,
 }: ResultsTimeBlockProps) {
   return (
     <BaseTimeBlock
       numQuarterHours={numQuarterHours}
       visibleDaysCount={numVisibleDays}
-      hasNext={hasNext}
-      hasPrev={hasPrev}
       onMouseLeave={() => onHoverSlot?.(null)}
     >
       {timeslots.map(({ iso, coords, cellClasses: baseClasses }) => {

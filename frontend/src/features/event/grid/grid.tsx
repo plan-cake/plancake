@@ -8,6 +8,10 @@ import {
   ResultsAvailabilityMap,
 } from "@/core/availability/types";
 import { createEmptyUserAvailability } from "@/core/availability/utils";
+import {
+  SIDE_WIDTH,
+  TIME_LABEL_WIDTH,
+} from "@/features/event/grid/lib/constants";
 import useGridinfo from "@/features/event/grid/lib/use-grid";
 import ScheduleHeader from "@/features/event/grid/schedule-header";
 import TimeColumn from "@/features/event/grid/time-column";
@@ -114,6 +118,12 @@ export default function ScheduleGrid({
     return () => resizeObserver.disconnect();
   });
 
+  // Dateblocks logic
+  const numQuarterHours =
+    dateBlocks[0]?.timeBlocks?.map((block) => block.numQuarterHours) || [];
+  const firstBlockPastStart = dateBlocks[0]?.pastStart || false;
+  const lastBlockPastEnd = dateBlocks[dateBlocks.length - 1]?.pastEnd || false;
+
   if (unselectedRange)
     return (
       <GridMessage
@@ -171,61 +181,132 @@ export default function ScheduleGrid({
               animate="center"
               exit="exit"
               transition={{ type: "tween", ease: "easeInOut" }}
-              className="flex gap-4"
+              className="flex"
             >
+              <div className="flex flex-col gap-4">
+                {dateBlocks[0]?.timeBlocks.map((_, i) => (
+                  <div
+                    key={`border-left-${i}`}
+                    className={cn(
+                      !hasPrevPage && "invisible",
+                      "pointer-events-none relative grid",
+                      "divide-foreground/75 border-foreground/75 divide-y divide-dashed border border-l-0",
+                      firstBlockPastStart && "border-r-0",
+                    )}
+                    style={{
+                      gridTemplateColumns: `${TIME_LABEL_WIDTH}px`,
+                      gridTemplateRows: `repeat(${numQuarterHours[i]}, minmax(20px, 1fr))`,
+                      maskImage: "linear-gradient(to left, black, transparent)",
+                      WebkitMaskImage:
+                        "linear-gradient(to left, black, transparent)",
+                    }}
+                  >
+                    {Array.from({ length: numQuarterHours[i] }).map(
+                      (_, idx) => (
+                        <div
+                          key={`border-left-${idx}`}
+                          style={{ gridRow: idx + 1, gridColumn: 1 }}
+                        />
+                      ),
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {hasPrevPage && !firstBlockPastStart && <div className="w-4" />}
+
               {dateBlocks.map((dBlock, dIndex) => {
                 const isFirstDateBlock = dIndex === 0;
                 const isLastDateBlock = dIndex === dateBlocks.length - 1;
 
                 return (
-                  <div
-                    key={dIndex}
-                    className="flex flex-col gap-4"
-                    style={{
-                      flex: dBlock.numDays,
-                    }}
-                  >
-                    {dBlock.timeBlocks.map((tBlock, tIndex) => {
-                      const commonProps = {
-                        numQuarterHours: tBlock.numQuarterHours,
-                        numVisibleDays: dBlock.numDays,
-                        timeslots: tBlock.timeslots,
-                        hasPrev: isFirstDateBlock && hasPrevPage,
-                        hasNext: isLastDateBlock && hasNextPage,
-                      };
+                  <>
+                    <div
+                      key={`date-block-${dIndex}`}
+                      className="flex flex-col gap-4"
+                      style={{
+                        flex: dBlock.numDays,
+                      }}
+                    >
+                      {dBlock.timeBlocks.map((tBlock, tIndex) => {
+                        const commonProps = {
+                          numQuarterHours: tBlock.numQuarterHours,
+                          numVisibleDays: dBlock.numDays,
+                          timeslots: tBlock.timeslots,
+                          hasPrev: isFirstDateBlock && hasPrevPage,
+                          hasNext: isLastDateBlock && hasNextPage,
+                        };
 
-                      if (mode === "preview") {
-                        return (
-                          <PreviewTimeBlock key={tIndex} {...commonProps} />
-                        );
-                      } else if (mode === "paint") {
-                        return (
-                          <InteractiveTimeBlock
-                            key={tIndex}
-                            {...commonProps}
-                            availability={userAvailability}
-                            onToggle={onToggleSlot}
-                          />
-                        );
-                      } else if (mode === "view") {
-                        return (
-                          <ResultsTimeBlock
-                            key={tIndex}
-                            {...commonProps}
-                            hoveredSlot={hoveredSlot}
-                            availabilities={availabilities}
-                            numParticipants={numParticipants}
-                            highestMatchCount={getHighestMatchCount(
-                              availabilities,
-                            )}
-                            onHoverSlot={setHoveredSlot}
-                          />
-                        );
-                      }
-                    })}
-                  </div>
+                        if (mode === "preview") {
+                          return (
+                            <PreviewTimeBlock
+                              key={`preview-${dIndex}-${tIndex}`}
+                              {...commonProps}
+                            />
+                          );
+                        } else if (mode === "paint") {
+                          return (
+                            <InteractiveTimeBlock
+                              key={`interactive-${dIndex}-${tIndex}`}
+                              {...commonProps}
+                              availability={userAvailability}
+                              onToggle={onToggleSlot}
+                            />
+                          );
+                        } else if (mode === "view") {
+                          return (
+                            <ResultsTimeBlock
+                              key={`results-${dIndex}-${tIndex}`}
+                              {...commonProps}
+                              hoveredSlot={hoveredSlot}
+                              availabilities={availabilities}
+                              numParticipants={numParticipants}
+                              highestMatchCount={getHighestMatchCount(
+                                availabilities,
+                              )}
+                              onHoverSlot={setHoveredSlot}
+                            />
+                          );
+                        }
+                      })}
+                    </div>
+                    {!isLastDateBlock && <div className="w-4" />}
+                  </>
                 );
               })}
+
+              {hasNextPage && !lastBlockPastEnd && <div className="w-4" />}
+
+              <div className="flex flex-col gap-4">
+                {dateBlocks[0]?.timeBlocks.map((_, i) => (
+                  <div
+                    key={`border-right-${i}`}
+                    className={cn(
+                      !hasNextPage && "invisible",
+                      "pointer-events-none relative grid",
+                      "divide-foreground/75 border-foreground/75 divide-y divide-dashed border border-r-0",
+                      lastBlockPastEnd && "border-l-0",
+                    )}
+                    style={{
+                      gridTemplateColumns: `${SIDE_WIDTH}px`,
+                      gridTemplateRows: `repeat(${numQuarterHours[i]}, minmax(20px, 1fr))`,
+                      maskImage:
+                        "linear-gradient(to right, black, transparent)",
+                      WebkitMaskImage:
+                        "linear-gradient(to right, black, transparent)",
+                    }}
+                  >
+                    {Array.from({ length: numQuarterHours[i] }).map(
+                      (_, idx) => (
+                        <div
+                          key={`border-right-${idx}`}
+                          style={{ gridRow: idx + 1, gridColumn: 1 }}
+                        />
+                      ),
+                    )}
+                  </div>
+                ))}
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>
