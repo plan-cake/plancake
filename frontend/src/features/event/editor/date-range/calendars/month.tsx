@@ -35,7 +35,7 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     const defaultClassNames = getDefaultClassNames();
 
     const isMobile = useCheckMobile();
-    const numberOfMonths = isMobile ? 6 : 2;
+    const numberOfMonths = isMobile ? 13 : 2;
     const hideNavigation = isMobile ? true : false;
 
     const startDate = useMemo(() => {
@@ -149,6 +149,8 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
           selected={selectedDatesArray}
           onSelect={handleSelect}
           disabled={{ before: startDate }}
+          startMonth={startDate}
+          endMonth={new Date(startDate.getFullYear() + 1, startDate.getMonth())}
           // modifiers + styles
           modifiers={modifiers}
           modifiersClassNames={{
