@@ -278,12 +278,12 @@ export default function ScheduleGrid({
 
               {hasNextPage && !lastBlockPastEnd && <div className="w-4" />}
 
+              {hasNextPage && (
               <div className="flex flex-col gap-4">
                 {dateBlocks[0]?.timeBlocks.map((_, i) => (
                   <div
                     key={`border-right-${i}`}
                     className={cn(
-                      !hasNextPage && "invisible",
                       "pointer-events-none relative grid",
                       "divide-foreground/75 border-foreground/75 divide-y divide-dashed border border-r-0",
                       lastBlockPastEnd && "border-l-0",
@@ -308,6 +308,7 @@ export default function ScheduleGrid({
                   </div>
                 ))}
               </div>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
