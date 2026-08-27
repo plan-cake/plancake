@@ -161,7 +161,7 @@ export default function ScheduleGrid({
           mode === "preview" ? "pb-1" : "pb-6",
         )}
       >
-        <div className="z-5 pointer-events-none absolute left-0 top-2 flex w-full flex-col gap-5">
+        <div className="z-5 pointer-events-none absolute left-0 top-2 flex w-full flex-col gap-3">
           {dateBlocks[0]?.timeBlocks.map((block, i) => (
             <TimeColumn
               key={`labels-${i}`}
@@ -184,7 +184,7 @@ export default function ScheduleGrid({
               transition={{ type: "tween", ease: "easeInOut" }}
               className="flex"
             >
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 {dateBlocks[0]?.timeBlocks.map((_, i) => (
                   <div
                     key={`border-left-${i}`}
@@ -214,7 +214,7 @@ export default function ScheduleGrid({
                 ))}
               </div>
 
-              {hasPrevPage && !firstBlockPastStart && <div className="w-4" />}
+              {hasPrevPage && !firstBlockPastStart && <div className="w-2" />}
 
               {dateBlocks.map((dBlock, dIndex) => {
                 const isFirstDateBlock = dIndex === 0;
@@ -223,7 +223,7 @@ export default function ScheduleGrid({
                 return (
                   <Fragment key={`date-block-fragment-${dIndex}`}>
                     <div
-                      className="flex flex-col gap-4"
+                      className="flex flex-col gap-2"
                       style={{
                         flex: dBlock.numDays,
                       }}
@@ -270,15 +270,15 @@ export default function ScheduleGrid({
                         }
                       })}
                     </div>
-                    {!isLastDateBlock && <div className="w-4" />}
+                    {!isLastDateBlock && <div className="w-2" />}
                   </Fragment>
                 );
               })}
 
-              {hasNextPage && !lastBlockPastEnd && <div className="w-4" />}
+              {hasNextPage && !lastBlockPastEnd && <div className="w-2" />}
 
               {hasNextPage && (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
                   {dateBlocks[0]?.timeBlocks.map((_, i) => (
                     <div
                       key={`border-right-${i}`}

@@ -120,7 +120,7 @@ export default function ScheduleHeader({
             transition={{ type: "tween", ease: "easeInOut" }}
             className="absolute inset-0 flex h-full w-full items-center"
           >
-            {gaps.has(-1) && <div className="w-4" />}
+            {gaps.has(-1) && <div className="w-2" />}
 
             {visibleDays.map(({ dayDisplay }, i) => {
               const [weekday, month, day] = dayDisplay.split(" ");
@@ -138,7 +138,7 @@ export default function ScheduleHeader({
                     )}
                   </div>
 
-                  {gaps.has(i) && <div className="w-4" />}
+                  {gaps.has(i) && <div className="w-2" />}
                 </Fragment>
               );
             })}
