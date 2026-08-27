@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils/classname";
@@ -12,7 +14,9 @@ export default function SpecificDateRangeDisplay({
   dates,
   open = false,
 }: SpecificDateRangeDisplayProps) {
-  const display = formatDateSet(dates);
+  const display = useMemo(() => {
+    return formatDateSet(dates);
+  }, [dates]);
 
   return (
     <form className="flex w-full flex-col gap-y-2 md:flex-row md:gap-4">
