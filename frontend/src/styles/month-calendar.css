@@ -77,10 +77,18 @@
     );
   }
 
+  .rdp-selected:hover > .rdp-day_button::before {
+    background-color: color-mix(
+      in srgb,
+      var(--calendar-accent) 25%,
+      transparent
+    );
+  }
+
   .rdp-day:active > .rdp-day_button::before {
     background-color: color-mix(
       in srgb,
-      var(--calendar-accent) 30%,
+      var(--calendar-accent) 40%,
       transparent
     );
   }
