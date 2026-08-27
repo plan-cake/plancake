@@ -8,17 +8,20 @@ import { cn } from "@/lib/utils/classname";
 export default function BaseTimeBlock({
   numQuarterHours,
   visibleDaysCount,
+  maxColumns,
   children,
   hasNext = false,
   hasPrev = false,
   onMouseLeave,
 }: TimeBlockProps) {
+  const gridWidth = (visibleDaysCount / maxColumns) * 100;
+
   return (
     <div
       className="relative isolate grid"
       onMouseLeave={onMouseLeave}
       style={{
-        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${hasNext ? SIDE_WIDTH : 10}px`,
+        gridTemplateColumns: `${TIME_LABEL_WIDTH}px minmax(0, ${gridWidth}%) auto`,
       }}
     >
       <div

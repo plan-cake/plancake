@@ -16,6 +16,7 @@ interface ScheduleHeaderProps {
   visibleDays: { dayKey: string; dayDisplay: string }[];
   currentPage: number;
   totalPages: number;
+  maxColumns: number;
   scrollbarPresent?: boolean;
   isWeekdayEvent?: boolean;
   onPrevPage: () => void;
@@ -43,6 +44,7 @@ export default function ScheduleHeader({
   visibleDays,
   currentPage,
   totalPages,
+  maxColumns,
   scrollbarPresent = false,
   isWeekdayEvent = false,
   onPrevPage,
@@ -50,6 +52,8 @@ export default function ScheduleHeader({
   direction = 0,
 }: ScheduleHeaderProps) {
   const { topMarginClass } = useHeaderSize();
+
+  const gridWidth = (visibleDays.length / maxColumns) * 100;
 
   return (
     <div
@@ -88,9 +92,10 @@ export default function ScheduleHeader({
             animate="center"
             exit="exit"
             transition={{ type: "tween", ease: "easeInOut" }}
-            className="absolute inset-0 grid h-full w-full items-center"
+            className="absolute inset-0 grid h-full items-center"
             style={{
               gridTemplateColumns: `repeat(${visibleDays.length}, 1fr)`,
+              width: `${gridWidth}%`,
             }}
           >
             {visibleDays.map(({ dayDisplay }, i) => {

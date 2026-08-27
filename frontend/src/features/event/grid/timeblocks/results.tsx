@@ -8,6 +8,7 @@ export default function ResultsTimeBlock({
   numQuarterHours,
   timeslots,
   numVisibleDays,
+  maxColumns,
   availabilities,
   numParticipants,
   highestMatchCount,
@@ -20,6 +21,7 @@ export default function ResultsTimeBlock({
     <BaseTimeBlock
       numQuarterHours={numQuarterHours}
       visibleDaysCount={numVisibleDays}
+      maxColumns={maxColumns}
       hasNext={hasNext}
       hasPrev={hasPrev}
       onMouseLeave={() => onHoverSlot?.(null)}

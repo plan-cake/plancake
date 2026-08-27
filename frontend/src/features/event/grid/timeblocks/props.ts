@@ -6,6 +6,7 @@ import {
 export type TimeBlockProps = {
   numQuarterHours: number;
   visibleDaysCount: number;
+  maxColumns: number;
   children: React.ReactNode;
   hasPrev?: boolean;
   hasNext?: boolean;
@@ -21,6 +22,7 @@ type TimeSlot = {
 type CommonBlockProps = {
   numQuarterHours: number;
   numVisibleDays: number;
+  maxColumns: number;
   timeslots: TimeSlot[];
   hasPrev?: boolean;
   hasNext?: boolean;

@@ -6,6 +6,7 @@ export default function PreviewTimeBlock({
   numQuarterHours,
   timeslots,
   numVisibleDays,
+  maxColumns,
   hasNext = false,
   hasPrev = false,
 }: PreviewTimeBlockProps) {
@@ -13,6 +14,7 @@ export default function PreviewTimeBlock({
     <BaseTimeBlock
       numQuarterHours={numQuarterHours}
       visibleDaysCount={numVisibleDays}
+      maxColumns={maxColumns}
       hasNext={hasNext}
       hasPrev={hasPrev}
     >

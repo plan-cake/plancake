@@ -135,6 +135,7 @@ export default function ScheduleGrid({
         visibleDays={visibleDays}
         currentPage={currentPage}
         totalPages={totalPages}
+        maxColumns={isMobile ? 4 : 7}
         scrollbarPresent={scrollbarPresent}
         isWeekdayEvent={isWeekdayEvent}
         onPrevPage={() => paginate(-1)}
@@ -177,6 +178,7 @@ export default function ScheduleGrid({
                 const commonProps = {
                   numQuarterHours: block.numQuarterHours,
                   numVisibleDays: visibleDays.length,
+                  maxColumns: isMobile ? 4 : 7,
                   timeslots: block.timeslots,
                   hasPrev: hasPrevPage,
                   hasNext: hasNextPage,

@@ -7,6 +7,7 @@ export default function InteractiveTimeBlock({
   numQuarterHours,
   timeslots,
   numVisibleDays,
+  maxColumns,
   availability,
   onToggle,
   hasNext = false,
@@ -18,6 +19,7 @@ export default function InteractiveTimeBlock({
     <BaseTimeBlock
       numQuarterHours={numQuarterHours}
       visibleDaysCount={numVisibleDays}
+      maxColumns={maxColumns}
       hasNext={hasNext}
       hasPrev={hasPrev}
     >
