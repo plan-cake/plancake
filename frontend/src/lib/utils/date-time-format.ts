@@ -168,6 +168,67 @@ export function formatDate(date: string, fmt: string): string {
   return format(parsedDate, fmt);
 }
 
+/**
+ * Formats an arbitrary set of dates into a readable string. The dates are not expected to
+ * be contiguous, and the function will group them into ranges.
+ * 
+ * @param dates A set of date strings in "YYYY-MM-DD" format
+ * @returns A human-readable string representation of the date set, or null if empty
+ */
+export function formatDateSet(dates: Set<string>): string | null {
+  if (dates.size === 0) return null;
+
+  const sortedDates = Array.from(dates).sort((a, b) => (a < b ? -1 : 1));
+  const dateObjects = Array.from(sortedDates).map((date) => parseISO(date));
+
+  const groups = new Set<{ start: string; end: string }>();
+  const months = new Set<number>();
+  let rangeStart = dateObjects[0];
+  months.add(dateObjects[0].getUTCMonth());
+
+  for (let i = 1; i < dateObjects.length; i++) {
+    const prevDate = dateObjects[i - 1];
+    const currentDate = dateObjects[i];
+    const diffInDays =
+      (currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24);
+    if (diffInDays !== 1) {
+      groups.add({
+        start: format(rangeStart, "yyyy-MM-dd"),
+        end: format(prevDate, "yyyy-MM-dd"),
+      });
+      rangeStart = currentDate;
+    }
+    months.add(currentDate.getUTCMonth());
+  }
+
+  groups.add({
+    start: format(rangeStart, "yyyy-MM-dd"),
+    end: format(dateObjects[dateObjects.length - 1], "yyyy-MM-dd"),
+  });
+
+  if (sortedDates.length === 1) {
+    return formatDate(sortedDates[0], "MMM d");
+  } else if (groups.size === 1) {
+    return formatDateRange(sortedDates[0], sortedDates[sortedDates.length - 1]);
+  } else if (months.size === 1 && groups.size <= 5) {
+    return `${formatDate(sortedDates[0], "MMM")} ${Array.from(groups)
+      .map((group) => {
+        if (group.start === group.end)
+          return formatDate(group.start, "d");
+        return `${formatDate(group.start, "d")}-${formatDate(group.end, "d")}`;
+      })
+      .join(", ")}`;
+  } else if (groups.size <= 3) {
+    return Array.from(groups)
+      .map((group) => {
+        return formatDateRange(group.start, group.end);
+      })
+      .join(", ");
+  } else {
+    return `${sortedDates.length} days between ${formatDateRange(sortedDates[0], sortedDates[sortedDates.length - 1])}`;
+  }
+}
+
 /* TIME UTILS */
 
 // expects two time strings in "HH:mm" format
