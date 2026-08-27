@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
@@ -16,6 +18,7 @@ interface ScheduleHeaderProps {
   visibleDays: { dayKey: string; dayDisplay: string }[];
   currentPage: number;
   totalPages: number;
+  dateBlocks: { numDays: number; pastStart: boolean; pastEnd: boolean }[];
   scrollbarPresent?: boolean;
   isWeekdayEvent?: boolean;
   onPrevPage: () => void;
@@ -43,6 +46,7 @@ export default function ScheduleHeader({
   visibleDays,
   currentPage,
   totalPages,
+  dateBlocks,
   scrollbarPresent = false,
   isWeekdayEvent = false,
   onPrevPage,
@@ -50,6 +54,28 @@ export default function ScheduleHeader({
   direction = 0,
 }: ScheduleHeaderProps) {
   const { topMarginClass } = useHeaderSize();
+
+  // Which indexed dates need gaps after them to match the date blocks
+  // -1 means before the first block
+  const gaps = useMemo(() => {
+    const gapIndices = new Set<number>();
+    let runningTotalDays = 0;
+
+    for (let i = 0; i < dateBlocks.length; i++) {
+      const block = dateBlocks[i];
+      if (currentPage !== 0 && !block.pastStart) {
+        gapIndices.add(-1);
+      }
+      if (currentPage !== totalPages - 1 && !block.pastEnd) {
+        gapIndices.add(visibleDays.length - 1);
+      }
+      if (i > 0) {
+        runningTotalDays += dateBlocks[i - 1].numDays;
+        gapIndices.add(runningTotalDays - 1);
+      }
+    }
+    return gapIndices;
+  }, [dateBlocks, currentPage, visibleDays.length, totalPages]);
 
   return (
     <div
@@ -88,26 +114,31 @@ export default function ScheduleHeader({
             animate="center"
             exit="exit"
             transition={{ type: "tween", ease: "easeInOut" }}
-            className="absolute inset-0 grid h-full w-full items-center"
-            style={{
-              gridTemplateColumns: `repeat(${visibleDays.length}, 1fr)`,
-            }}
+            className="absolute inset-0 flex h-full w-full items-center"
           >
+            {gaps.has(-1) && <div className="w-4" />}
+
             {visibleDays.map(({ dayDisplay }, i) => {
               const [weekday, month, day] = dayDisplay.split(" ");
 
               return (
-                <div
-                  key={i}
-                  className="flex flex-col items-center justify-center text-sm font-medium leading-tight"
-                >
-                  <div>{isWeekdayEvent ? weekday.toUpperCase() : weekday}</div>
-                  {!isWeekdayEvent && (
+                <>
+                  <div
+                    key={i}
+                    className="flex flex-1 flex-col items-center justify-center text-sm font-medium leading-tight"
+                  >
                     <div>
-                      {month} {day.replace(/^0+/, "")}
+                      {isWeekdayEvent ? weekday.toUpperCase() : weekday}
                     </div>
-                  )}
-                </div>
+                    {!isWeekdayEvent && (
+                      <div>
+                        {month} {day.replace(/^0+/, "")}
+                      </div>
+                    )}
+                  </div>
+
+                  {gaps.has(i) && <div key={`gap-${i}`} className="w-4" />}
+                </>
               );
             })}
           </motion.div>

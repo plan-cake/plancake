@@ -145,6 +145,7 @@ export default function ScheduleGrid({
         visibleDays={visibleDays}
         currentPage={currentPage}
         totalPages={totalPages}
+        dateBlocks={dateBlocks}
         scrollbarPresent={scrollbarPresent}
         isWeekdayEvent={isWeekdayEvent}
         onPrevPage={() => paginate(-1)}
