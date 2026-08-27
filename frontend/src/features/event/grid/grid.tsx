@@ -160,7 +160,7 @@ export default function ScheduleGrid({
           mode === "preview" ? "pb-1" : "pb-6",
         )}
       >
-        <div className="z-5 pointer-events-none absolute left-0 top-2 flex w-full flex-col gap-4">
+        <div className="z-5 pointer-events-none absolute left-0 top-2 flex w-full flex-col gap-5">
           {dateBlocks[0]?.timeBlocks.map((block, i) => (
             <TimeColumn
               key={`labels-${i}`}
