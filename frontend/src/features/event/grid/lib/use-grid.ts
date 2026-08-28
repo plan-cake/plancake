@@ -144,7 +144,7 @@ function processTimeslots(timeslots: Date[], timezone: string) {
 
     lastBlock.end = i;
   }
-  if (lastBlock && lastBlock.start && lastBlock.end) {
+  if (lastBlock) {
     dateBlocks.push({
       startDay: lastBlock.start,
       endDay: lastBlock.end,
