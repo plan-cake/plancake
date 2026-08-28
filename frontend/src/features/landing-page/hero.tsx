@@ -1,18 +1,95 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { LayoutDashboardIcon, PlusIcon } from "lucide-react";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 
+import SegmentedControl from "@/components/segmented-control";
 import LinkButton from "@/features/button/components/link";
+
+type HeroImageView = "specific-dates" | "weekly";
+type HeroImageTheme = "light" | "dark";
+type HeroImageVariant = { src: string; width: number; height: number };
+
+const HERO_IMAGES: Record<
+  HeroImageView,
+  Record<"desktop" | "mobile", Record<HeroImageTheme, HeroImageVariant>>
+> = {
+  "specific-dates": {
+    desktop: {
+      light: {
+        src: "/images/specific-desktop-light.png",
+        width: 2880,
+        height: 1622,
+      },
+      dark: {
+        src: "/images/specific-desktop-dark.png",
+        width: 2880,
+        height: 1618,
+      },
+    },
+    mobile: {
+      light: {
+        src: "/images/specific-mobile-light.png",
+        width: 1206,
+        height: 2622,
+      },
+      dark: {
+        src: "/images/specific-mobile-dark.png",
+        width: 1206,
+        height: 2622,
+      },
+    },
+  },
+  weekly: {
+    desktop: {
+      light: {
+        src: "/images/weekly-desktop-light.png",
+        width: 2880,
+        height: 1626,
+      },
+      dark: {
+        src: "/images/weekly-desktop-dark.png",
+        width: 2880,
+        height: 1622,
+      },
+    },
+    mobile: {
+      light: {
+        src: "/images/weekly-mobile-light.png",
+        width: 1206,
+        height: 2622,
+      },
+      dark: {
+        src: "/images/weekly-mobile-dark.png",
+        width: 1206,
+        height: 2622,
+      },
+    },
+  },
+};
 
 export default function Hero() {
   const trackRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
   const plansMadeRef = useRef<HTMLSpanElement>(null);
   const [clipCenter, setClipCenter] = useState({ x: 0, y: 0 });
+  const [heroImageView, setHeroImageView] =
+    useState<HeroImageView>("specific-dates");
+
+  // Avoids a hydration mismatch: resolvedTheme is unknown on the server, so
+  // fall back to light until mounted on the client.
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const heroImageTheme: HeroImageTheme =
+    mounted && resolvedTheme === "dark" ? "dark" : "light";
+
+  const desktopImage = HERO_IMAGES[heroImageView].desktop[heroImageTheme];
+  const mobileImage = HERO_IMAGES[heroImageView].mobile[heroImageTheme];
 
   const { scrollYProgress } = useScroll({
     target: trackRef,
@@ -123,16 +200,36 @@ export default function Hero() {
           </div>
 
           <motion.div
-            aria-hidden
             style={{ y: imageY }}
             className="pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto w-[90vw] max-w-[1296px]"
           >
+            <div className="pointer-events-auto relative z-10 mx-auto mb-4 w-64">
+              <SegmentedControl
+                options={[
+                  { label: "Specific Dates", value: "specific-dates" },
+                  { label: "Weekly", value: "weekly" },
+                ]}
+                value={heroImageView}
+                onChange={setHeroImageView}
+                className="bg-background/90 shadow-lg backdrop-blur"
+              />
+            </div>
+
             <Image
-              src="/images/hero-image.png"
+              aria-hidden
+              src={desktopImage.src}
               alt="Hero Image"
-              width={1920}
-              height={1080}
-              className="pointer-events-none w-full select-none rounded-3xl shadow-2xl"
+              width={desktopImage.width}
+              height={desktopImage.height}
+              className="pointer-events-none hidden w-full select-none rounded-3xl shadow-2xl md:block"
+            />
+            <Image
+              aria-hidden
+              src={mobileImage.src}
+              alt="Hero Image"
+              width={mobileImage.width}
+              height={mobileImage.height}
+              className="pointer-events-none mx-auto block w-3/5 max-w-[260px] select-none rounded-3xl shadow-2xl md:hidden"
             />
           </motion.div>
         </div>
