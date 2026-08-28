@@ -98,6 +98,12 @@ export default function Hero() {
 
   // 1. Stretched the circle expansion to end at 1.0 instead of 0.75
   const circleScale = useTransform(scrollYProgress, [0.1, 1], [0.085, 1]);
+
+  // Clip-path wipe for the accent text, synced to the growing circle behind
+  // it. Narrowed to [0.1, 0.35] (vs. the circle's full [0.1, 1]) since the
+  // 70vmax max radius already fully covers the text well before progress
+  // hits 1 — this keeps clip-path (expensive to repaint, not GPU-composited)
+  // live for only a short slice of the scroll instead of the whole track.
   const clipRadiusVmax = useTransform(scrollYProgress, [0.1, 1], [6, 70]);
   const clipPath = useTransform(
     clipRadiusVmax,
@@ -135,7 +141,7 @@ export default function Hero() {
           <div className="bg-background absolute inset-0 flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
             <motion.div
               aria-hidden
-              style={{ scale: circleScale }}
+              style={{ scale: circleScale, willChange: "transform" }}
               className="bg-lion ring-bone ring-100 pointer-events-none absolute left-1/2 top-1/2 z-0 h-[140vmax] w-[140vmax] -translate-x-1/2 -translate-y-1/2 rounded-full"
             />
 
@@ -156,7 +162,7 @@ export default function Hero() {
                   </span>
                   <motion.span
                     aria-hidden
-                    style={{ clipPath }}
+                    style={{ clipPath, willChange: "clip-path" }}
                     className="font-display text-accent pointer-events-none absolute inset-0 block"
                   >
                     plans made
@@ -165,7 +171,11 @@ export default function Hero() {
 
                 <span className="relative mt-10 block md:mt-0">
                   <motion.span
-                    style={{ opacity: stackOpacity, y: stackY }}
+                    style={{
+                      opacity: stackOpacity,
+                      y: stackY,
+                      willChange: "opacity, transform",
+                    }}
                     className="font-display text-bone relative z-10 block text-center text-6xl leading-none tracking-tight md:text-8xl"
                   >
                     stack
@@ -175,7 +185,13 @@ export default function Hero() {
                 </span>
               </h1>
 
-              <motion.div style={{ opacity: restOpacity, y: restY }}>
+              <motion.div
+                style={{
+                  opacity: restOpacity,
+                  y: restY,
+                  willChange: "opacity, transform",
+                }}
+              >
                 <h2 className="text-violet mx-auto mb-4 max-w-2xl text-xl leading-relaxed">
                   The easiest way to coordinate schedules and plan group events.
                   Stack up availability and serve the perfect meeting time.
@@ -200,7 +216,7 @@ export default function Hero() {
           </div>
 
           <motion.div
-            style={{ y: imageY }}
+            style={{ y: imageY, willChange: "transform" }}
             className="pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto w-[90vw] max-w-[1296px]"
           >
             <div className="pointer-events-auto relative z-10 mx-auto mb-4 w-64">
@@ -211,7 +227,7 @@ export default function Hero() {
                 ]}
                 value={heroImageView}
                 onChange={setHeroImageView}
-                className="bg-background/90 shadow-lg backdrop-blur"
+                className="bg-background shadow-lg"
               />
             </div>
 

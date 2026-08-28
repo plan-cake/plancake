@@ -1,7 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-
 import { cn } from "@/lib/utils/classname";
 
 type SegmentedControlProps<T extends string> = {
@@ -21,19 +19,7 @@ export default function SegmentedControl<T extends string>({
 }: SegmentedControlProps<T>) {
   const activeIndex = options.findIndex((opt) => opt.value === value);
   const count = options.length;
-
-  // Calculate dynamic style for the sliding pill
-  const pillStyle = useMemo(() => {
-    const baseOffset = hidePadding ? 0 : 8;
-
-    const pillWidth = `(100% - ${baseOffset * 2}px) / ${count}`;
-    const leftOffset = `calc(${baseOffset}px + (${pillWidth}) * ${activeIndex})`;
-
-    return {
-      width: `calc(${pillWidth})`,
-      left: activeIndex === -1 ? `${baseOffset}px` : leftOffset,
-    };
-  }, [hidePadding, activeIndex, count]);
+  const baseOffset = hidePadding ? 0 : 8;
 
   return (
     <div
@@ -48,10 +34,14 @@ export default function SegmentedControl<T extends string>({
     >
       <div
         className={cn(
-          "bg-accent/25 absolute rounded-full transition-[left,width] duration-300 ease-out",
+          "bg-accent/25 absolute rounded-full transition-transform duration-300 ease-out will-change-transform",
           hidePadding ? "bottom-0 top-0" : "bottom-2 top-2",
         )}
-        style={pillStyle}
+        style={{
+          left: baseOffset,
+          width: `calc((100% - ${baseOffset * 2}px) / ${count})`,
+          transform: `translateX(${activeIndex === -1 ? 0 : activeIndex * 100}%)`,
+        }}
       />
 
       {options.map((option) => {
