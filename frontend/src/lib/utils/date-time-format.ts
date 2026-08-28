@@ -1,4 +1,4 @@
-import { format, parse, parseISO } from "date-fns";
+import { differenceInCalendarMonths, format, parse, parseISO } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
 import { EventType } from "@/core/event/types";
@@ -72,19 +72,18 @@ export function timeslotToISOString(
   }
 }
 
-
 /**
  * Checks if two timezones are equivalent even if they represent different locations.
- * 
+ *
  * For example, "America/New_York" and "America/Detroit" are equal because they are both
  * in Eastern Time.
- * 
+ *
  * IMPORTANT: This function also checks if the timezones have the same DST rules by
  * comparing offsets in January and July.
- * 
+ *
  * For example, "America/New_York" and "America/Caracas" are NOT equal because Caracas
  * does not observe DST, despite both having the same offset during part of the year.
- * 
+ *
  * @param tz1 The first timezone to compare
  * @param tz2 The second timezone to compare
  * @returns `true` if the timezones are equivalent, `false` otherwise
@@ -145,18 +144,24 @@ export function formatDateTime(
 // If both dates are the same, return a single date. If both dates are
 // in the same month, omit the month from the 'to' date. Otherwise, the
 // full range is shown.
+// If the dates are more than 11 months apart, the range will include years.
 export function formatDateRange(fromDate: string, toDate: string): string {
   const dateFormat = "MMM d";
   const fromFormatted = formatDate(fromDate, dateFormat);
   const toFormatted = formatDate(toDate, dateFormat);
+  const fromDateObj = parse(fromDate, "yyyy-MM-dd", new Date());
+  const toDateObj = parse(toDate, "yyyy-MM-dd", new Date());
+  const monthDiff = differenceInCalendarMonths(toDateObj, fromDateObj);
 
   if (fromDate === toDate) {
     return fromFormatted;
   } else if (fromDate.slice(0, 7) === toDate.slice(0, 7)) {
-    const fromDay = parse(fromDate, "yyyy-MM-dd", new Date()).getDate();
-    const toDay = parse(toDate, "yyyy-MM-dd", new Date()).getDate();
+    const fromDay = formatDate(fromDate, "d");
+    const toDay = formatDate(toDate, "d");
     const monthStr = formatDate(fromDate, "MMM");
     return `${monthStr} ${fromDay}-${toDay}`;
+  } else if (monthDiff > 11) {
+    return `${formatDate(fromDate, "MMM d, ''yy")} - ${formatDate(toDate, "MMM d, ''yy")}`;
   }
   return `${fromFormatted} - ${toFormatted}`;
 }
@@ -171,7 +176,7 @@ export function formatDate(date: string, fmt: string): string {
 /**
  * Formats an arbitrary set of dates into a readable string. The dates are not expected to
  * be contiguous, and the function will group them into ranges.
- * 
+ *
  * @param dates A set of date strings in "YYYY-MM-DD" format
  * @returns A human-readable string representation of the date set, or null if empty
  */
@@ -180,11 +185,14 @@ export function formatDateSet(dates: Set<string>): string | null {
 
   const sortedDates = Array.from(dates).sort((a, b) => (a < b ? -1 : 1));
   const dateObjects = Array.from(sortedDates).map((date) => parseISO(date));
+  const firstDateObj = dateObjects[0];
+  const lastDateObj = dateObjects[dateObjects.length - 1];
+  const monthDiff = differenceInCalendarMonths(lastDateObj, firstDateObj);
 
   const groups = new Set<{ start: string; end: string }>();
-  const months = new Set<number>();
-  let rangeStart = dateObjects[0];
-  months.add(dateObjects[0].getUTCMonth());
+  const months = new Set<string>();
+  let rangeStart = firstDateObj;
+  months.add(format(firstDateObj, "yyyy-MM"));
 
   for (let i = 1; i < dateObjects.length; i++) {
     const prevDate = dateObjects[i - 1];
@@ -198,13 +206,16 @@ export function formatDateSet(dates: Set<string>): string | null {
       });
       rangeStart = currentDate;
     }
-    months.add(currentDate.getUTCMonth());
+    months.add(format(currentDate, "yyyy-MM"));
   }
 
   groups.add({
     start: format(rangeStart, "yyyy-MM-dd"),
-    end: format(dateObjects[dateObjects.length - 1], "yyyy-MM-dd"),
+    end: format(lastDateObj, "yyyy-MM-dd"),
   });
+
+  const fallbackFormat = () =>
+    `${sortedDates.length} days between ${formatDateRange(sortedDates[0], sortedDates[sortedDates.length - 1])}`;
 
   if (sortedDates.length === 1) {
     return formatDate(sortedDates[0], "MMM d");
@@ -213,11 +224,12 @@ export function formatDateSet(dates: Set<string>): string | null {
   } else if (months.size === 1 && groups.size <= 5) {
     return `${formatDate(sortedDates[0], "MMM")} ${Array.from(groups)
       .map((group) => {
-        if (group.start === group.end)
-          return formatDate(group.start, "d");
+        if (group.start === group.end) return formatDate(group.start, "d");
         return `${formatDate(group.start, "d")}-${formatDate(group.end, "d")}`;
       })
       .join(", ")}`;
+  } else if (monthDiff > 11) {
+    return fallbackFormat();
   } else if (groups.size <= 3) {
     return Array.from(groups)
       .map((group) => {
@@ -225,7 +237,7 @@ export function formatDateSet(dates: Set<string>): string | null {
       })
       .join(", ");
   } else {
-    return `${sortedDates.length} days between ${formatDateRange(sortedDates[0], sortedDates[sortedDates.length - 1])}`;
+    return fallbackFormat();
   }
 }
 
