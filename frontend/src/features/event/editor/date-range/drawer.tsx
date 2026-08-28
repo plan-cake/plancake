@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { TriangleAlertIcon } from "lucide-react";
 
@@ -12,6 +12,7 @@ import {
 } from "@/features/event/editor/date-range/calendars/month";
 import { SpecificDateRangeDisplayProps } from "@/features/event/editor/date-range/date-range-props";
 import SpecificDateRangeDisplay from "@/features/event/editor/date-range/specific-date-display";
+import { formatDateSet } from "@/lib/utils/date-time-format";
 
 export default function DateRangeDrawer({
   earliestDate,
@@ -33,13 +34,15 @@ export default function DateRangeDrawer({
     }
   }, [open]);
 
+  const dateDisplay = useMemo(() => formatDateSet(dates), [dates]);
+
   return (
     <StandardDrawer
       open={open}
       onOpenChange={setOpen}
       contentClassName="h-2/3"
       title="Select Date Range"
-      description="Select a date range using the calendar below"
+      description="Select dates using the calendar below"
       trigger={
         <div onClick={() => setOpen(!open)}>
           <SpecificDateRangeDisplay dates={dates} open={open} />
@@ -47,7 +50,7 @@ export default function DateRangeDrawer({
       }
       headerContent={
         <div className="flex flex-col text-lg font-semibold">
-          Select Specific Date Range
+          Select Possible Dates
           {errors.dateRange ? (
             <span className="text-error flex items-center gap-2 text-sm">
               <TriangleAlertIcon className="h-4 w-4" />
@@ -55,7 +58,7 @@ export default function DateRangeDrawer({
             </span>
           ) : (
             <span className="text-accent text-sm font-normal">
-              Choose a start and end date
+              {dateDisplay || "Choose dates using the calendar below"}
             </span>
           )}
         </div>
