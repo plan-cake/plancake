@@ -11,6 +11,7 @@ import {
   CalendarHandle,
 } from "@/features/event/editor/date-range/calendar";
 import { SpecificDateRangeDisplayProps } from "@/features/event/editor/date-range/date-range-props";
+import DateRangePresets from "@/features/event/editor/date-range/presets";
 import SpecificDateRangeDisplay from "@/features/event/editor/date-range/specific-date-display";
 import { formatDateSet } from "@/lib/utils/date-time-format";
 
@@ -41,6 +42,7 @@ export default function DateRangeDrawer({
       open={open}
       onOpenChange={setOpen}
       contentClassName="h-2/3"
+      footerContent={<DateRangePresets dates={dates} setDates={setDates} />}
       title="Select Date Range"
       description="Select dates using the calendar below"
       trigger={
