@@ -92,10 +92,17 @@ def validate_date_timeslots(
     if not timeslots:
         return {"timeslots": ["At least one timeslot is required."]}
 
-    start_date = min(ts.date() for ts in timeslots)
-    end_date = max(ts.date() for ts in timeslots)
+    dates = set()
+    start_date = None
+    min_timeslot = None
+    for ts in timeslots:
+        dates.add(ts.date())
+        if start_date is None or ts.date() < start_date:
+            start_date = ts.date()
+        if min_timeslot is None or ts < min_timeslot:
+            min_timeslot = ts
 
-    start_date_local = min(timeslots).astimezone(ZoneInfo(user_time_zone)).date()
+    start_date_local = min_timeslot.astimezone(ZoneInfo(user_time_zone)).date()
 
     errors = {}
 
@@ -113,7 +120,7 @@ def validate_date_timeslots(
             )
         else:
             add_error("Event must start today or in the future.")
-    if (end_date - start_date).days > MAX_EVENT_DAYS:
+    if len(dates) > MAX_EVENT_DAYS:
         add_error(f"Max event length is {MAX_EVENT_DAYS} days.")
 
     if not check_timeslot_times(timeslots):
