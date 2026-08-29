@@ -5,6 +5,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { useEventContext } from "@/core/event/context";
 import { Weekday } from "@/core/event/types";
 import Calendar from "@/features/event/editor/weekday-range/calendar";
+import WeekdayRangePresets from "@/features/event/editor/weekday-range/presets";
 import WeekdayRangeDisplay from "@/features/event/editor/weekday-range/weekday-range-display";
 import { cn } from "@/lib/utils/classname";
 
@@ -33,7 +34,13 @@ export default function WeekdayRangePopover({
           )}
           aria-label="Weekday range picker"
         >
-          <Calendar selectedDays={weekdays} onChange={setWeekdayRange} />
+          <div className="flex flex-col gap-2">
+            <Calendar selectedDays={weekdays} onChange={setWeekdayRange} />
+            <WeekdayRangePresets
+              weekdays={weekdays}
+              setWeekdayRange={setWeekdayRange}
+            />
+          </div>
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>

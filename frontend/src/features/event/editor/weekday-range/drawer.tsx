@@ -6,6 +6,7 @@ import { useEventContext } from "@/core/event/context";
 import { Weekday } from "@/core/event/types";
 import { StandardDrawer } from "@/features/drawer";
 import Calendar from "@/features/event/editor/weekday-range/calendar";
+import WeekdayRangePresets from "@/features/event/editor/weekday-range/presets";
 import WeekdayRangeDisplay from "@/features/event/editor/weekday-range/weekday-range-display";
 
 export default function WeekdayRangeDrawer({
@@ -21,6 +22,12 @@ export default function WeekdayRangeDrawer({
       open={open}
       onOpenChange={setOpen}
       contentClassName="h-1/3"
+      footerContent={
+        <WeekdayRangePresets
+          weekdays={weekdays}
+          setWeekdayRange={setWeekdayRange}
+        />
+      }
       title="Select Days of the Week"
       description="Select days of the week below"
       trigger={
