@@ -1,7 +1,7 @@
 import { differenceInCalendarMonths, format, parse, parseISO } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
-import { EventType } from "@/core/event/types";
+import { EventType, Weekday } from "@/core/event/types";
 
 /* TIMEZONE UTILS */
 
@@ -238,6 +238,29 @@ export function formatDateSet(dates: Set<string>): string | null {
       .join(", ");
   } else {
     return fallbackFormat();
+  }
+}
+
+/* WEEKDAY UTILS */
+
+/**
+ * Returns the full name of a weekday given its abbreviation.
+ *
+ * @param abbrev A weekday abbreviation (from the Weekday type)
+ * @returns The full name of the weekday
+ */
+export function getFullWeekdayName(abbrev: Weekday): string {
+  switch (abbrev) {
+    case "Tue":
+      return "Tuesday";
+    case "Wed":
+      return "Wednesday";
+    case "Thu":
+      return "Thursday";
+    case "Sat":
+      return "Saturday";
+    default:
+      return abbrev + "day";
   }
 }
 
