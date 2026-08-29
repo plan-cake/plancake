@@ -246,14 +246,24 @@ export function formatDateSet(dates: Set<string>): string | null {
 // expects two time strings in "HH:mm" format
 // returns a formatted time range string.
 // If the time range is the full day (00:00 - 24:00), it returns "All day".
-export function formatTimeRange(startTime: string, endTime: string): string {
-  if (!startTime || !endTime) return "";
+export function formatTimeRange(
+  startTime: string,
+  endTime: string,
+): { display: string; pastMidnight: boolean } {
+  if (!startTime || !endTime) return { display: "", pastMidnight: false };
+
+  let pastMidnight = false;
 
   if (startTime === "00:00" && endTime === "00:00") {
-    return "All day";
+    return { display: "All day", pastMidnight: false };
+  } else if (endTime < startTime) {
+    pastMidnight = true;
   }
 
-  return `${formatTime(startTime)} - ${formatTime(endTime)}`;
+  return {
+    display: `${formatTime(startTime)} - ${formatTime(endTime)}`,
+    pastMidnight,
+  };
 }
 
 // expects a time string in "HH:mm" format

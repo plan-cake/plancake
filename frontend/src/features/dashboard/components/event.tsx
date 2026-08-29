@@ -183,6 +183,8 @@ export default function DashboardEvent({
     );
   }
 
+  const timeRange = formatTimeRange(dateDetails.startTime, dateDetails.endTime);
+
   return (
     <Link
       href={`/${code}`}
@@ -205,7 +207,10 @@ export default function DashboardEvent({
       </div>
       <div className="flex items-center gap-2">
         <ClockIcon className="h-5 w-5" />
-        {formatTimeRange(dateDetails.startTime, dateDetails.endTime)}
+        <span>
+          {timeRange.display}
+          {timeRange.pastMidnight && <sup className=""> +1</sup>}
+        </span>
       </div>
       <div className="mt-1.5 bg-inherit" ref={participantRowRef}>
         <ParticipantRow participants={participants} numIcons={numIcons} />
