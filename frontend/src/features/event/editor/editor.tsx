@@ -16,7 +16,7 @@ import LinkButton from "@/features/button/components/link";
 import TimeSelector from "@/features/event/components/selectors/time";
 import AdvancedOptions from "@/features/event/editor/advanced-options";
 import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
-import DateRangeSelection from "@/features/event/editor/date-range/selector";
+import DateRangeSelection from "@/features/event/editor/date-selector";
 import { EventEditorType } from "@/features/event/editor/types";
 import { validateEventData } from "@/features/event/editor/validate-data";
 import { ScheduleGrid } from "@/features/event/grid";

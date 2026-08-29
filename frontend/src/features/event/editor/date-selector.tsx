@@ -3,11 +3,11 @@ import { TriangleAlertIcon } from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
 import { SpecificDateRange } from "@/core/event/types";
-import WeekdayCalendar from "@/features/event/editor/date-range/calendars/weekday";
 import { DateRangeProps } from "@/features/event/editor/date-range/date-range-props";
 import DateRangeDrawer from "@/features/event/editor/date-range/drawer";
-import EventTypeSelect from "@/features/event/editor/date-range/event-type-select";
 import DateRangePopover from "@/features/event/editor/date-range/popover";
+import EventTypeSelect from "@/features/event/editor/event-type-select";
+import WeekdayCalendar from "@/features/event/editor/weekday-range/calendar";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 export default function DateRangeSelection({

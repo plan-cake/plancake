@@ -3,7 +3,7 @@ import { useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
 import { useEventContext } from "@/core/event/context";
-import { Calendar } from "@/features/event/editor/date-range/calendars/month";
+import { Calendar } from "@/features/event/editor/date-range/calendar";
 import { SpecificDateRangeDisplayProps } from "@/features/event/editor/date-range/date-range-props";
 import SpecificDateRangeDisplay from "@/features/event/editor/date-range/specific-date-display";
 import { cn } from "@/lib/utils/classname";

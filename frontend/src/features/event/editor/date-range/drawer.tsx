@@ -9,7 +9,7 @@ import { StandardDrawer } from "@/features/drawer";
 import {
   Calendar,
   CalendarHandle,
-} from "@/features/event/editor/date-range/calendars/month";
+} from "@/features/event/editor/date-range/calendar";
 import { SpecificDateRangeDisplayProps } from "@/features/event/editor/date-range/date-range-props";
 import SpecificDateRangeDisplay from "@/features/event/editor/date-range/specific-date-display";
 import { formatDateSet } from "@/lib/utils/date-time-format";
