@@ -25,8 +25,7 @@ export type DashboardEventProps = {
   participants: string[];
   startTime: string;
   endTime: string;
-  startDate: string;
-  endDate: string;
+  dates: string[];
   timezone: string;
   onDelete?: () => void;
 };
@@ -54,25 +53,52 @@ export default function DashboardEvent({
     router.push(`/${code}/edit`);
   }
 
-  // Memoized local start and end details
-  const start = useMemo(
-    () =>
-      getTimezoneDetails({
+  // Memoized local date details
+  const dateDetails = useMemo(() => {
+    const firstDate = dateTimeProps.dates.reduce((earliest, current) => {
+      return current < earliest ? current : earliest;
+    });
+    const lastDate = dateTimeProps.dates.reduce((latest, current) => {
+      return current > latest ? current : latest;
+    });
+
+    const start = getTimezoneDetails({
+      time: dateTimeProps.startTime,
+      date: firstDate,
+      fromTZ: type === "weekday" ? timezone : undefined,
+    });
+    const end = getTimezoneDetails({
+      time: dateTimeProps.endTime,
+      date: lastDate,
+      fromTZ: type === "weekday" ? timezone : undefined,
+    });
+
+    // Extract the days of the week from the start time on each day
+    const weekdays = new Set<number>();
+    for (const date of dateTimeProps.dates) {
+      const { weekday } = getTimezoneDetails({
         time: dateTimeProps.startTime,
-        date: dateTimeProps.startDate,
+        date: date,
         fromTZ: type === "weekday" ? timezone : undefined,
-      }),
-    [dateTimeProps.startTime, dateTimeProps.startDate, timezone, type],
-  );
-  const end = useMemo(
-    () =>
-      getTimezoneDetails({
-        time: dateTimeProps.endTime,
-        date: dateTimeProps.endDate,
-        fromTZ: type === "weekday" ? timezone : undefined,
-      }),
-    [dateTimeProps.endTime, dateTimeProps.endDate, timezone, type],
-  );
+        toTZ: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+      weekdays.add(weekday);
+    }
+
+    return {
+      startDate: start.date,
+      endDate: end.date,
+      startTime: start.time,
+      endTime: end.time,
+      weekdays,
+    };
+  }, [
+    dateTimeProps.dates,
+    dateTimeProps.startTime,
+    dateTimeProps.endTime,
+    timezone,
+    type,
+  ]);
 
   // Dynamic participant icon count based on event width
   const participantRowRef = useRef<HTMLDivElement>(null);
@@ -170,15 +196,16 @@ export default function DashboardEvent({
       <div className="text-sm opacity-50">{code}</div>
       <div className="mb-2 mt-1">
         {type === "specific" && (
-          <DateRangeRow startDate={start.date} endDate={end.date} />
+          <DateRangeRow
+            startDate={dateDetails.startDate}
+            endDate={dateDetails.endDate}
+          />
         )}
-        {type === "weekday" && (
-          <WeekdayRow startWeekday={start.weekday} endWeekday={end.weekday} />
-        )}
+        {type === "weekday" && <WeekdayRow weekdays={dateDetails.weekdays} />}
       </div>
       <div className="flex items-center gap-2">
         <ClockIcon className="h-5 w-5" />
-        {formatTimeRange(start.time, end.time)}
+        {formatTimeRange(dateDetails.startTime, dateDetails.endTime)}
       </div>
       <div className="mt-1.5 bg-inherit" ref={participantRowRef}>
         <ParticipantRow participants={participants} numIcons={numIcons} />

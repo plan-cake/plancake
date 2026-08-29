@@ -1,43 +1,41 @@
 import { cn } from "@/lib/utils/classname";
 
 type WeekdayRowProps = {
-  startWeekday: number;
-  endWeekday: number;
+  weekdays: Set<number>;
 };
 
-export default function WeekdayRow({
-  startWeekday,
-  endWeekday,
-}: WeekdayRowProps) {
+export default function WeekdayRow({ weekdays }: WeekdayRowProps) {
   return (
     <div className="bg-panel flex w-fit rounded-full">
-      {["S", "M", "T", "W", "T", "F", "S"].map((initial, index) => (
-        <WeekdayRowIcon
-          key={index}
-          label={initial}
-          index={index}
-          start={startWeekday}
-          end={endWeekday}
-        />
-      ))}
+      {["S", "M", "T", "W", "T", "F", "S"].map((initial, index) => {
+        const isActive = weekdays.has(index);
+        const isStart = isActive && !weekdays.has(index - 1);
+        const isEnd = isActive && !weekdays.has(index + 1);
+        return (
+          <WeekdayRowIcon
+            key={index}
+            label={initial}
+            isActive={isActive}
+            isStart={isStart}
+            isEnd={isEnd}
+          />
+        );
+      })}
     </div>
   );
 }
 
 function WeekdayRowIcon({
   label,
-  index,
-  start,
-  end,
+  isActive,
+  isStart,
+  isEnd,
 }: {
   label: string;
-  index: number;
-  start: number;
-  end: number;
+  isActive: boolean;
+  isStart: boolean;
+  isEnd: boolean;
 }) {
-  const isActive = index >= start && index <= end;
-  const isStart = index === start;
-  const isEnd = index === end;
   return (
     <div
       className={cn(

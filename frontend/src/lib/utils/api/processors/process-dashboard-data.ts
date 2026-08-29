@@ -4,7 +4,9 @@ import { DashboardData } from "@/lib/utils/api/types";
 
 function processSingleEvent(
   myEvent: boolean,
-  eventData: DashboardData["created_events"][number] | DashboardData["participated_events"][number],
+  eventData:
+    | DashboardData["created_events"][number]
+    | DashboardData["participated_events"][number],
 ): DashboardEventProps {
   const data: DashboardEventProps = {
     myEvent: myEvent,
@@ -13,8 +15,7 @@ function processSingleEvent(
     type: eventData.event_type === "Date" ? "specific" : "weekday",
     startTime: eventData.start_time,
     endTime: eventData.end_time,
-    startDate: eventData.start_date!,
-    endDate: eventData.end_date!,
+    dates: eventData.dates,
     participants: eventData.participants,
     timezone: eventData.time_zone,
   };
