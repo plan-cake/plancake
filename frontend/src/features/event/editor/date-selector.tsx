@@ -38,20 +38,20 @@ export default function DateRangeSelection({
         </p>
 
         {eventRange?.type === "specific" ? (
-          <SpecificDateRangeDisplay
+          <DatePicker
             eventRange={eventRange}
             editing={editing}
             originalEventRange={originalEventRange as SpecificDateRange}
           />
         ) : (
-          <WeekdayRangeDisplay weekdays={eventRange.weekdays} />
+          <WeekdayPicker weekdays={eventRange.weekdays} />
         )}
       </div>
     </div>
   );
 }
 
-function SpecificDateRangeDisplay({
+function DatePicker({
   eventRange,
   editing = false,
   originalEventRange,
@@ -82,7 +82,7 @@ function SpecificDateRangeDisplay({
   }
 }
 
-function WeekdayRangeDisplay({ weekdays }: { weekdays: Set<Weekday> }) {
+function WeekdayPicker({ weekdays }: { weekdays: Set<Weekday> }) {
   const isMobile = useCheckMobile();
 
   if (isMobile) {
