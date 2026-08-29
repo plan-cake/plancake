@@ -265,7 +265,7 @@ export function formatTimeRange(
     format(parse(endTime, "HH:mm", new Date()), "a");
 
   return {
-    display: `${formatTime(startTime, !sameMeridiem)} - ${formatTime(endTime)}`,
+    display: `${formatTime(startTime, !sameMeridiem || pastMidnight)} - ${formatTime(endTime)}`,
     pastMidnight,
   };
 }
