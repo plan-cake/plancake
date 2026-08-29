@@ -7,7 +7,7 @@ import { DateRangeProps } from "@/features/event/editor/date-range/date-range-pr
 import DateRangeDrawer from "@/features/event/editor/date-range/drawer";
 import DateRangePopover from "@/features/event/editor/date-range/popover";
 import EventTypeSelect from "@/features/event/editor/event-type-select";
-import WeekdayCalendar from "@/features/event/editor/weekday-range/calendar";
+import Calendar from "@/features/event/editor/weekday-range/calendar";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 export default function DateRangeSelection({
@@ -43,7 +43,7 @@ export default function DateRangeSelection({
             originalEventRange={originalEventRange as SpecificDateRange}
           />
         ) : (
-          <WeekdayCalendar
+          <Calendar
             selectedDays={eventRange?.weekdays}
             onChange={setWeekdayRange}
           />

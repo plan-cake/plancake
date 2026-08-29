@@ -1,15 +1,13 @@
 import { ALL_WEEKDAYS, Weekday } from "@/core/event/types";
 import { cn } from "@/lib/utils/classname";
 
-type WeekdayCalendarProps = {
-  selectedDays: Set<Weekday>;
-  onChange: (days: Set<Weekday>) => void;
-};
-
-export default function WeekdayCalendar({
+export default function Calendar({
   selectedDays,
   onChange,
-}: WeekdayCalendarProps) {
+}: {
+  selectedDays: Set<Weekday>;
+  onChange: (days: Set<Weekday>) => void;
+}) {
   const handleDayClick = (index: number) => {
     const day = ALL_WEEKDAYS[index];
     const newDays = new Set(selectedDays);
