@@ -55,41 +55,38 @@ export default function DashboardEvent({
 
   // Memoized local date details
   const dateDetails = useMemo(() => {
-    const firstDate = dateTimeProps.dates.reduce((earliest, current) => {
-      return current < earliest ? current : earliest;
-    });
-    const lastDate = dateTimeProps.dates.reduce((latest, current) => {
-      return current > latest ? current : latest;
-    });
-
-    const start = getTimezoneDetails({
-      time: dateTimeProps.startTime,
-      date: firstDate,
-      fromTZ: type === "weekday" ? timezone : undefined,
-    });
-    const end = getTimezoneDetails({
-      time: dateTimeProps.endTime,
-      date: lastDate,
-      fromTZ: type === "weekday" ? timezone : undefined,
-    });
-
-    // Extract the days of the week from the start time on each day
+    // Extract the dates from the start time on each day
     const weekdays = new Set<number>();
-    for (const date of dateTimeProps.dates) {
-      const { weekday } = getTimezoneDetails({
+    let startDate = dateTimeProps.dates[0];
+    let endDate = dateTimeProps.dates[0];
+    for (const singleDate of dateTimeProps.dates) {
+      const { date, weekday } = getTimezoneDetails({
         time: dateTimeProps.startTime,
-        date: date,
+        date: singleDate,
         fromTZ: type === "weekday" ? timezone : undefined,
         toTZ: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
       weekdays.add(weekday);
+      if (singleDate < startDate) startDate = date;
+      if (singleDate > endDate) endDate = date;
     }
 
+    const startTime = getTimezoneDetails({
+      time: dateTimeProps.startTime,
+      date: startDate,
+      fromTZ: type === "weekday" ? timezone : undefined,
+    }).time;
+    const endTime = getTimezoneDetails({
+      time: dateTimeProps.endTime,
+      date: startDate,
+      fromTZ: type === "weekday" ? timezone : undefined,
+    }).time;
+
     return {
-      startDate: start.date,
-      endDate: end.date,
-      startTime: start.time,
-      endTime: end.time,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
       weekdays,
     };
   }, [
