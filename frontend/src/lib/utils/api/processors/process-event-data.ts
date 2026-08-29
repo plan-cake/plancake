@@ -34,7 +34,8 @@ export function processEventData(eventData: EventDetails): {
     const { date, time, weekday } = getTimezoneDetails({
       date: tsDate,
       time: tsTime,
-      fromTZ: isWeekEvent ? eventData.time_zone : undefined,
+      // Don't include fromTZ, since week events are already converted from the event's
+      // timezone above in parseIsoDateTime
       toTZ: eventData.time_zone,
     });
     dates.add(date);
