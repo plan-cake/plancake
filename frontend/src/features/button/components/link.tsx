@@ -16,6 +16,7 @@ const LinkButton = forwardRef<Ref, LinkButtonProps>(
       loading = false,
       disabled = false,
       href,
+      fullWidth = false,
       className,
       ...props
     },
@@ -32,6 +33,7 @@ const LinkButton = forwardRef<Ref, LinkButtonProps>(
         loading={loading}
         disabled={disabled}
         href={href}
+        fullWidth={fullWidth}
         className={className}
         ref={ref}
         {...props}
