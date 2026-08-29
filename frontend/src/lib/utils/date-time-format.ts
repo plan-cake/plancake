@@ -260,17 +260,40 @@ export function formatTimeRange(
     pastMidnight = true;
   }
 
+  const sameMeridiem =
+    format(parse(startTime, "HH:mm", new Date()), "a") ===
+    format(parse(endTime, "HH:mm", new Date()), "a");
+
   return {
-    display: `${formatTime(startTime)} - ${formatTime(endTime)}`,
+    display: `${formatTime(startTime, !sameMeridiem)} - ${formatTime(endTime)}`,
     pastMidnight,
   };
 }
 
-// expects a time string in "HH:mm" format
-// returns the time formatted in "h:mm aaa" format (e.g., "2:30 PM")
-export function formatTime(time: string): string {
+/**
+ * Formats a time to a minimal representation.
+ *
+ * If the time is exactly on the hour, it will be formatted as "haaa" (e.g., "2pm").
+ *
+ * If the time is not on the hour, it will be formatted as "h:mmaaa" (e.g., "2:30pm").
+ *
+ * The meridiem (AM/PM) is included by default, but can be excluded by setting
+ * `includeMeridiem` to false.
+ *
+ * @param time A time string in "HH:mm" format
+ * @param includeMeridiem Whether to include the meridiem (AM/PM). Defaults to true.
+ * @returns A string of the formatted time.
+ */
+export function formatTime(
+  time: string,
+  includeMeridiem: boolean = true,
+): string {
   const parsedDate = parse(time, "HH:mm", new Date());
-  return format(parsedDate, "h:mm aaa");
+  if (time.endsWith(":00")) {
+    return format(parsedDate, `h${includeMeridiem ? "aaa" : ""}`);
+  } else {
+    return format(parsedDate, `h:mm${includeMeridiem ? "aaa" : ""}`);
+  }
 }
 
 // expects a time string in "HH:mm" (24-hour) format
