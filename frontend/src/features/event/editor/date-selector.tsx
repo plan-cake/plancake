@@ -2,18 +2,19 @@ import { parseISO } from "date-fns";
 import { TriangleAlertIcon } from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
-import { SpecificDateRange } from "@/core/event/types";
+import { SpecificDateRange, Weekday } from "@/core/event/types";
 import { DateRangeProps } from "@/features/event/editor/date-range/date-range-props";
 import DateRangeDrawer from "@/features/event/editor/date-range/drawer";
 import DateRangePopover from "@/features/event/editor/date-range/popover";
 import EventTypeSelect from "@/features/event/editor/event-type-select";
-import Calendar from "@/features/event/editor/weekday-range/calendar";
+import WeekdayRangeDrawer from "@/features/event/editor/weekday-range/drawer";
+import WeekdayRangePopover from "@/features/event/editor/weekday-range/popover";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 export default function DateRangeSelection({
   editing = false,
 }: DateRangeProps) {
-  const { state, setWeekdayRange, errors } = useEventContext();
+  const { state, errors } = useEventContext();
   const { eventRange, originalEventRange } = state;
 
   const rangeType = eventRange?.type ?? "specific";
@@ -43,10 +44,7 @@ export default function DateRangeSelection({
             originalEventRange={originalEventRange as SpecificDateRange}
           />
         ) : (
-          <Calendar
-            selectedDays={eventRange?.weekdays}
-            onChange={setWeekdayRange}
-          />
+          <WeekdayRangeDisplay weekdays={eventRange.weekdays} />
         )}
       </div>
     </div>
@@ -81,5 +79,15 @@ function SpecificDateRangeDisplay({
     return (
       <DateRangePopover earliestDate={earliestDate} dates={eventRange.dates} />
     );
+  }
+}
+
+function WeekdayRangeDisplay({ weekdays }: { weekdays: Set<Weekday> }) {
+  const isMobile = useCheckMobile();
+
+  if (isMobile) {
+    return <WeekdayRangeDrawer weekdays={weekdays} />;
+  } else {
+    return <WeekdayRangePopover weekdays={weekdays} />;
   }
 }

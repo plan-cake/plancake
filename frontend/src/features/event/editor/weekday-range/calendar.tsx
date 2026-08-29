@@ -22,7 +22,7 @@ export default function Calendar({
   );
 
   return (
-    <div className="flex w-full select-none flex-row flex-wrap">
+    <div className="flex select-none flex-row flex-wrap">
       {ALL_WEEKDAYS.map((day, index) => {
         const isSelected = selectedIndices[index];
         const leftSelected = selectedIndices[index - 1];
