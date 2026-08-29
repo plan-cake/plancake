@@ -256,7 +256,7 @@ export function formatTimeRange(
 
   if (startTime === "00:00" && endTime === "00:00") {
     return { display: "All day", pastMidnight: false };
-  } else if (endTime < startTime) {
+  } else if (endTime <= startTime) {
     pastMidnight = true;
   }
 
