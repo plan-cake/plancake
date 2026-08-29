@@ -7,7 +7,7 @@ type WeekdayRowProps = {
 export default function WeekdayRow({ weekdays }: WeekdayRowProps) {
   return (
     <div className="bg-panel flex w-fit rounded-full">
-      {["S", "M", "T", "W", "T", "F", "S"].map((initial, index) => {
+      {["U", "M", "T", "W", "R", "F", "S"].map((initial, index) => {
         const isActive = weekdays.has(index);
         const isStart = isActive && !weekdays.has(index - 1);
         const isEnd = isActive && !weekdays.has(index + 1);
