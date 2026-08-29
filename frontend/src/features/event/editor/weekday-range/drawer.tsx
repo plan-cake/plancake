@@ -22,6 +22,7 @@ export default function WeekdayRangeDrawer({
       open={open}
       onOpenChange={setOpen}
       contentClassName="h-1/3"
+      bodyClassName="flex justify-center items-center"
       footerContent={
         <WeekdayRangePresets
           weekdays={weekdays}
@@ -44,9 +45,7 @@ export default function WeekdayRangeDrawer({
         </div>
       }
     >
-      <div className="flex w-full justify-center">
-        <Calendar selectedDays={weekdays} onChange={setWeekdayRange} />
-      </div>
+      <Calendar selectedDays={weekdays} onChange={setWeekdayRange} />
     </StandardDrawer>
   );
 }
