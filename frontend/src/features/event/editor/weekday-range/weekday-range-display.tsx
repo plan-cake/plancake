@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 
 import { Weekday } from "@/core/event/types";
 import { cn } from "@/lib/utils/classname";
+import { formatWeekdaySet } from "@/lib/utils/date-time-format";
 
 export default function WeekdayRangeDisplay({
   weekdays,
@@ -13,11 +14,7 @@ export default function WeekdayRangeDisplay({
   open: boolean;
 }) {
   const display = useMemo(() => {
-    if (weekdays.size === 0) {
-      return "No days selected";
-    } else {
-      return Array.from(weekdays).join(", ");
-    }
+    return formatWeekdaySet(weekdays);
   }, [weekdays]);
 
   return (

@@ -1,7 +1,7 @@
 import { differenceInCalendarMonths, format, parse, parseISO } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
-import { EventType, Weekday } from "@/core/event/types";
+import { ALL_WEEKDAYS, EventType, Weekday } from "@/core/event/types";
 
 /* TIMEZONE UTILS */
 
@@ -262,6 +262,53 @@ export function getFullWeekdayName(abbrev: Weekday): string {
     default:
       return abbrev + "day";
   }
+}
+
+export function formatWeekdaySet(weekdays: Set<Weekday>): string | null {
+  if (weekdays.size === 0) {
+    return null;
+  } else if (weekdays.size === 7) {
+    return "All Week";
+  } else if (
+    weekdays.size === 2 &&
+    weekdays.has("Sat") &&
+    weekdays.has("Sun")
+  ) {
+    return "Weekends";
+  } else if (
+    weekdays.size === 5 &&
+    !weekdays.has("Sat") &&
+    !weekdays.has("Sun")
+  ) {
+    return "Weekdays";
+  } else if (weekdays.size === 6) {
+    const lastDay = ALL_WEEKDAYS.filter((day) => !weekdays.has(day))[0];
+    return "All days except " + getFullWeekdayName(lastDay);
+  }
+
+  const dayGroups = [];
+  let currentGroup: Weekday[] = [];
+  for (const day of ALL_WEEKDAYS) {
+    if (weekdays.has(day)) {
+      currentGroup.push(day);
+    } else if (currentGroup.length > 0) {
+      dayGroups.push(currentGroup);
+      currentGroup = [];
+    }
+  }
+  if (currentGroup.length > 0) {
+    dayGroups.push(currentGroup);
+  }
+
+  return dayGroups
+    .map((group) => {
+      if (group.length === 1) {
+        return group[0];
+      } else {
+        return group[0] + " - " + group[group.length - 1];
+      }
+    })
+    .join(", ");
 }
 
 /* TIME UTILS */
