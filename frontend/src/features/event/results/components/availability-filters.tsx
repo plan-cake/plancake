@@ -86,6 +86,7 @@ export default function AvailabilityFilters() {
           label="Show times that work for everyone"
           checked={showOnlyBestTimes}
           onChange={handleCheckboxChange}
+          textSize="sm"
         />
 
         <div>
