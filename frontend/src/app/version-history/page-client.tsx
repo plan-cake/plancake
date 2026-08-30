@@ -337,17 +337,31 @@ function ChangeList({
 }) {
   return (
     <ul className="flex flex-col gap-1">
-      <ChangeSection icon={<PlusCircleIcon />} changes={versionData.added} />
-      <ChangeSection icon={<WrenchIcon />} changes={versionData.changed} />
-      <ChangeSection icon={<BugIcon />} changes={versionData.fixed} />
+      <ChangeSection
+        title="Added"
+        icon={<PlusCircleIcon />}
+        changes={versionData.added}
+      />
+      <ChangeSection
+        title="Changed"
+        icon={<WrenchIcon />}
+        changes={versionData.changed}
+      />
+      <ChangeSection
+        title="Fixed"
+        icon={<BugIcon />}
+        changes={versionData.fixed}
+      />
     </ul>
   );
 }
 
 function ChangeSection({
+  title,
   icon,
   changes,
 }: {
+  title: string;
   icon: React.ReactNode;
   changes: string[];
 }) {
@@ -361,13 +375,16 @@ function ChangeSection({
   );
 
   return (
-    <>
-      {changes.map((change) => (
-        <li key={change} className="flex items-start gap-2">
-          <div className="mt-[3px]">{iconElement}</div>
-          <div className="leading-tight">{change}</div>
-        </li>
-      ))}
-    </>
+    <div>
+      <span className="font-bold opacity-75">{title}</span>
+      <div className="flex flex-col gap-1">
+        {changes.map((change) => (
+          <li key={change} className="flex items-start gap-2">
+            <div className="mt-[3px]">{iconElement}</div>
+            <div className="leading-tight">{change}</div>
+          </li>
+        ))}
+      </div>
+    </div>
   );
 }
