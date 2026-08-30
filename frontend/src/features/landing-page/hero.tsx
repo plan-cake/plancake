@@ -169,14 +169,14 @@ export default function Hero() {
                   </motion.span>
                 </span>
 
-                <span className="relative mt-10 block md:mt-0">
+                <span className="relative mt-0 block">
                   <motion.span
                     style={{
                       opacity: stackOpacity,
                       y: stackY,
                       willChange: "opacity, transform",
                     }}
-                    className="font-display text-bone relative z-10 block text-center text-6xl leading-none tracking-tight md:text-8xl"
+                    className="font-display text-bone relative z-10 block text-center text-5xl leading-none tracking-tight md:text-8xl"
                   >
                     stack
                     <br />
@@ -192,7 +192,7 @@ export default function Hero() {
                   willChange: "opacity, transform",
                 }}
               >
-                <h2 className="text-violet mx-auto mb-4 max-w-2xl text-xl leading-relaxed">
+                <h2 className="text-violet mx-auto mb-4 max-w-2xl text-lg md:text-xl">
                   The easiest way to coordinate schedules and plan group events.
                   Stack up availability and serve the perfect meeting time.
                 </h2>
