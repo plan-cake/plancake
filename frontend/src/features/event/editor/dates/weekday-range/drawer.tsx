@@ -5,9 +5,9 @@ import { useState } from "react";
 import { useEventContext } from "@/core/event/context";
 import { Weekday } from "@/core/event/types";
 import { StandardDrawer } from "@/features/drawer";
-import Calendar from "@/features/event/editor/weekday-range/calendar";
-import WeekdayRangePresets from "@/features/event/editor/weekday-range/presets";
-import WeekdayRangeDisplay from "@/features/event/editor/weekday-range/weekday-range-display";
+import Calendar from "@/features/event/editor/dates/weekday-range/calendar";
+import WeekdayRangePresets from "@/features/event/editor/dates/weekday-range/presets";
+import WeekdayRangeDisplay from "@/features/event/editor/dates/weekday-range/weekday-range-display";
 
 export default function WeekdayRangeDrawer({
   weekdays,

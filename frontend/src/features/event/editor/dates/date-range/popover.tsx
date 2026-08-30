@@ -1,11 +1,11 @@
 import { useState } from "react";
 
 import { useEventContext } from "@/core/event/context";
-import DatePopover from "@/features/event/editor/date-popover";
-import { Calendar } from "@/features/event/editor/date-range/calendar";
-import { SpecificDateRangeDisplayProps } from "@/features/event/editor/date-range/date-range-props";
-import DateRangePresets from "@/features/event/editor/date-range/presets";
-import SpecificDateRangeDisplay from "@/features/event/editor/date-range/specific-date-display";
+import DatePopover from "@/features/event/editor/dates/date-popover";
+import { Calendar } from "@/features/event/editor/dates/date-range/calendar";
+import { SpecificDateRangeDisplayProps } from "@/features/event/editor/dates/date-range/date-range-props";
+import DateRangePresets from "@/features/event/editor/dates/date-range/presets";
+import SpecificDateRangeDisplay from "@/features/event/editor/dates/date-range/specific-date-display";
 
 export default function DateRangePopover({
   earliestDate,

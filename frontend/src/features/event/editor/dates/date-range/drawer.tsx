@@ -9,10 +9,10 @@ import { StandardDrawer } from "@/features/drawer";
 import {
   Calendar,
   CalendarHandle,
-} from "@/features/event/editor/date-range/calendar";
-import { SpecificDateRangeDisplayProps } from "@/features/event/editor/date-range/date-range-props";
-import DateRangePresets from "@/features/event/editor/date-range/presets";
-import SpecificDateRangeDisplay from "@/features/event/editor/date-range/specific-date-display";
+} from "@/features/event/editor/dates/date-range/calendar";
+import { SpecificDateRangeDisplayProps } from "@/features/event/editor/dates/date-range/date-range-props";
+import DateRangePresets from "@/features/event/editor/dates/date-range/presets";
+import SpecificDateRangeDisplay from "@/features/event/editor/dates/date-range/specific-date-display";
 import { formatDateSet } from "@/lib/utils/date-time-format";
 
 export default function DateRangeDrawer({
