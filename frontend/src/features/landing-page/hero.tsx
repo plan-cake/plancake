@@ -2,7 +2,12 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { LayoutDashboardIcon, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
@@ -235,22 +240,58 @@ export default function Hero() {
               />
             </div>
 
-            <Image
-              aria-hidden
-              src={desktopImage.src}
-              alt="Hero Image"
-              width={desktopImage.width}
-              height={desktopImage.height}
-              className="pointer-events-none hidden w-full select-none rounded-3xl shadow-2xl md:block"
-            />
-            <Image
-              aria-hidden
-              src={mobileImage.src}
-              alt="Hero Image"
-              width={mobileImage.width}
-              height={mobileImage.height}
-              className="pointer-events-none mx-auto block w-3/5 max-w-[260px] select-none rounded-3xl shadow-2xl md:hidden"
-            />
+            <div
+              className="relative hidden w-full md:block"
+              style={{
+                aspectRatio: `${desktopImage.width} / ${desktopImage.height}`,
+              }}
+            >
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={heroImageView}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    aria-hidden
+                    src={desktopImage.src}
+                    alt="Hero Image"
+                    fill
+                    sizes="90vw"
+                    className="pointer-events-none select-none rounded-3xl object-cover shadow-2xl"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            <div
+              className="relative mx-auto block w-3/5 max-w-[260px] md:hidden"
+              style={{
+                aspectRatio: `${mobileImage.width} / ${mobileImage.height}`,
+              }}
+            >
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={heroImageView}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    aria-hidden
+                    src={mobileImage.src}
+                    alt="Hero Image"
+                    fill
+                    sizes="60vw"
+                    className="pointer-events-none select-none rounded-3xl object-cover shadow-2xl"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </motion.div>
         </div>
       </div>
