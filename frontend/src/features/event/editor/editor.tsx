@@ -59,12 +59,8 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     setEndTime,
   } = useEventContext();
   const { title, customCode, eventRange, timeslots } = state;
-  const {
-    gridPageDays,
-    gridPageDaysOptions,
-    usingMaxGridPageDays,
-    setGridPageDays,
-  } = useGridPageDays();
+  const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
+    useGridPageDays();
   const [gridDisplayed, setGridDisplayed] = useState(false);
   const router = useRouter();
 
@@ -121,7 +117,6 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       timezone={eventRange.timezone}
       timeslots={timeslots}
       pageDays={gridPageDays}
-      useCompactHeader={usingMaxGridPageDays}
       setGridDisplayed={setGridDisplayed}
     />
   );

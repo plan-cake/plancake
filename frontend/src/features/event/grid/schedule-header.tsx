@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
@@ -9,12 +11,12 @@ import {
   TIME_LABEL_WIDTH,
 } from "@/features/event/grid/lib/constants";
 import { useHeaderSize } from "@/features/header/context";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 interface ScheduleHeaderProps {
   preview?: boolean;
   visibleDays: { dayKey: string; dayDisplay: string }[];
-  compact: boolean;
   currentPage: number;
   totalPages: number;
   scrollbarPresent?: boolean;
@@ -63,7 +65,6 @@ const condenseWeekday = (weekday: string) => {
 export default function ScheduleHeader({
   preview = false,
   visibleDays,
-  compact,
   currentPage,
   totalPages,
   scrollbarPresent = false,
@@ -73,6 +74,12 @@ export default function ScheduleHeader({
   direction = 0,
 }: ScheduleHeaderProps) {
   const { topMarginClass } = useHeaderSize();
+
+  const isMobile = useCheckMobile();
+  const compact = useMemo(
+    () => (isMobile ? visibleDays.length > 4 : visibleDays.length > 7),
+    [isMobile, visibleDays.length],
+  );
 
   return (
     <div
