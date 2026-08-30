@@ -34,7 +34,7 @@ export default function Footer() {
       )}
     >
       <div className="mx-auto max-w-7xl px-4 pt-16 text-center sm:px-6 lg:absolute lg:inset-x-0 lg:top-[25%] lg:px-8 lg:pt-0">
-        <h2 className="font-display text-violet relative mb-8 text-6xl tracking-wide lg:text-8xl">
+        <h2 className="font-display text-violet relative mb-4 text-6xl tracking-wide lg:text-8xl">
           PLAN TODAY
         </h2>
         <div className="relative flex justify-center">
@@ -47,15 +47,8 @@ export default function Footer() {
         </div>
       </div>
       <div className="text-violet mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 lg:absolute lg:inset-x-0 lg:bottom-0 lg:px-8 lg:pt-0">
-        <div className="flex flex-col items-center gap-10 text-center md:flex-row md:items-start md:justify-between md:text-left">
-          <div className="flex flex-col items-center gap-3 md:items-start">
-            <Logo />
-            <p className="max-w-xs text-sm opacity-70">
-              The easiest way to coordinate schedules and plan group events.
-            </p>
-          </div>
-
-          <nav className="flex flex-col gap-8 sm:flex-row sm:gap-16">
+        <div className="flex flex-col items-center gap-10 px-6 text-center md:flex-row md:items-start md:justify-between md:text-left">
+          <nav className="flex flex-row gap-8 sm:gap-16">
             {NAV_SECTIONS.map((section) => (
               <div key={section.title}>
                 <h3 className="mb-3 text-sm font-semibold tracking-wide opacity-60">
@@ -76,11 +69,24 @@ export default function Footer() {
               </div>
             ))}
           </nav>
+
+          <div className="flex flex-col items-center md:items-end">
+            <span className="text-5xl font-black tracking-wide lg:text-5xl">
+              108
+            </span>
+            <p className="mt-1 text-sm opacity-70">Plans made and counting</p>
+          </div>
         </div>
 
-        <div className="mt-6 text-center text-sm opacity-70">
-          &copy; {new Date().getFullYear()} Plancake. Stacking up perfect plans,
-          one pancake at a time.
+        <div className="border-violet/15 mt-10 flex flex-col items-center gap-4 border-t pt-6 text-center md:flex-row md:items-center md:justify-between md:text-left">
+          <div className="flex flex-col items-center gap-3 md:flex-row md:items-center">
+            <Logo />
+          </div>
+
+          <p className="text-sm opacity-70">
+            &copy; {new Date().getFullYear()} Plancake. Perfect plans, one
+            pancake at a time.
+          </p>
         </div>
       </div>
     </footer>
