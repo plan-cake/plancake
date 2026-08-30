@@ -142,7 +142,7 @@ export default function Hero() {
             <motion.div
               aria-hidden
               style={{ scale: circleScale, willChange: "transform" }}
-              className="bg-lion ring-bone ring-100 pointer-events-none absolute left-1/2 top-1/2 z-0 h-[140vmax] w-[140vmax] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              className="bg-lion border-bone pointer-events-none absolute left-1/2 top-1/2 z-0 h-[140vmax] w-[140vmax] -translate-x-1/2 -translate-y-1/2 rounded-full border-[100px]"
             />
 
             <div className="relative z-10 mx-auto max-w-7xl text-center">
@@ -162,7 +162,7 @@ export default function Hero() {
                   </span>
                   <motion.span
                     aria-hidden
-                    style={{ clipPath, willChange: "clip-path" }}
+                    style={{ clipPath }}
                     className="font-display text-accent pointer-events-none absolute inset-0 block"
                   >
                     plans made
@@ -216,7 +216,11 @@ export default function Hero() {
           </div>
 
           <motion.div
-            style={{ y: imageY, willChange: "transform" }}
+            style={{
+              y: imageY,
+              willChange: "transform",
+              transform: "translateZ(0)",
+            }}
             className="pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto w-[90vw] max-w-[1296px]"
           >
             <div className="pointer-events-auto relative z-10 mx-auto mb-4 w-64">
