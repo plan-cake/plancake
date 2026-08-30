@@ -97,14 +97,14 @@ export default function Hero() {
   });
 
   // 1. Stretched the circle expansion to end at 1.0 instead of 0.75
-  const circleScale = useTransform(scrollYProgress, [0.1, 1], [0.085, 1]);
+  const circleScale = useTransform(scrollYProgress, [0.1, 1], [0.035, 1]);
 
   // Clip-path wipe for the accent text, synced to the growing circle behind
   // it. Narrowed to [0.1, 0.35] (vs. the circle's full [0.1, 1]) since the
   // 70vmax max radius already fully covers the text well before progress
   // hits 1 — this keeps clip-path (expensive to repaint, not GPU-composited)
   // live for only a short slice of the scroll instead of the whole track.
-  const clipRadiusVmax = useTransform(scrollYProgress, [0.1, 1], [6, 70]);
+  const clipRadiusVmax = useTransform(scrollYProgress, [0.1, 1], [3.5, 100]);
   const clipPath = useTransform(
     clipRadiusVmax,
     (r) => `circle(${r}vmax at ${clipCenter.x}px ${clipCenter.y}px)`,
@@ -142,7 +142,7 @@ export default function Hero() {
             <motion.div
               aria-hidden
               style={{ scale: circleScale, willChange: "transform" }}
-              className="bg-lion border-bone pointer-events-none absolute left-1/2 top-1/2 z-0 h-[140vmax] w-[140vmax] -translate-x-1/2 -translate-y-1/2 rounded-full border-[100px]"
+              className="bg-lion border-bone pointer-events-none absolute left-1/2 top-1/2 z-0 h-[200vmax] w-[200vmax] -translate-x-1/2 -translate-y-1/2 rounded-full border-[100px]"
             />
 
             <div className="relative z-10 mx-auto mt-28 max-w-7xl text-center md:mt-16">
