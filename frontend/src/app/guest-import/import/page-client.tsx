@@ -230,7 +230,7 @@ function DataSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-panel flex h-fit w-full flex-col gap-2 rounded-3xl p-2">
+    <div className="bg-panel flex h-fit w-full flex-col gap-4 rounded-3xl p-4">
       <div className="text-center text-lg font-bold">{title}</div>
       {children}
     </div>
