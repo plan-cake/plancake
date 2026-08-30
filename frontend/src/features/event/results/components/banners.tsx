@@ -30,17 +30,28 @@ export function getResultBanners(
     );
   } else if (isCreator && participants.length === 0) {
     return shareLinkBanner;
-  } else if (!hasMutualAvailability(availabilities, participants)) {
+  } else if (participants.length === 0) {
+    return (
+      <Banner
+        type="info"
+        subtitle="No one has submitted availability!"
+        showPing
+      >
+        <p className="md:hidden">{MESSAGES.INFO_ADD_AVAILABILITY_MOBILE}</p>
+        <p className="hidden md:block">{MESSAGES.INFO_ADD_AVAILABILITY}</p>
+      </Banner>
+    );
+  } else if (!hasMutualAvailability(availabilities, participants.length)) {
     if (getHighestMatchCount(availabilities) <= 1) {
       return (
         <Banner type="info" subtitle="Yikes..." showPing>
-          <p>{MESSAGES.INFO_NO_MUTUAL_AVAILABILITY}</p>
+          <p>{MESSAGES.INFO_NO_OVERLAP}</p>
         </Banner>
       );
     }
     return (
       <Banner type="info" subtitle="Oh dear :(" showPing>
-        <p>{MESSAGES.INFO_NO_IDEAL_TIMES_BANNER}</p>
+        <p>{MESSAGES.INFO_NO_IDEAL_TIMES}</p>
       </Banner>
     );
   } else if (participated && participants.length === 1) {
