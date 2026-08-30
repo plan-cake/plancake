@@ -25,7 +25,7 @@ export default function DatePopover({
       <Popover.Portal>
         <Popover.Content
           align="start"
-          sideOffset={10}
+          sideOffset={8}
           className={cn(
             "bg-background z-50 rounded-2xl border border-gray-400 p-4 shadow-lg",
             "data-[state=open]:animate-slideUpAndFade",
