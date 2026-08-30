@@ -209,14 +209,19 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
         leftButtons={[cancelButton]}
         rightButtons={[importButton]}
       >
-        {unresolvedConflicts > 0 ? (
-          <div className="text-error flex items-center justify-center gap-1 font-bold">
-            <TriangleAlertIcon className="h-4 w-4 flex-none" strokeWidth={2} />
-            Please resolve conflicts.
-          </div>
-        ) : (
-          actionText
-        )}
+        <div className="px-1">
+          {unresolvedConflicts > 0 ? (
+            <div className="text-error flex items-center justify-center gap-1 font-bold">
+              <TriangleAlertIcon
+                className="h-4 w-4 flex-none"
+                strokeWidth={2}
+              />
+              Please resolve conflicts.
+            </div>
+          ) : (
+            actionText
+          )}
+        </div>
       </MobileFooterIsland>
     </div>
   );
