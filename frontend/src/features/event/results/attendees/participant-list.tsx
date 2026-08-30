@@ -18,6 +18,7 @@ export default function ParticipantList({
     isCreator,
     setHoveredParticipant,
     toggleParticipant: onParticipantToggle,
+    validParticipantsForList,
   } = useResultsContext();
 
   const listClassNames = mobile
@@ -39,6 +40,7 @@ export default function ParticipantList({
           key={person}
           index={index}
           person={person}
+          includedInSlider={validParticipantsForList.includes(person)}
           isAvailable={
             !hoveredSlot || availabilities[hoveredSlot]?.includes(person)
           }
