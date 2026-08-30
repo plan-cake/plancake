@@ -2,17 +2,21 @@
 
 import { useState } from "react";
 
+import { AnimatePresence, motion } from "framer-motion";
 import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
 
 import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
+import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
+import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import ScheduleGrid from "@/features/event/grid/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
 import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
 import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
+import AvailabilityFilters from "@/features/event/results/components/availability-filters";
 import { getResultBanners } from "@/features/event/results/components/banners";
-import DisplaySettings from "@/features/event/results/components/display-settings";
 import {
   ResultsProvider,
   useResultsContext,
@@ -20,6 +24,7 @@ import {
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import ShareMenu from "@/features/share-menu/menu";
+import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -84,15 +89,49 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     timeslots,
     eventRange.type === "weekday",
     currentUser !== null,
+    isCreator,
   );
+
+  /* DISPLAY SETTINGS */
+  const renderTimezoneSelector = (id: string) => (
+    <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
+      Displaying event in
+      <TimeZoneSelector
+        id={id}
+        value={timezone}
+        onChange={handleTZChange}
+        drawerNesting={0}
+      />
+    </div>
+  );
+
+  const availabilityFilters = (
+    <motion.div
+      key="availability-filters"
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ type: "tween", ease: "easeInOut", duration: 0.3 }}
+      className="shrink-0 overflow-hidden"
+    >
+      <div className="bg-panel rounded-3xl p-6 text-sm">
+        <AvailabilityFilters />
+      </div>
+    </motion.div>
+  );
+
+  const doViewTransition = useViewTransition();
 
   /* BUTTONS */
   const paintingButton = (
-    <LinkButton
+    <ActionButton
       buttonStyle="primary"
       icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
-      href={`/${eventCode}/painting`}
+      onClick={() => {
+        doViewTransition(`/${eventCode}/painting`, GRID_ID_SELECTOR);
+      }}
+      loadOnSuccess
     />
   );
 
@@ -154,11 +193,8 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           timeslots={timeslots}
         />
 
-        <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm md:hidden">
-          <DisplaySettings
-            timezone={timezone}
-            onTimezoneChange={handleTZChange}
-          />
+        <div className="md:hidden">
+          {renderTimezoneSelector("timezone-select-mobile")}
         </div>
 
         {/* Mobile Spacer & Drawer */}
@@ -171,6 +207,14 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             onSnapChange={setDrawerSnap}
             eventTitle={eventTitle}
             eventCode={eventCode}
+            numParticipants={participants.length}
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed left-0 right-0 top-[100vh] w-[100vw]"
+            style={{
+              viewTransitionName: "painting-island",
+            }}
           />
         </div>
 
@@ -185,12 +229,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           {banners}
           <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4">
             <AttendeesPanel />
-            <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
-              <DisplaySettings
-                timezone={timezone}
-                onTimezoneChange={handleTZChange}
-              />
-            </div>
+            <AnimatePresence initial={false}>
+              {participants.length > 1 && availabilityFilters}
+            </AnimatePresence>
+            {renderTimezoneSelector("timezone-select-desktop")}
           </div>
         </div>
       </div>
