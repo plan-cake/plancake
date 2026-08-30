@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 
+import { format } from "date-fns-tz";
 import { BroomIcon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
@@ -27,7 +28,7 @@ export default function DateRangePresets({
     for (let i = 1; i <= 5; i++) {
       const nextDate = new Date(currentDate);
       nextDate.setDate(currentDate.getDate() + i);
-      days.push(nextDate.toISOString().split("T")[0]);
+      days.push(format(nextDate, "yyyy-MM-dd"));
     }
     return days;
   }, []);
@@ -44,7 +45,7 @@ export default function DateRangePresets({
       if (weekDates.length === 0 && nextDate.getDay() !== 1) {
         continue;
       }
-      weekDates.push(nextDate.toISOString().split("T")[0]);
+      weekDates.push(format(nextDate, "yyyy-MM-dd"));
     }
     return weekDates;
   }, []);
