@@ -7,10 +7,12 @@ import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
 
 import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
+import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import ScheduleGrid from "@/features/event/grid/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
 import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
 import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
 import AvailabilityFilters from "@/features/event/results/components/availability-filters";
@@ -22,6 +24,7 @@ import {
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import ShareMenu from "@/features/share-menu/menu";
+import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
@@ -86,6 +89,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     timeslots,
     eventRange.type === "weekday",
     currentUser !== null,
+    isCreator,
   );
 
   /* DISPLAY SETTINGS */
@@ -116,13 +120,18 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     </motion.div>
   );
 
+  const doViewTransition = useViewTransition();
+
   /* BUTTONS */
   const paintingButton = (
-    <LinkButton
+    <ActionButton
       buttonStyle="primary"
       icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
-      href={`/${eventCode}/painting`}
+      onClick={() => {
+        doViewTransition(`/${eventCode}/painting`, GRID_ID_SELECTOR);
+      }}
+      loadOnSuccess
     />
   );
 
@@ -199,6 +208,13 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             eventTitle={eventTitle}
             eventCode={eventCode}
             numParticipants={participants.length}
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed left-0 right-0 top-[100vh] w-[100vw]"
+            style={{
+              viewTransitionName: "painting-island",
+            }}
           />
         </div>
 

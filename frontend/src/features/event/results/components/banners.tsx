@@ -12,7 +12,14 @@ export function getResultBanners(
   timeslots: Date[],
   isWeekEvent: boolean,
   participated: boolean,
+  isCreator: boolean,
 ) {
+  const shareLinkBanner = (
+    <Banner type="info" subtitle="Waiting for responses..." showPing>
+      <p>{MESSAGES.INFO_COPY_SHARE_LINK}</p>
+    </Banner>
+  );
+
   if (
     !isWeekEvent &&
     timeslots.length > 0 &&
@@ -21,6 +28,8 @@ export function getResultBanners(
     return (
       <Banner type="info" subtitle={MESSAGES.INFO_EVENT_PASSED} showPing />
     );
+  } else if (isCreator && participants.length === 0) {
+    return shareLinkBanner;
   } else if (participants.length === 0) {
     return (
       <Banner
@@ -46,11 +55,7 @@ export function getResultBanners(
       </Banner>
     );
   } else if (participated && participants.length === 1) {
-    return (
-      <Banner type="info" subtitle="Waiting for others..." showPing>
-        <p>{MESSAGES.INFO_COPY_SHARE_LINK}</p>
-      </Banner>
-    );
+    return shareLinkBanner;
   } else if (!participated) {
     return (
       <Banner type="info" subtitle="Don't be a stranger!" showPing>
