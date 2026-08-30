@@ -47,10 +47,10 @@ export default function Footer() {
         </div>
       </div>
       <div className="text-violet mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 lg:absolute lg:inset-x-0 lg:bottom-0 lg:px-8 lg:pt-0">
-        <div className="flex flex-col items-center gap-10 px-6 text-center md:flex-row md:items-start md:justify-between md:text-left">
-          <nav className="flex flex-row gap-8 sm:gap-16">
+        <div className="flex flex-col items-center gap-10 px-6 text-center md:flex-row md:items-start md:justify-evenly">
+          <nav className="contents">
             {NAV_SECTIONS.map((section) => (
-              <div key={section.title}>
+              <div key={section.title} className="flex flex-col items-center">
                 <h3 className="mb-3 text-sm font-semibold tracking-wide opacity-60">
                   {section.title}
                 </h3>
@@ -70,7 +70,7 @@ export default function Footer() {
             ))}
           </nav>
 
-          <div className="flex flex-col items-center md:items-end">
+          <div className="flex flex-col items-center">
             <span className="text-5xl font-black tracking-wide lg:text-5xl">
               108
             </span>
