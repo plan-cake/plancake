@@ -69,7 +69,7 @@ function DatePicker({
             cur < min ? cur : min,
           ),
         )
-      : new Date();
+      : undefined;
 
   if (isMobile) {
     return (

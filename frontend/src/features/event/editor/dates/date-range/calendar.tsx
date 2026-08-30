@@ -41,11 +41,7 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     const startDate = useMemo(() => {
       const now = new Date();
       if (earliestDate && earliestDate < now) {
-        return new Date(
-          earliestDate.getUTCFullYear(),
-          earliestDate.getUTCMonth(),
-          earliestDate.getUTCDate(),
-        );
+        return earliestDate;
       }
       return now;
     }, [earliestDate]);
