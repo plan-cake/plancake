@@ -30,7 +30,10 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { SelfAvailability } from "@/lib/utils/api/types";
-import { timeslotToISOString } from "@/lib/utils/date-time-format";
+import {
+  getDatesFromTimeslots,
+  timeslotToISOString,
+} from "@/lib/utils/date-time-format";
 import type { Session } from "@/lib/utils/get-session";
 
 export default function ClientPage({
@@ -60,6 +63,9 @@ export default function ClientPage({
   // GRID PAGE DAYS
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
+  const showGridPageDaysSelector =
+    getDatesFromTimeslots(timeslots, timeZone).size >
+    Math.min(...gridPageDaysOptions);
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -255,15 +261,17 @@ export default function ClientPage({
 
   const displaySettings = (
     <div className="bg-panel flex flex-col gap-2 rounded-3xl p-6 text-sm">
-      <div>
-        <p>Days per page</p>
-        <GridPageDaysSelector
-          id="grid-page-days-selector"
-          value={gridPageDays}
-          options={gridPageDaysOptions}
-          onChange={setGridPageDays}
-        />
-      </div>
+      {showGridPageDaysSelector && (
+        <div>
+          <p>Days per page</p>
+          <GridPageDaysSelector
+            id="grid-page-days-selector"
+            value={gridPageDays}
+            options={gridPageDaysOptions}
+            onChange={setGridPageDays}
+          />
+        </div>
+      )}
       <div>
         <p>Displaying event in</p>
         <TimeZoneSelector

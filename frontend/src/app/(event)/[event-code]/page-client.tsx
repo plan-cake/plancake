@@ -23,6 +23,7 @@ import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import ShareMenu from "@/features/share-menu/menu";
 import { cn } from "@/lib/utils/classname";
+import { getDatesFromTimeslots } from "@/lib/utils/date-time-format";
 
 export default function ClientPage({
   eventData,
@@ -125,7 +126,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     />
   );
 
-  const daysPerPageSelector = (
+  const showGridPageDaysSelector =
+    getDatesFromTimeslots(timeslots, timezone).size >
+    Math.min(...gridPageDaysOptions);
+  const daysPerPageSelector = showGridPageDaysSelector ? (
     <div className="mb-2">
       <p>Days per page</p>
       <GridPageDaysSelector
@@ -135,7 +139,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         onChange={setGridPageDays}
       />
     </div>
-  );
+  ) : null;
 
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">

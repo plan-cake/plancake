@@ -28,6 +28,7 @@ import { RateLimitBanner } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import submitEvent from "@/lib/utils/api/submit-event";
 import { cn } from "@/lib/utils/classname";
+import { getDatesFromTimeslots } from "@/lib/utils/date-time-format";
 
 type EventEditorProps = {
   type: EventEditorType;
@@ -61,6 +62,9 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   const { title, customCode, eventRange, timeslots } = state;
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
+  const showGridPageDaysSelector =
+    getDatesFromTimeslots(timeslots, eventRange.timezone).size >
+    Math.min(...gridPageDaysOptions);
   const [gridDisplayed, setGridDisplayed] = useState(false);
   const router = useRouter();
 
@@ -211,15 +215,17 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
               {gridDisplayed && (
                 <div className="flex items-center justify-between pl-4 pr-2 text-sm">
                   {previewText}
-                  <div className="flex flex-none items-center gap-2">
-                    <p className="opacity-75">Days per page:</p>
-                    <GridPageDaysSelector
-                      id="grid-page-days-selector-desktop"
-                      value={gridPageDays}
-                      options={gridPageDaysOptions}
-                      onChange={setGridPageDays}
-                    />
-                  </div>
+                  {showGridPageDaysSelector && (
+                    <div className="flex flex-none items-center gap-2">
+                      <p className="opacity-75">Days per page:</p>
+                      <GridPageDaysSelector
+                        id="grid-page-days-selector-desktop"
+                        value={gridPageDays}
+                        options={gridPageDaysOptions}
+                        onChange={setGridPageDays}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -237,15 +243,17 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         {gridDisplayed && (
           <div className="bg-panel flex flex-col gap-2 rounded-3xl p-6 text-sm">
             {previewText}
-            <div>
-              <p>Days per page</p>
-              <GridPageDaysSelector
-                id="grid-page-days-selector-mobile"
-                value={gridPageDays}
-                options={gridPageDaysOptions}
-                onChange={setGridPageDays}
-              />
-            </div>
+            {showGridPageDaysSelector && (
+              <div>
+                <p>Days per page</p>
+                <GridPageDaysSelector
+                  id="grid-page-days-selector-mobile"
+                  value={gridPageDays}
+                  options={gridPageDaysOptions}
+                  onChange={setGridPageDays}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
