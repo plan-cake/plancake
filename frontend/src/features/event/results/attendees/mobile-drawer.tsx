@@ -12,6 +12,7 @@ import {
   useParticipantRemoval,
 } from "@/features/event/results/attendees/remove-participant";
 import AvailabilityFilters from "@/features/event/results/components/availability-filters";
+import { useResultsContext } from "@/features/event/results/context";
 import ShareMenu from "@/features/share-menu/menu";
 
 export default function AttendeesDrawer({
@@ -37,6 +38,9 @@ export default function AttendeesDrawer({
     currentUser,
     clearSelectedParticipants,
   } = useParticipantRemoval();
+
+  const { showOnlyBestTimes, minAvailability } = useResultsContext();
+  const areFiltersActive = showOnlyBestTimes || minAvailability > 1;
 
   /* TABS */
   const [activeSnap, setActiveSnap] = useState<number | string | null>(0.22);
@@ -75,7 +79,9 @@ export default function AttendeesDrawer({
       description="View Options"
       trigger={
         <EmptyButton
-          buttonStyle="semi-transparent"
+          buttonStyle={
+            areFiltersActive ? "bordered semi-transparent" : "semi-transparent"
+          }
           icon={<SlidersHorizontalIcon />}
           aria-label="View Options"
         />
