@@ -132,7 +132,7 @@ export default function Hero() {
   const restY = useTransform(scrollYProgress, [0.4, 0.8], [24, 0]);
 
   // 3. Image now finishes moving exactly at 1.0, handing off perfectly to the native scroll
-  const imageY = useTransform(scrollYProgress, [0.2, 1], ["100%", "80%"]);
+  const imageY = useTransform(scrollYProgress, [0.2, 1], ["110%", "90%"]);
 
   return (
     <div className="relative left-1/2 w-[100vw] -translate-x-1/2">
@@ -145,7 +145,7 @@ export default function Hero() {
               className="bg-lion border-bone pointer-events-none absolute left-1/2 top-1/2 z-0 h-[140vmax] w-[140vmax] -translate-x-1/2 -translate-y-1/2 rounded-full border-[100px]"
             />
 
-            <div className="relative z-10 mx-auto max-w-7xl text-center">
+            <div className="relative z-10 mx-auto mt-28 max-w-7xl text-center md:mt-16">
               <div className="mb-6 flex justify-center">
                 <span className="bg-bone text-violet inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold tracking-wide">
                   finally making it outta the group chat.
@@ -259,7 +259,7 @@ export default function Hero() {
           aria-hidden
           className="pointer-events-none mx-auto w-[90vw] max-w-[1296px]"
         >
-          <div className="w-full pb-[75%] sm:pb-[60%] md:pb-[50%]" />
+          <div className="aspect-[1/1.25] w-full sm:aspect-square md:aspect-[2/1]" />
         </div>
       </div>
     </div>
