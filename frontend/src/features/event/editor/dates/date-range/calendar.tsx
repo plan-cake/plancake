@@ -138,7 +138,7 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     };
 
     return (
-      <div ref={containerRef} className={cn("flex flex-col gap-4", className)}>
+      <div ref={containerRef} className={cn("flex flex-col gap-2", className)}>
         <DayPicker
           mode="multiple"
           numberOfMonths={numberOfMonths}
@@ -164,7 +164,7 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
         />
         {!isMobile && dateRangeError && (
           <div className="text-error flex items-center justify-center gap-1 font-bold">
-            <TriangleAlertIcon />
+            <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
             {dateRangeError}
           </div>
         )}

@@ -21,14 +21,16 @@ export default function DateRangePopover({
       trigger={<SpecificDateRangeDisplay dates={dates} open={open} />}
       ariaLabel="Date range picker"
     >
-      <Calendar
-        earliestDate={earliestDate}
-        className="w-fit"
-        selectedDates={dates}
-        setDates={setDates}
-        dateRangeError={errors.dateRange}
-      />
-      <DateRangePresets dates={dates} setDates={setDates} />
+      <div className="flex flex-col gap-2">
+        <Calendar
+          earliestDate={earliestDate}
+          className="w-fit"
+          selectedDates={dates}
+          setDates={setDates}
+          dateRangeError={errors.dateRange}
+        />
+        <DateRangePresets dates={dates} setDates={setDates} />
+      </div>
     </DatePopover>
   );
 }
