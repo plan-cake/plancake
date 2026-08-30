@@ -300,7 +300,7 @@ export default function Hero() {
           aria-hidden
           className="pointer-events-none mx-auto w-[90vw] max-w-[1296px]"
         >
-          <div className="aspect-[1/1.25] w-full sm:aspect-square md:aspect-[2/1]" />
+          <div className="aspect-[1/1.25] w-full sm:aspect-square md:aspect-[2/1.125]" />
         </div>
       </div>
     </div>

@@ -23,17 +23,20 @@ function OrbitNode({
   hoverCard,
   onSelect,
   orbitScale,
+  openAbove = false,
 }: {
   stepNumber: number;
   label: string;
   hoverCard: React.ReactNode;
   onSelect: () => void;
   orbitScale: number | null;
+  openAbove?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [opensLeft, setOpensLeft] = useState(false);
 
   const handleMouseEnter = () => {
+    if (openAbove) return;
     if (containerRef.current) {
       // Get the pill's bounding box
       const rect = containerRef.current.getBoundingClientRect();
@@ -90,10 +93,15 @@ function OrbitNode({
 
       <div
         className={cn(
-          "w-xl pointer-events-none absolute top-1/2 -translate-y-1/2 opacity-0 transition-all duration-300 ease-out hover:z-50 group-hover:pointer-events-auto group-hover:opacity-100",
-          opensLeft
-            ? "right-[110%] origin-right scale-95 group-hover:scale-100"
-            : "left-[110%] origin-left scale-95 group-hover:scale-100",
+          "w-xl pointer-events-none absolute opacity-0 transition-all duration-300 ease-out hover:z-50 group-hover:pointer-events-auto group-hover:opacity-100",
+          openAbove
+            ? "bottom-[110%] left-1/2 origin-bottom -translate-x-1/2 scale-95 group-hover:scale-100"
+            : cn(
+                "top-1/2 -translate-y-1/2",
+                opensLeft
+                  ? "right-[110%] origin-right scale-95 group-hover:scale-100"
+                  : "left-[110%] origin-left scale-95 group-hover:scale-100",
+              ),
         )}
       >
         <div className="bg-foreground text-background overflow-hidden rounded-3xl shadow-2xl">
@@ -271,6 +279,7 @@ export default function Demo() {
       hoverCard={step3}
       onSelect={() => setActiveStep(3)}
       orbitScale={orbitScale}
+      openAbove
     />,
     <OrbitNode
       key="2"
