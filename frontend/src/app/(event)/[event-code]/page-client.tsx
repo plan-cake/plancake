@@ -75,6 +75,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   /* GRID PAGE DAYS */
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
+  const showGridPageDaysSelector =
+    getDatesFromTimeslots(timeslots, timezone).size >
+    Math.min(...gridPageDaysOptions);
 
   /* MOBILE DRAWER SPACING */
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);
@@ -100,18 +103,6 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   );
 
   /* DISPLAY SETTINGS */
-  const renderTimezoneSelector = (id: string) => (
-    <>
-      Displaying event in
-      <TimeZoneSelector
-        id={id}
-        value={timezone}
-        onChange={handleTZChange}
-        drawerNesting={0}
-      />
-    </>
-  );
-
   const availabilityFilters = (
     <motion.div
       key="availability-filters"
@@ -125,6 +116,30 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         <AvailabilityFilters />
       </div>
     </motion.div>
+  );
+
+  const daysPerPageSelector = showGridPageDaysSelector ? (
+    <div className="mb-2">
+      <p>Days per page</p>
+      <GridPageDaysSelector
+        id="grid-page-days-selector"
+        value={gridPageDays}
+        options={gridPageDaysOptions}
+        onChange={setGridPageDays}
+      />
+    </div>
+  ) : null;
+
+  const renderTimezoneSelector = (id: string) => (
+    <>
+      Displaying event in
+      <TimeZoneSelector
+        id={id}
+        value={timezone}
+        onChange={handleTZChange}
+        drawerNesting={0}
+      />
+    </>
   );
 
   const doViewTransition = useViewTransition();
@@ -164,21 +179,6 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       }
     />
   );
-
-  const showGridPageDaysSelector =
-    getDatesFromTimeslots(timeslots, timezone).size >
-    Math.min(...gridPageDaysOptions);
-  const daysPerPageSelector = showGridPageDaysSelector ? (
-    <div className="mb-2">
-      <p>Days per page</p>
-      <GridPageDaysSelector
-        id="grid-page-days-selector"
-        value={gridPageDays}
-        options={gridPageDaysOptions}
-        onChange={setGridPageDays}
-      />
-    </div>
-  ) : null;
 
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
