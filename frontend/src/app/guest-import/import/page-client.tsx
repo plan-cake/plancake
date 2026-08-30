@@ -158,8 +158,8 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
                 conflict={hasConflict && choice === null}
               >
                 {hasConflict ? (
-                  <div>
-                    <div className="flex items-center justify-between gap-2 pb-1 text-sm">
+                  <div className="mt-1 flex flex-col gap-1">
+                    <div className="flex items-center justify-between gap-2 pb-1">
                       <ConflictOption
                         label="Guest"
                         name={event.guest_display_name}
@@ -191,7 +191,7 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
                       />
                     </div>
                     {choice !== null && (
-                      <div className="mt-1 text-center text-xs opacity-50">
+                      <div className="text-center text-xs opacity-50">
                         The {choice === "guest" ? "account" : "guest"}{" "}
                         submission will be deleted.
                       </div>
@@ -309,7 +309,7 @@ function ConflictOption({
   return (
     <div
       className={cn(
-        "flex-1 text-center text-sm",
+        "bg-panel flex-1 rounded-2xl p-1 text-center leading-tight",
         selected === true ? "font-bold" : "",
         selected === false ? "line-through opacity-50" : "",
       )}
