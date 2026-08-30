@@ -12,7 +12,14 @@ export function getResultBanners(
   timeslots: Date[],
   isWeekEvent: boolean,
   participated: boolean,
+  isCreator: boolean,
 ) {
+  const shareLinkBanner = (
+    <Banner type="info" subtitle="Waiting for responses..." showPing>
+      <p>{MESSAGES.INFO_COPY_SHARE_LINK}</p>
+    </Banner>
+  );
+
   if (
     !isWeekEvent &&
     timeslots.length > 0 &&
@@ -21,17 +28,8 @@ export function getResultBanners(
     return (
       <Banner type="info" subtitle={MESSAGES.INFO_EVENT_PASSED} showPing />
     );
-  } else if (participants.length === 0) {
-    return (
-      <Banner
-        type="info"
-        subtitle="No one has submitted availability!"
-        showPing
-      >
-        <p className="md:hidden">{MESSAGES.INFO_ADD_AVAILABILITY_MOBILE}</p>
-        <p className="hidden md:block">{MESSAGES.INFO_ADD_AVAILABILITY}</p>
-      </Banner>
-    );
+  } else if (isCreator && participants.length === 0) {
+    return shareLinkBanner;
   } else if (!hasMutualAvailability(availabilities, participants)) {
     if (getHighestMatchCount(availabilities) <= 1) {
       return (
@@ -46,11 +44,7 @@ export function getResultBanners(
       </Banner>
     );
   } else if (participated && participants.length === 1) {
-    return (
-      <Banner type="info" subtitle="Waiting for others..." showPing>
-        <p>{MESSAGES.INFO_COPY_SHARE_LINK}</p>
-      </Banner>
-    );
+    return shareLinkBanner;
   } else if (!participated) {
     return (
       <Banner type="info" subtitle="Don't be a stranger!" showPing>

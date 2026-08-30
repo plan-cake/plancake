@@ -87,6 +87,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     timeslots,
     eventRange.type === "weekday",
     currentUser !== null,
+    isCreator,
   );
 
   const doViewTransition = useViewTransition();
