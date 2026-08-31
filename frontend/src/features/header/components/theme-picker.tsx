@@ -1,17 +1,17 @@
 "use client";
 
 import { MonitorIcon, MoonIcon, SunIcon, SunMoonIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 
 import KebabMenu from "@/components/kebab-menu";
 import SegmentedControl from "@/components/segmented-control";
 import EmptyButton from "@/features/button/components/empty";
 import ShrinkingHeaderButton from "@/features/header/components/buttons/shrinking-header";
 import { useHeaderSize } from "@/features/header/context";
+import { useThemeToggle } from "@/lib/hooks/use-theme-toggle";
 
 export default function ThemePicker() {
   const { activeMenu, setActiveMenu } = useHeaderSize();
-  const { theme = "system", setTheme } = useTheme();
+  const { theme = "system", toggleTheme } = useThemeToggle();
 
   const isMenuOpen = activeMenu === "theme";
 
@@ -47,7 +47,7 @@ export default function ThemePicker() {
             { value: "dark", label: <MoonIcon />, ariaLabel: "Dark Theme" },
           ]}
           value={theme}
-          onChange={setTheme}
+          onChange={toggleTheme}
           className="frosted-glass-inset"
         />
         <div className="text-center text-sm opacity-75">
