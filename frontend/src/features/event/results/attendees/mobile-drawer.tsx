@@ -1,26 +1,32 @@
 import { useEffect, useState } from "react";
 
-import { ShareIcon, SquarePenIcon } from "lucide-react";
+import { ShareIcon, SlidersHorizontalIcon, SquarePenIcon } from "lucide-react";
 
+import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
-import LinkButton from "@/features/button/components/link";
-import { MorphingDrawer } from "@/features/drawer";
+import { FloatingDrawer, MorphingDrawer } from "@/features/drawer";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
 import PanelHeader from "@/features/event/results/attendees/panel-header";
 import ParticipantList from "@/features/event/results/attendees/participant-list";
 import {
   RemoveParticipantDialog,
   useParticipantRemoval,
 } from "@/features/event/results/attendees/remove-participant";
+import AvailabilityFilters from "@/features/event/results/components/availability-filters";
+import { useResultsContext } from "@/features/event/results/context";
 import ShareMenu from "@/features/share-menu/menu";
+import { useViewTransition } from "@/lib/hooks/use-view-transition";
 
 export default function AttendeesDrawer({
   onSnapChange,
   eventTitle,
   eventCode,
+  numParticipants,
 }: {
   onSnapChange: (snap: number | string | null) => void;
   eventTitle: string;
   eventCode: string;
+  numParticipants: number;
 }) {
   const {
     isRemoving,
@@ -35,8 +41,15 @@ export default function AttendeesDrawer({
     clearSelectedParticipants,
   } = useParticipantRemoval();
 
-  /* TABS */
-  const [activeSnap, setActiveSnap] = useState<number | string | null>(0.22);
+  const { showOnlyBestTimes, minAvailability } = useResultsContext();
+  const areFiltersActive = showOnlyBestTimes || minAvailability > 1;
+
+  /* SNAP POINTS */
+  const [activeSnap, setActiveSnap] = useState<number | string | null>(0);
+  const [currentSnapPoints, setCurrentSnapPoints] = useState<number[]>([
+    0, 0.22, 0.37,
+  ]);
+  const [openViewOptions, setOpenViewOptions] = useState(false);
 
   useEffect(() => {
     onSnapChange(activeSnap);
@@ -51,15 +64,67 @@ export default function AttendeesDrawer({
     }
   }, [isCollapsed, isRemoving, clearSelectedParticipants, setIsRemoving]);
 
+  const doViewTransition = useViewTransition();
+
   /* BUTTONS */
   const paintingButton = (
-    <LinkButton
+    <ActionButton
       buttonStyle="primary"
       icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
-      href={`/${eventCode}/painting`}
+      onClick={() => {
+        doViewTransition(`/${eventCode}/painting`, GRID_ID_SELECTOR);
+      }}
+      loadOnSuccess
     />
   );
+
+  const filtersButton = (
+    <FloatingDrawer
+      showOverlay={false}
+      modal={false}
+      open={openViewOptions}
+      onOpenChange={setOpenViewOptions}
+      title="View Options"
+      description="View Options"
+      trigger={
+        <EmptyButton
+          buttonStyle={
+            areFiltersActive ? "bordered semi-transparent" : "semi-transparent"
+          }
+          icon={<SlidersHorizontalIcon />}
+          aria-label="View Options"
+        />
+      }
+    >
+      <AvailabilityFilters />
+    </FloatingDrawer>
+  );
+
+  const shareButton = (
+    <ShareMenu
+      trigger={
+        <EmptyButton
+          buttonStyle="semi-transparent"
+          icon={<ShareIcon />}
+          aria-label="Share Event"
+        />
+      }
+      eventTitle={eventTitle}
+      eventCode={eventCode}
+      isNested
+    />
+  );
+
+  useEffect(() => {
+    // Wait for the view transition to finish, then animate the drawer in
+    const timer = setTimeout(() => {
+      setCurrentSnapPoints([0.22, 0.37]);
+      setActiveSnap(0.22);
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <MorphingDrawer
@@ -70,7 +135,7 @@ export default function AttendeesDrawer({
       setActiveSnapPoint={setActiveSnap}
       title="Attendees List"
       description="View attendees for this event"
-      snapPoints={[0.22, 0.37]}
+      snapPoints={currentSnapPoints}
       modal={false}
       floatingAtLowestSnap
       scrollableBody
@@ -85,21 +150,14 @@ export default function AttendeesDrawer({
       }
       footerContent={
         <div className="mx-1 flex grow justify-between gap-2">
-          <ShareMenu
-            trigger={
-              <EmptyButton
-                buttonStyle="semi-transparent"
-                icon={<ShareIcon />}
-                aria-label="Share Event"
-              />
-            }
-            eventTitle={eventTitle}
-            eventCode={eventCode}
-            isNested
-          />
+          <div className="flex gap-2">
+            {shareButton}
+            {numParticipants > 1 && filtersButton}
+          </div>
           {paintingButton}
         </div>
       }
+      viewTransitionName="results-drawer"
     >
       <ParticipantList
         isRemoving={isRemoving}

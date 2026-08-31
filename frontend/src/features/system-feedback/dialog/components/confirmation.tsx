@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useState } from "react";
 
 import ActionButton from "@/features/button/components/action";
@@ -28,9 +30,7 @@ export default function ConfirmationDialog({
   const open = isControlled ? controlledOpen : uncontrolledOpen;
 
   const isMobile = useCheckMobile();
-  if (isMobile && !asNestedDrawer) {
-    asNestedDrawer = true;
-  }
+  const effectiveAsNestedDrawer = asNestedDrawer || isMobile;
 
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
@@ -86,7 +86,7 @@ export default function ConfirmationDialog({
       trigger={trigger}
       open={open}
       onOpenChange={handleOpenChange}
-      asNestedDrawer={asNestedDrawer}
+      asNestedDrawer={effectiveAsNestedDrawer}
       triggerDisabled={triggerDisabled}
       showCloseButton={showCloseButton}
       overlayClassName={cn(
