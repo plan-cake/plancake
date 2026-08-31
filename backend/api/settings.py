@@ -6,6 +6,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import environ
+import requests
 from celery.schedules import crontab
 from django.core.mail import send_mail
 from rest_framework.response import Response
@@ -155,9 +156,11 @@ AWS_SES_SECRET_ACCESS_KEY = env("AWS_SES_SECRET_ACCESS_KEY")
 AWS_SES_REGION_NAME = env("AWS_SES_REGION_NAME")
 AWS_SES_REGION_ENDPOINT = env("AWS_SES_REGION_ENDPOINT")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
-ADMIN_EMAILS = env.list("ADMIN_EMAILS", default=[])
 SEND_EMAILS = env.bool("SEND_EMAILS", default=False)
-CRITICAL_EMAIL_INTERVAL_SECONDS = 1800  # 30 minutes
+
+# Discord Webhook URL
+# Errors will only be sent if this is set.
+DISCORD_WEBHOOK_URL = env("DISCORD_WEBHOOK_URL", default=None)
 
 # Automated tasks
 CELERY_BEAT_SCHEDULE = {
@@ -234,30 +237,43 @@ LOGGING = {
 # Custom logger just to add some of my own custom logging functions
 # We love DRY!!!
 class PlancakeLogger(logging.Logger):
-    _last_email_time = 0
+    def execute_webhook(self, msg, color):
+        if DISCORD_WEBHOOK_URL:
+            try:
+                requests.post(
+                    DISCORD_WEBHOOK_URL,
+                    json={
+                        "embeds": [
+                            {
+                                "title": "Error",
+                                "description": msg,
+                                "color": color,
+                                "timestamp": time.strftime(
+                                    "%Y-%m-%dT%H:%M:%SZ", time.gmtime()
+                                ),
+                            }
+                        ]
+                    },
+                    timeout=5,
+                )
+            except Exception as e:
+                self.warning(
+                    "Failed to execute Discord Webhook for error logging: %s\nIf you don't have Webhooks set up, leave the environment variable empty.",
+                    e,
+                )
 
     def db_error(self, msg, *args, **kwargs):
         self.error("Database error: %s", msg, *args, **kwargs)
 
+    def error(self, msg, *args, **kwargs):
+        super().error(msg, *args, **kwargs)
+        formatted_msg = str(msg) % args if args else str(msg)
+        self.execute_webhook(formatted_msg, 0xFF0000)
+
     def critical(self, msg, *args, **kwargs):
         super().critical(msg, *args, **kwargs)
-
-        # Send an email to admins
-        if SEND_EMAILS:
-            now = time.time()
-            if now - self._last_email_time > CRITICAL_EMAIL_INTERVAL_SECONDS:
-                stack_trace = "".join(traceback.format_stack())
-                try:
-                    send_mail(
-                        subject=f"Plancake - Critical Error",
-                        message=f"A critical error occurred in the application: {msg}\n\nStack Trace:\n{stack_trace}",
-                        from_email=DEFAULT_FROM_EMAIL,
-                        recipient_list=ADMIN_EMAILS,
-                        fail_silently=False,
-                    )
-                    self._last_email_time = now
-                except Exception as e:
-                    self.error("Failed to send critical error email: %s", e)
+        formatted_msg = str(msg) % args if args else str(msg)
+        self.execute_webhook(formatted_msg, 0xFF00FF)
 
 
 # Now any logger in the project will have access to this class
