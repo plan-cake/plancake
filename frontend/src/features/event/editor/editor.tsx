@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 import { TriangleAlertIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -61,6 +61,52 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
   const [mobileTab, setMobileTab] = useState<SegmentedControlOption>("details");
 
+  // CHECK FIELDS
+  const invalidForm = useMemo(() => {
+    let eventNotEdited = false;
+    if (type === "edit" && initialData && initialData.originalEventRange) {
+      const sameTitle = title.trim() === initialData.title.trim();
+      const sameType = eventRange.type === initialData.originalEventRange.type;
+      const sameTimeRange =
+        eventRange.timeRange.from ===
+          initialData.originalEventRange.timeRange.from &&
+        eventRange.timeRange.to ===
+          initialData.originalEventRange.timeRange.to &&
+        eventRange.timezone === initialData.originalEventRange.timezone;
+
+      const sameDate =
+        eventRange.type === "specific" &&
+        initialData.originalEventRange.type === "specific" &&
+        eventRange.dateRange.from ===
+          initialData.originalEventRange.dateRange.from &&
+        eventRange.dateRange.to === initialData.originalEventRange.dateRange.to;
+
+      const sameWeekdays =
+        eventRange.type === "weekday" &&
+        initialData.originalEventRange.type === "weekday" &&
+        JSON.stringify(eventRange.weekdays) ===
+          JSON.stringify(initialData.originalEventRange.weekdays);
+
+      eventNotEdited =
+        sameTitle && sameType && sameTimeRange && (sameDate || sameWeekdays);
+    }
+
+    return !title ||
+      !title.trim() ||
+      (eventRange.type === "specific" &&
+        (!eventRange.dateRange.from || !eventRange.dateRange.to)) ||
+      (eventRange.type === "weekday" &&
+        (!eventRange.weekdays || eventRange.weekdays.length === 0)) ||
+      !eventRange.timeRange.from ||
+      !eventRange.timeRange.to
+      ? MESSAGES.FORM_NOT_FILLED
+      : eventNotEdited
+        ? "Please make changes to update the event."
+        : Object.keys(errors).length || title.length > MAX_TITLE_LENGTH
+          ? MESSAGES.FORM_HAS_ERRORS
+          : undefined;
+  }, [title, eventRange, type, initialData, errors]);
+
   // SUBMIT EVENT INFO
   const submitEventInfo = async () => {
     clearAllErrors();
@@ -96,11 +142,14 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       href={`/${initialData?.customCode}`}
     />
   );
-  const submitButton = (
+
+  const submitButton = (desktop: boolean) => (
     <ActionButton
       buttonStyle="primary"
       label={type === "edit" ? "Update Event" : "Create Event"}
+      tooltip={desktop && invalidForm ? invalidForm : undefined}
       onClick={submitEventInfo}
+      disabled={desktop && !!invalidForm}
       loadOnSuccess
     />
   );
@@ -141,7 +190,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         </div>
         <div className="hidden gap-2 md:flex">
           {type === "edit" && cancelButton}
-          {submitButton}
+          {submitButton(true)}
         </div>
       </div>
 
@@ -210,7 +259,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       <div className="z-10">
         <MobileFooterIsland
           leftButtons={type === "edit" ? [cancelButton] : undefined}
-          rightButtons={[submitButton]}
+          rightButtons={[submitButton(false)]}
         >
           <SegmentedControl
             value={mobileTab}

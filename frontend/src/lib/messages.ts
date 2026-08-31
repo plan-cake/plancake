@@ -73,4 +73,8 @@ export const MESSAGES = {
     "Literally no one is free at the same time. This is NOT making it out of the group chat...",
   INFO_NO_IDEAL_TIMES:
     "There are no times that work for everyone. Times with an indicator are the best options.",
+
+  // form error messages
+  FORM_NOT_FILLED: "Please fill out all fields.",
+  FORM_HAS_ERRORS: "Please fix the displayed errors.",
 };
