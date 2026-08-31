@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils/classname";
 export default function ParticipantChip({
   person,
   index,
+  includedInSlider,
   isAvailable,
   isRemoving,
   onRemove,
@@ -16,6 +17,7 @@ export default function ParticipantChip({
 }: {
   person: string;
   index: number;
+  includedInSlider: boolean;
   isAvailable: boolean;
   isRemoving: boolean;
   onRemove: () => void;
@@ -75,7 +77,9 @@ export default function ParticipantChip({
       <div
         style={{ animationDelay: `${wiggleDelay}s` }}
         onMouseEnter={() => {
-          if (window.matchMedia("(hover: hover)").matches) {
+          if (window.matchMedia("(hover: hover)").matches && includedInSlider) {
+            // Only trigger hover effects on devices that support hover and if the
+            // participant is included in the slider
             onHoverChange(true);
           }
         }}
@@ -83,7 +87,10 @@ export default function ParticipantChip({
         onClick={() => {
           if (isRemoving) {
             onRemove();
-          } else {
+          } else if (includedInSlider || isSelected) {
+            // Only allow clicking if included in the slider OR already selected
+            // (The already selected check allows them to un-click themselves if state
+            // got weird)
             onHoverChange(false);
             onClick();
           }
@@ -100,6 +107,15 @@ export default function ParticipantChip({
           isAvailable && "bg-lion text-violet opacity-100",
 
           !isAvailable && isSelected && "text-violet",
+
+          // Slider Styling
+          // Participants are only disabled when they are both excluded from the slider filters
+          // and not in removing mode.
+          !includedInSlider &&
+            !isRemoving &&
+            (isSelected
+              ? "text-foreground bg-gray-200/25 opacity-50"
+              : "text-foreground pointer-events-none bg-gray-200/25 opacity-50"),
 
           // Selection Styling
           isSelected &&

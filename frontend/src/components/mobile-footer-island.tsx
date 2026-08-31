@@ -7,10 +7,12 @@ export default function MobileFooterIsland({
   children,
   leftButtons,
   rightButtons,
+  viewTransitionName,
 }: {
   children?: React.ReactNode;
   leftButtons?: ButtonArray;
   rightButtons?: ButtonArray;
+  viewTransitionName?: string;
 }) {
   const [islandHeight, setIslandHeight] = useState(0);
   const islandRef = useRef<HTMLDivElement>(null);
@@ -40,6 +42,11 @@ export default function MobileFooterIsland({
           "border-foreground/10 border",
           "flex flex-col gap-3",
         )}
+        style={{
+          viewTransitionName: viewTransitionName
+            ? viewTransitionName
+            : undefined,
+        }}
       >
         {children}
         <div className="flex w-full justify-between gap-2">

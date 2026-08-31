@@ -9,7 +9,7 @@ import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
-export default function ShareMenu({
+export default function ShareMenuContent({
   eventTitle,
   eventCode,
 }: {
@@ -63,6 +63,7 @@ export default function ShareMenu({
     <div className="flex w-full flex-col items-center gap-4">
       <QRCode url={currentURL} />
       <div className="flex flex-col items-center gap-1">
+        <div className="text-center">{eventTitle}</div>
         <div
           className={cn(
             "w-full min-w-0 text-center text-xl font-bold",
@@ -74,7 +75,7 @@ export default function ShareMenu({
           {currentURL ? currentURL.replace(/^https?:\/\//, "") : "Loading..."}
         </div>
         <div className="text-center text-sm opacity-60">
-          Anyone can join the event using this link
+          Anyone can join the event using this link.
         </div>
       </div>
       <div
