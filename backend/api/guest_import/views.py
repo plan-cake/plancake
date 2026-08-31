@@ -148,7 +148,7 @@ def import_data(request):
     Every conflicted submission that is not kept will be deleted when calling this
     endpoint.
     """
-    availability_choices = request.data.get("availability_choices", {})
+    availability_choices = request.validated_data.get("availability_choices", {})
 
     response = Response()
 

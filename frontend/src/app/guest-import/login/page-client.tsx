@@ -20,11 +20,13 @@ export default function ClientPage({
   const router = useRouter();
 
   const navigate = (route: string) => {
-    if (dontShowAgain) {
-      localStorage.setItem(DONT_SHOW_AGAIN_KEY, "true");
-    } else {
-      localStorage.removeItem(DONT_SHOW_AGAIN_KEY);
-    }
+    try {
+      if (dontShowAgain) {
+        localStorage.setItem(DONT_SHOW_AGAIN_KEY, "true");
+      } else {
+        localStorage.removeItem(DONT_SHOW_AGAIN_KEY);
+      }
+    } catch {}
     router.push(route);
   };
 

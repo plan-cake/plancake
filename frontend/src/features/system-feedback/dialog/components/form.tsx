@@ -32,9 +32,7 @@ export default function FormDialog({
   const open = isControlled ? controlledOpen : uncontrolledOpen;
 
   const isMobile = useCheckMobile();
-  if (isMobile && !asNestedDrawer) {
-    asNestedDrawer = true;
-  }
+  const effectiveAsNestedDrawer = asNestedDrawer || isMobile;
 
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
@@ -64,7 +62,7 @@ export default function FormDialog({
       trigger={trigger}
       open={open}
       onOpenChange={handleOpenChange}
-      asNestedDrawer={asNestedDrawer}
+      asNestedDrawer={effectiveAsNestedDrawer}
       showCloseButton={showCloseButton}
       overlayClassName={cn(
         type === "error" &&
