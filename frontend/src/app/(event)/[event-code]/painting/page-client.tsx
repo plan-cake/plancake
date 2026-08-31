@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
-import { useRouter } from "next/navigation";
+import { GlobeIcon } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
 import Checkbox from "@/components/checkbox";
@@ -12,17 +12,18 @@ import TextInputField from "@/components/text-input-field";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
-import LinkButton from "@/features/button/components/link";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,
   RateLimitBanner,
   useToast,
 } from "@/features/system-feedback";
+import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -46,7 +47,7 @@ export default function ClientPage({
   timeslots: Date[];
   initialData: SelfAvailability | null;
 }) {
-  const router = useRouter();
+  const doViewTransition = useViewTransition();
 
   // AVAILABILITY STATE
   const { state, setDisplayName, setTimeZone, toggleSlot } = useAvailability(
@@ -214,7 +215,7 @@ export default function ClientPage({
 
     try {
       await clientPost(ROUTES.availability.add, payload);
-      router.push(`/${eventCode}`);
+      doViewTransition(`/${eventCode}`, GRID_ID_SELECTOR);
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -232,10 +233,11 @@ export default function ClientPage({
 
   // BUTTONS
   const cancelButton = (
-    <LinkButton
+    <ActionButton
       buttonStyle="transparent"
       label={initialData?.display_name ? "Cancel Edits" : "Cancel"}
-      href={`/${eventCode}`}
+      onClick={() => doViewTransition(`/${eventCode}`, GRID_ID_SELECTOR)}
+      loadOnSuccess
     />
   );
   const submitButton = (
@@ -283,7 +285,10 @@ export default function ClientPage({
           />
 
           <div className="bg-panel rounded-3xl p-6 text-sm">
-            Displaying event in
+            <div className="flex items-center gap-1">
+              <GlobeIcon className="h-3.5 w-3.5" />
+              Displaying event in
+            </div>
             <TimeZoneSelector
               id="timezone-select"
               value={timeZone}
@@ -309,7 +314,10 @@ export default function ClientPage({
         />
 
         <div className="bg-panel rounded-3xl p-6 text-sm md:hidden">
-          Displaying event in
+          <div className="flex items-center gap-1">
+            <GlobeIcon className="h-3.5 w-3.5" />
+            Displaying event in
+          </div>
           <TimeZoneSelector
             id="timezone-select"
             value={timeZone}
@@ -323,6 +331,7 @@ export default function ClientPage({
         <MobileFooterIsland
           leftButtons={[cancelButton]}
           rightButtons={[submitButton]}
+          viewTransitionName="painting-island"
         >
           <div className="mx-3 -mt-2">
             <DisplayNameInput
@@ -335,6 +344,13 @@ export default function ClientPage({
             />
           </div>
         </MobileFooterIsland>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed left-0 right-0 top-[100vh] w-[100vw] md:hidden"
+          style={{
+            viewTransitionName: "results-drawer",
+          }}
+        />
       </div>
 
       <ConfirmationDialog

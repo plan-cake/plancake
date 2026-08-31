@@ -67,7 +67,7 @@ export default function SettingsNav() {
               aria-current={isActive ? "page" : undefined}
               className={cn(
                 "focus-visible:ring-primary/50 relative flex items-center whitespace-nowrap rounded-full px-3 py-1 font-medium outline-none focus-visible:ring-2",
-                "flex items-center gap-2",
+                "flex items-center gap-1.5",
                 isActive
                   ? "bg-foreground/10 text-foreground"
                   : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground",
