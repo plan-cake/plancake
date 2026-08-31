@@ -20,6 +20,7 @@ export default function SelectorDrawer<TValue extends string | number | null>({
   drawerNesting = false,
   trigger,
   disabled = false,
+  className,
 }: DrawerProps<TValue>) {
   const [internalOpen, setInternalOpen] = useState(false);
 
@@ -89,6 +90,7 @@ export default function SelectorDrawer<TValue extends string | number | null>({
               // Visual styles for disabled state
               disabled &&
                 "bg-foreground/20 text-foreground hover:bg-foreground/20 active:bg-foreground/20 cursor-not-allowed opacity-50 hover:cursor-not-allowed",
+              className,
             )}
           >
             <span

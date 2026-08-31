@@ -8,10 +8,8 @@ import ResetStep from "@/features/account/setting-dialogs/change-password/steps/
 import { useChangePasswordFlow } from "@/features/account/setting-dialogs/change-password/use-change-password";
 import EmptyButton from "@/features/button/components/empty";
 import { FormDialog } from "@/features/system-feedback";
-import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 export default function ChangePasswordDialog() {
-  const isMobile = useCheckMobile();
   const flow = useChangePasswordFlow();
 
   const [renderedStep, setRenderedStep] = useState(flow.step);
@@ -56,7 +54,6 @@ export default function ChangePasswordDialog() {
   return (
     <FormDialog
       type="info"
-      asNestedDrawer={isMobile}
       title={dialogTitle}
       description={dialogDescriptionText}
       submitLabel={submitLabel}

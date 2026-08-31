@@ -10,6 +10,7 @@ import { TOAST_CONFIG } from "@/features/system-feedback/toast/config";
 import ToastContext from "@/features/system-feedback/toast/context";
 import { ToastData, ToastOptions } from "@/features/system-feedback/toast/type";
 import { ToastType } from "@/features/system-feedback/type";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 export default function ToastProvider({
@@ -17,6 +18,8 @@ export default function ToastProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const isMobile = useCheckMobile();
+
   const [toasts, setToasts] = useState<ToastData[]>([]);
   const [isHoveringViewport, setIsHoveringViewport] = useState(false);
   const pathname = usePathname();
@@ -91,17 +94,23 @@ export default function ToastProvider({
     [pathname],
   );
 
-  const removeToast = useCallback((id: number) => {
-    if (id === -1) return;
+  const removeToast = useCallback(
+    (id: number) => {
+      if (id === -1) return;
 
-    setToasts((prevToasts) =>
-      prevToasts.map((t) => (t.id === id ? { ...t, open: false } : t)),
-    );
+      setToasts((prevToasts) =>
+        prevToasts.map((t) => (t.id === id ? { ...t, open: false } : t)),
+      );
 
-    setTimeout(() => {
-      setToasts((prevToasts) => prevToasts.filter((t) => t.id !== id));
-    }, 400);
-  }, []);
+      setTimeout(
+        () => {
+          setToasts((prevToasts) => prevToasts.filter((t) => t.id !== id));
+        },
+        isMobile ? 100 : 250,
+      );
+    },
+    [isMobile],
+  );
 
   // Remove persistent toasts on page change
   useEffect(() => {
@@ -117,7 +126,7 @@ export default function ToastProvider({
 
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>
-      <Toast.Provider swipeDirection="right">
+      <Toast.Provider swipeDirection={isMobile ? "up" : "right"}>
         {children}
 
         <Toast.Viewport
@@ -125,19 +134,30 @@ export default function ToastProvider({
           onMouseLeave={() => setIsHoveringViewport(false)}
           style={{
             // adjust the position of the toast viewport based on keyboard height
-            transform: `translateY(-${keyboardHeight}px)`,
+            transform: isMobile
+              ? undefined
+              : `translateY(-${keyboardHeight}px)`,
             transition: "transform 0.2s ease-out",
           }}
           className={cn(
-            "fixed bottom-12 right-0 z-[2147483647] md:bottom-0",
-            keyboardHeight > 0 && "bottom-0",
-            "flex list-none flex-col items-end outline-none",
-            "m-0 space-y-1 pb-[var(--viewport-padding)] pr-[var(--viewport-padding)] [--viewport-padding:_25px]",
+            "fixed z-[2147483647]",
+            "m-0 list-none outline-none [--viewport-padding:_25px]",
+            isMobile
+              ? cn(
+                  "left-0 right-0 top-0",
+                  "px-[var(--viewport-padding)] pt-[var(--viewport-padding)]",
+                )
+              : cn(
+                  "bottom-0 right-0",
+                  "flex flex-col items-end",
+                  "space-y-1 pb-[var(--viewport-padding)] pr-[var(--viewport-padding)]",
+                ),
           )}
         >
-          {toasts.map((toast) => {
+          {toasts.map((toast, index) => {
             const config = TOAST_CONFIG[toast.type] || TOAST_CONFIG.info;
             const Icon = config.icon;
+            const stackIndex = toasts.length - index - 1;
 
             return (
               <BaseToast
@@ -150,7 +170,7 @@ export default function ToastProvider({
                 icon={<Icon className="col-start-1 row-span-2 h-5 w-5" />}
                 isPersistent={toast.isPersistent}
                 duration={toast.duration}
-                isPaused={isHoveringViewport}
+                isPaused={isMobile ? stackIndex > 0 : isHoveringViewport}
                 onOpenChange={(isOpen) => {
                   if (!isOpen) {
                     if (toast.onDismiss) {
@@ -159,6 +179,7 @@ export default function ToastProvider({
                     removeToast(toast.id);
                   }
                 }}
+                stackIndex={stackIndex}
               />
             );
           })}

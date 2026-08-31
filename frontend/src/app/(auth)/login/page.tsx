@@ -10,6 +10,7 @@ import AuthPageLayout from "@/components/layout/auth-page";
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
 import ActionButton from "@/features/button/components/action";
+import { DONT_SHOW_AGAIN_KEY } from "@/features/guest-import/constants";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
@@ -26,7 +27,7 @@ export default function Page() {
   const isMobile = useCheckMobile();
 
   const searchParams = useSearchParams();
-  const callbackUrl = getSafeRedirectUrl(searchParams.get("callbackUrl"));
+  const callbackUrl = searchParams.get("callbackUrl");
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
@@ -65,12 +66,22 @@ export default function Page() {
     }
 
     try {
+      let dontShowGuestImport = false;
+      try {
+        dontShowGuestImport =
+          localStorage.getItem(DONT_SHOW_AGAIN_KEY) === "true";
+      } catch {}
+      const redirectUrl = getSafeRedirectUrl(
+        callbackUrl,
+        dontShowGuestImport ? undefined : "/guest-import/login",
+      );
+
       await clientPost(ROUTES.auth.login, {
         email,
         password,
         remember_me: rememberMe,
       });
-      router.push(callbackUrl);
+      router.push(redirectUrl);
       router.refresh();
       return true;
     } catch (e) {

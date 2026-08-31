@@ -1,5 +1,6 @@
 import {
   AccountData,
+  ActiveSessionList,
   AllAvailability,
   AuthedPasswordResetCode,
   AuthedPasswordResetData,
@@ -12,6 +13,9 @@ import {
   EventDetails,
   EventDisplayNameData,
   EventEditData,
+  GuestData,
+  GuestDataSummary,
+  GuestImportData,
   LoginData,
   MessageResponse,
   NewEventData,
@@ -20,10 +24,9 @@ import {
   PasswordResetData,
   RegisterData,
   SelfAvailability,
-  VerificationCode,
-  ActiveSessionList,
   SessionId,
   TrueCode,
+  VerificationCode,
 } from "@/lib/utils/api/types";
 
 /**
@@ -270,4 +273,24 @@ export const ROUTES = {
      */
     deleteAccount: route<MessageResponse, Password>("/account/delete-account/"),
   },
+  guestImport: {
+    /**
+     * Gets a summary of the guest user's created and participated events.
+     * @method GET
+     */
+    getSummary: route<GuestDataSummary>("/guest-import/get-summary/"),
+    /**
+     * Gets data about the guest user's created and participated events.
+     * @method GET
+     */
+    getData: route<GuestData>("/guest-import/get-data/"),
+    /**
+     * Imports the guest user's data into the logged-in user's account, resolving any
+     * availability submission conflicts based on the provided choices.
+     * @method POST
+     * @throws 400 - If there is no guest data found.
+     * @throws 400 - If the availability choices do not match the guest submissions.
+     */
+    importData: route<MessageResponse, GuestImportData>("/guest-import/import-data/"),
+  }
 } as const;
