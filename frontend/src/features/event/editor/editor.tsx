@@ -5,6 +5,7 @@ import { memo, useState } from "react";
 import { TriangleAlertIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import Captcha from "@/components/captcha";
 import MobileFooterIsland from "@/components/mobile-footer-island";
 import SegmentedControl from "@/components/segmented-control";
 import TextInputField from "@/components/text-input-field";
@@ -19,7 +20,7 @@ import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
 import DateRangeSelection from "@/features/event/editor/date-range/selector";
 import { EventEditorType } from "@/features/event/editor/types";
 import { validateEventData } from "@/features/event/editor/validate-data";
-import { GridPreviewDialog, ScheduleGrid } from "@/features/event/grid";
+import { ScheduleGrid } from "@/features/event/grid";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { RateLimitBanner } from "@/features/system-feedback";
@@ -34,7 +35,6 @@ type EventEditorProps = {
 
 type SegmentedControlOption = "details" | "preview";
 
-const MemoizedGridPreview = memo(GridPreviewDialog);
 const MemoizedScheduleGrid = memo(ScheduleGrid);
 
 export default function EventEditor({ type, initialData }: EventEditorProps) {
@@ -60,6 +60,10 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   const { title, customCode, eventRange, timeslots } = state;
   const router = useRouter();
 
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
+
   const [mobileTab, setMobileTab] = useState<SegmentedControlOption>("details");
 
   // SUBMIT EVENT INFO
@@ -68,8 +72,14 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
     try {
       const validationErrors = await validateEventData(type, state);
+
       if (Object.keys(validationErrors).length > 0) {
         batchHandleErrors(validationErrors);
+        return false;
+      }
+
+      if (type == "new" && !captchaToken) {
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
         return false;
       }
 
@@ -77,6 +87,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         { title, code: customCode, eventRange, timeslots },
         type,
         eventRange.type,
+        captchaToken,
         (code: string) => router.push(`/${code}`),
         handleError,
       );
@@ -89,7 +100,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     }
   };
 
-  // BUTTONS
+  // REUSED COMPONENTS
   const cancelButton = (
     <LinkButton
       buttonStyle="transparent"
@@ -103,6 +114,16 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       label={type === "edit" ? "Update Event" : "Create Event"}
       onClick={submitEventInfo}
       loadOnSuccess
+      disabled={captchaInitError}
+    />
+  );
+  const grid = (
+    <MemoizedScheduleGrid
+      mode="preview"
+      isWeekdayEvent={eventRange.type === "weekday"}
+      unselectedRange={checkUnselectedRange(eventRange)}
+      timezone={eventRange.timezone}
+      timeslots={timeslots}
     />
   );
 
@@ -113,6 +134,15 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       {/* Rate Limit Error */}
       {errors.rate_limit && (
         <RateLimitBanner>{errors.rate_limit}</RateLimitBanner>
+      )}
+
+      {type === "new" && (
+        <Captcha
+          backendVerificationFailed={!!errors.captcha}
+          onTokenChange={setCaptchaToken}
+          onClearBackendError={() => handleError("captcha", "")}
+          onInitError={() => setCaptchaInitError(true)}
+        />
       )}
 
       <div className="-mb-1 flex w-full items-center justify-between">
@@ -160,6 +190,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
                 value={eventRange.timeRange.from}
                 onChange={setStartTime}
                 placeholder="Start Time"
+                dialogTitle="Select Start Time"
               />
             </FormSelectorField>
 
@@ -169,6 +200,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
                 value={eventRange.timeRange.to}
                 onChange={setEndTime}
                 placeholder="End Time"
+                dialogTitle="Select End Time"
               />
             </FormSelectorField>
           </div>
@@ -179,7 +211,11 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         </div>
         <div className="h-16 md:hidden" />
         <div className="hidden flex-1 md:col-start-2 md:row-span-9 md:row-start-2 md:block">
-          <MemoizedGridPreview eventRange={eventRange} timeslots={timeslots} />
+          <div className="relative h-full w-full grow">
+            <div className="bg-panel absolute inset-0 flex rounded-3xl pb-4 pl-2 pr-4 pt-4">
+              <div className="flex1 min-h-0 grow space-y-4">{grid}</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -189,14 +225,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           mobileTab === "details" ? "hidden" : "block",
         )}
       >
-        <MemoizedScheduleGrid
-          mode="preview"
-          isWeekdayEvent={eventRange.type === "weekday"}
-          disableSelect={true}
-          unselectedRange={checkUnselectedRange(eventRange)}
-          timezone={eventRange.timezone}
-          timeslots={timeslots}
-        />
+        {grid}
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}

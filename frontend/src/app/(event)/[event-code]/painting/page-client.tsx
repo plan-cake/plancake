@@ -3,26 +3,27 @@
 import { useEffect, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
-import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
+import Captcha from "@/components/captcha";
 import Checkbox from "@/components/checkbox";
 import MobileFooterIsland from "@/components/mobile-footer-island";
 import TextInputField from "@/components/text-input-field";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
-import LinkButton from "@/features/button/components/link";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,
   RateLimitBanner,
   useToast,
 } from "@/features/system-feedback";
+import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -46,7 +47,7 @@ export default function ClientPage({
   timeslots: Date[];
   initialData: SelfAvailability | null;
 }) {
-  const router = useRouter();
+  const doViewTransition = useViewTransition();
 
   // AVAILABILITY STATE
   const { state, setDisplayName, setTimeZone, toggleSlot } = useAvailability(
@@ -54,6 +55,10 @@ export default function ClientPage({
     eventRange.type,
   );
   const { displayName, timeZone, userAvailability } = state;
+
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -111,11 +116,13 @@ export default function ClientPage({
   const handleNameChange = (value: string) => {
     setDisplayName(value);
     if (value === "") {
+      checkNameAvailability.cancel();
       setErrors((prev) => ({
         ...prev,
         displayName: MESSAGES.ERROR_NAME_MISSING,
       }));
     } else if (value.length > MAX_DISPLAY_NAME_LENGTH) {
+      checkNameAvailability.cancel();
       setErrors((prev) => ({
         ...prev,
         displayName: MESSAGES.ERROR_NAME_LENGTH,
@@ -179,6 +186,14 @@ export default function ClientPage({
       }
     }
 
+    if (!captchaToken) {
+      setErrors((prev) => ({
+        ...prev,
+        captcha: MESSAGES.ERROR_CAPTCHA_FAILED,
+      }));
+      return false;
+    }
+
     // Save the default name if checkbox checked
     if (saveDefaultName) {
       if (session.isLoggedIn) {
@@ -208,11 +223,12 @@ export default function ClientPage({
       display_name: displayName,
       availability: payload_availability,
       time_zone: timeZone,
+      captcha_token: captchaToken,
     };
 
     try {
       await clientPost(ROUTES.availability.add, payload);
-      router.push(`/${eventCode}`);
+      doViewTransition(`/${eventCode}`, GRID_ID_SELECTOR);
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -220,6 +236,11 @@ export default function ClientPage({
         setErrors((prev) => ({
           ...prev,
           rate_limit: error.formattedMessage || MESSAGES.ERROR_RATE_LIMIT,
+        }));
+      } else if (error.captchaFailed) {
+        setErrors((prev) => ({
+          ...prev,
+          captcha: MESSAGES.ERROR_CAPTCHA_FAILED,
         }));
       } else {
         addToast("error", error.formattedMessage);
@@ -230,10 +251,11 @@ export default function ClientPage({
 
   // BUTTONS
   const cancelButton = (
-    <LinkButton
+    <ActionButton
       buttonStyle="transparent"
       label={initialData?.display_name ? "Cancel Edits" : "Cancel"}
-      href={`/${eventCode}`}
+      onClick={() => doViewTransition(`/${eventCode}`, GRID_ID_SELECTOR)}
+      loadOnSuccess
     />
   );
   const submitButton = (
@@ -246,6 +268,7 @@ export default function ClientPage({
       }
       onClick={handleSubmitAvailability}
       loadOnSuccess
+      disabled={captchaInitError}
     />
   );
 
@@ -257,6 +280,20 @@ export default function ClientPage({
       {errors.rate_limit && (
         <RateLimitBanner>{errors.rate_limit}</RateLimitBanner>
       )}
+
+      {/* CAPTCHA + Error */}
+      <Captcha
+        backendVerificationFailed={!!errors.captcha}
+        onTokenChange={setCaptchaToken}
+        onClearBackendError={() =>
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.captcha;
+            return newErrors;
+          })
+        }
+        onInitError={() => setCaptchaInitError(true)}
+      />
 
       {/* Header and Button Row */}
       <div className="flex w-full flex-wrap justify-between md:flex-row">
@@ -321,6 +358,7 @@ export default function ClientPage({
         <MobileFooterIsland
           leftButtons={[cancelButton]}
           rightButtons={[submitButton]}
+          viewTransitionName="painting-island"
         >
           <div className="mx-3 -mt-2">
             <DisplayNameInput
@@ -333,6 +371,13 @@ export default function ClientPage({
             />
           </div>
         </MobileFooterIsland>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed left-0 right-0 top-[100vh] w-[100vw] md:hidden"
+          style={{
+            viewTransitionName: "results-drawer",
+          }}
+        />
       </div>
 
       <ConfirmationDialog

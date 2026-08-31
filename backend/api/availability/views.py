@@ -19,6 +19,7 @@ from api.decorators import (
     api_endpoint,
     check_auth,
     require_auth,
+    require_captcha,
     validate_json_input,
     validate_output,
     validate_query_param_input,
@@ -52,6 +53,7 @@ class InvalidTimeslotError(Exception):
 
 
 @api_endpoint("POST")
+@require_captcha
 @require_auth
 @validate_json_input(AvailabilityAddSerializer)
 @validate_output(MessageOutputSerializer)

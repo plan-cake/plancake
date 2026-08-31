@@ -5,6 +5,7 @@ import { CheckIcon, DoorOpenIcon, EraserIcon, Undo2Icon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { useResultsContext } from "@/features/event/results/context";
+import usePointerType from "@/lib/hooks/use-pointer-type";
 import { cn } from "@/lib/utils/classname";
 
 type PanelHeaderProps = {
@@ -46,6 +47,8 @@ export default function PanelHeader({
     !isCreator &&
     currentUser &&
     participants.some((p) => p.display_name === currentUser);
+
+  const pointerType = usePointerType();
 
   const formatHoveredSlot = () => {
     const date = new Date(hoveredSlot!);
@@ -121,13 +124,17 @@ export default function PanelHeader({
       )}
     >
       <div className="flex flex-col items-start">
-        <h2 className="text-md font-semibold">{headerContent()}</h2>
+        <h2 className="font-semibold">{headerContent()}</h2>
         {gridNumParticipants > 0 && (
           <span className="text-sm opacity-75">
             {isRemoving
-              ? `Select to remove`
+              ? pointerType === "coarse"
+                ? "Tap to remove"
+                : "Click to remove"
               : hoveredSlot === null
-                ? "Hover grid for availability"
+                ? pointerType === "coarse"
+                  ? "Tap grid for availability"
+                  : "Hover grid for availability"
                 : formatHoveredSlot()}
           </span>
         )}
