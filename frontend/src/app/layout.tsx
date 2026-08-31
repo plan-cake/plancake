@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Modak, Nunito } from "next/font/google";
 
 import { CookieGuard } from "@/components/cookie-guard";
+import SkipToContentButton from "@/components/skip-to-content-button";
 import Header from "@/features/header/components/header";
 import ShortcutModeIndicator from "@/features/system-feedback/hotkeys/components/shortcut-mode-indicator";
 import ToastListener from "@/features/system-feedback/toast/listener";
@@ -79,14 +80,18 @@ export default async function RootLayout({
       className={`${modak.variable} ${nunito.variable}`}
     >
       <body className="font-sans antialiased">
-        <div className="mx-auto flex min-h-dvh max-w-[1440px] flex-col">
+        <div className="max-w-360 mx-auto flex min-h-dvh flex-col">
           <Providers>
+            <SkipToContentButton />
             <CookieGuard>
               <Suspense fallback={null}>
                 <ToastListener />
               </Suspense>
               <Header />
-              {children}
+              {/* The main content is wrapped to allow skip to content functionality. */}
+              <div id="main-content" className="outline-hidden">
+                {children}
+              </div>
               <ShortcutModeIndicator />
             </CookieGuard>
           </Providers>

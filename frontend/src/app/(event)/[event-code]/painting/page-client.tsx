@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
-import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
 import Checkbox from "@/components/checkbox";
@@ -12,11 +11,11 @@ import TextInputField from "@/components/text-input-field";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
-import LinkButton from "@/features/button/components/link";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,
@@ -24,6 +23,7 @@ import {
   useToast,
 } from "@/features/system-feedback";
 import ShortcutTrigger from "@/features/system-feedback/hotkeys/components/shortcut-trigger";
+import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -47,7 +47,7 @@ export default function ClientPage({
   timeslots: Date[];
   initialData: SelfAvailability | null;
 }) {
-  const router = useRouter();
+  const doViewTransition = useViewTransition();
 
   // AVAILABILITY STATE
   const { state, setDisplayName, setTimeZone, toggleSlot } = useAvailability(
@@ -112,11 +112,13 @@ export default function ClientPage({
   const handleNameChange = (value: string) => {
     setDisplayName(value);
     if (value === "") {
+      checkNameAvailability.cancel();
       setErrors((prev) => ({
         ...prev,
         displayName: MESSAGES.ERROR_NAME_MISSING,
       }));
     } else if (value.length > MAX_DISPLAY_NAME_LENGTH) {
+      checkNameAvailability.cancel();
       setErrors((prev) => ({
         ...prev,
         displayName: MESSAGES.ERROR_NAME_LENGTH,
@@ -213,7 +215,7 @@ export default function ClientPage({
 
     try {
       await clientPost(ROUTES.availability.add, payload);
-      router.push(`/${eventCode}`);
+      doViewTransition(`/${eventCode}`, GRID_ID_SELECTOR);
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -231,11 +233,12 @@ export default function ClientPage({
 
   // BUTTONS
   const cancelButton = (desktop: boolean) => (
-    <LinkButton
+    <ActionButton
       buttonStyle="transparent"
       label={initialData?.display_name ? "Cancel Edits" : "Cancel"}
-      href={`/${eventCode}`}
+      onClick={() => doViewTransition(`/${eventCode}`, GRID_ID_SELECTOR)}
       hotkey={desktop ? { keys: "c", type: "shortcut" } : undefined}
+      loadOnSuccess
     />
   );
   const submitButton = (desktop: boolean) => (
@@ -327,6 +330,7 @@ export default function ClientPage({
         <MobileFooterIsland
           leftButtons={[cancelButton(false)]}
           rightButtons={[submitButton(false)]}
+          viewTransitionName="painting-island"
         >
           <div className="mx-3 -mt-2">
             <DisplayNameInput
@@ -340,6 +344,13 @@ export default function ClientPage({
             />
           </div>
         </MobileFooterIsland>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed left-0 right-0 top-[100vh] w-screen md:hidden"
+          style={{
+            viewTransitionName: "results-drawer",
+          }}
+        />
       </div>
 
       <ConfirmationDialog
@@ -418,7 +429,7 @@ function DisplayNameInput({
               tooltipSide="right"
               className="inline w-fit"
             >
-              {displayNameField}
+              <div className="inline">{displayNameField}</div>
             </ShortcutTrigger>
           ) : (
             displayNameField
