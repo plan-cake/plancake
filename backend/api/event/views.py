@@ -217,6 +217,7 @@ def create_week_event(request):
 
 
 @api_endpoint("POST")
+@require_captcha
 @require_auth
 @validate_json_input(EventCreateSerializer)
 @validate_output(EventCodeSerializer)
