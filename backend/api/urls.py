@@ -7,4 +7,5 @@ urlpatterns = [
     path("availability/", include("api.availability.urls")),
     path("dashboard/", include("api.dashboard.urls")),
     path("account/", include("api.account.urls")),
+    path("guest-import/", include("api.guest_import.urls")),
 ]

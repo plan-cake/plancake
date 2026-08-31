@@ -10,7 +10,5 @@ urlpatterns = [
     path("check-account-auth/", views.check_account_auth),
     path("start-password-reset/", views.start_password_reset),
     path("reset-password/", views.reset_password),
-    path("change-password/", views.change_password),
     path("logout/", views.logout),
-    path("delete-account/", views.delete_account),
 ]

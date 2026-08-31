@@ -1,4 +1,5 @@
 import { ResultsAvailabilityMap } from "@/core/availability/types";
+import { AllAvailability } from "@/lib/utils/api/types";
 
 /**
  * Determines if there is at least one timeslot where all participants are
@@ -9,12 +10,12 @@ import { ResultsAvailabilityMap } from "@/core/availability/types";
  */
 export function hasMutualAvailability(
   availabilities: ResultsAvailabilityMap,
-  participantCount: number,
+  participants: AllAvailability["participants"],
 ): boolean {
-  if (participantCount === 0) return false;
+  if (participants.length === 0) return false;
 
   for (const slot in availabilities) {
-    if (availabilities[slot].length === participantCount) {
+    if (availabilities[slot].length === participants.length) {
       return true;
     }
   }
@@ -31,7 +32,7 @@ export function hasMutualAvailability(
  */
 export function findConsensusAndConflicts(
   availabilities: ResultsAvailabilityMap,
-  participantCount: number,
+  participants: AllAvailability["participants"],
 ): {
   allAvailableSlots: string[];
   noOneAvailableSlots: string[];
@@ -40,14 +41,14 @@ export function findConsensusAndConflicts(
   const noOneAvailableSlots: string[] = [];
 
   // early return for no participants
-  if (participantCount === 0) {
+  if (participants.length === 0) {
     return { allAvailableSlots, noOneAvailableSlots };
   }
 
   for (const [slot, availableParticipants] of Object.entries(availabilities)) {
     const count = availableParticipants.length;
 
-    if (count === participantCount) {
+    if (count === participants.length) {
       allAvailableSlots.push(slot);
     } else if (count === 0) {
       noOneAvailableSlots.push(slot);
@@ -59,10 +60,12 @@ export function findConsensusAndConflicts(
 
 /**
  * Finds the highest number of participants available for any single timeslot.
- * 
+ *
  * @returns The maximum count of participants available in any timeslot.
  */
-export function getHighestMatchCount(availabilities: ResultsAvailabilityMap): number {
+export function getHighestMatchCount(
+  availabilities: ResultsAvailabilityMap,
+): number {
   let highestCount = 0;
   for (const slot in availabilities) {
     const count = availabilities[slot].length;

@@ -13,6 +13,7 @@ export default function DashboardButton() {
         buttonStyle="frosted glass inset"
         icon={<LayoutDashboardIcon className="h-5 w-5" />}
         href="/dashboard"
+        tooltip="Dashboard"
       />
     </ShrinkingHeaderButton>
   );
