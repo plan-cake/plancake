@@ -30,6 +30,7 @@ export default function BaseDrawer({
   showOverlay = !frostedGlass && modal,
   nested = false,
   hideCloseButton = false,
+  viewTransitionName,
   ...rest
 }: DrawerProps) {
   useDrawerResize();
@@ -157,7 +158,12 @@ export default function BaseDrawer({
             _type !== "floating" && "h-[100dvh]",
             contentClassName,
           )}
-          style={{ zIndex: contentZIndex }}
+          style={{
+            zIndex: contentZIndex,
+            viewTransitionName: viewTransitionName
+              ? viewTransitionName
+              : undefined,
+          }}
         >
           <div
             className="flex w-full flex-col"
