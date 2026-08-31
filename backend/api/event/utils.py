@@ -15,7 +15,7 @@ logger = logging.getLogger("api")
 
 def check_code_available(code):
     try:
-        UrlCode.objects.get(url_code=code)
+        UrlCode.objects.get(url_code__iexact=code)
         return False
     except UrlCode.DoesNotExist:
         pass
@@ -33,6 +33,7 @@ def check_custom_code(code):
         "api",
         "dashboard",
         "forgot-password",
+        "guest-import",
         "login",
         "new-event",
         "settings",
@@ -41,12 +42,12 @@ def check_custom_code(code):
         "verify-email",
         "version-history",
     ]
-    if code in RESERVED_KEYWORDS or not check_code_available(code):
+    if code.lower() in RESERVED_KEYWORDS or not check_code_available(code):
         return "Code unavailable."
 
 
 ALLOWED_URL_CODE_CHARS = "".join(
-    [c for c in string.ascii_letters + string.digits if c not in "Il1O0"]
+    [c for c in string.ascii_lowercase + string.digits if c not in "Il1O0"]
 )
 
 
@@ -131,7 +132,7 @@ def validate_weekday_timeslots(timeslots):
     return {}
 
 
-def event_lookup(event_code: str):
+def event_lookup_prefetch(event_code: str):
     """
     Looks up an event by its URL code.
 
@@ -146,7 +147,7 @@ def event_lookup(event_code: str):
             "weekday_timeslots",
             queryset=EventWeekdayTimeslot.objects.order_by("weekday", "local_timeslot"),
         ),
-    ).get(url_code=event_code)
+    ).get(url_code__url_code__iexact=event_code)
 
 
 def js_weekday(weekday: int) -> int:
@@ -161,6 +162,6 @@ def touch_url_code(url_code: str):
     Updates the last_used timestamp for a URL code.
     """
     try:
-        UrlCode.objects.get(url_code=url_code).save()
+        UrlCode.objects.get(url_code__iexact=url_code).save()
     except UrlCode.DoesNotExist:
         logger.error(f"URL code {url_code} not found when attempting to touch.")

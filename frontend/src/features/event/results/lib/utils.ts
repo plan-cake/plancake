@@ -1,4 +1,5 @@
 import { ResultsAvailabilityMap } from "@/core/availability/types";
+import { AllAvailability } from "@/lib/utils/api/types";
 
 /**
  * Determines if there is at least one timeslot where all participants are
@@ -9,8 +10,10 @@ import { ResultsAvailabilityMap } from "@/core/availability/types";
  */
 export function hasMutualAvailability(
   availabilities: ResultsAvailabilityMap,
-  participants: string[],
+  participants: AllAvailability["participants"],
 ): boolean {
+  if (participants.length === 0) return false;
+
   for (const slot in availabilities) {
     if (availabilities[slot].length === participants.length) {
       return true;
@@ -29,7 +32,7 @@ export function hasMutualAvailability(
  */
 export function findConsensusAndConflicts(
   availabilities: ResultsAvailabilityMap,
-  participants: string[],
+  participants: AllAvailability["participants"],
 ): {
   allAvailableSlots: string[];
   noOneAvailableSlots: string[];
@@ -37,14 +40,17 @@ export function findConsensusAndConflicts(
   const allAvailableSlots: string[] = [];
   const noOneAvailableSlots: string[] = [];
 
-  for (const slot in availabilities) {
-    const availableParticipants = availabilities[slot];
+  // early return for no participants
+  if (participants.length === 0) {
+    return { allAvailableSlots, noOneAvailableSlots };
+  }
 
-    if (availableParticipants.length === participants.length) {
+  for (const [slot, availableParticipants] of Object.entries(availabilities)) {
+    const count = availableParticipants.length;
+
+    if (count === participants.length) {
       allAvailableSlots.push(slot);
-    }
-
-    if (availableParticipants.length === 0) {
+    } else if (count === 0) {
       noOneAvailableSlots.push(slot);
     }
   }
@@ -54,10 +60,12 @@ export function findConsensusAndConflicts(
 
 /**
  * Finds the highest number of participants available for any single timeslot.
- * 
+ *
  * @returns The maximum count of participants available in any timeslot.
  */
-export function getHighestMatchCount(availabilities: ResultsAvailabilityMap): number {
+export function getHighestMatchCount(
+  availabilities: ResultsAvailabilityMap,
+): number {
   let highestCount = 0;
   for (const slot in availabilities) {
     const count = availabilities[slot].length;

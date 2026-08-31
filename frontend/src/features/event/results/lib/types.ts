@@ -4,6 +4,7 @@ import { AllAvailability } from "@/lib/utils/api/types";
 export type ResultsInformation = {
   eventCode: string;
   eventType: EventType;
+  timezone: string;
   isCreator: boolean;
   participants: AllAvailability["participants"];
   availability: AllAvailability["availability"];
