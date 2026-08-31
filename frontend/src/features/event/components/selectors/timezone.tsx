@@ -29,8 +29,6 @@ export default function TimeZoneSelector({
     />
   );
 
-  console.log(useShortcut, "useShortcut");
-
   return useShortcut ? (
     <ShortcutTrigger
       hotkey="z"
