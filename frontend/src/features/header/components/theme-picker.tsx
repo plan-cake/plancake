@@ -30,6 +30,7 @@ export default function ThemePicker() {
             buttonStyle="frosted glass inset"
             icon={<SunMoonIcon />}
             aria-label="Choose Site Theme"
+            tooltip="Theme"
           />
         }
         closeOnClick={false}

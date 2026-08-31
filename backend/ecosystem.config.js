@@ -6,7 +6,7 @@ module.exports = {
             name: "plancake-api",
             cwd: __dirname,
             script: "./.venv/bin/python",
-            args: "-m gunicorn api.wsgi --workers 2 --bind 127.0.0.1:8000",
+            args: "-m uvicorn api.asgi:application --host 127.0.0.1 --port 8000 --workers 2 --lifespan off",
             instances: 1,
             autorestart: true,
             max_memory_restart: "250M",

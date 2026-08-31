@@ -207,6 +207,28 @@ export function getVersionHistoryData(): VersionHistoryData {
         },
       ],
     },
+    {
+      version: "v0.5",
+      releaseDate: { year: 2026, month: 7, day: 30 },
+      changes: [
+        "Added live updates to the results page",
+        "Added availability filters to the results page",
+        "Added the ability to import guest data into an account",
+        "Added tooltips across the site",
+        "Added transitions between the results and painting pages",
+        "Added a smooth transition between site themes",
+        "Added a feedback form link to the landing page footer",
+        'Added a "Skip to Content" button for accessibility',
+        'Added an "Expand/Collapse All" button to the version history page',
+        "Updated the appearance and functionality of toasts on mobile",
+        "Updated the appearance of timeslots not included in an event",
+        "Updated the results page banners to prompt event creators to share their event",
+        "Updated results page text to better describe actions on mobile",
+        "Changed event codes to be case-insensitive",
+      ],
+      bugFixes: [],
+      minorVersions: [],
+    },
   ];
 }
 
