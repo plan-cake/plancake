@@ -71,6 +71,10 @@ type BaseDrawerProps = {
    * @default false
    */
   hideCloseButton?: boolean;
+  /**
+   * Optional name identifier to apply to the drawer content for smooth page transitions.
+   */
+  viewTransitionName?: string;
 };
 
 export type StandardDrawerProps = BaseDrawerProps & {
