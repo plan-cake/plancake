@@ -1,35 +1,39 @@
 from rest_framework import serializers
 
+SIX_DIGIT_CODE_FIELD = serializers.RegexField(
+    regex=r"^\d{6}$",
+    required=True,
+    min_length=6,
+    max_length=6,
+)
+
 
 class EmailSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
 
-class PasswordSerializer(serializers.Serializer):
+class ResetCodeSerializer(serializers.Serializer):
+    reset_code = SIX_DIGIT_CODE_FIELD
+
+
+class RegisterAccountSerializer(EmailSerializer):
     password = serializers.CharField(required=True)
 
 
-class NewPasswordSerializer(serializers.Serializer):
-    new_password = serializers.CharField(required=True)
-
-
-class RegisterAccountSerializer(EmailSerializer, PasswordSerializer):
-    pass
-
-
-class EmailVerifySerializer(serializers.Serializer):
-    verification_code = serializers.CharField(required=True)
+class EmailVerifySerializer(EmailSerializer):
+    verification_code = SIX_DIGIT_CODE_FIELD
 
 
 class LoginSerializer(RegisterAccountSerializer):
     remember_me = serializers.BooleanField(default=False, required=False)
 
 
-class PasswordResetSerializer(NewPasswordSerializer):
-    reset_token = serializers.CharField(required=True)
+class CodeCheckSerializer(EmailSerializer, ResetCodeSerializer):
+    pass
 
 
-class PasswordChangeSerializer(PasswordSerializer, NewPasswordSerializer):
+class PasswordResetSerializer(EmailSerializer, ResetCodeSerializer):
+    new_password = serializers.CharField(required=True)
     prune_sessions = serializers.BooleanField(default=False, required=False)
 
 

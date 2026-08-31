@@ -8,8 +8,10 @@ import ResetStep from "@/features/account/setting-dialogs/change-password/steps/
 import { useChangePasswordFlow } from "@/features/account/setting-dialogs/change-password/use-change-password";
 import EmptyButton from "@/features/button/components/empty";
 import { FormDialog } from "@/features/system-feedback";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 export default function ChangePasswordDialog() {
+  const isMobile = useCheckMobile();
   const flow = useChangePasswordFlow();
 
   const [renderedStep, setRenderedStep] = useState(flow.step);
@@ -38,8 +40,8 @@ export default function ChangePasswordDialog() {
     onConfirmHandler = flow.handleChangePassword;
     dialogContent = <ChangeStep flow={flow} />;
   } else if (displayStep === "OTP") {
-    dialogTitle = "Enter Reset Code";
-    dialogDescriptionText = "Please enter the code sent to your email.";
+    dialogTitle = "Verify It's You";
+    dialogDescriptionText = "We sent a code to your email, input it below.";
     submitLabel = "Verify Code";
     onConfirmHandler = () => flow.handleVerifyOTP();
     dialogContent = <OtpStep flow={flow} />;
@@ -61,6 +63,8 @@ export default function ChangePasswordDialog() {
       open={flow.open}
       onOpenChange={flow.handleOpenChange}
       onSubmit={onConfirmHandler}
+      submitTooltip={flow.invalidForm}
+      submitDisabled={!isMobile && !!flow.invalidForm}
     >
       {dialogContent}
     </FormDialog>

@@ -17,7 +17,7 @@ export const MESSAGES = {
   ERROR_PASSWORD_REUSE: "Cannot reuse old password.",
   ERROR_PASSWORD_WEAK: "Password is not strong enough.",
   ERROR_PASSWORD_MISMATCH: "Passwords do not match.",
-  ERROR_RESET_TOKEN_INVALID: "Invalid or expired reset token.",
+  ERROR_RESET_CODE_INVALID: "Invalid or expired reset code.",
 
   // availability errors
   ERROR_NAME_LENGTH: `Name must be ${MAX_DISPLAY_NAME_LENGTH} characters or less.`,
@@ -73,4 +73,8 @@ export const MESSAGES = {
     "Literally no one is free at the same time. This is NOT making it out of the group chat...",
   INFO_NO_IDEAL_TIMES:
     "There are no times that work for everyone. Times with an indicator are the best options.",
+
+  // form error messages
+  FORM_NOT_FILLED: "Please fill out all fields.",
+  FORM_HAS_ERRORS: "Please fix the displayed errors.",
 };

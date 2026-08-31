@@ -68,7 +68,7 @@ export default function ChangeStep({ flow }: ChangePasswordStepProps) {
         />
         <button
           type="button"
-          onClick={flow.handleForgotPassword}
+          onClick={() => flow.handleForgotPassword(false)}
           className="cursor-pointer border-none bg-transparent p-0"
         >
           <LinkText>Forgot password?</LinkText>

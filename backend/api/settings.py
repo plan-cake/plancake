@@ -137,8 +137,6 @@ EMAIL_CODE_EXP_SECONDS = 600  # 10 minutes
 
 PWD_RESET_EXP_SECONDS = 600  # 10 minutes
 
-AUTHED_PWD_RESET_EXP_SECONDS = 600  # 10 minutes
-
 URL_CODE_EXP_SECONDS = 1209600  # 14 days
 
 ACCOUNT_COOKIE_NAME = "account_sess_token"
@@ -148,13 +146,25 @@ GENERIC_ERR_RESPONSE = Response(
     {"error": {"general": ["An unknown error has occurred."]}}, status=500
 )
 
-# AWS SES Credentials
-EMAIL_BACKEND = "django_ses.SESBackend"
-AWS_SES_ACCESS_KEY_ID = env("AWS_SES_ACCESS_KEY_ID")
-AWS_SES_SECRET_ACCESS_KEY = env("AWS_SES_SECRET_ACCESS_KEY")
-AWS_SES_REGION_NAME = env("AWS_SES_REGION_NAME")
-AWS_SES_REGION_ENDPOINT = env("AWS_SES_REGION_ENDPOINT")
+# Email settings
+if DEBUG:
+    # For use with something like Mailpit
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = env("SMTP_HOST")
+    EMAIL_PORT = env.int("SMTP_PORT")
+    EMAIL_USE_TLS = False
+    EMAIL_HOST_USER = env("SMTP_HOST_USER")
+    EMAIL_HOST_PASSWORD = env("SMTP_HOST_PASSWORD")
+else:
+    # For production, uses AWS SES
+    EMAIL_BACKEND = "django_ses.SESBackend"
+    AWS_SES_ACCESS_KEY_ID = env("AWS_SES_ACCESS_KEY_ID")
+    AWS_SES_SECRET_ACCESS_KEY = env("AWS_SES_SECRET_ACCESS_KEY")
+    AWS_SES_REGION_NAME = env("AWS_SES_REGION_NAME")
+    AWS_SES_REGION_ENDPOINT = env("AWS_SES_REGION_ENDPOINT")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+EMAIL_BRIDGE_SECRET = env("EMAIL_BRIDGE_SECRET")
+EMAIL_TIMEOUT = 10  # seconds
 ADMIN_EMAILS = env.list("ADMIN_EMAILS", default=[])
 SEND_EMAILS = env.bool("SEND_EMAILS", default=False)
 CRITICAL_EMAIL_INTERVAL_SECONDS = 1800  # 30 minutes

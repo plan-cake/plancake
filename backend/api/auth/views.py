@@ -3,27 +3,28 @@ import uuid
 from datetime import datetime, timedelta
 
 import bcrypt
-from django.core.mail import send_mail
 from django.db import transaction
 from rest_framework.response import Response
 
 from api.auth.serializers import (
     AccountDetailsSerializer,
+    CodeCheckSerializer,
     EmailSerializer,
     EmailVerifySerializer,
     LoginSerializer,
     PasswordResetSerializer,
     RegisterAccountSerializer,
 )
-from api.auth.utils import list_failed_criteria, validate_password
+from api.auth.utils import generate_auth_code, list_failed_criteria, validate_password
 from api.decorators import (
     api_endpoint,
+    check_auth,
     require_account_auth,
     validate_json_input,
     validate_output,
 )
 from api.models import (
-    PasswordResetToken,
+    PasswordResetCode,
     UnverifiedUserAccount,
     UserAccount,
     UserLogin,
@@ -31,19 +32,20 @@ from api.models import (
 )
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
-    BASE_URL,
     EMAIL_CODE_EXP_SECONDS,
     PWD_RESET_EXP_SECONDS,
-    SEND_EMAILS,
     ThrottleScopes,
 )
 from api.utils import (
+    EmailTemplateKey,
     MessageOutputSerializer,
     check_rate_limit,
     delete_session_cookie,
     get_client_ip_address,
     get_client_user_agent,
     get_session,
+    prune_account_sessions,
+    send_templated_email,
     set_session_cookie,
 )
 
@@ -58,7 +60,7 @@ def register(request):
     Registers a new user account as an "unverified user" that cannot be used until the
     email address is verified.
 
-    If the email address is available, it will send an email with a link to verify.
+    If the email address is available, it will send an email with a code to verify.
 
     If the email address is already used for an unverified user, it will update the
     verification code and send a new email.
@@ -83,17 +85,14 @@ def register(request):
     # Check if the email already exists
     if UserAccount.objects.filter(email=email).exists():
         logger.info("Email %s is already in use!", email)
-        if SEND_EMAILS:
-            send_mail(
-                subject="Plancake - Email in Use",
-                message=f"Looks like your email was already used for a Plancake account.\n\nNot you? Nothing to worry about, just ignore this email.",
-                from_email=None,  # Use the default from settings
-                recipient_list=[email],
-                fail_silently=False,
-            )
+        send_templated_email(
+            to_email=email,
+            template_key=EmailTemplateKey.EMAIL_IN_USE,
+            context={},
+        )
     else:
         # Create an unverified user account
-        ver_code = str(uuid.uuid4())
+        ver_code = generate_auth_code()
         with transaction.atomic():
             UnverifiedUserAccount.objects.filter(email=email).delete()
             UnverifiedUserAccount.objects.create(
@@ -103,14 +102,11 @@ def register(request):
             )
         logger.debug("Verification code for %s: %s", email, ver_code)
 
-        if SEND_EMAILS:
-            send_mail(
-                subject="Plancake - Email Verification",
-                message=f"Welcome to Plancake!\n\nClick this link to verify your email:\n{BASE_URL}/verify-email?code={ver_code}\n\nNot you? Nothing to worry about, just ignore this email.",
-                from_email=None,  # Use the default from settings
-                recipient_list=[email],
-                fail_silently=False,
-            )
+        send_templated_email(
+            to_email=email,
+            template_key=EmailTemplateKey.EMAIL_VERIFICATION_CODE,
+            context={"code": ver_code},
+        )
 
     return Response(
         {"message": ["An email has been sent to your address for verification."]},
@@ -147,14 +143,11 @@ def resend_register_email(request):
             unverified_user.verification_code,
         )
 
-        if SEND_EMAILS:
-            send_mail(
-                subject="Plancake - Email Verification",
-                message=f"Welcome to Plancake!\n\nClick this link to verify your email:\n{BASE_URL}/verify-email?code={unverified_user.verification_code}\n\nNot you? Nothing to worry about, just ignore this email.",
-                from_email=None,  # Use the default from settings
-                recipient_list=[email],
-                fail_silently=False,
-            )
+        send_templated_email(
+            to_email=email,
+            template_key=EmailTemplateKey.EMAIL_VERIFICATION_CODE,
+            context={"code": unverified_user.verification_code},
+        )
 
     except UnverifiedUserAccount.DoesNotExist:
         logger.info("Unverified user with email %s does not exist!", email)
@@ -167,19 +160,21 @@ def resend_register_email(request):
 @validate_output(MessageOutputSerializer)
 def verify_email(request):
     """
-    Verifies the email address of an unverified user account.
+    Verifies an unverified user account given an email and verification code.
 
-    If the verification code is valid, it creates a verified user account with the
+    If the given information is valid, it creates a verified user account with the
     information given when initially registering.
 
     This endpoint does NOT automatically log in the user after verifying.
     """
+    email = request.validated_data.get("email")
     ver_code = request.validated_data.get("verification_code")
 
     check_rate_limit(request, ThrottleScopes.CODE_CHECK)
 
     try:
         unverified_user = UnverifiedUserAccount.objects.get(
+            email=email,
             verification_code=ver_code,
             created_at__gte=datetime.now() - timedelta(seconds=EMAIL_CODE_EXP_SECONDS),
         )
@@ -196,10 +191,8 @@ def verify_email(request):
         logger.info("Account successfully created for %s.", unverified_user.email)
 
     except UnverifiedUserAccount.DoesNotExist:
-        logger.info("Verification code is invalid.")
-        return Response(
-            {"error": {"verification_code": ["Invalid verification code."]}}, status=404
-        )
+        logger.info("Verification code or email is invalid for %s.", email)
+        return Response({"error": {"verification_code": ["Invalid code."]}}, status=400)
 
     return Response({"message": ["Email verified successfully."]}, status=200)
 
@@ -311,13 +304,13 @@ def check_account_auth(request):
 @validate_output(MessageOutputSerializer)
 def start_password_reset(request):
     """
-    Starts the password reset process by sending a password reset link to the specified
+    Starts the password reset process by sending a password reset code to the specified
     email.
 
     If the email address is not associated with a user account, nothing will happen.
 
     To resend the email, this endpoint can be called again with the same input. A new
-    reset token will be generated and the old one invalidated.
+    reset code will be generated and the old one invalidated.
     """
     email = request.validated_data.get("email")
 
@@ -325,22 +318,19 @@ def start_password_reset(request):
 
     try:
         user = UserAccount.objects.get(email=email)
-        reset_token = str(uuid.uuid4())
+        reset_code = generate_auth_code()
         with transaction.atomic():
-            PasswordResetToken.objects.filter(user_account=user).delete()
-            PasswordResetToken.objects.create(
-                reset_token=reset_token, user_account=user
+            PasswordResetCode.objects.update_or_create(
+                user_account=user,
+                defaults={"reset_code": reset_code, "created_at": datetime.now()},
             )
-        logger.debug("Password reset token for %s: %s", email, reset_token)
+        logger.debug("Password reset code for %s: %s", email, reset_code)
 
-        if SEND_EMAILS:
-            send_mail(
-                subject="Plancake - Reset Password",
-                message=f"Click this link to reset your password:\n{BASE_URL}/reset-password?token={reset_token}\n\nNot you? Nothing to worry about, just ignore this email.",
-                from_email=None,  # Use the default from settings
-                recipient_list=[email],
-                fail_silently=False,
-            )
+        send_templated_email(
+            to_email=email,
+            template_key=EmailTemplateKey.PASSWORD_RESET_CODE,
+            context={"code": reset_code},
+        )
 
     except UserAccount.DoesNotExist:
         logger.info("Password reset failed for %s: User does not exist.", email)
@@ -355,20 +345,81 @@ def start_password_reset(request):
     )
 
 
+INVALID_RESET_CODE_RESPONSE = Response(
+    {"error": {"general": ["Invalid code."]}}, status=400
+)
+
+
 @api_endpoint("POST")
+@validate_json_input(CodeCheckSerializer)
+@validate_output(MessageOutputSerializer)
+def check_password_reset_code(request):
+    """
+    Checks if the provided password reset code is valid for the account associated with
+    the provided email address.
+    """
+    email = request.validated_data.get("email")
+    reset_code = request.validated_data.get("reset_code")
+
+    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
+
+    try:
+        user = UserAccount.objects.get(email=email)
+        PasswordResetCode.objects.get(
+            user_account=user,
+            reset_code=reset_code,
+            created_at__gte=datetime.now() - timedelta(seconds=PWD_RESET_EXP_SECONDS),
+        )
+    except UserAccount.DoesNotExist:
+        logger.info(
+            "Password reset code check failed for %s: User does not exist.", email
+        )
+        return INVALID_RESET_CODE_RESPONSE
+    except PasswordResetCode.DoesNotExist:
+        logger.info(
+            "Password reset code check failed for %s: Invalid or expired reset code.",
+            email,
+        )
+        return INVALID_RESET_CODE_RESPONSE
+
+    return Response({"message": ["Password reset code is valid."]}, status=200)
+
+
+@api_endpoint("POST")
+@check_auth
 @validate_json_input(PasswordResetSerializer)
 @validate_output(MessageOutputSerializer)
 def reset_password(request):
     """
-    Resets the password for a user account given a valid password reset token.
+    Resets the password for a user account given a valid combination of email and password
+    reset code.
 
-    Also removes all currently active sessions as a security measure. This means that you
-    probably shouldn't call this endpoint while the user is currently logged in.
+    If "prune_sessions" is true, all active sessions for this account will be removed,
+    unless the user is logged into an account. If that is the case, the current session
+    will be preserved.
     """
-    reset_token = request.validated_data.get("reset_token")
+    user = request.user
+    email = request.validated_data.get("email")
+    reset_code = request.validated_data.get("reset_code")
     new_password = request.validated_data.get("new_password")
+    prune_sessions = request.validated_data.get("prune_sessions")
 
     check_rate_limit(request, ThrottleScopes.CODE_CHECK)
+
+    has_account_auth = user is not None and not user.is_guest
+
+    if has_account_auth and user.email != email:
+        logger.info(
+            "Password reset failed: Authenticated user email %s does not match provided email %s.",
+            user.email,
+            email,
+        )
+        # This is the one time it's okay to say the email does not match because the user
+        # is already authenticated.
+        return Response(
+            {"error": {"email": ["Provided email does not match account."]}},
+            status=400,
+        )
 
     is_strong, criteria = validate_password(new_password)
     if not is_strong:
@@ -379,12 +430,13 @@ def reset_password(request):
 
     try:
         with transaction.atomic():
-            reset_token_obj = PasswordResetToken.objects.get(
-                reset_token=reset_token,
+            reset_code_obj = PasswordResetCode.objects.select_for_update().get(
+                user_account__email=email,
+                reset_code=reset_code,
                 created_at__gte=datetime.now()
                 - timedelta(seconds=PWD_RESET_EXP_SECONDS),
             )
-            user = reset_token_obj.user_account
+            user = reset_code_obj.user_account
 
             # Check if the new password is actually new
             if bcrypt.checkpw(new_password.encode(), user.password_hash.encode()):
@@ -404,16 +456,24 @@ def reset_password(request):
                 new_password.encode(), bcrypt.gensalt()
             ).decode()
             user.save()
-            reset_token_obj.delete()  # Make sure to remove the reset token after use
+            reset_code_obj.delete()  # Make sure to remove the reset code after use
 
-            # Remove all active sessions for the user
-            UserSession.objects.filter(user_account=user).delete()
+            if prune_sessions:
+                if has_account_auth:
+                    # Remove all active sessions except the current one
+                    prune_account_sessions(request)
+                else:
+                    # Remove all active sessions for the user
+                    UserSession.objects.filter(user_account=user).delete()
 
-    except PasswordResetToken.DoesNotExist:
-        logger.info("Password reset failed: Invalid reset token.")
-        return Response(
-            {"error": {"reset_token": ["Invalid reset token."]}}, status=404
-        )
+    except PasswordResetCode.DoesNotExist:
+        if has_account_auth:
+            logger.info("Password reset failed for %s: Invalid reset code.", user.email)
+        else:
+            logger.info(
+                "Password reset failed for %s: Invalid reset code or email.", email
+            )
+        return INVALID_RESET_CODE_RESPONSE
 
     return Response({"message": ["Password reset successfully."]}, status=200)
 

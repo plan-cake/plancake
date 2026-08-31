@@ -2,13 +2,12 @@ import {
   AccountData,
   ActiveSessionList,
   AllAvailability,
-  AuthedPasswordResetCode,
-  AuthedPasswordResetData,
   AvailabilityAddData,
   CustomCode,
   DashboardData,
   DisplayName,
   Email,
+  EmailVerification,
   EventCode,
   EventDetails,
   EventDisplayNameData,
@@ -21,12 +20,12 @@ import {
   NewEventData,
   Password,
   PasswordChangeData,
+  PasswordResetCodeCheckData,
   PasswordResetData,
   RegisterData,
   SelfAvailability,
   SessionId,
   TrueCode,
-  VerificationCode,
 } from "@/lib/utils/api/types";
 
 /**
@@ -53,7 +52,7 @@ export const ROUTES = {
     /**
      * Registers a new user account that cannot be used until the email is verified.
      * @method POST
-     * @throws {400} - If the password is not strong enough.
+     * @throws 400 - If the password is not strong enough.
      */
     register: route<MessageResponse, RegisterData>("/auth/register/"),
     /**
@@ -64,9 +63,9 @@ export const ROUTES = {
     /**
      * Verifies the email address of an unverified user account.
      * @method POST
-     * @throws 404 - If the verification code is invalid.
+     * @throws 400 - If the verification code is invalid.
      */
-    verifyEmail: route<MessageResponse, VerificationCode>("/auth/verify-email/"),
+    verifyEmail: route<MessageResponse, EmailVerification>("/auth/verify-email/"),
     /**
      * Logs in a user account.
      * @method POST
@@ -86,11 +85,17 @@ export const ROUTES = {
      */
     startPasswordReset: route<MessageResponse, Email>("/auth/start-password-reset/"),
     /**
-     * Given a valid password reset token, resets the password for a user account.
+     * Checks if a password reset code is valid for a given email address.
+     * @method POST
+     * @throws 400 - If the reset code is invalid.
+     */
+    checkPasswordResetCode: route<MessageResponse, PasswordResetCodeCheckData>("/auth/check-password-reset-code/"),
+    /**
+     * Given a valid password reset code, resets the password for a user account.
      * @method POST
      * @throws 400 - If the new password is not strong enough.
      * @throws 400 - If the new password is the same as the old password.
-     * @throws 404 - If the reset token is invalid.
+     * @throws 400 - If the reset code is invalid.
      */
     resetPassword: route<MessageResponse, PasswordResetData>("/auth/reset-password/"),
     /**
@@ -243,28 +248,6 @@ export const ROUTES = {
      * @throws 400 - If the new password is the same as the old password.
      */
     changePassword: route<MessageResponse, PasswordChangeData>("/account/change-password/"),
-    /**
-     * Starts the password reset process for a logged-in user by sending an email.
-     * @method POST
-     * @throws 401 - If the user is not logged in.
-     */
-    startAuthedPasswordReset: route<MessageResponse>("/account/start-authed-password-reset/"),
-    /**
-     * Checks the validity of a password reset code for a logged-in user.
-     * @method POST
-     * @throws 401 - If the user is not logged in.
-     * @throws 400 - If the reset code is invalid.
-     */
-    checkAuthedPasswordResetCode: route<MessageResponse, AuthedPasswordResetCode>("/account/check-authed-password-reset-code/"),
-    /**
-     * Resets the password for a logged-in user.
-     * @method POST
-     * @throws 401 - If the user is not logged in.
-     * @throws 400 - If the reset code is invalid.
-     * @throws 400 - If the new password is not strong enough.
-     * @throws 400 - If the new password is the same as the old password.
-     */
-    authedPasswordReset: route<MessageResponse, AuthedPasswordResetData>("/account/authed-password-reset/"),
     /**
      * Deletes the current user account, including all created events and participation
      * data.

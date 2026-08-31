@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from enum import Enum
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+import requests
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
 from ipware import get_client_ip
 from redis import Redis
@@ -17,10 +19,13 @@ from api.models import UserAccount, UserEvent, UserSession
 from api.redis_pools import sync_pool
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
+    BASE_URL,
     COOKIE_DOMAIN,
     DEBUG,
+    EMAIL_BRIDGE_SECRET,
     GUEST_COOKIE_NAME,
     LONG_SESS_EXP_SECONDS,
+    SEND_EMAILS,
     SESS_EXP_SECONDS,
     TEST_ENVIRONMENT,
     ThrottleScope,
@@ -472,3 +477,71 @@ def notify_live_update(event: LiveUpdateEvent):
         f"event_{event.event_code}",
         event.dumps(),
     )
+
+
+class EmailTemplateKey(str, Enum):
+    EMAIL_IN_USE = "email_in_use"
+    EMAIL_VERIFICATION_CODE = "email_verification_code"
+    PASSWORD_RESET_CODE = "password_reset_code"
+
+
+def send_templated_email(to_email, template_key: EmailTemplateKey, context) -> bool:
+    """
+    Fetches rendered HTML from Next.js and sends it as an email.
+
+    Returns True if the email was sent successfully, False otherwise.
+
+    This function will check the SEND_EMAILS environment variable, and if set to False
+    then the email will not be sent and True will be returned every time.
+    """
+    if not SEND_EMAILS:
+        return True
+
+    url = BASE_URL
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {EMAIL_BRIDGE_SECRET}",
+    }
+    payload = {
+        "template_key": template_key,
+        "context": context,
+    }
+
+    html_content = None
+    text_fallback = None
+    msg_subject = None
+    success = False
+
+    try:
+        response = requests.post(
+            url + "/api/render-email/", json=payload, headers=headers, timeout=5
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            html_content = data.get("html")
+            text_fallback = data.get("text")
+            msg_subject = data.get("subject")
+            success = True
+            logger.info(f"Successfully rendered email for template '{template_key}'")
+        else:
+            logger.error(
+                f"Failed to render email for template '{template_key}'. "
+                f"Status code: {response.status_code}, Response: {response.text}"
+            )
+    except requests.RequestException as e:
+        logger.error(f"Error rendering email for template '{template_key}': {e}")
+
+    try:
+        if html_content:
+            EmailMultiAlternatives(
+                subject=msg_subject,
+                body=text_fallback,
+                alternatives=[(html_content, "text/html")],
+                to=[to_email],
+            ).send()
+    except Exception as e:
+        logger.error(f"Error sending email: {e}")
+        success = False
+
+    return success
