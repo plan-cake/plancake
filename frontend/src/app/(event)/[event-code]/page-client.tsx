@@ -253,7 +253,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           {bannerElement}
           <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4">
             <AttendeesPanel />
-            <AnimatePresence initial={true}>
+            <AnimatePresence initial={false}>
               {participants.length > 1 && availabilityFilters}
             </AnimatePresence>
             <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
