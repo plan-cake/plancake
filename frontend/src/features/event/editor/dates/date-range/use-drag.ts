@@ -92,14 +92,12 @@ export default function useDateRangeDrag({
       setDates(newDates);
     };
 
-    window.addEventListener("mouseup", endDrag);
-    window.addEventListener("touchend", endDrag);
+    window.addEventListener("pointerup", endDrag);
 
     return () => {
-      window.removeEventListener("mouseup", endDrag);
-      window.removeEventListener("touchend", endDrag);
+      window.removeEventListener("pointerup", endDrag);
     };
-  }, [dragState, selectedDates, setDates, dragRange]);
+  }, [dragRange, dragState.isEnabling, selectedDates, setDates]);
 
   return {
     hoveredDate,

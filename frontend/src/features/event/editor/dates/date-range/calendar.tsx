@@ -19,7 +19,6 @@ import {
 
 import useDateRangeDrag from "@/features/event/editor/dates/date-range/use-drag";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
-import { cn } from "@/lib/utils/classname";
 
 type CalendarProps = {
   earliestDate?: Date;
@@ -41,8 +40,7 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     const defaultClassNames = getDefaultClassNames();
 
     const isMobile = useCheckMobile();
-    const numberOfMonths = isMobile ? 13 : 2;
-    const hideNavigation = isMobile ? true : false;
+    const numberOfMonths = isMobile ? 1 : 2;
 
     const startDate = useMemo(() => {
       const now = new Date();
@@ -171,12 +169,11 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     };
 
     return (
-      <div ref={containerRef} className={cn("flex flex-col gap-2", className)}>
+      <div ref={containerRef} className={className}>
         <DayPicker
           mode="multiple"
           numberOfMonths={numberOfMonths}
           animate
-          hideNavigation={hideNavigation}
           month={month}
           onMonthChange={setMonth}
           selected={selectedDatesArray}

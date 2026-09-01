@@ -69,7 +69,6 @@ export default function DateRangeDrawer({
       <Calendar
         ref={calendarRef}
         earliestDate={earliestDate}
-        className="w-fit"
         selectedDates={dates}
         setDates={setDates}
         dateRangeError={errors.dateRange}
