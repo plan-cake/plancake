@@ -186,7 +186,6 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
           modifiers={modifiers}
           modifiersClassNames={{
             group_start: "rdp-group_start",
-            group_middle: "rdp-group_middle",
             group_end: "rdp-group_end",
             drag_enabling: "rdp-drag_enabling",
             drag_disabling: "rdp-drag_disabling",
