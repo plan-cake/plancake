@@ -166,7 +166,11 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
         );
       },
       hovered: (date: Date) => {
-        return !!hoveredDate && getDateString(date) === hoveredDate;
+        return (
+          !dragState.isDragging &&
+          !!hoveredDate &&
+          getDateString(date) === hoveredDate
+        );
       },
     };
 
