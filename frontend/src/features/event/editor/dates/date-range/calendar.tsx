@@ -190,7 +190,9 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
           onSelect={handleSelect}
           disabled={{ before: startDate }}
           startMonth={startDate}
-          endMonth={new Date(startDate.getFullYear() + 1, startDate.getMonth())}
+          endMonth={
+            new Date(new Date().getFullYear() + 1, new Date().getMonth())
+          }
           // modifiers + styles
           modifiers={modifiers}
           modifiersClassNames={{
