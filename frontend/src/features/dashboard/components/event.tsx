@@ -9,6 +9,8 @@ import DateRangeRow from "@/features/dashboard/components/date-range-row";
 import ParticipantRow from "@/features/dashboard/components/participant-row";
 import DashboardShareButton from "@/features/dashboard/components/share-button";
 import WeekdayRow from "@/features/dashboard/components/weekday-row";
+import Tooltip from "@/features/system-feedback/tooltip/base";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 import {
   formatTimeRange,
@@ -40,6 +42,7 @@ export default function DashboardEvent({
   ...dateTimeProps
 }: DashboardEventProps) {
   const router = useRouter();
+  const isMobile = useCheckMobile();
 
   function handleDelete(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault(); // prevent the link behind it triggering
@@ -92,6 +95,68 @@ export default function DashboardEvent({
     return () => observer.disconnect();
   }, []);
 
+  // Dynamic tooltip for the title only if it's too long
+  const titleRef = useRef<HTMLDivElement>(null);
+  const [titleOverflowed, setTitleOverflowed] = useState(false);
+  useEffect(() => {
+    const currentTitleRef = titleRef.current;
+    if (!currentTitleRef) return;
+
+    const checkOverflow = () => {
+      // Create a temporary element to measure the full title width
+      const tempSpan = document.createElement("span");
+      // Copy style of real title
+      const computedStyle = window.getComputedStyle(currentTitleRef);
+      tempSpan.style.fontSize = computedStyle.fontSize;
+      tempSpan.style.fontWeight = computedStyle.fontWeight;
+      tempSpan.style.fontFamily = computedStyle.fontFamily;
+      tempSpan.style.letterSpacing = computedStyle.letterSpacing;
+      tempSpan.style.whiteSpace = "nowrap";
+      tempSpan.style.position = "absolute"; // Don't affect layout
+      tempSpan.style.visibility = "hidden"; // Don't show it
+
+      tempSpan.textContent = currentTitleRef.textContent;
+      document.body.appendChild(tempSpan);
+
+      const contentWidth = tempSpan.offsetWidth;
+      const containerWidth = currentTitleRef.clientWidth;
+
+      setTitleOverflowed(contentWidth > containerWidth);
+
+      document.body.removeChild(tempSpan);
+    };
+
+    checkOverflow();
+
+    const observer = new ResizeObserver(checkOverflow);
+    observer.observe(currentTitleRef);
+
+    // Observe the parent
+    if (currentTitleRef.parentElement) {
+      observer.observe(currentTitleRef.parentElement);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+  let titleContent = (
+    <div
+      ref={titleRef}
+      className={cn(
+        "md:overflow-hidden md:overflow-ellipsis md:whitespace-nowrap",
+        "text-lg font-bold leading-tight",
+      )}
+    >
+      {title}
+    </div>
+  );
+  if (titleOverflowed && !isMobile) {
+    titleContent = (
+      <Tooltip side="top" content={title}>
+        {titleContent}
+      </Tooltip>
+    );
+  }
+
   return (
     <Link
       href={`/${code}`}
@@ -101,7 +166,7 @@ export default function DashboardEvent({
         "[&:not(:has([data-actions]:active))]:active:bg-[color-mix(in_oklab,var(--color-background)_95%,var(--color-black))]",
       )}
     >
-      <div className="text-lg font-bold leading-tight">{title}</div>
+      {titleContent}
       <div className="text-sm opacity-50">{code}</div>
       <div className="mb-2 mt-1">
         {type === "specific" && (
@@ -122,31 +187,35 @@ export default function DashboardEvent({
         <DashboardShareButton title={title} code={code} />
         {myEvent && (
           <>
-            <button className="cursor-pointer" onClick={navigateToEdit}>
-              <div
-                className={cn(
-                  "border-foreground w-fit rounded-full border p-1.5",
-                  "hover:bg-foreground/20 active:bg-foreground/10",
-                )}
+            <Tooltip content="Edit Event">
+              <button className="cursor-pointer" onClick={navigateToEdit}>
+                <div
+                  className={cn(
+                    "border-foreground w-fit rounded-full border p-1.5",
+                    "hover:bg-foreground/20 active:bg-foreground/10",
+                  )}
+                >
+                  <PencilIcon className="h-4 w-4" />
+                </div>
+              </button>
+            </Tooltip>
+            <Tooltip content="Delete Event">
+              <button
+                className="cursor-pointer"
+                onClick={handleDelete}
+                aria-label="Delete Event"
               >
-                <PencilIcon className="h-4 w-4" />
-              </div>
-            </button>
-            <button
-              className="cursor-pointer"
-              onClick={handleDelete}
-              aria-label="Delete Event"
-            >
-              <div
-                className={cn(
-                  "border-foreground w-fit rounded-full border p-1.5",
-                  "hover:bg-error/20 hover:text-error hover:border-error",
-                  "active:bg-error/40",
-                )}
-              >
-                <Trash2Icon className="h-4 w-4" />
-              </div>
-            </button>
+                <div
+                  className={cn(
+                    "border-foreground w-fit rounded-full border p-1.5",
+                    "hover:bg-error/20 hover:text-error hover:border-error",
+                    "active:bg-error/40",
+                  )}
+                >
+                  <Trash2Icon className="h-4 w-4" />
+                </div>
+              </button>
+            </Tooltip>
           </>
         )}
       </div>
