@@ -160,3 +160,33 @@ export type AuthedPasswordResetData = {
   new_password: string;
   prune_sessions?: boolean;
 }
+
+export type GuestDataSummary = {
+  created_events: number;
+  participated_events: number;
+}
+
+type GuestCreatedEvent = {
+  url_code: string | null;
+  public_id: string;
+  title: string;
+}
+
+type GuestParticipatedEvent = {
+  url_code: string | null;
+  public_id: string;
+  title: string;
+  guest_display_name: string;
+  account_display_name: string | null;
+}
+
+export type GuestData = {
+  created_events: GuestCreatedEvent[];
+  participated_events: GuestParticipatedEvent[];
+}
+
+export type GuestImportData = {
+  availability_choices: {
+    [public_id: string]: "guest" | "account";
+  };
+}
