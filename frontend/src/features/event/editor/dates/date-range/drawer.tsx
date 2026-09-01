@@ -13,6 +13,7 @@ import {
 import { SpecificDateRangeDisplayProps } from "@/features/event/editor/dates/date-range/date-range-props";
 import DateRangePresets from "@/features/event/editor/dates/date-range/presets";
 import SpecificDateRangeDisplay from "@/features/event/editor/dates/date-range/specific-date-display";
+import { MESSAGES } from "@/lib/messages";
 import { formatDateSet } from "@/lib/utils/date-time-format";
 
 export default function DateRangeDrawer({
@@ -60,7 +61,7 @@ export default function DateRangeDrawer({
             </span>
           ) : (
             <span className="text-accent text-sm font-normal">
-              {dateDisplay || "Choose dates using the calendar below"}
+              {dateDisplay || MESSAGES.INFO_DRAG_DATES}
             </span>
           )}
         </div>

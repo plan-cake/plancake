@@ -19,6 +19,7 @@ import {
 
 import useDateRangeDrag from "@/features/event/editor/dates/date-range/use-drag";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
 type CalendarProps = {
@@ -206,10 +207,15 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
             root: `${defaultClassNames.root} flex justify-center items-center select-none`,
           }}
         />
-        {!isMobile && dateRangeError && (
-          <div className="text-error flex items-center justify-center gap-1 font-bold">
-            <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
-            {dateRangeError}
+        {!isMobile && (
+          <div className="flex items-center justify-between gap-2">
+            <span className="opacity-50">{MESSAGES.INFO_DRAG_DATES}</span>
+            {dateRangeError && (
+              <div className="text-error flex items-center gap-1 font-bold">
+                <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
+                {dateRangeError}
+              </div>
+            )}
           </div>
         )}
       </div>

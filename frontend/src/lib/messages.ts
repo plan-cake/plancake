@@ -73,4 +73,5 @@ export const MESSAGES = {
     "Literally no one is free at the same time. This is NOT making it out of the group chat...",
   INFO_NO_IDEAL_TIMES:
     "There are no times that work for everyone. Times with an indicator are the best options.",
+  INFO_DRAG_DATES: "Drag to select multiple",
 };
