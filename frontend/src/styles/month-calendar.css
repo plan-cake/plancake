@@ -5,7 +5,7 @@
   --rdp-accent-background-color: var(--calendar-accent-background);
   --rdp-enabling-color: color-mix(
     in srgb,
-    var(--calendar-accent) 15%,
+    var(--calendar-accent) 30%,
     transparent
   );
   --rdp-disabling-color: color-mix(
