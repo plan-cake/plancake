@@ -108,9 +108,11 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     };
 
     const {
+      hoveredDate,
       dragState,
       handlePointerDown,
       handlePointerEnter,
+      handlePointerLeave,
       handleTouchMove,
     } = useDateRangeDrag({
       selectedDates,
@@ -163,6 +165,9 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
           selectedDates.has(getDateString(date))
         );
       },
+      hovered: (date: Date) => {
+        return !!hoveredDate && getDateString(date) === hoveredDate;
+      },
     };
 
     return (
@@ -187,6 +192,7 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
             group_end: "rdp-group_end",
             drag_enabling: "rdp-drag_enabling",
             drag_disabling: "rdp-drag_disabling",
+            hovered: "rdp-hovered",
           }}
           components={{
             DayButton: (props) => (
@@ -194,6 +200,7 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
                 {...props}
                 handlePointerDown={handlePointerDown}
                 handlePointerEnter={handlePointerEnter}
+                handlePointerLeave={handlePointerLeave}
                 handleTouchMove={handleTouchMove}
               />
             ),
@@ -218,11 +225,13 @@ function DraggableDayButton({
   modifiers,
   handlePointerDown,
   handlePointerEnter,
+  handlePointerLeave,
   handleTouchMove,
   ...buttonProps
 }: DayButtonProps & {
   handlePointerDown: (date: Date) => void;
   handlePointerEnter: (date: Date) => void;
+  handlePointerLeave: () => void;
   handleTouchMove: (event: React.TouchEvent<HTMLButtonElement>) => void;
 }) {
   return (
@@ -237,6 +246,7 @@ function DraggableDayButton({
       onPointerEnter={() => {
         handlePointerEnter(day.date);
       }}
+      onPointerLeave={handlePointerLeave}
       onTouchMove={(e) => {
         handleTouchMove(e);
       }}

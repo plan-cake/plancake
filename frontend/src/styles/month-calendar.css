@@ -87,11 +87,11 @@
  * wrap it inside this query
  */
 @media (hover: hover) {
-  .rdp-day:hover > .rdp-day_button::before {
+  .rdp-hovered:hover > .rdp-day_button::before {
     background-color: var(--rdp-enabling-color);
   }
 
-  .rdp-selected:hover > .rdp-day_button::before {
+  .rdp-hovered.rdp-selected:hover > .rdp-day_button::before {
     background-color: var(--rdp-disabling-color);
   }
 }

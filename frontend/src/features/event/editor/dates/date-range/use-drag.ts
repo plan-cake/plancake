@@ -10,6 +10,7 @@ export default function useDateRangeDrag({
   setDates: (dates: Set<string>) => void;
 }) {
   const isDragging = useRef(false);
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
   const [dragState, setDragState] = useState<{
     isEnabling: boolean;
     startDate: Date | null;
@@ -50,9 +51,15 @@ export default function useDateRangeDrag({
   };
 
   const handlePointerEnter = (date: Date) => {
+    setHoveredDate(getDateString(date));
+
     if (!isDragging.current) return;
 
     setDragState((prev) => ({ ...prev, endDate: date }));
+  };
+
+  const handlePointerLeave = () => {
+    setHoveredDate(null);
   };
 
   const handleTouchMove = (event: React.TouchEvent<HTMLButtonElement>) => {
@@ -72,6 +79,7 @@ export default function useDateRangeDrag({
     const endDrag = () => {
       if (!isDragging.current) return;
       isDragging.current = false;
+      setHoveredDate(null);
 
       const newDates = new Set(selectedDates);
       for (const dateString of dragRange) {
@@ -94,6 +102,7 @@ export default function useDateRangeDrag({
   }, [dragState, selectedDates, setDates, dragRange]);
 
   return {
+    hoveredDate,
     dragState: {
       isDragging: isDragging.current,
       isEnabling: dragState.isEnabling,
@@ -101,6 +110,7 @@ export default function useDateRangeDrag({
     },
     handlePointerDown,
     handlePointerEnter,
+    handlePointerLeave,
     handleTouchMove,
   };
 }
