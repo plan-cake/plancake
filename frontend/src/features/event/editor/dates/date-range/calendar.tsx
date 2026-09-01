@@ -133,8 +133,10 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
         );
         prevDate.setDate(prevDate.getDate() - 1);
         return (
-          selectedDates.has(getDateString(date)) &&
-          !selectedDates.has(getDateString(prevDate))
+          (selectedDates.has(getDateString(date)) ||
+            dragState.dragRange.has(getDateString(date))) &&
+          !selectedDates.has(getDateString(prevDate)) &&
+          !dragState.dragRange.has(getDateString(prevDate))
         );
       },
       group_end: (date: Date) => {
@@ -145,8 +147,10 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
         );
         nextDate.setDate(nextDate.getDate() + 1);
         return (
-          selectedDates.has(getDateString(date)) &&
-          !selectedDates.has(getDateString(nextDate))
+          (selectedDates.has(getDateString(date)) ||
+            dragState.dragRange.has(getDateString(date))) &&
+          !selectedDates.has(getDateString(nextDate)) &&
+          !dragState.dragRange.has(getDateString(nextDate))
         );
       },
       drag_enabling: (date: Date) => {

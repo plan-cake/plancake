@@ -56,10 +56,12 @@
 }
 
 .rdp-drag_enabling > .rdp-day_button::before {
+  border-radius: 0;
   background-color: var(--rdp-enabling-color);
 }
 
 .rdp-drag_disabling > .rdp-day_button::before {
+  border-radius: 0;
   background-color: var(--rdp-disabling-color);
 }
 

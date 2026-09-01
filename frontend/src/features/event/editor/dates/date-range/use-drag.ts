@@ -35,11 +35,17 @@ export default function useDateRangeDrag({
     const range = new Set<string>();
     const currentDate = new Date(start);
     while (currentDate <= end) {
-      range.add(getDateString(currentDate));
+      if (
+        (dragState.isEnabling &&
+          !selectedDates.has(getDateString(currentDate))) ||
+        (!dragState.isEnabling && selectedDates.has(getDateString(currentDate)))
+      ) {
+        range.add(getDateString(currentDate));
+      }
       currentDate.setDate(currentDate.getDate() + 1);
     }
     return range;
-  }, [dragState]);
+  }, [selectedDates, dragState]);
 
   const handlePointerDown = (date: Date) => {
     let isEnabling = true;
@@ -79,6 +85,7 @@ export default function useDateRangeDrag({
     const endDrag = () => {
       if (!isDragging.current) return;
       isDragging.current = false;
+      setDragState({ isEnabling: true, startDate: null, endDate: null });
       setHoveredDate(null);
 
       const newDates = new Set(selectedDates);
