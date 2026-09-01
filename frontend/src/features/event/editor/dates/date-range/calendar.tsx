@@ -10,8 +10,14 @@ import {
 
 import { parseISO } from "date-fns";
 import { TriangleAlertIcon } from "lucide-react";
-import { DayPicker, getDefaultClassNames } from "react-day-picker";
+import {
+  DayButton,
+  DayButtonProps,
+  DayPicker,
+  getDefaultClassNames,
+} from "react-day-picker";
 
+import useDateRangeDrag from "@/features/event/editor/dates/date-range/use-drag";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
@@ -101,6 +107,16 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
       }
     };
 
+    const {
+      dragState,
+      handlePointerDown,
+      handlePointerEnter,
+      handleTouchMove,
+    } = useDateRangeDrag({
+      selectedDates,
+      setDates,
+    });
+
     /**
      * MODIFIERS
      * Modifiers are used to apply custom styles to groups of days. A group is just
@@ -131,6 +147,22 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
           !selectedDates.has(getDateString(nextDate))
         );
       },
+      drag_enabling: (date: Date) => {
+        return (
+          dragState.isDragging &&
+          dragState.isEnabling &&
+          dragState.dragRange.has(getDateString(date)) &&
+          !selectedDates.has(getDateString(date))
+        );
+      },
+      drag_disabling: (date: Date) => {
+        return (
+          dragState.isDragging &&
+          !dragState.isEnabling &&
+          dragState.dragRange.has(getDateString(date)) &&
+          selectedDates.has(getDateString(date))
+        );
+      },
     };
 
     return (
@@ -153,9 +185,21 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
             group_start: "rdp-group_start",
             group_middle: "rdp-group_middle",
             group_end: "rdp-group_end",
+            drag_enabling: "rdp-drag_enabling",
+            drag_disabling: "rdp-drag_disabling",
+          }}
+          components={{
+            DayButton: (props) => (
+              <DraggableDayButton
+                {...props}
+                handlePointerDown={handlePointerDown}
+                handlePointerEnter={handlePointerEnter}
+                handleTouchMove={handleTouchMove}
+              />
+            ),
           }}
           classNames={{
-            root: `${defaultClassNames.root} flex justify-center items-center`,
+            root: `${defaultClassNames.root} flex justify-center items-center select-none`,
           }}
         />
         {!isMobile && dateRangeError && (
@@ -168,3 +212,34 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     );
   },
 );
+
+function DraggableDayButton({
+  day,
+  modifiers,
+  handlePointerDown,
+  handlePointerEnter,
+  handleTouchMove,
+  ...buttonProps
+}: DayButtonProps & {
+  handlePointerDown: (date: Date) => void;
+  handlePointerEnter: (date: Date) => void;
+  handleTouchMove: (event: React.TouchEvent<HTMLButtonElement>) => void;
+}) {
+  return (
+    <DayButton
+      {...buttonProps}
+      data-day={day.date}
+      day={day}
+      modifiers={modifiers}
+      onPointerDown={() => {
+        handlePointerDown(day.date);
+      }}
+      onPointerEnter={() => {
+        handlePointerEnter(day.date);
+      }}
+      onTouchMove={(e) => {
+        handleTouchMove(e);
+      }}
+    />
+  );
+}
