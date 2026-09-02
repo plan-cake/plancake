@@ -90,9 +90,11 @@ export default function useWeekdayRangeDrag({
     };
 
     window.addEventListener("pointerup", endDrag);
+    window.addEventListener("pointercancel", endDrag);
 
     return () => {
       window.removeEventListener("pointerup", endDrag);
+      window.removeEventListener("pointercancel", endDrag);
     };
   }, [dragRange, dragState.isEnabling, selectedDays, setDays]);
 

@@ -103,9 +103,11 @@ export default function useDateRangeDrag({
     };
 
     window.addEventListener("pointerup", endDrag);
+    window.addEventListener("pointercancel", endDrag);
 
     return () => {
       window.removeEventListener("pointerup", endDrag);
+      window.removeEventListener("pointercancel", endDrag);
     };
   }, [dragRange, dragState.isEnabling, selectedDates, setDates]);
 
