@@ -96,6 +96,7 @@ export default function AttendeesDrawer({
           aria-label="View Options"
         />
       }
+      nested={isCollapsed}
     >
       <AvailabilityFilters />
     </FloatingDrawer>
@@ -112,7 +113,7 @@ export default function AttendeesDrawer({
       }
       eventTitle={eventTitle}
       eventCode={eventCode}
-      isNested
+      isNested={isCollapsed}
     />
   );
 

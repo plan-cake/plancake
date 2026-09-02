@@ -2,7 +2,7 @@ import { cloneElement, useEffect, useRef, useState } from "react";
 
 import { ChevronDownIcon } from "lucide-react";
 
-import { FloatingDrawer, StandardDrawer } from "@/features/drawer";
+import { FloatingDrawer } from "@/features/drawer";
 import { DrawerProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
@@ -53,16 +53,14 @@ export default function SelectorDrawer<TValue extends string | number | null>({
     }
   }, [open]);
 
-  const DrawerComponent = drawerNesting ? FloatingDrawer : StandardDrawer;
-
   return (
-    <DrawerComponent
+    <FloatingDrawer
       nested={drawerNesting}
       open={open}
       onOpenChange={handleOpenChange}
       title={dialogTitle}
       description={dialogDescription || "Select an option from the list below"}
-      contentClassName="h-1/2"
+      contentClassName="h-2/3"
       trigger={
         trigger ? (
           // Apply accessibility attributes to the trigger element
@@ -136,6 +134,6 @@ export default function SelectorDrawer<TValue extends string | number | null>({
           );
         })}
       </div>
-    </DrawerComponent>
+    </FloatingDrawer>
   );
 }
