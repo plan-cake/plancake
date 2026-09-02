@@ -32,9 +32,9 @@ export default function WeekdayRangeDrawer({
       title="Select Days of the Week"
       description="Select days of the week below"
       trigger={
-        <div onClick={() => setOpen(!open)}>
+        <button onClick={() => setOpen(!open)}>
           <WeekdayRangeDisplay weekdays={weekdays} open={open} />
-        </div>
+        </button>
       }
       headerContent={
         <div className="flex flex-col text-lg font-semibold">
