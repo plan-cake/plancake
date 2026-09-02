@@ -198,7 +198,17 @@ export function formatDateSet(dates: Set<string>): string | null {
     const prevDate = dateObjects[i - 1];
     const currentDate = dateObjects[i];
     const diffInDays =
-      (currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24);
+      (Date.UTC(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate(),
+      ) -
+        Date.UTC(
+          prevDate.getFullYear(),
+          prevDate.getMonth(),
+          prevDate.getDate(),
+        )) /
+      (1000 * 60 * 60 * 24);
     if (diffInDays !== 1) {
       groups.add({
         start: format(rangeStart, "yyyy-MM-dd"),
