@@ -311,7 +311,7 @@ export default function BaseDrawer({
                   <div
                     onClick={(e) => e.stopPropagation()}
                     className={cn(
-                      "shrink-0 px-4 pt-2",
+                      "shrink-0 px-4 py-2",
                       isPill && _type === "morphing" && "px-3 pb-3 pt-0",
                       !frostedGlass && "bg-panel",
                     )}
