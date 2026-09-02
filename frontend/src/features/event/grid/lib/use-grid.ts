@@ -177,7 +177,6 @@ function organizeGridView(
         endGap: false,
         middleGaps: new Set<number>(),
       },
-      timeBlocks: [],
       visibleDays: [],
       totalPages: 1,
       error: MESSAGES.ERROR_EVENT_RANGE_INVALID,
