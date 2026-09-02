@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useEventContext } from "@/core/event/context";
 import { Weekday } from "@/core/event/types";
-import { StandardDrawer } from "@/features/drawer";
+import { FloatingDrawer } from "@/features/drawer";
 import Calendar from "@/features/event/editor/dates/weekday-range/calendar";
 import WeekdayRangePresets from "@/features/event/editor/dates/weekday-range/presets";
 import WeekdayRangeDisplay from "@/features/event/editor/dates/weekday-range/weekday-range-display";
@@ -18,10 +18,9 @@ export default function WeekdayRangeDrawer({
   const [open, setOpen] = useState(false);
 
   return (
-    <StandardDrawer
+    <FloatingDrawer
       open={open}
       onOpenChange={setOpen}
-      contentClassName="h-1/3"
       bodyClassName="flex justify-center items-center"
       footerContent={
         <WeekdayRangePresets
@@ -46,6 +45,6 @@ export default function WeekdayRangeDrawer({
       }
     >
       <Calendar selectedDays={weekdays} onChange={setWeekdayRange} />
-    </StandardDrawer>
+    </FloatingDrawer>
   );
 }

@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { TriangleAlertIcon } from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
-import { StandardDrawer } from "@/features/drawer";
+import { FloatingDrawer } from "@/features/drawer";
 import {
   Calendar,
   CalendarHandle,
@@ -39,10 +39,9 @@ export default function DateRangeDrawer({
   const dateDisplay = useMemo(() => formatDateSet(dates), [dates]);
 
   return (
-    <StandardDrawer
+    <FloatingDrawer
       open={open}
       onOpenChange={setOpen}
-      contentClassName="h-2/3"
       footerContent={<DateRangePresets dates={dates} setDates={setDates} />}
       title="Select Date Range"
       description="Select dates using the calendar below"
@@ -74,6 +73,6 @@ export default function DateRangeDrawer({
         setDates={setDates}
         dateRangeError={errors.dateRange}
       />
-    </StandardDrawer>
+    </FloatingDrawer>
   );
 }

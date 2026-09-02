@@ -27,7 +27,7 @@ export default function DatePopover({
           align="start"
           sideOffset={8}
           className={cn(
-            "bg-background z-50 rounded-3xl border border-gray-400 p-4 shadow-lg",
+            "bg-background border-accent z-50 rounded-3xl border p-4 shadow-lg",
             "data-[state=open]:animate-slideUpAndFade",
             "data-[state=closed]:animate-slideDownAndFadeOut",
           )}
