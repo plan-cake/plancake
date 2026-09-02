@@ -192,8 +192,8 @@ export default function BaseDrawer({
               className={cn(
                 "mx-auto flex w-full flex-col transition-[max-width,border-radius,margin,padding] duration-300",
                 isPill
-                  ? "border-foreground/10 rounded-4xl max-h-[calc(100svh-2rem)] max-w-[calc(100%-1rem)] overflow-hidden border"
-                  : "border-foreground/10 max-w-full overflow-hidden rounded-t-[32px] border",
+                  ? "rounded-4xl max-h-[calc(100svh-2rem)] max-w-[calc(100%-1rem)] overflow-hidden"
+                  : "max-w-full overflow-hidden rounded-t-[32px]",
                 frostedGlass ? "frosted-glass" : "bg-panel",
                 (_type === "floating" || !isPill) &&
                   "max-h-full min-h-0 flex-1",
