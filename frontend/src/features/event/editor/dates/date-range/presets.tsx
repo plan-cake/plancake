@@ -22,33 +22,35 @@ export default function DateRangePresets({
     [dates],
   );
 
+  const dateNow = format(new Date(), "yyyy-MM-dd");
+
   const next4Days = useMemo(() => {
     const days: string[] = [];
-    const currentDate = new Date();
+    const today = new Date(dateNow);
     for (let i = 1; i <= 4; i++) {
-      const nextDate = new Date(currentDate);
-      nextDate.setDate(currentDate.getDate() + i);
+      const nextDate = new Date(today);
+      nextDate.setDate(today.getDate() + i);
       days.push(format(nextDate, "yyyy-MM-dd"));
     }
     return days;
-  }, []);
+  }, [dateNow]);
   const isNext4Days = useMemo(() => {
     return checkDatesSelected(new Set(next4Days));
   }, [checkDatesSelected, next4Days]);
 
   const nextWeek = useMemo(() => {
     const weekDates: string[] = [];
-    const currentDate = new Date();
     for (let i = 0; weekDates.length < 5; i++) {
-      const nextDate = new Date(currentDate);
-      nextDate.setDate(currentDate.getDate() + i);
+      const today = new Date(dateNow);
+      const nextDate = new Date(today);
+      nextDate.setDate(today.getDate() + i);
       if (weekDates.length === 0 && nextDate.getDay() !== 1) {
         continue;
       }
       weekDates.push(format(nextDate, "yyyy-MM-dd"));
     }
     return weekDates;
-  }, []);
+  }, [dateNow]);
   const isNextWeek = useMemo(() => {
     return checkDatesSelected(new Set(nextWeek));
   }, [checkDatesSelected, nextWeek]);
