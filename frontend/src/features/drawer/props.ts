@@ -36,6 +36,8 @@ type BaseDrawerProps = {
    * @default true
    */
   scrollableBody?: boolean;
+  /** Optional content to render in the drawer footer, outside of the scrollable body */
+  footerContent?: ReactNode;
   /**
    * Whether to show the Vaul top drag handle.
    * @default true
@@ -84,8 +86,6 @@ export type MorphingDrawerProps = BaseDrawerProps & {
    * on the active snap point. At the lowest snap point, it is a pill.
    */
   _type: "morphing";
-  /** Optional content to render in the drawer footer, outside of the scrollable body */
-  footerContent?: ReactNode;
   /**
    * Optional alternative header content to display ONLY when the drawer is in its pill form.
    * If not provided, it falls back to `headerContent` or `title`.
