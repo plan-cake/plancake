@@ -70,8 +70,8 @@ export default function ScheduleHeader({
         gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 0}px`,
       }}
     >
-      {currentPage > 0 ? (
-        <div>
+      <div>
+        {currentPage > 0 && (
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronLeftIcon />}
@@ -80,10 +80,8 @@ export default function ScheduleHeader({
             aria-label="Previous Page"
             tooltip="Previous Page"
           />
-        </div>
-      ) : (
-        <div style={{ width: `${SIDE_WIDTH}px` }} />
-      )}
+        )}
+      </div>
 
       {/* This container takes up the '1fr' space */}
       <div className="relative grid h-full select-none overflow-hidden">
@@ -126,8 +124,8 @@ export default function ScheduleHeader({
         </AnimatePresence>
       </div>
 
-      {currentPage < totalPages - 1 ? (
-        <div>
+      <div>
+        {currentPage < totalPages - 1 && (
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronRightIcon />}
@@ -136,10 +134,8 @@ export default function ScheduleHeader({
             aria-label="Next Page"
             tooltip="Next Page"
           />
-        </div>
-      ) : (
-        <div style={{ width: `${SIDE_WIDTH}px` }} />
-      )}
+        )}
+      </div>
     </div>
   );
 }
