@@ -144,7 +144,10 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         <Link
           ref={ref as React.Ref<HTMLAnchorElement>}
           {...props}
-          className={cn("group focus:outline-none", fullWidth && "w-full")}
+          className={cn(
+            "group focus:outline-none",
+            fullWidth && "block w-full",
+          )}
           href={href!}
         >
           {buttonContent}
