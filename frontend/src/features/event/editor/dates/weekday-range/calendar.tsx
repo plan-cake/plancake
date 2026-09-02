@@ -1,5 +1,6 @@
 import { ALL_WEEKDAYS, Weekday } from "@/core/event/types";
 import useWeekdayRangeDrag from "@/features/event/editor/dates/weekday-range/use-drag";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 export default function Calendar({
@@ -9,6 +10,8 @@ export default function Calendar({
   selectedDays: Set<Weekday>;
   onChange: (days: Set<Weekday>) => void;
 }) {
+  const isMobile = useCheckMobile();
+
   const handleDayClick = (index: number) => {
     const day = ALL_WEEKDAYS[index];
     const newDays = new Set(selectedDays);
@@ -35,7 +38,7 @@ export default function Calendar({
   });
 
   return (
-    <div className="flex select-none flex-row flex-wrap">
+    <div className="flex w-full select-none flex-row justify-center">
       {ALL_WEEKDAYS.map((day, index) => {
         const previousDay = ALL_WEEKDAYS[index - 1];
         const nextDay = ALL_WEEKDAYS[index + 1];
@@ -68,7 +71,8 @@ export default function Calendar({
             key={day}
             data-day={day}
             className={cn(
-              "flex h-8 w-10 items-center justify-center px-6",
+              "flex h-8 items-center justify-center",
+              isMobile ? "max-w-12 flex-1 text-center" : "w-10 px-6",
               "text-foreground/50 cursor-pointer rounded-full",
 
               // Selected State

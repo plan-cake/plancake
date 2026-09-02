@@ -22,7 +22,7 @@ export default function WeekdayRangeDrawer({
     <FloatingDrawer
       open={open}
       onOpenChange={setOpen}
-      bodyClassName="flex justify-center items-center"
+      bodyClassName="px-3"
       footerContent={
         <WeekdayRangePresets
           weekdays={weekdays}
