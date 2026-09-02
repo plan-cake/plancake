@@ -54,7 +54,7 @@ export default function Dropdown<TValue extends string | number | null>({
       </Select.Trigger>
 
       <Select.Portal>
-        <Select.Content className="bg-background z-50 max-h-60 overflow-auto rounded-2xl border border-gray-400 shadow-lg dark:shadow-violet-700">
+        <Select.Content className="bg-background border-accent z-50 max-h-60 overflow-auto rounded-2xl border shadow-lg dark:shadow-violet-700">
           <Select.Viewport className="p-1">
             {options.map((option) => (
               <DropdownItem
