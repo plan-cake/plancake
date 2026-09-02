@@ -1,5 +1,7 @@
 "use client";
 
+import { Fragment } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
@@ -16,6 +18,11 @@ interface ScheduleHeaderProps {
   visibleDays: { dayKey: string; dayDisplay: string }[];
   currentPage: number;
   totalPages: number;
+  dateBlockGaps: {
+    startGap: boolean;
+    endGap: boolean;
+    middleGaps: Set<number>;
+  };
   scrollbarPresent?: boolean;
   isWeekdayEvent?: boolean;
   onPrevPage: () => void;
@@ -43,6 +50,7 @@ export default function ScheduleHeader({
   visibleDays,
   currentPage,
   totalPages,
+  dateBlockGaps,
   scrollbarPresent = false,
   isWeekdayEvent = false,
   onPrevPage,
@@ -59,11 +67,11 @@ export default function ScheduleHeader({
         "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
       )}
       style={{
-        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 10}px`,
+        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 0}px`,
       }}
     >
-      {currentPage > 0 ? (
-        <div>
+      <div>
+        {currentPage > 0 && (
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronLeftIcon />}
@@ -72,10 +80,8 @@ export default function ScheduleHeader({
             aria-label="Previous Page"
             tooltip="Previous Page"
           />
-        </div>
-      ) : (
-        <div style={{ width: `${SIDE_WIDTH}px` }} />
-      )}
+        )}
+      </div>
 
       {/* This container takes up the '1fr' space */}
       <div className="relative grid h-full select-none overflow-hidden">
@@ -88,34 +94,38 @@ export default function ScheduleHeader({
             animate="center"
             exit="exit"
             transition={{ type: "tween", ease: "easeInOut" }}
-            className="absolute inset-0 grid h-full w-full items-center"
-            style={{
-              gridTemplateColumns: `repeat(${visibleDays.length}, 1fr)`,
-            }}
+            className="absolute inset-0 flex h-full w-full items-center"
           >
+            {dateBlockGaps.startGap && <div className="w-2" />}
+
             {visibleDays.map(({ dayDisplay }, i) => {
               const [weekday, month, day] = dayDisplay.split(" ");
 
               return (
-                <div
-                  key={i}
-                  className="flex flex-col items-center justify-center text-sm font-medium leading-tight"
-                >
-                  <div>{isWeekdayEvent ? weekday.toUpperCase() : weekday}</div>
-                  {!isWeekdayEvent && (
+                <Fragment key={`header-fragment-${i}`}>
+                  <div className="flex flex-1 flex-col items-center justify-center text-sm font-medium leading-tight">
                     <div>
-                      {month} {day.replace(/^0+/, "")}
+                      {isWeekdayEvent ? weekday.toUpperCase() : weekday}
                     </div>
-                  )}
-                </div>
+                    {!isWeekdayEvent && (
+                      <div>
+                        {month} {day.replace(/^0+/, "")}
+                      </div>
+                    )}
+                  </div>
+
+                  {dateBlockGaps.middleGaps.has(i) && <div className="w-2" />}
+                </Fragment>
               );
             })}
+
+            {dateBlockGaps.endGap && <div className="w-2" />}
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {currentPage < totalPages - 1 ? (
-        <div>
+      <div>
+        {currentPage < totalPages - 1 && (
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronRightIcon />}
@@ -124,10 +134,8 @@ export default function ScheduleHeader({
             aria-label="Next Page"
             tooltip="Next Page"
           />
-        </div>
-      ) : (
-        <div style={{ width: `${SIDE_WIDTH}px` }} />
-      )}
+        )}
+      </div>
     </div>
   );
 }

@@ -1,8 +1,5 @@
 import { useCallback, useMemo, useReducer } from "react";
 
-import { format } from "date-fns";
-import { DateRange } from "react-day-picker";
-
 import { DEFAULT_RANGE_SPECIFIC } from "@/core/event/lib/default-range";
 import { expandEventRange } from "@/core/event/lib/expand-event-range";
 import { EventInfoReducer } from "@/core/event/reducers/info-reducer";
@@ -111,29 +108,24 @@ export function useEventInfo(initialData?: EventInformation) {
     [state.eventRange.timeRange.from, handleError],
   );
 
-  const setDateRange = useCallback(
-    (dateRange: DateRange | undefined) => {
-      if (checkDateRange(dateRange?.from, dateRange?.to)) {
+  const setDates = useCallback(
+    (dates: Set<string>) => {
+      if (checkDateRange(dates)) {
         handleError("dateRange", MESSAGES.ERROR_EVENT_RANGE_TOO_LONG);
       } else {
         handleError("dateRange", "");
       }
 
-      if (dateRange?.from && dateRange?.to) {
-        const from = format(dateRange.from, "yyyy-MM-dd");
-        const to = format(dateRange.to, "yyyy-MM-dd");
-
-        dispatch({
-          type: "SET_DATE_RANGE",
-          payload: { from, to },
-        });
-      }
+      dispatch({
+        type: "SET_DATE_RANGE",
+        payload: dates,
+      });
     },
     [handleError],
   );
 
   const setWeekdayRange = useCallback(
-    (weekdays: Weekday[]) => {
+    (weekdays: Set<Weekday>) => {
       handleError("weekdayRange", "");
       dispatch({ type: "SET_WEEKDAYS", payload: weekdays });
     },
@@ -154,7 +146,7 @@ export function useEventInfo(initialData?: EventInformation) {
       setTimezone,
       setStartTime,
       setEndTime,
-      setDateRange,
+      setDates,
       setWeekdayRange,
       resetEventInfo,
       errors,
@@ -172,7 +164,7 @@ export function useEventInfo(initialData?: EventInformation) {
       setTimezone,
       setStartTime,
       setEndTime,
-      setDateRange,
+      setDates,
       setWeekdayRange,
       resetEventInfo,
       errors,

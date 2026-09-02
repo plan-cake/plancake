@@ -1,7 +1,7 @@
 import json
 import logging
 from abc import ABC, abstractmethod
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from enum import Enum
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -141,73 +141,72 @@ def get_event_type(date_type):
             return "Week"
 
 
-class EventBounds:
+class EventRange:
     def __init__(
         self,
-        start_date: datetime.date,
-        end_date: datetime.date,
-        start_time: datetime.time,
-        end_time: datetime.time,
+        dates: list[date],
+        start_time: time,
+        end_time: time,
     ):
-        self.start_date = start_date
-        self.end_date = end_date
+        self.dates = dates
         self.start_time = start_time
         self.end_time = end_time
 
 
-def get_event_bounds(event: UserEvent) -> EventBounds:
+def get_event_range(event: UserEvent) -> EventRange:
     """
-    Finds the start and end date/time bounds for an event.
+    Finds the list of dates and start/end times for an event.
 
     For query efficiency, the event's timeslots should be prefetched.
     """
-    all_timeslots: list[datetime] = []
+    times: set[time] = set()
+    dates: set[date] = set()
     event_time_zone = ZoneInfo(event.time_zone)
 
-    event_type = get_event_type(event.date_type)
     match event.date_type:
         case UserEvent.EventType.SPECIFIC:
-            # Sort the timeslots by the EVENT'S time zone to get the creator's min/max
-            all_timeslots = [
-                ts.utc_timeslot.astimezone(event_time_zone)
-                for ts in event.date_timeslots.all()
-            ]
+            # Convert the timeslots to the EVENT'S time zone to get dates/times relative
+            # to the creator
+            for ts in event.date_timeslots.all():
+                current = ts.utc_timeslot.astimezone(event_time_zone)
+                times.add(current.time())
+                dates.add(current.date())
         case UserEvent.EventType.GENERIC:
-            all_timeslots = [
-                get_weekday_date(ts.weekday, ts.local_timeslot)
-                for ts in event.weekday_timeslots.all()
-            ]
+            for ts in event.weekday_timeslots.all():
+                current = get_weekday_date(ts.weekday, ts.local_timeslot)
+                times.add(current.time())
+                dates.add(current.date())
 
-    if not all_timeslots:
+    if not times or not dates:
         logger.critical(
             f"Event {event.id} has no timeslots when formatting for dashboard."
         )
         raise ValueError("Event has no timeslots.")
 
-    # Earliest weekday is also sorted by date
-    start_date = min(ts.date() for ts in all_timeslots)
-    end_date = max(ts.date() for ts in all_timeslots)
-    start_time = min(ts.time() for ts in all_timeslots)
-    end_time = max(ts.time() for ts in all_timeslots)
-    # End time should be 15 minutes after the last timeslot
-    end_time = (datetime.combine(datetime.min, end_time) + timedelta(minutes=15)).time()
+    start_time = min(times)
+    end_time = max(times)
+    # End time is 15 minutes after the last timeslot
+    end_time = (
+        datetime.combine(datetime.today(), end_time) + timedelta(minutes=15)
+    ).time()
 
     # datetime.combine has no time zone info, so we include the event's time zone to
     # make sure it doesn't convert twice
-    start_datetime = datetime.combine(start_date, start_time).replace(
+    start_time_converted = datetime.combine(datetime.today(), start_time).replace(
         tzinfo=event_time_zone
     )
-    end_datetime = datetime.combine(end_date, end_time).replace(tzinfo=event_time_zone)
+    end_time_converted = datetime.combine(datetime.today(), end_time).replace(
+        tzinfo=event_time_zone
+    )
     if event.date_type == UserEvent.EventType.SPECIFIC:
         # Convert to UTC for date events, not week events since those stay in local time
-        start_datetime = start_datetime.astimezone(ZoneInfo("UTC"))
-        end_datetime = end_datetime.astimezone(ZoneInfo("UTC"))
+        start_time_converted = start_time_converted.astimezone(ZoneInfo("UTC"))
+        end_time_converted = end_time_converted.astimezone(ZoneInfo("UTC"))
 
-    return EventBounds(
-        start_date=start_datetime.date(),
-        end_date=end_datetime.date(),
-        start_time=start_datetime.time(),
-        end_time=end_datetime.time(),
+    return EventRange(
+        dates=list(dates),
+        start_time=start_time_converted.time(),
+        end_time=end_time_converted.time(),
     )
 
 
@@ -220,13 +219,12 @@ def format_event_info(event: UserEvent, include_participants: bool = False) -> d
     If `include_participants` is `True`, the event's participants should also be
     prefetched.
     """
-    bounds = get_event_bounds(event)
+    bounds = get_event_range(event)
 
     data = {
         "title": event.title,
         "event_type": get_event_type(event.date_type),
-        "start_date": bounds.start_date,
-        "end_date": bounds.end_date,
+        "dates": bounds.dates,
         "start_time": bounds.start_time,
         "end_time": bounds.end_time,
         "time_zone": event.time_zone,
