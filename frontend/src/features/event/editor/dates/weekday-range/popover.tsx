@@ -6,6 +6,7 @@ import DatePopover from "@/features/event/editor/dates/date-popover";
 import Calendar from "@/features/event/editor/dates/weekday-range/calendar";
 import WeekdayRangePresets from "@/features/event/editor/dates/weekday-range/presets";
 import WeekdayRangeDisplay from "@/features/event/editor/dates/weekday-range/weekday-range-display";
+import { MESSAGES } from "@/lib/messages";
 
 export default function WeekdayRangePopover({
   weekdays,
@@ -28,6 +29,9 @@ export default function WeekdayRangePopover({
           weekdays={weekdays}
           setWeekdayRange={setWeekdayRange}
         />
+        <p className="text-center text-sm opacity-50">
+          {MESSAGES.INFO_DRAG_DATES}
+        </p>
       </div>
     </DatePopover>
   );

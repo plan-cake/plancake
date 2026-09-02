@@ -8,6 +8,7 @@ import { FloatingDrawer } from "@/features/drawer";
 import Calendar from "@/features/event/editor/dates/weekday-range/calendar";
 import WeekdayRangePresets from "@/features/event/editor/dates/weekday-range/presets";
 import WeekdayRangeDisplay from "@/features/event/editor/dates/weekday-range/weekday-range-display";
+import { MESSAGES } from "@/lib/messages";
 
 export default function WeekdayRangeDrawer({
   weekdays,
@@ -39,7 +40,7 @@ export default function WeekdayRangeDrawer({
         <div className="flex flex-col text-lg font-semibold">
           Select Possible Days
           <span className="text-accent text-sm font-normal">
-            Choose days of the week below
+            {MESSAGES.INFO_DRAG_DATES}
           </span>
         </div>
       }
