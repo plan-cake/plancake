@@ -197,6 +197,7 @@ export default function BaseDrawer({
                 frostedGlass ? "frosted-glass" : "bg-panel",
                 (_type === "floating" || !isPill) &&
                   "max-h-full min-h-0 flex-1",
+                !showOverlay && "shadow-lg",
               )}
               style={{
                 paddingBottom:
