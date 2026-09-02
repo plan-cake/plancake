@@ -60,7 +60,7 @@ export default function SelectorDrawer<TValue extends string | number | null>({
       onOpenChange={handleOpenChange}
       title={dialogTitle}
       description={dialogDescription || "Select an option from the list below"}
-      contentClassName="h-1/2"
+      contentClassName="h-2/3"
       trigger={
         trigger ? (
           // Apply accessibility attributes to the trigger element
