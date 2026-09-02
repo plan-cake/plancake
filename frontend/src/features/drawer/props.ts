@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-export type DrawerType = "standard" | "floating" | "morphing";
+export type DrawerType = "floating" | "morphing";
 
 type BaseDrawerProps = {
   /** Drawer open states */
