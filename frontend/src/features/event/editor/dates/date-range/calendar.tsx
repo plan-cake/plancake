@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import { parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import {
   DayButton,
   DayButtonProps,
@@ -87,7 +87,7 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     }));
 
     const getDateString = (date: Date) => {
-      return date.toISOString().split("T")[0];
+      return format(date, "yyyy-MM-dd");
     };
 
     /**
@@ -233,7 +233,7 @@ function DraggableDayButton({
   return (
     <DayButton
       {...buttonProps}
-      data-day={day.date}
+      data-day={format(day.date, "yyyy-MM-dd")}
       day={day}
       modifiers={modifiers}
       onPointerDown={() => {

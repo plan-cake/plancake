@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { parseISO } from "date-fns";
+import { format } from "date-fns-tz";
+
 export default function useDateRangeDrag({
   selectedDates,
   setDates,
@@ -18,7 +21,7 @@ export default function useDateRangeDrag({
   }>({ isEnabling: true, startDate: null, endDate: null });
 
   const getDateString = (date: Date) => {
-    return date.toISOString().split("T")[0];
+    return format(date, "yyyy-MM-dd");
   };
 
   const dragRange = useMemo(() => {
@@ -76,7 +79,7 @@ export default function useDateRangeDrag({
     const target = document.elementFromPoint(touch.clientX, touch.clientY);
 
     if (target instanceof HTMLElement && target.dataset.day) {
-      const currentDay = target.dataset.day;
+      const currentDay = parseISO(target.dataset.day);
       setDragState((prev) => ({ ...prev, endDate: new Date(currentDay) }));
     }
   };
