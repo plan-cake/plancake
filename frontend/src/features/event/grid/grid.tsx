@@ -14,6 +14,7 @@ import {
   TIME_LABEL_WIDTH,
 } from "@/features/event/grid/lib/constants";
 import useGridinfo from "@/features/event/grid/lib/use-grid";
+import GridPageIndicator from "@/features/event/grid/page-indicator";
 import ScheduleHeader from "@/features/event/grid/schedule-header";
 import TimeColumn from "@/features/event/grid/time-column";
 import InteractiveTimeBlock from "@/features/event/grid/timeblocks/interactive";
@@ -191,34 +192,19 @@ export default function ScheduleGrid({
               transition={{ type: "tween", ease: "easeInOut" }}
               className="flex"
             >
-              <div className="flex flex-col gap-2">
-                {dateBlocks[0]?.timeBlocks.map((_, i) => (
-                  <div
-                    key={`border-left-${i}`}
-                    className={cn(
-                      !hasPrevPage && "invisible",
-                      "pointer-events-none relative grid",
-                      "divide-foreground/75 border-foreground/75 divide-y divide-dashed border border-l-0",
-                      !dateBlockGaps.startGap && "border-r-0",
-                    )}
-                    style={{
-                      gridTemplateColumns: `${TIME_LABEL_WIDTH}px`,
-                      gridTemplateRows: `repeat(${numQuarterHours[i]}, minmax(20px, 1fr))`,
-                      maskImage: "linear-gradient(to left, black, transparent)",
-                      WebkitMaskImage:
-                        "linear-gradient(to left, black, transparent)",
-                    }}
-                  >
-                    {Array.from({ length: numQuarterHours[i] }).map(
-                      (_, idx) => (
-                        <div
-                          key={`border-left-${idx}`}
-                          style={{ gridRow: idx + 1, gridColumn: 1 }}
-                        />
-                      ),
-                    )}
-                  </div>
-                ))}
+              <div
+                className={cn(
+                  "flex flex-col gap-2",
+                  !hasPrevPage && "invisible",
+                )}
+              >
+                <GridPageIndicator
+                  side="left"
+                  width={TIME_LABEL_WIDTH}
+                  gapPresent={dateBlockGaps.startGap}
+                  numQuarterHours={numQuarterHours}
+                  numTimeBlocks={dateBlocks[0]?.timeBlocks.length}
+                />
               </div>
 
               {dateBlockGaps.startGap && <div className="w-2" />}
@@ -282,35 +268,13 @@ export default function ScheduleGrid({
               {dateBlockGaps.endGap && <div className="w-2" />}
 
               {hasNextPage && (
-                <div className="flex flex-col gap-2">
-                  {dateBlocks[0]?.timeBlocks.map((_, i) => (
-                    <div
-                      key={`border-right-${i}`}
-                      className={cn(
-                        "pointer-events-none relative grid",
-                        "divide-foreground/75 border-foreground/75 divide-y divide-dashed border border-r-0",
-                        !dateBlockGaps.endGap && "border-l-0",
-                      )}
-                      style={{
-                        gridTemplateColumns: `${SIDE_WIDTH}px`,
-                        gridTemplateRows: `repeat(${numQuarterHours[i]}, minmax(20px, 1fr))`,
-                        maskImage:
-                          "linear-gradient(to right, black, transparent)",
-                        WebkitMaskImage:
-                          "linear-gradient(to right, black, transparent)",
-                      }}
-                    >
-                      {Array.from({ length: numQuarterHours[i] }).map(
-                        (_, idx) => (
-                          <div
-                            key={`border-right-${idx}`}
-                            style={{ gridRow: idx + 1, gridColumn: 1 }}
-                          />
-                        ),
-                      )}
-                    </div>
-                  ))}
-                </div>
+                <GridPageIndicator
+                  side="right"
+                  width={SIDE_WIDTH}
+                  gapPresent={dateBlockGaps.endGap}
+                  numQuarterHours={numQuarterHours}
+                  numTimeBlocks={dateBlocks[0]?.timeBlocks.length}
+                />
               )}
             </motion.div>
           </AnimatePresence>
