@@ -51,10 +51,10 @@ export default function DateRangeDrawer({
         </div>
       }
       headerContent={
-        <div className="flex flex-col text-lg font-semibold">
+        <div className="flex flex-col items-center text-lg font-semibold">
           Select Possible Dates
           {errors.dateRange ? (
-            <span className="text-error flex items-center gap-2 text-sm">
+            <span className="text-error flex items-center gap-1 text-sm">
               <TriangleAlertIcon className="h-4 w-4" />
               {errors.dateRange}
             </span>
@@ -71,7 +71,6 @@ export default function DateRangeDrawer({
         earliestDate={earliestDate}
         selectedDates={dates}
         setDates={setDates}
-        dateRangeError={errors.dateRange}
       />
     </FloatingDrawer>
   );
