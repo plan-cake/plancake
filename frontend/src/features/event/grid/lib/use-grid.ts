@@ -212,8 +212,8 @@ function organizeGridView(
     const isLastBlock = i === currentBlocks.length - 1;
 
     /* PROCESS TIMEBLOCKS */
-    const processedTimeBlocks = timeBlocks.map((block) =>
-      processTimeblock(block, blockDays, slotsByDay),
+    const processedTimeBlocks = timeBlocks.map((timeBlock) =>
+      processTimeblock(timeBlock, blockDays, slotsByDay),
     );
 
     if (!isLastBlock) {
