@@ -57,8 +57,8 @@ export default function DashboardEvent({
   const dateDetails = useMemo(() => {
     // Extract the dates from the start time on each day
     const weekdays = new Set<number>();
-    let startDate = dateTimeProps.dates[0];
-    let endDate = dateTimeProps.dates[0];
+    let startDate = null;
+    let endDate = null;
     for (const singleDate of dateTimeProps.dates) {
       const { date, weekday } = getTimezoneDetails({
         time: dateTimeProps.startTime,
@@ -67,24 +67,24 @@ export default function DashboardEvent({
         toTZ: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
       weekdays.add(weekday);
-      if (singleDate < startDate) startDate = date;
-      if (singleDate > endDate) endDate = date;
+      if (!startDate || singleDate < startDate) startDate = date;
+      if (!endDate || singleDate > endDate) endDate = date;
     }
 
     const startTime = getTimezoneDetails({
       time: dateTimeProps.startTime,
-      date: startDate,
+      date: startDate!,
       fromTZ: type === "weekday" ? timezone : undefined,
     }).time;
     const endTime = getTimezoneDetails({
       time: dateTimeProps.endTime,
-      date: startDate,
+      date: startDate!,
       fromTZ: type === "weekday" ? timezone : undefined,
     }).time;
 
     return {
-      startDate,
-      endDate,
+      startDate: startDate!,
+      endDate: endDate!,
       startTime,
       endTime,
       weekdays,
