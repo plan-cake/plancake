@@ -77,22 +77,6 @@ type BaseDrawerProps = {
   viewTransitionName?: string;
 };
 
-export type StandardDrawerProps = BaseDrawerProps & {
-  /**
-   * The type of drawer, which can determine it's behavior and appearance:
-   * - `standard`: A regular drawer that stretches full width and slides in from
-   * the bottom of the screen.
-   */
-  _type?: "standard";
-  /** Optional content to render in the drawer footer, outside of the scrollable body */
-  footerContent?: ReactNode;
-
-  /** Snap point logic */
-  snapPoints?: (number | string)[];
-  activeSnapPoint?: number | string | null;
-  setActiveSnapPoint?: (snap: number | string | null) => void;
-};
-
 export type MorphingDrawerProps = BaseDrawerProps & {
   /**
    * The type of drawer, which can determine it's behavior and appearance:
@@ -133,7 +117,4 @@ export type FloatingDrawerProps = BaseDrawerProps & {
   pillHeaderContent?: ReactNode;
 };
 
-export type DrawerProps =
-  | StandardDrawerProps
-  | MorphingDrawerProps
-  | FloatingDrawerProps;
+export type DrawerProps = MorphingDrawerProps | FloatingDrawerProps;

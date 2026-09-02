@@ -13,7 +13,7 @@ import useKeyboardHeight from "@/lib/hooks/use-keyboard-height";
 import { cn } from "@/lib/utils/classname";
 
 export default function BaseDrawer({
-  _type = "standard",
+  _type,
   open,
   onOpenChange,
   trigger,

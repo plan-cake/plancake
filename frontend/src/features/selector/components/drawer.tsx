@@ -2,7 +2,7 @@ import { cloneElement, useEffect, useRef, useState } from "react";
 
 import { ChevronDownIcon } from "lucide-react";
 
-import { FloatingDrawer, StandardDrawer } from "@/features/drawer";
+import { FloatingDrawer } from "@/features/drawer";
 import { DrawerProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
@@ -53,10 +53,8 @@ export default function SelectorDrawer<TValue extends string | number | null>({
     }
   }, [open]);
 
-  const DrawerComponent = drawerNesting ? FloatingDrawer : StandardDrawer;
-
   return (
-    <DrawerComponent
+    <FloatingDrawer
       nested={drawerNesting}
       open={open}
       onOpenChange={handleOpenChange}
@@ -136,6 +134,6 @@ export default function SelectorDrawer<TValue extends string | number | null>({
           );
         })}
       </div>
-    </DrawerComponent>
+    </FloatingDrawer>
   );
 }
