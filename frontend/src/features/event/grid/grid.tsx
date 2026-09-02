@@ -224,7 +224,6 @@ export default function ScheduleGrid({
               {dateBlockGaps.startGap && <div className="w-2" />}
 
               {dateBlocks.map((dBlock, dIndex) => {
-                const isFirstDateBlock = dIndex === 0;
                 const isLastDateBlock = dIndex === dateBlocks.length - 1;
 
                 return (
@@ -240,8 +239,6 @@ export default function ScheduleGrid({
                           numQuarterHours: tBlock.numQuarterHours,
                           numVisibleDays: dBlock.numDays,
                           timeslots: tBlock.timeslots,
-                          hasPrev: isFirstDateBlock && hasPrevPage,
-                          hasNext: isLastDateBlock && hasNextPage,
                         };
 
                         if (mode === "preview") {
