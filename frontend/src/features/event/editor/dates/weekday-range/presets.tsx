@@ -36,6 +36,7 @@ export default function WeekdayRangePresets({
         icon={<BroomIcon />}
         onClick={() => setWeekdayRange(new Set())}
         disabled={weekdays.size === 0}
+        tooltip="Clear Selection"
       />
       <ActionButton
         buttonStyle={

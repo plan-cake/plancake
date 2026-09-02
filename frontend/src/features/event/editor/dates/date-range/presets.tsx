@@ -60,6 +60,7 @@ export default function DateRangePresets({
         icon={<BroomIcon />}
         onClick={() => setDates(new Set())}
         disabled={dates.size === 0}
+        tooltip="Clear Selection"
       />
       <ActionButton
         buttonStyle={
