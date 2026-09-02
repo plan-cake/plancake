@@ -80,9 +80,7 @@ function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
   if (checkUnselectedRange(range)) return [];
 
   // Validate Duration
-  const dateObjects = Array.from(range.dates, (dateStr) => parseISO(dateStr));
-
-  if (checkDateRange(new Set(dateObjects))) {
+  if (checkDateRange(new Set(range.dates))) {
     return [];
   }
 
@@ -94,11 +92,9 @@ function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
     to: range.timeRange.to!,
   };
 
-  for (const day of dateObjects) {
-    const dayStr = format(day, "yyyy-MM-dd");
-
+  for (const day of range.dates) {
     const { startUTC, endUTC } = getDailyBoundariesInUTC(
-      dayStr,
+      day,
       range.timezone,
       nonNullTimeRange,
     );
