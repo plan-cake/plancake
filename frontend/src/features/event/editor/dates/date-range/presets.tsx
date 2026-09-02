@@ -22,19 +22,19 @@ export default function DateRangePresets({
     [dates],
   );
 
-  const next5Days = useMemo(() => {
+  const next4Days = useMemo(() => {
     const days: string[] = [];
     const currentDate = new Date();
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 4; i++) {
       const nextDate = new Date(currentDate);
       nextDate.setDate(currentDate.getDate() + i);
       days.push(format(nextDate, "yyyy-MM-dd"));
     }
     return days;
   }, []);
-  const isNext5Days = useMemo(() => {
-    return checkDatesSelected(new Set(next5Days));
-  }, [checkDatesSelected, next5Days]);
+  const isNext4Days = useMemo(() => {
+    return checkDatesSelected(new Set(next4Days));
+  }, [checkDatesSelected, next4Days]);
 
   const nextWeek = useMemo(() => {
     const weekDates: string[] = [];
@@ -63,10 +63,10 @@ export default function DateRangePresets({
       />
       <ActionButton
         buttonStyle={
-          isNext5Days ? "bordered semi-transparent" : "semi-transparent"
+          isNext4Days ? "bordered semi-transparent" : "semi-transparent"
         }
-        label="Next 5 Days"
-        onClick={() => setDates(new Set(next5Days))}
+        label="Next 4 Days"
+        onClick={() => setDates(new Set(next4Days))}
         fullWidth
         className="justify-center"
       />
