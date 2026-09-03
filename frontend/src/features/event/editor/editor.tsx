@@ -212,7 +212,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         <div className="h-16 md:hidden" />
         <div className="hidden flex-1 md:col-start-2 md:row-span-9 md:row-start-2 md:block">
           <div className="relative h-full w-full grow">
-            <div className="bg-panel absolute inset-0 flex rounded-3xl pb-4 pl-2 pr-4 pt-4">
+            <div className="bg-panel absolute inset-0 flex rounded-3xl p-4">
               <div className="flex1 min-h-0 grow space-y-4">{grid}</div>
             </div>
           </div>
