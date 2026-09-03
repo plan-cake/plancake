@@ -8,24 +8,24 @@ import {
   ResultsAvailabilityMap,
 } from "@/core/availability/types";
 import { createEmptyUserAvailability } from "@/core/availability/utils";
+import DateHeader from "@/features/event/date-time-grid/date-header";
 import {
   GRID_ID,
   SIDE_WIDTH,
   TIME_LABEL_WIDTH,
-} from "@/features/event/grid/lib/constants";
-import useGridinfo from "@/features/event/grid/lib/use-grid";
-import GridPageIndicator from "@/features/event/grid/page-indicator";
-import ScheduleHeader from "@/features/event/grid/schedule-header";
-import TimeColumn from "@/features/event/grid/time-column";
-import InteractiveTimeBlock from "@/features/event/grid/timeblocks/interactive";
-import PreviewTimeBlock from "@/features/event/grid/timeblocks/preview";
-import ResultsTimeBlock from "@/features/event/grid/timeblocks/results";
+} from "@/features/event/date-time-grid/lib/constants";
+import useGridinfo from "@/features/event/date-time-grid/lib/use-grid";
+import GridPageIndicator from "@/features/event/date-time-grid/page-indicator";
+import TimeColumn from "@/features/event/date-time-grid/time-column";
+import InteractiveTimeBlock from "@/features/event/date-time-grid/timeblocks/interactive";
+import PreviewTimeBlock from "@/features/event/date-time-grid/timeblocks/preview";
+import ResultsTimeBlock from "@/features/event/date-time-grid/timeblocks/results";
 import { getHighestMatchCount } from "@/features/event/results/lib/utils";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
-interface ScheduleGridProps {
+interface DateTimeGridProps {
   mode: "paint" | "view" | "preview";
   timeslots: Date[];
   timezone: string;
@@ -64,7 +64,7 @@ const variants = {
   }),
 };
 
-export default function ScheduleGrid({
+export default function DateTimeGrid({
   timeslots,
   timezone,
   mode = "preview",
@@ -77,7 +77,7 @@ export default function ScheduleGrid({
   userAvailability = createEmptyUserAvailability(),
   onToggleSlot = () => {},
   onPageUpdate = () => {},
-}: ScheduleGridProps) {
+}: DateTimeGridProps) {
   const isMobile = useCheckMobile();
 
   const {
@@ -148,7 +148,7 @@ export default function ScheduleGrid({
       style={{ viewTransitionName: "grid" }}
       id={GRID_ID}
     >
-      <ScheduleHeader
+      <DateHeader
         preview={mode === "preview"}
         visibleDays={visibleDays}
         currentPage={currentPage}

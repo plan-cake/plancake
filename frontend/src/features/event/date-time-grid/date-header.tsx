@@ -9,11 +9,11 @@ import ActionButton from "@/features/button/components/action";
 import {
   SIDE_WIDTH,
   TIME_LABEL_WIDTH,
-} from "@/features/event/grid/lib/constants";
+} from "@/features/event/date-time-grid/lib/constants";
 import { useHeaderSize } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
-interface ScheduleHeaderProps {
+interface DateHeaderProps {
   preview?: boolean;
   visibleDays: { dayKey: string; dayDisplay: string }[];
   currentPage: number;
@@ -45,7 +45,7 @@ const variants = {
   }),
 };
 
-export default function ScheduleHeader({
+export default function DateHeader({
   preview = false,
   visibleDays,
   currentPage,
@@ -56,7 +56,7 @@ export default function ScheduleHeader({
   onPrevPage,
   onNextPage,
   direction = 0,
-}: ScheduleHeaderProps) {
+}: DateHeaderProps) {
   const { topMarginClass } = useHeaderSize();
 
   return (

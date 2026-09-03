@@ -1,4 +1,4 @@
-import { TimeBlockProps } from "@/features/event/grid/timeblocks/props";
+import { TimeBlockProps } from "@/features/event/date-time-grid/timeblocks/props";
 import { cn } from "@/lib/utils/classname";
 
 export default function BaseTimeBlock({

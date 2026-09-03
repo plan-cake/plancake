@@ -15,8 +15,8 @@ import ActionButton from "@/features/button/components/action";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
-import { ScheduleGrid } from "@/features/event/grid";
-import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
+import DateTimeGrid from "@/features/event/date-time-grid/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/date-time-grid/lib/constants";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,
@@ -328,7 +328,7 @@ export default function ClientPage({
         </div>
 
         {/* Right Panel */}
-        <ScheduleGrid
+        <DateTimeGrid
           mode="paint"
           isWeekdayEvent={eventRange.type === "weekday"}
           timezone={timeZone}

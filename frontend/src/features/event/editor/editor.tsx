@@ -15,12 +15,12 @@ import { EventInformation } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import TimeSelector from "@/features/event/components/selectors/time";
+import DateTimeGrid from "@/features/event/date-time-grid/grid";
 import AdvancedOptions from "@/features/event/editor/advanced-options";
 import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
 import DateRangeSelection from "@/features/event/editor/dates/date-selector";
 import { EventEditorType } from "@/features/event/editor/types";
 import { validateEventData } from "@/features/event/editor/validate-data";
-import { ScheduleGrid } from "@/features/event/grid";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { RateLimitBanner } from "@/features/system-feedback";
@@ -35,7 +35,7 @@ type EventEditorProps = {
 
 type SegmentedControlOption = "details" | "preview";
 
-const MemoizedScheduleGrid = memo(ScheduleGrid);
+const MemoizedGrid = memo(DateTimeGrid);
 
 export default function EventEditor({ type, initialData }: EventEditorProps) {
   return (
@@ -118,7 +118,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     />
   );
   const grid = (
-    <MemoizedScheduleGrid
+    <MemoizedGrid
       mode="preview"
       isWeekdayEvent={eventRange.type === "weekday"}
       unselectedRange={checkUnselectedRange(eventRange)}

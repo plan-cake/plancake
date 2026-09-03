@@ -11,8 +11,8 @@ import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
-import ScheduleGrid from "@/features/event/grid/grid";
-import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
+import DateTimeGrid from "@/features/event/date-time-grid/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/date-time-grid/lib/constants";
 import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
 import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
 import { getResultBanner } from "@/features/event/results/banner";
@@ -182,7 +182,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       <div className="-mb-2 md:hidden">{bannerElement}</div>
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-4">
-        <ScheduleGrid
+        <DateTimeGrid
           mode="view"
           isWeekdayEvent={eventRange.type === "weekday"}
           timezone={timezone}

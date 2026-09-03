@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 import { generateDragSlots } from "@/core/availability/utils";
-import { TimeSlot } from "@/features/event/grid/timeblocks/props";
+import { TimeSlot } from "@/features/event/date-time-grid/timeblocks/props";
 
 type DragState = {
   startSlot: string | null;
@@ -12,10 +12,10 @@ type DragState = {
 };
 
 /**
- * hook to manage the drag-to-select logic for the schedule grid.
+ * hook to manage the drag-to-select logic for the date/time grid.
  * it includes state, event handlers, and global listeners for both mouse and touch events.
  */
-export default function useScheduleDrag(
+export default function useDateTimeDrag(
   onToggle: (slotIso: string, togglingOn: boolean) => void,
   mode: "paint" | "view" | "preview",
   timeslots: TimeSlot[],

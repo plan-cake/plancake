@@ -1,7 +1,7 @@
-import useScheduleDrag from "@/features/event/grid/lib/use-schedule-drag";
-import TimeSlot from "@/features/event/grid/time-slot";
-import BaseTimeBlock from "@/features/event/grid/timeblocks/base";
-import { InteractiveTimeBlockProps } from "@/features/event/grid/timeblocks/props";
+import useDateTimeDrag from "@/features/event/date-time-grid/lib/use-date-time-drag";
+import TimeSlot from "@/features/event/date-time-grid/time-slot";
+import BaseTimeBlock from "@/features/event/date-time-grid/timeblocks/base";
+import { InteractiveTimeBlockProps } from "@/features/event/date-time-grid/timeblocks/props";
 
 export default function InteractiveTimeBlock({
   numQuarterHours,
@@ -10,7 +10,7 @@ export default function InteractiveTimeBlock({
   availability,
   onToggle,
 }: InteractiveTimeBlockProps) {
-  const dragHandlers = useScheduleDrag(onToggle, "paint", timeslots);
+  const dragHandlers = useDateTimeDrag(onToggle, "paint", timeslots);
 
   return (
     <BaseTimeBlock
