@@ -3,10 +3,6 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { TriangleAlertIcon } from "lucide-react";
 
-import {
-  AvailabilitySet,
-  ResultsAvailabilityMap,
-} from "@/core/availability/types";
 import { createEmptyUserAvailability } from "@/core/availability/utils";
 import DateHeader from "@/features/event/grid/date-time/date-header";
 import {
@@ -20,32 +16,11 @@ import TimeColumn from "@/features/event/grid/date-time/time-column";
 import InteractiveTimeBlock from "@/features/event/grid/date-time/timeblocks/interactive";
 import PreviewTimeBlock from "@/features/event/grid/date-time/timeblocks/preview";
 import ResultsTimeBlock from "@/features/event/grid/date-time/timeblocks/results";
+import { GridProps } from "@/features/event/grid/grid-props";
 import { getHighestMatchCount } from "@/features/event/results/lib/utils";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
-
-interface DateTimeGridProps {
-  mode: "paint" | "view" | "preview";
-  timeslots: Date[];
-  timezone: string;
-  isWeekdayEvent?: boolean;
-
-  unselectedRange?: boolean;
-
-  // for "view" mode
-  availabilities?: ResultsAvailabilityMap;
-  numParticipants?: number;
-  hoveredSlot?: string | null;
-  setHoveredSlot?: (slotIso: string | null) => void;
-
-  // for "paint" mode
-  userAvailability?: AvailabilitySet;
-  onToggleSlot?: (slotIso: string, togglingOn: boolean) => void;
-
-  // for pagination
-  onPageUpdate?: (index: number, pages: number) => void;
-}
 
 const variants = {
   enter: (direction: number) => ({
@@ -77,7 +52,7 @@ export default function DateTimeGrid({
   userAvailability = createEmptyUserAvailability(),
   onToggleSlot = () => {},
   onPageUpdate = () => {},
-}: DateTimeGridProps) {
+}: GridProps) {
   const isMobile = useCheckMobile();
 
   const {
