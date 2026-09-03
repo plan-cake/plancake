@@ -26,7 +26,7 @@ import { MESSAGES } from "@/lib/messages";
  *    - totalPages: Total number of pages based on daysPerPage
  *    - currentPage: Current active page index
  */
-export default function useGridInfo(
+export default function useDateTimeGridInfo(
   timeslots: Date[],
   timezone: string,
   daysPerPage: number,

@@ -10,7 +10,7 @@ import {
   SIDE_WIDTH,
   TIME_LABEL_WIDTH,
 } from "@/features/event/grid/date-time/lib/constants";
-import useGridinfo from "@/features/event/grid/date-time/lib/use-grid";
+import useDateTimeGridinfo from "@/features/event/grid/date-time/lib/use-grid";
 import GridPageIndicator from "@/features/event/grid/date-time/page-indicator";
 import TimeColumn from "@/features/event/grid/date-time/time-column";
 import InteractiveTimeBlock from "@/features/event/grid/date-time/timeblocks/interactive";
@@ -64,7 +64,7 @@ export default function DateTimeGrid({
     direction,
     paginate,
     error,
-  } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPageUpdate);
+  } = useDateTimeGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPageUpdate);
 
   // Initial onPageUpdate callback to report pagination info to parent
   // Also triggers if the user changes between mobile and desktop layouts
