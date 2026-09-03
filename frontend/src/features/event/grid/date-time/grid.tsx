@@ -8,18 +8,18 @@ import {
   ResultsAvailabilityMap,
 } from "@/core/availability/types";
 import { createEmptyUserAvailability } from "@/core/availability/utils";
-import DateHeader from "@/features/event/date-time-grid/date-header";
+import DateHeader from "@/features/event/grid/date-time/date-header";
 import {
   GRID_ID,
   SIDE_WIDTH,
   TIME_LABEL_WIDTH,
-} from "@/features/event/date-time-grid/lib/constants";
-import useGridinfo from "@/features/event/date-time-grid/lib/use-grid";
-import GridPageIndicator from "@/features/event/date-time-grid/page-indicator";
-import TimeColumn from "@/features/event/date-time-grid/time-column";
-import InteractiveTimeBlock from "@/features/event/date-time-grid/timeblocks/interactive";
-import PreviewTimeBlock from "@/features/event/date-time-grid/timeblocks/preview";
-import ResultsTimeBlock from "@/features/event/date-time-grid/timeblocks/results";
+} from "@/features/event/grid/date-time/lib/constants";
+import useGridinfo from "@/features/event/grid/date-time/lib/use-grid";
+import GridPageIndicator from "@/features/event/grid/date-time/page-indicator";
+import TimeColumn from "@/features/event/grid/date-time/time-column";
+import InteractiveTimeBlock from "@/features/event/grid/date-time/timeblocks/interactive";
+import PreviewTimeBlock from "@/features/event/grid/date-time/timeblocks/preview";
+import ResultsTimeBlock from "@/features/event/grid/date-time/timeblocks/results";
 import { getHighestMatchCount } from "@/features/event/results/lib/utils";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { MESSAGES } from "@/lib/messages";

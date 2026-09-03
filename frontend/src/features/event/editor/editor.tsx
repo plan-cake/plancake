@@ -15,7 +15,7 @@ import { EventInformation } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import TimeSelector from "@/features/event/components/selectors/time";
-import DateTimeGrid from "@/features/event/date-time-grid/grid";
+import DateTimeGrid from "@/features/event/grid/date-time/grid";
 import AdvancedOptions from "@/features/event/editor/advanced-options";
 import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
 import DateRangeSelection from "@/features/event/editor/dates/date-selector";

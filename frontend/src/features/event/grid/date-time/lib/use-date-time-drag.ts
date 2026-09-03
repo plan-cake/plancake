@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 import { generateDragSlots } from "@/core/availability/utils";
-import { TimeSlot } from "@/features/event/date-time-grid/timeblocks/props";
+import { TimeSlot } from "@/features/event/grid/date-time/timeblocks/props";
 
 type DragState = {
   startSlot: string | null;

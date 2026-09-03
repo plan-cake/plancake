@@ -9,7 +9,7 @@ import ActionButton from "@/features/button/components/action";
 import {
   SIDE_WIDTH,
   TIME_LABEL_WIDTH,
-} from "@/features/event/date-time-grid/lib/constants";
+} from "@/features/event/grid/date-time/lib/constants";
 import { useHeaderSize } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 

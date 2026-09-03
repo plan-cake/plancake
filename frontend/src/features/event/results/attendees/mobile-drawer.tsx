@@ -5,7 +5,7 @@ import { ShareIcon, SlidersHorizontalIcon, SquarePenIcon } from "lucide-react";
 import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import { FloatingDrawer, MorphingDrawer } from "@/features/drawer";
-import { GRID_ID_SELECTOR } from "@/features/event/date-time-grid/lib/constants";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/date-time/lib/constants";
 import PanelHeader from "@/features/event/results/attendees/panel-header";
 import ParticipantList from "@/features/event/results/attendees/participant-list";
 import {

@@ -1,7 +1,7 @@
-import useDateTimeDrag from "@/features/event/date-time-grid/lib/use-date-time-drag";
-import TimeSlot from "@/features/event/date-time-grid/time-slot";
-import BaseTimeBlock from "@/features/event/date-time-grid/timeblocks/base";
-import { InteractiveTimeBlockProps } from "@/features/event/date-time-grid/timeblocks/props";
+import useDateTimeDrag from "@/features/event/grid/date-time/lib/use-date-time-drag";
+import TimeSlot from "@/features/event/grid/date-time/time-slot";
+import BaseTimeBlock from "@/features/event/grid/date-time/timeblocks/base";
+import { InteractiveTimeBlockProps } from "@/features/event/grid/date-time/timeblocks/props";
 
 export default function InteractiveTimeBlock({
   numQuarterHours,
