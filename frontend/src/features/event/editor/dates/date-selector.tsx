@@ -2,7 +2,12 @@ import { parseISO } from "date-fns";
 import { TriangleAlertIcon } from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
-import { SpecificDateRange, Weekday } from "@/core/event/types";
+import {
+  CalendarRange,
+  SpecificDateRange,
+  Weekday,
+  WeekdayRange,
+} from "@/core/event/types";
 import { DateRangeProps } from "@/features/event/editor/dates/date-range/date-range-props";
 import DateRangeDrawer from "@/features/event/editor/dates/date-range/drawer";
 import DateRangePopover from "@/features/event/editor/dates/date-range/popover";
@@ -31,20 +36,20 @@ export default function DateRangeSelection({
         <p
           className={`flex items-center gap-2 font-bold ${errors.dateRange || errors.weekdayRange ? "text-error" : ""}`}
         >
-          {rangeType === "specific" ? "Possible Dates" : "Possible Days"}
+          {rangeType === "weekday" ? "Possible Days" : "Possible Dates"}
           {(errors.dateRange || errors.weekdayRange) && (
             <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
         </p>
 
-        {eventRange?.type === "specific" ? (
+        {eventRange?.type === "weekday" ? (
+          <WeekdayPicker weekdays={(eventRange as WeekdayRange).weekdays} />
+        ) : (
           <DatePicker
             eventRange={eventRange}
             editing={editing}
             originalEventRange={originalEventRange as SpecificDateRange}
           />
-        ) : (
-          <WeekdayPicker weekdays={eventRange.weekdays} />
         )}
       </div>
     </div>
@@ -56,7 +61,7 @@ function DatePicker({
   editing = false,
   originalEventRange,
 }: {
-  eventRange: SpecificDateRange;
+  eventRange: SpecificDateRange | CalendarRange;
   editing?: boolean;
   originalEventRange?: SpecificDateRange;
 }) {

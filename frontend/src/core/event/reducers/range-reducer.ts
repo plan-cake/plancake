@@ -2,6 +2,7 @@
 // import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
 import {
+  DEFAULT_RANGE_CALENDAR,
   DEFAULT_RANGE_SPECIFIC,
   DEFAULT_RANGE_WEEKDAY,
 } from "@/core/event/lib/default-range";
@@ -41,23 +42,31 @@ export function EventRangeReducer(
         timeRange: state.timeRange,
       };
 
-      if (action.payload === "specific") {
-        return {
-          ...baseEvent,
-          type: "specific",
-          dates: DEFAULT_RANGE_SPECIFIC.dates,
-        };
-      } else {
-        return {
-          ...baseEvent,
-          type: "weekday",
-          weekdays: DEFAULT_RANGE_WEEKDAY.weekdays,
-        };
+      switch (action.payload) {
+        case "specific":
+          return {
+            ...baseEvent,
+            type: "specific",
+            dates: DEFAULT_RANGE_SPECIFIC.dates,
+          };
+        case "weekday":
+          return {
+            ...baseEvent,
+            type: "weekday",
+            weekdays: DEFAULT_RANGE_WEEKDAY.weekdays,
+          };
+        case "calendar":
+          return {
+            ...baseEvent,
+            type: "calendar",
+            dates: DEFAULT_RANGE_CALENDAR.dates,
+            timeRange: DEFAULT_RANGE_CALENDAR.timeRange,
+          };
       }
     }
 
     case "SET_DATE_RANGE": {
-      if (state.type !== "specific") {
+      if (state.type === "weekday") {
         return state;
       }
 

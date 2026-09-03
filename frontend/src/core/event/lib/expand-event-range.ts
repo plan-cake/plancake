@@ -6,6 +6,7 @@ import {
   format,
   getDay,
   isBefore,
+  parse,
   parseISO,
   startOfWeek,
 } from "date-fns";
@@ -71,8 +72,10 @@ function getDailyBoundariesInUTC(
 export function expandEventRange(range: EventRange): Date[] {
   if (range.type === "specific") {
     return generateSlotsForSpecificRange(range);
-  } else {
+  } else if (range.type === "weekday") {
     return generateSlotsForWeekdayRange(range);
+  } else {
+    return generateSlotsForCalendarRange(range);
   }
 }
 
@@ -142,5 +145,16 @@ function generateSlotsForWeekdayRange(range: WeekdayRange): Date[] {
     }
   }
 
+  return slots;
+}
+
+function generateSlotsForCalendarRange(range: EventRange): Date[] {
+  if (range.type !== "calendar") return [];
+  if (checkUnselectedRange(range)) return [];
+
+  const slots: Date[] = [];
+  for (const day of range.dates) {
+    slots.push(parse(day, "yyyy-MM-dd", new Date()));
+  }
   return slots;
 }

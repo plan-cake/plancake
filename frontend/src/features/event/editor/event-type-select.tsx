@@ -20,6 +20,7 @@ export default function EventTypeSelect({
       options={[
         { label: "Specific Dates", value: "specific" },
         { label: "Days of the Week", value: "weekday" },
+        { label: "Dates Only", value: "calendar" },
       ]}
       dialogTitle="Select Event Type"
       dialogDescription="Select a type from the list"

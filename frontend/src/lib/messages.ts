@@ -66,10 +66,12 @@ export const MESSAGES = {
   INFO_ADD_AVAILABILITY_MOBILE:
     "Add your availability by clicking the button below.",
   INFO_COPY_SHARE_LINK: "Copy and share the link so others can join!",
-  INFO_UNSELECTED_DATE_RANGE:
+  INFO_UNSELECTED_DATE_TIME_RANGE:
     "Select dates and times to see a preview of the event grid.",
   INFO_UNSELECTED_WEEK_RANGE:
     "Select days and times to see a preview of the event grid.",
+  INFO_UNSELECTED_CALENDAR_RANGE:
+    "Select dates to see a preview of the event grid.",
   INFO_NO_OVERLAP:
     "Literally no one is free at the same time. This is NOT making it out of the group chat...",
   INFO_NO_IDEAL_TIMES:

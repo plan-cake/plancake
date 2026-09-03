@@ -20,6 +20,7 @@ import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
 import DateRangeSelection from "@/features/event/editor/dates/date-selector";
 import { EventEditorType } from "@/features/event/editor/types";
 import { validateEventData } from "@/features/event/editor/validate-data";
+import CalendarGrid from "@/features/event/grid/calendar/grid";
 import DateTimeGrid from "@/features/event/grid/date-time/grid";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
@@ -35,7 +36,8 @@ type EventEditorProps = {
 
 type SegmentedControlOption = "details" | "preview";
 
-const MemoizedGrid = memo(DateTimeGrid);
+const MemoizedDateTimeGrid = memo(DateTimeGrid);
+const MemoizedCalendarGrid = memo(CalendarGrid);
 
 export default function EventEditor({ type, initialData }: EventEditorProps) {
   return (
@@ -59,6 +61,11 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   } = useEventContext();
   const { title, customCode, eventRange, timeslots } = state;
   const router = useRouter();
+
+  const Grid =
+    state.eventRange.type === "calendar"
+      ? MemoizedCalendarGrid
+      : MemoizedDateTimeGrid;
 
   // CAPTCHA STATES
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -118,7 +125,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     />
   );
   const grid = (
-    <MemoizedGrid
+    <Grid
       mode="preview"
       eventType={eventRange.type}
       unselectedRange={checkUnselectedRange(eventRange)}
