@@ -41,6 +41,7 @@ class APIMetadata:
         self.output_serializer_class = None
         self.rate_limit = None
         self.min_auth_required = None
+        self.captcha_required = False
 
 
 def get_metadata(func):
@@ -139,6 +140,8 @@ def get_event_type(date_type):
             return "Date"
         case UserEvent.EventType.GENERIC:
             return "Week"
+        case UserEvent.EventType.CALENDAR:
+            return "Calendar"
 
 
 class EventRange:
@@ -176,38 +179,50 @@ def get_event_range(event: UserEvent) -> EventRange:
                 current = get_weekday_date(ts.weekday, ts.local_timeslot)
                 times.add(current.time())
                 dates.add(current.date())
+        case UserEvent.EventType.CALENDAR:
+            for ts in event.calendar_timeslots.all():
+                current = to_datetime(ts.date)
+                dates.add(current.date())
 
     if not times or not dates:
         logger.critical(
-            f"Event {event.id} has no timeslots when formatting for dashboard."
+            f"Event {event.user_event_id} has no timeslots when formatting for dashboard."
         )
         raise ValueError("Event has no timeslots.")
 
-    start_time = min(times)
-    end_time = max(times)
-    # End time is 15 minutes after the last timeslot
-    end_time = (
-        datetime.combine(datetime.today(), end_time) + timedelta(minutes=15)
-    ).time()
+    if event.date_type == UserEvent.EventType.CALENDAR:
+        # Don't do any conversions for calendar events, time zones don't affect them
+        return EventRange(
+            dates=list(dates),
+            start_time=time(hour=0, minute=0, second=0),
+            end_time=time(hour=0, minute=0, second=0),
+        )
+    else:
+        start_time = min(times)
+        end_time = max(times)
+        # End time is 15 minutes after the last timeslot
+        end_time = (
+            datetime.combine(datetime.today(), end_time) + timedelta(minutes=15)
+        ).time()
 
-    # datetime.combine has no time zone info, so we include the event's time zone to
-    # make sure it doesn't convert twice
-    start_time_converted = datetime.combine(datetime.today(), start_time).replace(
-        tzinfo=event_time_zone
-    )
-    end_time_converted = datetime.combine(datetime.today(), end_time).replace(
-        tzinfo=event_time_zone
-    )
-    if event.date_type == UserEvent.EventType.SPECIFIC:
-        # Convert to UTC for date events, not week events since those stay in local time
-        start_time_converted = start_time_converted.astimezone(ZoneInfo("UTC"))
-        end_time_converted = end_time_converted.astimezone(ZoneInfo("UTC"))
+        # datetime.combine has no time zone info, so we include the event's time zone to
+        # make sure it doesn't convert twice
+        start_time_converted = datetime.combine(datetime.today(), start_time).replace(
+            tzinfo=event_time_zone
+        )
+        end_time_converted = datetime.combine(datetime.today(), end_time).replace(
+            tzinfo=event_time_zone
+        )
+        if event.date_type == UserEvent.EventType.SPECIFIC:
+            # Convert to UTC for date events, not week events since those stay in local time
+            start_time_converted = start_time_converted.astimezone(ZoneInfo("UTC"))
+            end_time_converted = end_time_converted.astimezone(ZoneInfo("UTC"))
 
-    return EventRange(
-        dates=list(dates),
-        start_time=start_time_converted.time(),
-        end_time=end_time_converted.time(),
-    )
+        return EventRange(
+            dates=list(dates),
+            start_time=start_time_converted.time(),
+            end_time=end_time_converted.time(),
+        )
 
 
 def format_event_info(event: UserEvent, include_participants: bool = False) -> dict:
@@ -470,3 +485,14 @@ def notify_live_update(event: LiveUpdateEvent):
         f"event_{event.event_code}",
         event.dumps(),
     )
+
+
+def to_datetime(date):
+    """
+    Converts a date object to a datetime object at midnight.
+
+    If the input is already a datetime object, it is returned unchanged.
+    """
+    if isinstance(date, datetime):
+        return date
+    return datetime(date.year, date.month, date.day)
