@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { TriangleAlertIcon } from "lucide-react";
 
 import { createEmptyUserAvailability } from "@/core/availability/utils";
 import DateHeader from "@/features/event/grid/date-time/date-header";
@@ -16,6 +15,7 @@ import TimeColumn from "@/features/event/grid/date-time/time-column";
 import InteractiveTimeBlock from "@/features/event/grid/date-time/timeblocks/interactive";
 import PreviewTimeBlock from "@/features/event/grid/date-time/timeblocks/preview";
 import ResultsTimeBlock from "@/features/event/grid/date-time/timeblocks/results";
+import GridMessage from "@/features/event/grid/grid-message";
 import { GridProps } from "@/features/event/grid/grid-props";
 import { getHighestMatchCount } from "@/features/event/results/lib/utils";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
@@ -107,7 +107,7 @@ export default function DateTimeGrid({
         message={
           eventType === "weekday"
             ? MESSAGES.INFO_UNSELECTED_WEEK_RANGE
-            : MESSAGES.INFO_UNSELECTED_DATE_RANGE
+            : MESSAGES.INFO_UNSELECTED_DATE_TIME_RANGE
         }
       />
     );
@@ -258,21 +258,3 @@ export default function DateTimeGrid({
     </div>
   );
 }
-
-const GridMessage = ({
-  error,
-  message,
-}: {
-  error: boolean;
-  message: string;
-}) => (
-  <div
-    className={cn(
-      "flex h-full w-full items-center justify-center gap-2 text-center text-sm",
-      !error && "opacity-75",
-    )}
-  >
-    {error && <TriangleAlertIcon className="text-error h-5 w-5" />}
-    {message}
-  </div>
-);
