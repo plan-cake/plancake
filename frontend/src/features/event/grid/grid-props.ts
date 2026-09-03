@@ -2,12 +2,13 @@ import {
   AvailabilitySet,
   ResultsAvailabilityMap,
 } from "@/core/availability/types";
+import { EventRange } from "@/core/event/types";
 
 export interface GridProps {
   mode: "paint" | "view" | "preview";
   timeslots: Date[];
   timezone: string;
-  isWeekdayEvent?: boolean;
+  eventType: EventRange["type"];
 
   unselectedRange?: boolean;
 

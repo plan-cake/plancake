@@ -43,7 +43,7 @@ export default function DateTimeGrid({
   timeslots,
   timezone,
   mode = "preview",
-  isWeekdayEvent = false,
+  eventType,
   unselectedRange = false,
   availabilities = {},
   numParticipants = 0,
@@ -105,7 +105,7 @@ export default function DateTimeGrid({
       <GridMessage
         error={false}
         message={
-          isWeekdayEvent
+          eventType === "weekday"
             ? MESSAGES.INFO_UNSELECTED_WEEK_RANGE
             : MESSAGES.INFO_UNSELECTED_DATE_RANGE
         }
@@ -130,7 +130,7 @@ export default function DateTimeGrid({
         totalPages={totalPages}
         dateBlockGaps={dateBlockGaps}
         scrollbarPresent={scrollbarPresent}
-        isWeekdayEvent={isWeekdayEvent}
+        isWeekdayEvent={eventType === "weekday"}
         onPrevPage={() => paginate(-1)}
         onNextPage={() => paginate(1)}
         direction={direction}

@@ -330,7 +330,7 @@ export default function ClientPage({
         {/* Right Panel */}
         <DateTimeGrid
           mode="paint"
-          isWeekdayEvent={eventRange.type === "weekday"}
+          eventType={eventRange.type}
           timezone={timeZone}
           onToggleSlot={toggleSlot}
           userAvailability={userAvailability}

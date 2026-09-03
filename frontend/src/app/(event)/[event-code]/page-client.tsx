@@ -184,7 +184,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-4">
         <DateTimeGrid
           mode="view"
-          isWeekdayEvent={eventRange.type === "weekday"}
+          eventType={eventRange.type}
           timezone={timezone}
           hoveredSlot={hoveredSlot}
           setHoveredSlot={setHoveredSlot}
