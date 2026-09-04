@@ -11,6 +11,7 @@ import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
+import CalendarGrid from "@/features/event/grid/calendar/grid";
 import DateTimeGrid from "@/features/event/grid/date-time/grid";
 import { GRID_ID_SELECTOR } from "@/features/event/grid/date-time/lib/constants";
 import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
@@ -44,6 +45,9 @@ export default function ClientPage({
 type HeaderButtonStyle = "frosted glass inset" | "secondary";
 
 function EventResults({ eventData }: { eventData: EventInformation }) {
+  const Grid =
+    eventData.eventRange.type === "calendar" ? CalendarGrid : DateTimeGrid;
+
   const {
     hoveredSlot,
     participants,
@@ -182,7 +186,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       <div className="-mb-2 md:hidden">{bannerElement}</div>
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-4">
-        <DateTimeGrid
+        <Grid
           mode="view"
           eventType={eventRange.type}
           timezone={timezone}
