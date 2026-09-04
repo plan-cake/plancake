@@ -1,5 +1,6 @@
 import { createEmptyUserAvailability } from "@/core/availability/utils";
 import useCalendarGridInfo from "@/features/event/grid/calendar/lib/use-grid";
+import InteractiveWeekBlock from "@/features/event/grid/calendar/weekblocks/interactive";
 import PreviewWeekBlock from "@/features/event/grid/calendar/weekblocks/preview";
 import ResultsWeekBlock from "@/features/event/grid/calendar/weekblocks/results";
 import { GRID_ID } from "@/features/event/grid/date-time/lib/constants";
@@ -59,7 +60,14 @@ export default function CalendarGrid({
             if (mode === "preview") {
               return <PreviewWeekBlock key={index} weeks={weekBlock} />;
             } else if (mode === "paint") {
-              return <div key={index}>Haven{"'"}t gotten there yet...</div>;
+              return (
+                <InteractiveWeekBlock
+                  key={index}
+                  weeks={weekBlock}
+                  availability={userAvailability}
+                  onToggle={onToggleSlot}
+                />
+              );
             } else if (mode === "view") {
               return (
                 <ResultsWeekBlock
