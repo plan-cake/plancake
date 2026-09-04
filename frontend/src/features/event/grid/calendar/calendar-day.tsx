@@ -7,7 +7,8 @@ import { parse } from "date-fns";
 import { cn } from "@/lib/utils/classname";
 
 export interface CalendarDayProps {
-  dayString: string | null;
+  dayString: string;
+  exists?: boolean;
   isHovered?: boolean;
 
   disableSelect?: boolean;
@@ -31,6 +32,7 @@ export interface CalendarDayProps {
 
 function CalendarDay({
   dayString,
+  exists = true,
   isHovered,
   disableSelect,
   dynamicStyle: style,
@@ -58,7 +60,7 @@ function CalendarDay({
         gridRow < numRows && "border-b",
       );
 
-  if (!dayString) {
+  if (!exists) {
     return <div className={borderClasses}></div>;
   }
 

@@ -1,12 +1,13 @@
 import CalendarDay, {
   CalendarDayProps,
 } from "@/features/event/grid/calendar/calendar-day";
+import { CalendarGridWeek } from "@/features/event/grid/calendar/types";
 
 export default function BaseWeekBlock({
   weeks,
   getDayProps,
 }: {
-  weeks: (string | null)[][];
+  weeks: CalendarGridWeek[];
   getDayProps?: (dayString: string) => Partial<CalendarDayProps>;
 }) {
   return (
@@ -25,19 +26,19 @@ export default function BaseWeekBlock({
       }}
     >
       {weeks.map((week, wIndex) =>
-        week.map((day, dIndex) => {
+        week.days.map((day, dIndex) => {
           const commonProps = {
-            dayString: day,
+            dayString: day.dayString,
             gridColumn: dIndex + 1,
             gridRow: wIndex + 1,
             numRows: weeks.length,
           };
 
-          if (!day) {
-            return <CalendarDay key={dIndex} {...commonProps} />;
+          if (!day.exists) {
+            return <CalendarDay key={dIndex} exists={false} {...commonProps} />;
           }
 
-          const dayProps = getDayProps?.(day) ?? {};
+          const dayProps = getDayProps?.(day.dayString) ?? {};
 
           return <CalendarDay key={dIndex} {...commonProps} {...dayProps} />;
         }),

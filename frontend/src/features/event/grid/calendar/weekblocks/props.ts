@@ -2,9 +2,10 @@ import {
   AvailabilitySet,
   ResultsAvailabilityMap,
 } from "@/core/availability/types";
+import { CalendarGridWeek } from "@/features/event/grid/calendar/types";
 
 type CommonBlockProps = {
-  weeks: (string | null)[][];
+  weeks: CalendarGridWeek[];
 };
 
 export type PreviewWeekBlockProps = CommonBlockProps;

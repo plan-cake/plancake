@@ -2,44 +2,77 @@ import { useMemo } from "react";
 
 import { format } from "date-fns-tz";
 
+import { CalendarGridWeek } from "@/features/event/grid/calendar/types";
 import { MESSAGES } from "@/lib/messages";
 
-const EMPTY_WEEK_BLOCK = [null, null, null, null, null, null, null];
+function createWeek(weekStart: Date): CalendarGridWeek {
+  const days: string[] = [];
 
-type Week = {
-  weekStart: string;
-  days: (string | null)[];
-};
+  for (let i = 0; i < 7; i++) {
+    const currentDate = new Date(weekStart);
+    currentDate.setDate(currentDate.getDate() + i);
+    const dayString = format(currentDate, "yyyy-MM-dd");
+    days[i] = dayString;
+  }
+
+  const weekDays: CalendarGridWeek["days"] = [
+    { dayString: days[0], exists: false, firstOfMonth: false },
+    { dayString: days[1], exists: false, firstOfMonth: false },
+    { dayString: days[2], exists: false, firstOfMonth: false },
+    { dayString: days[3], exists: false, firstOfMonth: false },
+    { dayString: days[4], exists: false, firstOfMonth: false },
+    { dayString: days[5], exists: false, firstOfMonth: false },
+    { dayString: days[6], exists: false, firstOfMonth: false },
+  ];
+
+  return {
+    weekStart: format(weekStart, "yyyy-MM-dd"),
+    days: weekDays,
+  };
+}
 
 export default function useCalendarGridInfo(timeslots: Date[]) {
   // Organize into weekblocks
   return useMemo(() => {
     if (!timeslots || timeslots.length === 0)
       return {
-        weekBlocks: [] as (string | null)[][][],
+        weekBlocks: [] as CalendarGridWeek[][],
         error: MESSAGES.ERROR_EVENT_RANGE_INVALID,
       };
 
     const sortedDates = timeslots.sort();
 
-    const weeks = {} as Record<string, Week>;
+    const weeks = {} as Record<string, CalendarGridWeek>;
+    const months = new Set<string>();
     for (const date of sortedDates) {
-      const dayOfWeek = new Date(date).getDay();
       const weekStart = getWeekStart(new Date(date));
+      const weekStartString = format(weekStart, "yyyy-MM-dd");
 
-      if (!weeks[weekStart]) {
-        weeks[weekStart] = { weekStart, days: [...EMPTY_WEEK_BLOCK] };
+      if (!weeks[weekStartString]) {
+        weeks[weekStartString] = createWeek(weekStart);
       }
-      const currentBlock = weeks[weekStart];
-      currentBlock.days[dayOfWeek] = format(date, "yyyy-MM-dd");
+      const currentBlock = weeks[weekStartString];
+      const dayBlock = currentBlock.days.find(
+        (day) => day.dayString === format(date, "yyyy-MM-dd"),
+      );
+      const monthString = format(date, "yyyy-MM");
+      const newMonth = !months.has(monthString);
+      months.add(monthString);
+      if (!dayBlock) {
+        throw new Error(
+          `Date ${format(date, "yyyy-MM-dd")} is not in the week starting ${weekStartString}`,
+        );
+      }
+      dayBlock.exists = true;
+      dayBlock.firstOfMonth = newMonth;
     }
 
     const sortedWeeks = Object.values(weeks).sort((a, b) =>
       a.weekStart < b.weekStart ? -1 : 1,
     );
 
-    const weekBlocks: (string | null)[][][] = [];
-    let currentWeekBlock = [sortedWeeks[0].days];
+    const weekBlocks: CalendarGridWeek[][] = [];
+    let currentWeekBlock = [sortedWeeks[0]];
     for (let i = 1; i < sortedWeeks.length; i++) {
       const week = sortedWeeks[i];
       const weekStart = new Date(week.weekStart);
@@ -59,9 +92,9 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
 
       if (dateDiff > 7) {
         weekBlocks.push(currentWeekBlock);
-        currentWeekBlock = [week.days];
+        currentWeekBlock = [week];
       } else {
-        currentWeekBlock.push(week.days);
+        currentWeekBlock.push(week);
       }
     }
     weekBlocks.push(currentWeekBlock);
@@ -73,5 +106,5 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
 function getWeekStart(date: Date) {
   const dayOfWeek = date.getDay();
   const diff = date.getDate() - dayOfWeek;
-  return format(new Date(date.setDate(diff)), "yyyy-MM-dd");
+  return new Date(date.setDate(diff));
 }
