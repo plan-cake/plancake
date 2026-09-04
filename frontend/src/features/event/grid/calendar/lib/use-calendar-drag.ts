@@ -9,6 +9,7 @@ type DragState = {
   isDragging: boolean;
   startDay: string | null;
   endDay: string | null;
+  draggedDays: Set<string>;
   togglingOn: boolean | null;
 };
 
@@ -16,12 +17,12 @@ export default function useCalendarDrag(
   onToggle: (dayString: string, togglingOn: boolean) => void,
   timeslots: Date[],
 ) {
-  const [draggedDays, setDraggedDays] = useState<Set<string>>(new Set());
   const [hoveredDay, setHoveredDay] = useState<string | null>(null);
   const dragState = useRef<DragState>({
     isDragging: false,
     startDay: null,
     endDay: null,
+    draggedDays: new Set<string>(),
     togglingOn: null,
   });
   const dayStringSet = useMemo(
@@ -67,7 +68,7 @@ export default function useCalendarDrag(
           newDraggedDays.add(dayString);
         }
       }
-      setDraggedDays(newDraggedDays);
+      dragState.current.draggedDays = newDraggedDays;
     },
     [dayStringSet],
   );
@@ -77,15 +78,15 @@ export default function useCalendarDrag(
       isDragging: false,
       startDay: null,
       endDay: null,
+      draggedDays: new Set<string>(),
       togglingOn: null,
     };
-    setDraggedDays(new Set());
     setHoveredDay(null);
   }
 
   useEffect(() => {
     const stopDragging = () => {
-      for (const day of draggedDays) {
+      for (const day of dragState.current.draggedDays) {
         if (dayStringSet.has(day)) {
           onToggle(dateToISOString(day), dragState.current.togglingOn!);
         }
@@ -93,14 +94,14 @@ export default function useCalendarDrag(
       resetDrag();
     };
 
-    window.addEventListener("mouseup", stopDragging);
-    window.addEventListener("touchend", stopDragging);
+    window.addEventListener("pointerup", stopDragging);
+    window.addEventListener("pointercancel", stopDragging);
 
     return () => {
-      window.removeEventListener("mouseup", stopDragging);
-      window.removeEventListener("touchend", stopDragging);
+      window.removeEventListener("pointerup", stopDragging);
+      window.removeEventListener("pointercancel", stopDragging);
     };
-  }, [draggedDays, onToggle, dayStringSet]);
+  }, [dragState.current.draggedDays, onToggle, dayStringSet]);
 
   /* EVENT HANDLERS */
 
@@ -142,7 +143,7 @@ export default function useCalendarDrag(
   );
 
   return {
-    draggedDays,
+    draggedDays: dragState.current.draggedDays,
     hoveredDay,
     togglingOn: dragState.current.togglingOn,
     handlePointerDown,

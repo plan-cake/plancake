@@ -93,7 +93,10 @@ function CalendarDay({
       }}
       {...eventHandlers}
     >
-      <div className="flex h-full w-full flex-col justify-between p-2">
+      <div
+        data-day-string={dayString}
+        className="flex h-full w-full flex-col justify-between p-2"
+      >
         <span className="text-left leading-none">{dayNum}</span>
         {!!icon && <div className="flex w-full justify-end">{icon}</div>}
       </div>
