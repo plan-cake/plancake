@@ -6,7 +6,7 @@ import { parse } from "date-fns";
 
 import { cn } from "@/lib/utils/classname";
 
-interface CalendarDayProps {
+export interface CalendarDayProps {
   dayString: string | null;
   isHovered?: boolean;
 

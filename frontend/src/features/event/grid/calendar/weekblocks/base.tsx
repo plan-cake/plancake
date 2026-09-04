@@ -1,16 +1,20 @@
+import CalendarDay, {
+  CalendarDayProps,
+} from "@/features/event/grid/calendar/calendar-day";
+
 export default function BaseWeekBlock({
-  numWeeks,
-  children,
+  weeks,
+  getDayProps,
 }: {
-  numWeeks: number;
-  children: React.ReactNode;
+  weeks: (string | null)[][];
+  getDayProps?: (dayString: string) => Partial<CalendarDayProps>;
 }) {
   return (
     <div
       className="border-foreground/75 grid border"
       style={{
         gridTemplateColumns: "repeat(7, 1fr)",
-        gridTemplateRows: `repeat(${numWeeks}, minmax(80px, 1fr))`,
+        gridTemplateRows: `repeat(${weeks.length}, minmax(80px, 1fr))`,
         backgroundImage: `repeating-linear-gradient(
           45deg,
           color-mix(in srgb, var(--color-foreground) 10%, transparent) 0px,
@@ -20,7 +24,24 @@ export default function BaseWeekBlock({
         )`,
       }}
     >
-      {children}
+      {weeks.map((week, wIndex) =>
+        week.map((day, dIndex) => {
+          const commonProps = {
+            dayString: day,
+            gridColumn: dIndex + 1,
+            gridRow: wIndex + 1,
+            numRows: weeks.length,
+          };
+
+          if (!day) {
+            return <CalendarDay key={dIndex} {...commonProps} />;
+          }
+
+          const dayProps = getDayProps?.(day) ?? {};
+
+          return <CalendarDay key={dIndex} {...commonProps} {...dayProps} />;
+        }),
+      )}
     </div>
   );
 }
