@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { parseISO } from "date-fns";
 import { useDebouncedCallback } from "use-debounce";
 
+import Captcha from "@/components/captcha";
 import Checkbox from "@/components/checkbox";
 import MobileFooterIsland from "@/components/mobile-footer-island";
 import TextInputField from "@/components/text-input-field";
@@ -54,6 +55,10 @@ export default function ClientPage({
     eventRange.type,
   );
   const { displayName, timeZone, userAvailability } = state;
+
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -181,6 +186,14 @@ export default function ClientPage({
       }
     }
 
+    if (!captchaToken) {
+      setErrors((prev) => ({
+        ...prev,
+        captcha: MESSAGES.ERROR_CAPTCHA_FAILED,
+      }));
+      return false;
+    }
+
     // Save the default name if checkbox checked
     if (saveDefaultName) {
       if (session.isLoggedIn) {
@@ -210,6 +223,7 @@ export default function ClientPage({
       display_name: displayName,
       availability: payload_availability,
       time_zone: timeZone,
+      captcha_token: captchaToken,
     };
 
     try {
@@ -222,6 +236,11 @@ export default function ClientPage({
         setErrors((prev) => ({
           ...prev,
           rate_limit: error.formattedMessage || MESSAGES.ERROR_RATE_LIMIT,
+        }));
+      } else if (error.captchaFailed) {
+        setErrors((prev) => ({
+          ...prev,
+          captcha: MESSAGES.ERROR_CAPTCHA_FAILED,
         }));
       } else {
         addToast("error", error.formattedMessage);
@@ -249,6 +268,7 @@ export default function ClientPage({
       }
       onClick={handleSubmitAvailability}
       loadOnSuccess
+      disabled={captchaInitError}
     />
   );
 
@@ -260,6 +280,20 @@ export default function ClientPage({
       {errors.rate_limit && (
         <RateLimitBanner>{errors.rate_limit}</RateLimitBanner>
       )}
+
+      {/* CAPTCHA + Error */}
+      <Captcha
+        backendVerificationFailed={!!errors.captcha}
+        onTokenChange={setCaptchaToken}
+        onClearBackendError={() =>
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.captcha;
+            return newErrors;
+          })
+        }
+        onInitError={() => setCaptchaInitError(true)}
+      />
 
       {/* Header and Button Row */}
       <div className="flex w-full flex-wrap justify-between md:flex-row">
