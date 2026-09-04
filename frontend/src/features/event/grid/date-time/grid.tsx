@@ -3,12 +3,12 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { createEmptyUserAvailability } from "@/core/availability/utils";
-import DateHeader from "@/features/event/grid/date-time/date-header";
 import {
   GRID_ID,
   SIDE_WIDTH,
   TIME_LABEL_WIDTH,
-} from "@/features/event/grid/date-time/lib/constants";
+} from "@/features/event/grid/constants";
+import DateHeader from "@/features/event/grid/date-time/date-header";
 import useDateTimeGridinfo from "@/features/event/grid/date-time/lib/use-grid";
 import GridPageIndicator from "@/features/event/grid/date-time/page-indicator";
 import TimeColumn from "@/features/event/grid/date-time/time-column";

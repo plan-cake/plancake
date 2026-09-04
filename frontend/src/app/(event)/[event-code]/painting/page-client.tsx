@@ -16,8 +16,8 @@ import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import CalendarGrid from "@/features/event/grid/calendar/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/constants";
 import DateTimeGrid from "@/features/event/grid/date-time/grid";
-import { GRID_ID_SELECTOR } from "@/features/event/grid/date-time/lib/constants";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,

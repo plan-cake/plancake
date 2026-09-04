@@ -6,10 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
-import {
-  SIDE_WIDTH,
-  TIME_LABEL_WIDTH,
-} from "@/features/event/grid/date-time/lib/constants";
+import { SIDE_WIDTH, TIME_LABEL_WIDTH } from "@/features/event/grid/constants";
 import { useHeaderSize } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 

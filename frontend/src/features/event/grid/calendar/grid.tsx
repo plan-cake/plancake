@@ -3,7 +3,7 @@ import useCalendarGridInfo from "@/features/event/grid/calendar/lib/use-grid";
 import InteractiveWeekBlock from "@/features/event/grid/calendar/weekblocks/interactive";
 import PreviewWeekBlock from "@/features/event/grid/calendar/weekblocks/preview";
 import ResultsWeekBlock from "@/features/event/grid/calendar/weekblocks/results";
-import { GRID_ID } from "@/features/event/grid/date-time/lib/constants";
+import { GRID_ID } from "@/features/event/grid/constants";
 import GridMessage from "@/features/event/grid/grid-message";
 import { GridProps } from "@/features/event/grid/grid-props";
 import { getHighestMatchCount } from "@/features/event/results/lib/utils";

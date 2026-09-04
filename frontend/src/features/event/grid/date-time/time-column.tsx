@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { TIME_LABEL_WIDTH } from "@/features/event/grid/date-time/lib/constants";
+import { TIME_LABEL_WIDTH } from "@/features/event/grid/constants";
 import { cn } from "@/lib/utils/classname";
 
 export default function TimeColumn({
