@@ -60,29 +60,27 @@ export default function ScheduleHeader({
       className={cn(
         preview ? "md:bg-panel top-0" : cn(topMarginClass, "bg-background"),
         scrollbarPresent && "pr-4",
-        "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
+        "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-start",
       )}
       style={{
-        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 10}px`,
+        gridTemplateColumns: `${TIME_LABEL_WIDTH}px minmax(0, ${gridWidth}%) ${SIDE_WIDTH}px`,
       }}
     >
-      {currentPage > 0 ? (
-        <div>
+      <div className="flex h-full items-center justify-center">
+        {currentPage > 0 && (
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronLeftIcon />}
             onClick={onPrevPage}
-            className="ml-3 p-1.5"
+            className="p-1.5"
             aria-label="Previous Page"
             tooltip="Previous Page"
           />
-        </div>
-      ) : (
-        <div style={{ width: `${SIDE_WIDTH}px` }} />
-      )}
+        )}
+      </div>
 
       {/* This container takes up the '1fr' space */}
-      <div className="relative grid h-full select-none overflow-hidden">
+      <div className="relative h-full w-full select-none overflow-hidden">
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div
             key={currentPage}
@@ -92,10 +90,9 @@ export default function ScheduleHeader({
             animate="center"
             exit="exit"
             transition={{ type: "tween", ease: "easeInOut" }}
-            className="absolute inset-0 grid h-full items-center"
+            className="absolute inset-0 grid h-full w-full items-center"
             style={{
               gridTemplateColumns: `repeat(${visibleDays.length}, 1fr)`,
-              width: `${gridWidth}%`,
             }}
           >
             {visibleDays.map(({ dayDisplay }, i) => {
@@ -119,8 +116,8 @@ export default function ScheduleHeader({
         </AnimatePresence>
       </div>
 
-      {currentPage < totalPages - 1 ? (
-        <div>
+      <div className="flex h-full items-center justify-center">
+        {currentPage < totalPages - 1 && (
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronRightIcon />}
@@ -129,10 +126,8 @@ export default function ScheduleHeader({
             aria-label="Next Page"
             tooltip="Next Page"
           />
-        </div>
-      ) : (
-        <div style={{ width: `${SIDE_WIDTH}px` }} />
-      )}
+        )}
+      </div>
     </div>
   );
 }
