@@ -2,6 +2,8 @@
 
 import { cloneElement, memo } from "react";
 
+import { parse } from "date-fns";
+
 import { cn } from "@/lib/utils/classname";
 
 interface CalendarDayProps {
@@ -60,7 +62,7 @@ function CalendarDay({
     return <div className={borderClasses}></div>;
   }
 
-  const dayObj = new Date(dayString);
+  const dayObj = parse(dayString, "yyyy-MM-dd", new Date());
   const dayNum = dayObj.getDate();
 
   return (
