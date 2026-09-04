@@ -64,6 +64,7 @@ export default function CalendarGrid({
                 <InteractiveWeekBlock
                   key={index}
                   weeks={weekBlock}
+                  timeslots={timeslots}
                   availability={userAvailability}
                   onToggle={onToggleSlot}
                 />

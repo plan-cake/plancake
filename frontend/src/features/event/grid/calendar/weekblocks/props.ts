@@ -10,6 +10,7 @@ type CommonBlockProps = {
 export type PreviewWeekBlockProps = CommonBlockProps;
 
 export type InteractiveWeekBlockProps = CommonBlockProps & {
+  timeslots: Date[];
   availability: AvailabilitySet;
   onToggle: (dayString: string, togglingOn: boolean) => void;
 };
