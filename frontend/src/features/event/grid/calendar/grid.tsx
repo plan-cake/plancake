@@ -1,6 +1,6 @@
 import { createEmptyUserAvailability } from "@/core/availability/utils";
 import useCalendarGridInfo from "@/features/event/grid/calendar/lib/use-grid";
-import WeekBlock from "@/features/event/grid/calendar/weekblock";
+import PreviewWeekBlock from "@/features/event/grid/calendar/weekblocks/preview";
 import { GRID_ID } from "@/features/event/grid/date-time/lib/constants";
 import GridMessage from "@/features/event/grid/grid-message";
 import { GridProps } from "@/features/event/grid/grid-props";
@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils/classname";
 
 export default function CalendarGrid({
   timeslots,
-  timezone,
   mode,
   unselectedRange = false,
   availabilities = {},
@@ -55,7 +54,7 @@ export default function CalendarGrid({
       >
         <div className="relative flex flex-grow flex-col gap-2">
           {weekBlocks.map((weekBlock, index) => (
-            <WeekBlock key={index} weeks={weekBlock} />
+            <PreviewWeekBlock key={index} weeks={weekBlock} />
           ))}
         </div>
       </div>
