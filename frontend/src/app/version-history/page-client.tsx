@@ -1,12 +1,15 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { cloneElement, useEffect, useMemo, useRef, useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
 import {
   ArrowDownIcon,
+  BugIcon,
   ChevronRightIcon,
   ListChevronsDownUpIcon,
   ListChevronsUpDownIcon,
+  PlusCircleIcon,
+  WrenchIcon,
 } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
@@ -21,8 +24,10 @@ import { cn } from "@/lib/utils/classname";
 
 export default function ClientPage({
   versionHistoryData,
+  currentVersion,
 }: {
   versionHistoryData: VersionHistoryData;
+  currentVersion: string;
 }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const { expand } = useHeader();
@@ -39,17 +44,19 @@ export default function ClientPage({
   const allVersions = useMemo(() => {
     const versions = new Set<string>();
     versionHistoryData.forEach((version) => {
-      if (version.bugFixes && version.bugFixes.length > 0) {
+      if (
+        version.added.length > 0 ||
+        version.changed.length > 0 ||
+        version.fixed.length > 0
+      ) {
         versions.add(version.version);
       }
-      if (version.minorVersions && version.minorVersions.length > 0) {
-        version.minorVersions.forEach((minor) => versions.add(minor.version));
-      }
+      version.minorVersions.forEach((minor) => versions.add(minor.version));
     });
     return versions;
   }, [versionHistoryData]);
   const [expandedVersions, setExpandedVersions] = useState<Set<string>>(
-    new Set(),
+    new Set([currentVersion]),
   );
   const allExpanded = expandedVersions.size === allVersions.size;
 
@@ -115,8 +122,7 @@ export default function ClientPage({
         <div className="mx-auto flex w-full flex-col gap-8 px-2">
           {versionHistoryData.map((version, index) => {
             const isCurrent = index === versionHistoryData.length - 1;
-            const hasMinorVersions =
-              version.minorVersions && version.minorVersions.length > 0;
+            const hasMinorVersions = version.minorVersions.length > 0;
 
             return (
               <div
@@ -127,32 +133,33 @@ export default function ClientPage({
                 }
                 key={version.version}
               >
-                <MajorVersion
+                <Version
                   key={version.version}
                   versionData={version}
+                  isMajor={true}
                   isCurrent={isCurrent}
                   isLast={isCurrent && !hasMinorVersions}
                   extendLine={!isCurrent && !hasMinorVersions}
                   isExpanded={expandedVersions.has(version.version)}
                   toggleExpanded={toggleVersion}
                 />
-                {version.minorVersions &&
-                  version.minorVersions.map((minorVersion, minorIndex) => {
-                    const isLastMinor =
-                      minorIndex === version.minorVersions!.length - 1;
+                {version.minorVersions.map((minorVersion, minorIndex) => {
+                  const isLastMinor =
+                    minorIndex === version.minorVersions.length - 1;
 
-                    return (
-                      <MinorVersion
-                        key={minorVersion.version}
-                        versionData={minorVersion}
-                        isCurrent={isCurrent}
-                        isLast={isCurrent && isLastMinor}
-                        extendLine={!isCurrent && isLastMinor}
-                        isExpanded={expandedVersions.has(minorVersion.version)}
-                        toggleExpanded={toggleVersion}
-                      />
-                    );
-                  })}
+                  return (
+                    <Version
+                      key={minorVersion.version}
+                      versionData={minorVersion}
+                      isMajor={false}
+                      isCurrent={isCurrent}
+                      isLast={isCurrent && isLastMinor}
+                      extendLine={!isCurrent && isLastMinor}
+                      isExpanded={expandedVersions.has(minorVersion.version)}
+                      toggleExpanded={toggleVersion}
+                    />
+                  );
+                })}
               </div>
             );
           })}
@@ -207,15 +214,17 @@ function TimelineSegment({
   );
 }
 
-function MajorVersion({
+function Version({
   versionData,
+  isMajor,
   isCurrent,
   isLast,
   extendLine,
   isExpanded,
   toggleExpanded,
 }: {
-  versionData: MajorVersionData;
+  versionData: MajorVersionData | MinorVersionData;
+  isMajor: boolean;
   isCurrent: boolean;
   isLast: boolean;
   extendLine: boolean;
@@ -225,138 +234,158 @@ function MajorVersion({
   const releaseDate = new Date(
     Date.UTC(
       versionData.releaseDate.year,
-      versionData.releaseDate.month,
+      versionData.releaseDate.month - 1, // Adjust to 0-indexed month
       versionData.releaseDate.day,
     ),
   );
-  const releaseDateString = releaseDate.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  });
+  const releaseDateString = releaseDate.toLocaleDateString(
+    undefined,
+    isMajor
+      ? {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          timeZone: "UTC",
+        }
+      : {
+          month: "short",
+          day: "numeric",
+          timeZone: "UTC",
+        },
+  );
+
+  const hasChanges = useMemo(() => {
+    return (
+      versionData.added.length > 0 ||
+      versionData.changed.length > 0 ||
+      versionData.fixed.length > 0
+    );
+  }, [versionData]);
+  const versionTag = useMemo(() => {
+    if (isMajor && (versionData as MajorVersionData).tag) {
+      return (versionData as MajorVersionData).tag;
+    }
+    return undefined;
+  }, [isMajor, versionData]);
+
+  const HeaderType = hasChanges ? "button" : "div";
+
+  const header = (
+    <HeaderType className="group flex w-full items-center gap-2">
+      {!isMajor && <span className="font-bold">{versionData.version}</span>}
+      {versionTag && (
+        <div
+          className={cn(
+            "bg-lion text-violet text-nowrap rounded-full px-1.5 py-0.5 text-xs font-semibold",
+          )}
+        >
+          {versionTag}
+        </div>
+      )}
+      <span className="text-foreground/50 shrink-0 italic">
+        {releaseDateString}
+      </span>
+      {hasChanges && (
+        <div
+          className={cn(
+            "transition-transform duration-200",
+            "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
+            isExpanded && "rotate-90",
+          )}
+        >
+          <ChevronRightIcon className="h-4 w-4" />
+        </div>
+      )}
+      {isMajor && !isCurrent && (
+        <div className="border-foreground/50 w-full rounded-full border-t" />
+      )}
+    </HeaderType>
+  );
 
   return (
-    <div className="flex">
+    <div className={cn("flex", !isMajor && "mt-4")}>
       <TimelineSegment
-        version={versionData.version}
+        version={isMajor ? versionData.version : undefined}
         isCurrent={isCurrent}
         isLast={isLast}
         extend={extendLine}
       />
       <div className="w-full px-4">
-        <div className="flex items-center gap-4">
-          <span className="text-foreground/50 shrink-0 italic">
-            {releaseDateString}
-          </span>
-          {!isCurrent && (
-            <div className="border-foreground/50 w-full rounded-full border-t" />
-          )}
-        </div>
-        <ul>
-          {versionData.changes.map((change) => (
-            <li key={change}>- {change}</li>
-          ))}
-        </ul>
-        {versionData.bugFixes && versionData.bugFixes.length > 0 && (
+        {hasChanges ? (
           <Collapsible.Root
             open={isExpanded}
             onOpenChange={() => toggleExpanded(versionData.version)}
-            className="ml-3"
+            className="flex flex-col gap-1"
           >
-            <Collapsible.Trigger asChild>
-              <div className="group mt-2 flex cursor-pointer items-center gap-2">
-                <span className="font-semibold">Bug Fixes</span>
-                <div
-                  className={cn(
-                    "transition-transform duration-200",
-                    "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
-                    isExpanded && "rotate-90",
-                  )}
-                >
-                  <ChevronRightIcon className="h-4 w-4" />
-                </div>
-              </div>
+            <Collapsible.Trigger asChild className="cursor-pointer">
+              {header}
             </Collapsible.Trigger>
             <Collapsible.Content className="collapsible-content">
-              <ul>
-                {versionData.bugFixes!.map((bugFix) => (
-                  <li key={bugFix}>- {bugFix}</li>
-                ))}
-              </ul>
+              <ChangeList versionData={versionData} />
             </Collapsible.Content>
           </Collapsible.Root>
+        ) : (
+          header
         )}
       </div>
     </div>
   );
 }
 
-function MinorVersion({
+function ChangeList({
   versionData,
-  isCurrent,
-  isLast,
-  extendLine,
-  isExpanded,
-  toggleExpanded,
 }: {
-  versionData: MinorVersionData;
-  isCurrent: boolean;
-  isLast: boolean;
-  extendLine: boolean;
-  isExpanded: boolean;
-  toggleExpanded: (version: string) => void;
+  versionData: MajorVersionData | MinorVersionData;
 }) {
-  const releaseDate = new Date(
-    Date.UTC(
-      versionData.releaseDate.year,
-      versionData.releaseDate.month,
-      versionData.releaseDate.day,
-    ),
+  return (
+    <ul className="flex flex-col gap-1">
+      <ChangeSection
+        title="Added"
+        icon={<PlusCircleIcon />}
+        changes={versionData.added}
+      />
+      <ChangeSection
+        title="Changed"
+        icon={<WrenchIcon />}
+        changes={versionData.changed}
+      />
+      <ChangeSection
+        title="Fixed"
+        icon={<BugIcon />}
+        changes={versionData.fixed}
+      />
+    </ul>
   );
-  const releaseDateString = releaseDate.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC",
-  });
+}
+
+function ChangeSection({
+  title,
+  icon,
+  changes,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  changes: string[];
+}) {
+  if (changes.length === 0) return null;
+
+  const iconElement = cloneElement(
+    icon as React.ReactElement<{ className: string }>,
+    {
+      className: "h-3.5 w-3.5 shrink-0",
+    },
+  );
 
   return (
-    <div className="mt-4 flex">
-      <TimelineSegment
-        isCurrent={isCurrent}
-        isLast={isLast}
-        extend={extendLine}
-      />
-      <div className="px-4">
-        <Collapsible.Root
-          open={isExpanded}
-          onOpenChange={() => toggleExpanded(versionData.version)}
-        >
-          <Collapsible.Trigger asChild className="cursor-pointer">
-            <div className="group flex items-center gap-2">
-              <span className="font-bold">{versionData.version}</span>
-              <span className="text-foreground/50 italic">
-                {releaseDateString}
-              </span>
-              <div
-                className={cn(
-                  "transition-transform duration-200",
-                  "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
-                  isExpanded && "rotate-90",
-                )}
-              >
-                <ChevronRightIcon className="h-4 w-4" />
-              </div>
-            </div>
-          </Collapsible.Trigger>
-          <Collapsible.Content className="collapsible-content">
-            <ul>
-              {versionData.changes.map((change) => (
-                <li key={change}>- {change}</li>
-              ))}
-            </ul>
-          </Collapsible.Content>
-        </Collapsible.Root>
+    <div>
+      <span className="font-bold opacity-75">{title}</span>
+      <div className="flex flex-col gap-1">
+        {changes.map((change) => (
+          <li key={change} className="flex items-start gap-2">
+            <div className="mt-[3px]">{iconElement}</div>
+            <div className="leading-tight">{change}</div>
+          </li>
+        ))}
       </div>
     </div>
   );
