@@ -18,7 +18,7 @@ export async function validateEventData(
   }
 
   // Validate event range
-  if (eventRange.type === "specific") {
+  if (eventRange.type === "specific" || eventRange.type === "calendar") {
     if (!eventRange.dates.size) {
       errors.dateRange = MESSAGES.ERROR_EVENT_DATES_MISSING;
     } else {
@@ -35,13 +35,15 @@ export async function validateEventData(
     }
   }
 
-  // Validate time range
-  if (!eventRange.timeRange.from || !eventRange.timeRange.to) {
-    errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_MISSING;
-  } else if (
-    !checkTimeRange(eventRange.timeRange.from, eventRange.timeRange.to)
-  ) {
-    errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_INVALID;
+  if (eventRange.type === "specific" || eventRange.type === "weekday") {
+    // Validate time range
+    if (!eventRange.timeRange.from || !eventRange.timeRange.to) {
+      errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_MISSING;
+    } else if (
+      !checkTimeRange(eventRange.timeRange.from, eventRange.timeRange.to)
+    ) {
+      errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_INVALID;
+    }
   }
 
   return errors;

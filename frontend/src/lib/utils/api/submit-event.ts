@@ -41,8 +41,11 @@ export default async function submitEvent(
 
   if (eventType === "specific") {
     apiRoute = type === "new" ? ROUTES.event.dateCreate : ROUTES.event.dateEdit;
-  } else {
+  } else if (eventType === "weekday") {
     apiRoute = type === "new" ? ROUTES.event.weekCreate : ROUTES.event.weekEdit;
+  } else {
+    apiRoute =
+      type === "new" ? ROUTES.event.calendarCreate : ROUTES.event.calendarEdit;
   }
 
   if (data.timeslots.length === 0) {
