@@ -120,11 +120,11 @@ export function parseIsoDateTime(
   timezone: string,
   eventType: EventType,
 ): Date {
-  if (eventType === "specific") {
-    return parseISO(slotIso + "Z");
-  } else {
+  if (eventType === "weekday") {
     const localIso = slotIso;
     return fromZonedTime(localIso, timezone);
+  } else {
+    return parseISO(slotIso + "Z");
   }
 }
 
