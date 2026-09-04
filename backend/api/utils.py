@@ -184,7 +184,7 @@ def get_event_range(event: UserEvent) -> EventRange:
                 current = to_datetime(ts.date)
                 dates.add(current.date())
 
-    if not times or not dates:
+    if not dates or (event.date_type != UserEvent.EventType.CALENDAR and not times):
         logger.critical(
             f"Event {event.user_event_id} has no timeslots when formatting for dashboard."
         )
