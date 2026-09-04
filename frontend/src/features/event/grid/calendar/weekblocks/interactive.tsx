@@ -68,9 +68,7 @@ export default function InteractiveWeekBlock({
               onPointerEnter={() => {
                 handlePointerEnter(day);
               }}
-              onPointerLeave={() => {
-                handlePointerLeave();
-              }}
+              onPointerLeave={handlePointerLeave}
               onTouchMove={handleTouchMove}
             />
           );
