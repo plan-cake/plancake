@@ -166,6 +166,11 @@ export default function DateTimeGrid({
               exit="exit"
               transition={{ type: "tween", ease: "easeInOut" }}
               className="flex"
+              onMouseLeave={() => {
+                if (mode === "view") {
+                  setHoveredSlot(null);
+                }
+              }}
             >
               <div
                 className={cn(
@@ -184,61 +189,70 @@ export default function DateTimeGrid({
 
               {dateBlockGaps.startGap && <div className="w-2" />}
 
-              {dateBlocks.map((dBlock, dIndex) => {
-                const isLastDateBlock = dIndex === dateBlocks.length - 1;
+              <div
+                className="contents"
+                onMouseLeave={() => {
+                  if (mode === "view") {
+                    setHoveredSlot(null);
+                  }
+                }}
+              >
+                {dateBlocks.map((dBlock, dIndex) => {
+                  const isLastDateBlock = dIndex === dateBlocks.length - 1;
 
-                return (
-                  <Fragment key={`date-block-fragment-${dIndex}`}>
-                    <div
-                      className="flex flex-col gap-2"
-                      style={{
-                        flex: dBlock.numDays,
-                      }}
-                    >
-                      {dBlock.timeBlocks.map((tBlock, tIndex) => {
-                        const commonProps = {
-                          numQuarterHours: tBlock.numQuarterHours,
-                          numVisibleDays: dBlock.numDays,
-                          timeslots: tBlock.timeslots,
-                        };
+                  return (
+                    <Fragment key={`date-block-fragment-${dIndex}`}>
+                      <div
+                        className="flex flex-col gap-2"
+                        style={{
+                          flex: dBlock.numDays,
+                        }}
+                      >
+                        {dBlock.timeBlocks.map((tBlock, tIndex) => {
+                          const commonProps = {
+                            numQuarterHours: tBlock.numQuarterHours,
+                            numVisibleDays: dBlock.numDays,
+                            timeslots: tBlock.timeslots,
+                          };
 
-                        if (mode === "preview") {
-                          return (
-                            <PreviewTimeBlock
-                              key={`preview-${dIndex}-${tIndex}`}
-                              {...commonProps}
-                            />
-                          );
-                        } else if (mode === "paint") {
-                          return (
-                            <InteractiveTimeBlock
-                              key={`interactive-${dIndex}-${tIndex}`}
-                              {...commonProps}
-                              availability={userAvailability}
-                              onToggle={onToggleSlot}
-                            />
-                          );
-                        } else if (mode === "view") {
-                          return (
-                            <ResultsTimeBlock
-                              key={`results-${dIndex}-${tIndex}`}
-                              {...commonProps}
-                              hoveredSlot={hoveredSlot}
-                              availabilities={availabilities}
-                              numParticipants={numParticipants}
-                              highestMatchCount={getHighestMatchCount(
-                                availabilities,
-                              )}
-                              onHoverSlot={setHoveredSlot}
-                            />
-                          );
-                        }
-                      })}
-                    </div>
-                    {!isLastDateBlock && <div className="w-2" />}
-                  </Fragment>
-                );
-              })}
+                          if (mode === "preview") {
+                            return (
+                              <PreviewTimeBlock
+                                key={`preview-${dIndex}-${tIndex}`}
+                                {...commonProps}
+                              />
+                            );
+                          } else if (mode === "paint") {
+                            return (
+                              <InteractiveTimeBlock
+                                key={`interactive-${dIndex}-${tIndex}`}
+                                {...commonProps}
+                                availability={userAvailability}
+                                onToggle={onToggleSlot}
+                              />
+                            );
+                          } else if (mode === "view") {
+                            return (
+                              <ResultsTimeBlock
+                                key={`results-${dIndex}-${tIndex}`}
+                                {...commonProps}
+                                hoveredSlot={hoveredSlot}
+                                availabilities={availabilities}
+                                numParticipants={numParticipants}
+                                highestMatchCount={getHighestMatchCount(
+                                  availabilities,
+                                )}
+                                onHoverSlot={setHoveredSlot}
+                              />
+                            );
+                          }
+                        })}
+                      </div>
+                      {!isLastDateBlock && <div className="w-2" />}
+                    </Fragment>
+                  );
+                })}
+              </div>
 
               {dateBlockGaps.endGap && <div className="w-2" />}
 

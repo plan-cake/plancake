@@ -7,7 +7,6 @@ export type TimeBlockProps = {
   numQuarterHours: number;
   visibleDaysCount: number;
   children: React.ReactNode;
-  onMouseLeave?: () => void;
 };
 
 export type TimeSlot = {

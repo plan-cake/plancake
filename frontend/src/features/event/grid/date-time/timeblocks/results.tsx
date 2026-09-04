@@ -18,7 +18,6 @@ export default function ResultsTimeBlock({
     <BaseTimeBlock
       numQuarterHours={numQuarterHours}
       visibleDaysCount={numVisibleDays}
-      onMouseLeave={() => onHoverSlot?.(null)}
     >
       {timeslots.map(({ iso, coords, cellClasses: baseClasses }) => {
         const { row: gridRow, column: gridColumn } = coords;

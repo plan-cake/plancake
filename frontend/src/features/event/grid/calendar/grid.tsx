@@ -55,7 +55,14 @@ export default function CalendarGrid({
           mode === "preview" ? "pb-1" : "pb-6",
         )}
       >
-        <div className="relative flex flex-grow flex-col gap-2">
+        <div
+          className="relative flex flex-grow flex-col gap-2"
+          onMouseLeave={() => {
+            if (mode === "view") {
+              setHoveredSlot(null);
+            }
+          }}
+        >
           {weekBlocks.map((weekBlock, index) => {
             if (mode === "preview") {
               return <PreviewWeekBlock key={index} weeks={weekBlock} />;

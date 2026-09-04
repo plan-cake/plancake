@@ -15,10 +15,7 @@ export default function ResultsWeekBlock({
   onHoverDay,
 }: ResultsWeekBlockProps) {
   return (
-    <BaseWeekBlock
-      numWeeks={weeks.length}
-      onMouseLeave={() => onHoverDay?.(null)}
-    >
+    <BaseWeekBlock numWeeks={weeks.length}>
       {weeks.map((week, wIndex) =>
         week.map((day, dIndex) => {
           const commonProps = {

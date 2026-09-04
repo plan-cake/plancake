@@ -1,11 +1,9 @@
 export default function BaseWeekBlock({
   numWeeks,
   children,
-  onMouseLeave,
 }: {
   numWeeks: number;
   children: React.ReactNode;
-  onMouseLeave?: () => void;
 }) {
   return (
     <div
@@ -21,7 +19,6 @@ export default function BaseWeekBlock({
           color-mix(in srgb, var(--color-background) 10%, transparent) 9.5px
         )`,
       }}
-      onMouseLeave={onMouseLeave}
     >
       {children}
     </div>

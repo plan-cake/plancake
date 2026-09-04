@@ -5,7 +5,6 @@ export default function BaseTimeBlock({
   numQuarterHours,
   visibleDaysCount,
   children,
-  onMouseLeave,
 }: TimeBlockProps) {
   return (
     <div
@@ -16,13 +15,11 @@ export default function BaseTimeBlock({
         gridTemplateColumns: `repeat(${visibleDaysCount}, 1fr)`,
         gridTemplateRows: `repeat(${numQuarterHours}, minmax(20px, 1fr))`,
       }}
-      onMouseLeave={onMouseLeave}
     >
       {Array.from({ length: visibleDaysCount }).map((_, idx) => (
         <div
           key={`col-backdrop-${idx}`}
           className="bg-background hover:cursor-not-allowed"
-          onMouseEnter={onMouseLeave}
           style={{
             gridRow: "1 / -1",
             gridColumn: idx + 1,
