@@ -4,6 +4,7 @@ import CalendarDay from "@/features/event/grid/calendar/calendar-day";
 import BaseWeekBlock from "@/features/event/grid/calendar/weekblocks/base";
 import { ResultsWeekBlockProps } from "@/features/event/grid/calendar/weekblocks/props";
 import { cn } from "@/lib/utils/classname";
+import { dateToISOString } from "@/lib/utils/date-time-format";
 
 export default function ResultsWeekBlock({
   weeks,
@@ -31,7 +32,7 @@ export default function ResultsWeekBlock({
             return <CalendarDay key={dIndex} {...commonProps} />;
           }
 
-          const dayIso = new Date(day + "T00:00Z").toISOString();
+          const dayIso = dateToISOString(day);
           const matchCount =
             availabilities[dayIso]?.length > 0
               ? availabilities[dayIso].length

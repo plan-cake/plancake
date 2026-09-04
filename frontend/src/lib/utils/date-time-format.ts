@@ -73,6 +73,16 @@ export function timeslotToISOString(
 }
 
 /**
+ * Converts a date string in "YYYY-MM-DD" format to an ISO string at midnight UTC.
+ *
+ * @param dateString A date string in "YYYY-MM-DD" format
+ * @returns An ISO string representation of the date at midnight UTC.
+ */
+export function dateToISOString(dateString: string): string {
+  return new Date(dateString + "T00:00Z").toISOString();
+}
+
+/**
  * Checks if two timezones are equivalent even if they represent different locations.
  *
  * For example, "America/New_York" and "America/Detroit" are equal because they are both
