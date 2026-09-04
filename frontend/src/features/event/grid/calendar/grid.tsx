@@ -50,9 +50,9 @@ export default function CalendarGrid({
     >
       <div
         className={cn(
-          "relative grow select-none overflow-x-hidden",
-          !isMobile ? "overflow-y-auto" : "overflow-y-hidden",
-          mode === "preview" ? "pb-1" : "pb-6",
+          "relative grow select-none p-2",
+          !isMobile && "overflow-y-auto",
+          mode !== "preview" && "pb-6",
         )}
       >
         <div
