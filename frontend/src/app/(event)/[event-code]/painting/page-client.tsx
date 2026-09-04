@@ -217,6 +217,9 @@ export default function ClientPage({
     }
 
     const payload_availability = Array.from(userAvailability).map((iso) => {
+      if (eventRange.type === "calendar") {
+        return iso;
+      }
       const date = parseISO(iso);
       return timeslotToISOString(date, timeZone, eventRange.type);
     });
