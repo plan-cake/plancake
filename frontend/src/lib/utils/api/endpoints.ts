@@ -44,6 +44,10 @@ function route<Res, Req = void>(url: string) {
   } as const;
 }
 
+type CaptchaToken = {
+  captcha_token: string;
+};
+
 // Helpers to extract types from the route object
 export type InferReq<T> = T extends { __req: infer R } ? R : never;
 export type InferRes<T> = T extends { __res: infer R } ? R : never;
@@ -55,18 +59,24 @@ export const ROUTES = {
      * @method POST
      * @throws {400} - If the password is not strong enough.
      */
-    register: route<MessageResponse, RegisterData>("/auth/register/"),
+    register: route<MessageResponse, RegisterData & CaptchaToken>(
+      "/auth/register/",
+    ),
     /**
      * Attempts to resend the verification email for an unverified user account.
      * @method POST
      */
-    resendRegisterEmail: route<MessageResponse, Email>("/auth/resend-register-email/"),
+    resendRegisterEmail: route<MessageResponse, Email>(
+      "/auth/resend-register-email/",
+    ),
     /**
      * Verifies the email address of an unverified user account.
      * @method POST
      * @throws 404 - If the verification code is invalid.
      */
-    verifyEmail: route<MessageResponse, VerificationCode>("/auth/verify-email/"),
+    verifyEmail: route<MessageResponse, VerificationCode>(
+      "/auth/verify-email/",
+    ),
     /**
      * Logs in a user account.
      * @method POST
@@ -84,7 +94,9 @@ export const ROUTES = {
      * Starts the password reset process by sending a password reset email.
      * @method POST
      */
-    startPasswordReset: route<MessageResponse, Email>("/auth/start-password-reset/"),
+    startPasswordReset: route<MessageResponse, Email & CaptchaToken>(
+      "/auth/start-password-reset/",
+    ),
     /**
      * Given a valid password reset token, resets the password for a user account.
      * @method POST
@@ -92,7 +104,9 @@ export const ROUTES = {
      * @throws 400 - If the new password is the same as the old password.
      * @throws 404 - If the reset token is invalid.
      */
-    resetPassword: route<MessageResponse, PasswordResetData>("/auth/reset-password/"),
+    resetPassword: route<MessageResponse, PasswordResetData>(
+      "/auth/reset-password/",
+    ),
     /**
      * Logs out the current user.
      * @method POST
@@ -106,14 +120,27 @@ export const ROUTES = {
      * @throws 400 - If the timeslots are invalid.
      * @throws 400 - If the custom code is not available or invalid.
      */
-    dateCreate: route<EventCode, NewEventData>("/event/date-create/"),
+    dateCreate: route<EventCode, NewEventData & CaptchaToken>(
+      "/event/date-create/",
+    ),
     /**
      * Creates a 'week' type event.
      * @method POST
      * @throws 400 - If the timeslots are invalid.
      * @throws 400 - If the custom code is not available or invalid.
      */
-    weekCreate: route<EventCode, NewEventData>("/event/week-create/"),
+    weekCreate: route<EventCode, NewEventData & CaptchaToken>(
+      "/event/week-create/",
+    ),
+    /**
+     * Creates a 'calendar' type event.
+     * @method POST
+     * @throws 400 - If the timeslots are invalid.
+     * @throws 400 - If the custom code is not available or invalid.
+     */
+    calendarCreate: route<EventCode, NewEventData & CaptchaToken>(
+      "/event/calendar-create/",
+    ),
     /**
      * Checks if a custom event code is available for use.
      * @method POST
@@ -141,6 +168,15 @@ export const ROUTES = {
      */
     weekEdit: route<MessageResponse, EventEditData>("/event/week-edit/"),
     /**
+     * Edits the details of a 'calendar' type event.
+     * @method POST
+     * @throws 400 - If the timeslots are invalid.
+     * @throws 404 - If the user is not the creator of the event.
+     */
+    calendarEdit: route<MessageResponse, EventEditData>(
+      "/event/calendar-edit/",
+    ),
+    /**
      * Deletes an event.
      * @method POST
      * @throws 403 - If the user is not the creator of the event.
@@ -162,14 +198,18 @@ export const ROUTES = {
      * @throws 400 - If the timeslots are invalid.
      * @throws 404 - If the event code is invalid.
      */
-    add: route<MessageResponse, AvailabilityAddData>("/availability/add/"),
+    add: route<MessageResponse, AvailabilityAddData & CaptchaToken>(
+      "/availability/add/",
+    ),
     /**
      * Checks if a display name is available for the current user in an event.
      * @method POST
      * @throws 400 - If the display name is unavailable.
      * @throws 404 - If the event code is invalid.
      */
-    checkDisplayName: route<MessageResponse, EventDisplayNameData>("/availability/check-display-name/"),
+    checkDisplayName: route<MessageResponse, EventDisplayNameData>(
+      "/availability/check-display-name/",
+    ),
     /**
      * Gets the availability of the current user for an event.
      * @method GET
@@ -197,7 +237,9 @@ export const ROUTES = {
      * @throws 404 - If the participant does not exist.
      * @throws 404 - If the event code is invalid.
      */
-    remove: route<MessageResponse, EventDisplayNameData>("/availability/remove/"),
+    remove: route<MessageResponse, EventDisplayNameData>(
+      "/availability/remove/",
+    ),
   },
   dashboard: {
     /**
@@ -211,7 +253,9 @@ export const ROUTES = {
      * Sets the default display name for the current user.
      * @method POST
      */
-    setDefaultName: route<MessageResponse, DisplayName>("/account/set-default-name/"),
+    setDefaultName: route<MessageResponse, DisplayName>(
+      "/account/set-default-name/",
+    ),
     /**
      * Removes the default display name for the current user.
      * @method POST
@@ -228,7 +272,9 @@ export const ROUTES = {
      * @throws 400 - If the session ID is for the current session.
      * @throws 404 - If the session ID is invalid.
      */
-    terminateSession: route<MessageResponse, SessionId>("/account/terminate-session/"),
+    terminateSession: route<MessageResponse, SessionId>(
+      "/account/terminate-session/",
+    ),
     /**
      * Terminates all active sessions for the current user except the current session.
      * @method POST
@@ -242,20 +288,27 @@ export const ROUTES = {
      * @throws 400 - If the new password is not strong enough.
      * @throws 400 - If the new password is the same as the old password.
      */
-    changePassword: route<MessageResponse, PasswordChangeData>("/account/change-password/"),
+    changePassword: route<MessageResponse, PasswordChangeData>(
+      "/account/change-password/",
+    ),
     /**
      * Starts the password reset process for a logged-in user by sending an email.
      * @method POST
      * @throws 401 - If the user is not logged in.
      */
-    startAuthedPasswordReset: route<MessageResponse>("/account/start-authed-password-reset/"),
+    startAuthedPasswordReset: route<MessageResponse>(
+      "/account/start-authed-password-reset/",
+    ),
     /**
      * Checks the validity of a password reset code for a logged-in user.
      * @method POST
      * @throws 401 - If the user is not logged in.
      * @throws 400 - If the reset code is invalid.
      */
-    checkAuthedPasswordResetCode: route<MessageResponse, AuthedPasswordResetCode>("/account/check-authed-password-reset-code/"),
+    checkAuthedPasswordResetCode: route<
+      MessageResponse,
+      AuthedPasswordResetCode
+    >("/account/check-authed-password-reset-code/"),
     /**
      * Resets the password for a logged-in user.
      * @method POST
@@ -264,7 +317,9 @@ export const ROUTES = {
      * @throws 400 - If the new password is not strong enough.
      * @throws 400 - If the new password is the same as the old password.
      */
-    authedPasswordReset: route<MessageResponse, AuthedPasswordResetData>("/account/authed-password-reset/"),
+    authedPasswordReset: route<MessageResponse, AuthedPasswordResetData>(
+      "/account/authed-password-reset/",
+    ),
     /**
      * Deletes the current user account, including all created events and participation
      * data.
@@ -291,6 +346,8 @@ export const ROUTES = {
      * @throws 400 - If there is no guest data found.
      * @throws 400 - If the availability choices do not match the guest submissions.
      */
-    importData: route<MessageResponse, GuestImportData>("/guest-import/import-data/"),
-  }
+    importData: route<MessageResponse, GuestImportData>(
+      "/guest-import/import-data/",
+    ),
+  },
 } as const;

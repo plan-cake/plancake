@@ -41,6 +41,7 @@ class APIMetadata:
         self.output_serializer_class = None
         self.rate_limit = None
         self.min_auth_required = None
+        self.captcha_required = False
 
 
 def get_metadata(func):
@@ -139,6 +140,8 @@ def get_event_type(date_type):
             return "Date"
         case UserEvent.EventType.GENERIC:
             return "Week"
+        case UserEvent.EventType.CALENDAR:
+            return "Calendar"
 
 
 class EventBounds:
@@ -177,10 +180,14 @@ def get_event_bounds(event: UserEvent) -> EventBounds:
                 get_weekday_date(ts.weekday, ts.local_timeslot)
                 for ts in event.weekday_timeslots.all()
             ]
+        case UserEvent.EventType.CALENDAR:
+            all_timeslots = [
+                to_datetime(ts.date) for ts in event.calendar_timeslots.all()
+            ]
 
     if not all_timeslots:
         logger.critical(
-            f"Event {event.id} has no timeslots when formatting for dashboard."
+            f"Event {event.user_event_id} has no timeslots when formatting for dashboard."
         )
         raise ValueError("Event has no timeslots.")
 
@@ -189,26 +196,41 @@ def get_event_bounds(event: UserEvent) -> EventBounds:
     end_date = max(ts.date() for ts in all_timeslots)
     start_time = min(ts.time() for ts in all_timeslots)
     end_time = max(ts.time() for ts in all_timeslots)
-    # End time should be 15 minutes after the last timeslot
-    end_time = (datetime.combine(datetime.min, end_time) + timedelta(minutes=15)).time()
 
-    # datetime.combine has no time zone info, so we include the event's time zone to
-    # make sure it doesn't convert twice
-    start_datetime = datetime.combine(start_date, start_time).replace(
-        tzinfo=event_time_zone
-    )
-    end_datetime = datetime.combine(end_date, end_time).replace(tzinfo=event_time_zone)
-    if event.date_type == UserEvent.EventType.SPECIFIC:
-        # Convert to UTC for date events, not week events since those stay in local time
-        start_datetime = start_datetime.astimezone(ZoneInfo("UTC"))
-        end_datetime = end_datetime.astimezone(ZoneInfo("UTC"))
+    if event.date_type == UserEvent.EventType.CALENDAR:
+        # Don't do any conversions for calendar events, time zones don't affect them
+        return EventBounds(
+            start_date=start_date,
+            end_date=end_date,
+            start_time=start_time,
+            end_time=end_time,
+        )
+    else:
+        # End time should be 15 minutes after the last timeslot
+        # Only applies to date and week events, since calendar events are all-day
+        end_time = (
+            datetime.combine(datetime.min, end_time) + timedelta(minutes=15)
+        ).time()
 
-    return EventBounds(
-        start_date=start_datetime.date(),
-        end_date=end_datetime.date(),
-        start_time=start_datetime.time(),
-        end_time=end_datetime.time(),
-    )
+        # datetime.combine has no time zone info, so we include the event's time zone to
+        # make sure it doesn't convert twice
+        start_datetime = datetime.combine(start_date, start_time).replace(
+            tzinfo=event_time_zone
+        )
+        end_datetime = datetime.combine(end_date, end_time).replace(
+            tzinfo=event_time_zone
+        )
+        if event.date_type == UserEvent.EventType.SPECIFIC:
+            # Convert to UTC for date events, not week events since those stay in local time
+            start_datetime = start_datetime.astimezone(ZoneInfo("UTC"))
+            end_datetime = end_datetime.astimezone(ZoneInfo("UTC"))
+
+        return EventBounds(
+            start_date=start_datetime.date(),
+            end_date=end_datetime.date(),
+            start_time=start_datetime.time(),
+            end_time=end_datetime.time(),
+        )
 
 
 def format_event_info(event: UserEvent, include_participants: bool = False) -> dict:
@@ -472,3 +494,14 @@ def notify_live_update(event: LiveUpdateEvent):
         f"event_{event.event_code}",
         event.dumps(),
     )
+
+
+def to_datetime(date):
+    """
+    Converts a date object to a datetime object at midnight.
+
+    If the input is already a datetime object, it is returned unchanged.
+    """
+    if isinstance(date, datetime):
+        return date
+    return datetime(date.year, date.month, date.day)
