@@ -19,5 +19,5 @@ export type ResultsWeekBlockProps = CommonBlockProps & {
   availabilities: ResultsAvailabilityMap;
   numParticipants: number;
   highestMatchCount: number;
-  onHoverDay?: (dayString: string | null) => void;
+  onHoverDay: (dayString: string | null) => void;
 };
