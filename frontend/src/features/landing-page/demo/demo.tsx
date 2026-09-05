@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { FloatingDrawer } from "@/features/drawer";
+import { DEMO_STEPS_CONFIG } from "@/features/landing-page/demo/config";
 import OrbitImages from "@/features/landing-page/demo/orbit-images";
 import OrbitNode from "@/features/landing-page/demo/orbit-node";
 import PaintAvailabilityStep from "@/features/landing-page/demo/paint-step";
@@ -10,7 +11,7 @@ import ViewResultsStep from "@/features/landing-page/demo/results-step";
 import {
   PARTICIPANTS,
   INITIAL_AVAILABILITIES,
-} from "@/features/landing-page/utils";
+} from "@/features/landing-page/demo/utils";
 import { cn } from "@/lib/utils/classname";
 
 export default function HowItWorksSection() {
@@ -80,61 +81,41 @@ export default function HowItWorksSection() {
     }
   };
 
-  const STEPS_CONFIG = [
-    {
-      step: 1,
-      label: "Create Event",
-      title: "Create Your Event",
-      description: "Pick a range of dates and times you think might work.",
-      body: null,
-    },
-    {
-      step: 2,
-      label: "Share Link",
-      title: "Share with Your Friends",
-      description: "Anyone can join from the event link, no account required.",
-      body: null,
-    },
-    {
-      step: 3,
-      label: "Add Availability",
-      title: "Paint Your Availability",
-      description:
-        "Try it here! Click and drag on the grid to fill in the times you're free.",
-      body: (
-        <PaintAvailabilityStep
-          userAvailability={userAvailability}
-          onToggleSlot={paintSlot}
-          onSubmit={handleAvailabilitySubmit}
-          allowSubmit={allowSubmit}
-        />
-      ),
-    },
-    {
-      step: 4,
-      label: "View Results",
-      title: "Watch the Results Stack Up",
-      description:
-        "See which times work best for everyone as soon as they respond.",
-      body: (
-        <ViewResultsStep
-          availabilities={availabilities}
-          hoveredSlot={hoveredSlot}
-          onHoverSlot={handleResultsHover}
-          currentlyAvailable={currentlyAvailable}
-        />
-      ),
-    },
-  ];
+  const getStepBody = (stepNumber: number) => {
+    switch (stepNumber) {
+      case 3:
+        return (
+          <PaintAvailabilityStep
+            userAvailability={userAvailability}
+            onToggleSlot={paintSlot}
+            onSubmit={handleAvailabilitySubmit}
+            allowSubmit={allowSubmit}
+          />
+        );
+      case 4:
+        return (
+          <ViewResultsStep
+            availabilities={availabilities}
+            hoveredSlot={hoveredSlot}
+            onHoverSlot={handleResultsHover}
+            currentlyAvailable={currentlyAvailable}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
-  const orbitNodes = [...STEPS_CONFIG].reverse().map((config) => {
+  const orbitNodes = [...DEMO_STEPS_CONFIG].reverse().map((config) => {
+    const body = getStepBody(config.step);
+
     const hoverCard = (
       <div className="w-full p-4">
-        <div className={cn("text-center", config.body && "mb-4")}>
+        <div className={cn("text-center", body && "mb-4")}>
           <div className="text-lg font-bold">{config.title}</div>
           <div className="text-background/70 text-sm">{config.description}</div>
         </div>
-        {config.body}
+        {body}
       </div>
     );
 
@@ -146,14 +127,14 @@ export default function HowItWorksSection() {
         hoverCard={hoverCard}
         onSelect={() => setActiveStep(config.step)}
         orbitScale={orbitScale}
-        openAbove={config.step === 3}
+        openAbove={config.openAbove}
       />
     );
   });
 
   const activeDrawerStep =
     activeStep !== null
-      ? STEPS_CONFIG.find((s) => s.step === activeStep)
+      ? DEMO_STEPS_CONFIG.find((s) => s.step === activeStep)
       : null;
 
   return (
@@ -211,7 +192,7 @@ export default function HowItWorksSection() {
             <p className="text-foreground/70 text-center">
               {activeDrawerStep.description}
             </p>
-            {activeDrawerStep.body}
+            {getStepBody(activeDrawerStep.step)}
           </div>
         )}
       </FloatingDrawer>

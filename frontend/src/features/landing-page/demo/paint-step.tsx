@@ -2,7 +2,7 @@
 
 import ActionButton from "@/features/button/components/action";
 import ScheduleGrid from "@/features/event/grid/grid";
-import { TIMESLOTS } from "@/features/landing-page/utils";
+import { TIMESLOTS } from "@/features/landing-page/demo/utils";
 
 interface PaintAvailabilityStepProps {
   userAvailability: Set<string>;
