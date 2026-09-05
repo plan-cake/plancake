@@ -15,9 +15,11 @@ import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
+import GridPageDaysSelector from "@/features/event/components/selectors/grid-page-days";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
 import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
+import useGridPageDays from "@/features/event/grid/lib/use-page-days";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,
@@ -30,7 +32,10 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { SelfAvailability } from "@/lib/utils/api/types";
-import { timeslotToISOString } from "@/lib/utils/date-time-format";
+import {
+  getDatesFromTimeslots,
+  timeslotToISOString,
+} from "@/lib/utils/date-time-format";
 import type { Session } from "@/lib/utils/get-session";
 
 export default function ClientPage({
@@ -57,6 +62,13 @@ export default function ClientPage({
   );
   const { displayName, timeZone, userAvailability } = state;
 
+  // GRID PAGE DAYS
+  const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
+    useGridPageDays();
+  const showGridPageDaysSelector =
+    getDatesFromTimeslots(timeslots, timeZone).size >
+    Math.min(...gridPageDaysOptions);
+
   // CAPTCHA STATES
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [captchaInitError, setCaptchaInitError] = useState(false);
@@ -66,9 +78,7 @@ export default function ClientPage({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // VISITED LAST PAGE STATE
-  const [maxVisitedPage, setMaxVisitedPage] = useState(0);
-  const [numPages, setNumPages] = useState(1);
-  const visitedLastPage = maxVisitedPage >= numPages - 1;
+  const [visitedLastPage, setVisitedLastPage] = useState(false);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const dialogResolver = useRef<((confirmed: boolean) => void) | null>(null);
 
@@ -273,6 +283,33 @@ export default function ClientPage({
     />
   );
 
+  const displaySettings = (
+    <div className="bg-panel flex flex-col gap-2 rounded-3xl p-6 text-sm">
+      {showGridPageDaysSelector && (
+        <div>
+          <p>Days per page</p>
+          <GridPageDaysSelector
+            id="grid-page-days-selector"
+            value={gridPageDays}
+            options={gridPageDaysOptions}
+            onChange={setGridPageDays}
+          />
+        </div>
+      )}
+      <div className="text-sm">
+        <div className="flex items-center gap-1">
+          <GlobeIcon className="h-3.5 w-3.5" />
+          Displaying event in
+        </div>
+        <TimeZoneSelector
+          id="timezone-select"
+          value={timeZone}
+          onChange={setTimeZone}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
       <HeaderSpacer />
@@ -318,17 +355,7 @@ export default function ClientPage({
             setSaveDefaultName={setSaveDefaultName}
           />
 
-          <div className="bg-panel rounded-3xl p-6 text-sm">
-            <div className="flex items-center gap-1">
-              <GlobeIcon className="h-3.5 w-3.5" />
-              Displaying event in
-            </div>
-            <TimeZoneSelector
-              id="timezone-select"
-              value={timeZone}
-              onChange={setTimeZone}
-            />
-          </div>
+          {displaySettings}
         </div>
 
         {/* Right Panel */}
@@ -340,24 +367,14 @@ export default function ClientPage({
           userAvailability={userAvailability}
           timeslots={timeslots}
           onPageUpdate={(index, pages) => {
-            setNumPages(pages);
-            if (index > maxVisitedPage) {
-              setMaxVisitedPage(index);
+            if (index >= pages - 1) {
+              setVisitedLastPage(true);
             }
           }}
+          pageDays={gridPageDays}
         />
 
-        <div className="bg-panel rounded-3xl p-6 text-sm md:hidden">
-          <div className="flex items-center gap-1">
-            <GlobeIcon className="h-3.5 w-3.5" />
-            Displaying event in
-          </div>
-          <TimeZoneSelector
-            id="timezone-select"
-            value={timeZone}
-            onChange={setTimeZone}
-          />
-        </div>
+        <div className="md:hidden">{displaySettings}</div>
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}

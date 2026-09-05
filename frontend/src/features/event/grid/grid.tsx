@@ -24,9 +24,12 @@ interface ScheduleGridProps {
   mode: "paint" | "view" | "preview";
   timeslots: Date[];
   timezone: string;
+  pageDays: number;
   isWeekdayEvent?: boolean;
 
+  // for "preview" mode
   unselectedRange?: boolean;
+  setGridDisplayed?: (displayed: boolean) => void;
 
   // for "view" mode
   availabilities?: ResultsAvailabilityMap;
@@ -62,9 +65,11 @@ const variants = {
 export default function ScheduleGrid({
   timeslots,
   timezone,
+  pageDays,
   mode = "preview",
   isWeekdayEvent = false,
   unselectedRange = false,
+  setGridDisplayed = () => {},
   availabilities = {},
   numParticipants = 0,
   hoveredSlot,
@@ -83,17 +88,23 @@ export default function ScheduleGrid({
     direction,
     paginate,
     error,
-  } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPageUpdate);
+  } = useGridinfo(timeslots, timezone, pageDays, onPageUpdate);
 
   // Initial onPageUpdate callback to report pagination info to parent
   // Also triggers if the user changes between mobile and desktop layouts
   const reportedTotalPages = useRef<number | null>(null);
   useEffect(() => {
+    let effectiveCurrentPage = currentPage;
+    if (currentPage >= totalPages) {
+      // If out of bounds, go to the last page
+      effectiveCurrentPage = totalPages - 1;
+      paginate(totalPages - 1 - currentPage);
+    }
     if (reportedTotalPages.current !== totalPages) {
-      onPageUpdate(currentPage, totalPages);
+      onPageUpdate(effectiveCurrentPage, totalPages);
       reportedTotalPages.current = totalPages;
     }
-  }, [onPageUpdate, currentPage, totalPages]);
+  }, [onPageUpdate, currentPage, totalPages, paginate]);
 
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < totalPages - 1;
@@ -114,6 +125,11 @@ export default function ScheduleGrid({
 
     return () => resizeObserver.disconnect();
   });
+
+  const isGridDisplayed = !unselectedRange && !error;
+  useEffect(() => {
+    setGridDisplayed(isGridDisplayed);
+  }, [isGridDisplayed, setGridDisplayed]);
 
   if (unselectedRange)
     return (

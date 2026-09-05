@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { formatInTimeZone, toZonedTime } from "date-fns-tz";
 
@@ -44,15 +44,18 @@ export default function useGridInfo(
     [data, currentPage, daysPerPage],
   );
 
-  const paginate = (newDirection: number) => {
-    if (
-      (newDirection === -1 && currentPage > 0) ||
-      (newDirection === 1 && currentPage < view.totalPages - 1)
-    ) {
-      setCurrentPage([currentPage + newDirection, newDirection]);
-      onPaginate(currentPage + newDirection, view.totalPages);
-    }
-  };
+  const paginate = useCallback(
+    (newDirection: number) => {
+      if (
+        (newDirection < 0 && currentPage > 0) ||
+        (newDirection > 0 && currentPage < view.totalPages - 1)
+      ) {
+        setCurrentPage([currentPage + newDirection, newDirection]);
+        onPaginate(currentPage + newDirection, view.totalPages);
+      }
+    },
+    [currentPage, view.totalPages, onPaginate],
+  );
 
   return { ...view, currentPage, direction, paginate };
 }
