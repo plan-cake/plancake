@@ -397,14 +397,20 @@ export default function Demo() {
   return (
     <div className="bg-panel rounded-4xl flex flex-col overflow-visible p-12">
       {/* Text Row */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-6">
         <h2 className="font-display text-foreground text-5xl tracking-wide md:text-6xl">
           the perfect recipe
         </h2>
-        <p className="text-foreground/80 max-w-md text-lg md:text-xl">
-          Four simple steps to coordinate your next group event without the
-          messy back-and-forth.
-        </p>
+        <div className="text-foreground/80 max-w-md text-lg md:text-xl">
+          <p>
+            Four simple steps to coordinate your next group event without the
+            messy back-and-forth.
+          </p>
+          <p className="text-foreground mt-2 text-sm font-semibold md:text-lg">
+            Try it out by <span className="max-md:hidden">hovering over</span>
+            <span className="md:hidden">tapping</span> the steps below!
+          </p>
+        </div>
       </div>
 
       {/* Orbit Row */}
