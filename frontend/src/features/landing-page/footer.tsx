@@ -80,7 +80,7 @@ export default function Footer() {
 
           <div className="flex flex-col items-center">
             <span className="text-5xl font-black tracking-wide lg:text-5xl">
-              108
+              100+
             </span>
             <p className="mt-1 text-sm opacity-70">Plans made and counting</p>
           </div>
