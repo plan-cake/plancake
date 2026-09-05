@@ -78,12 +78,14 @@ export default function ShrinkingHeader({
   if (!mounted) return null;
 
   return (
-    <header className={cn(heightClass, "fixed top-0 z-40 w-full pt-4")}>
+    <header
+      className={cn(
+        heightClass,
+        "pointer-events-none fixed top-0 z-40 w-full pt-4",
+      )}
+    >
       <nav
-        className={cn(
-          "flex w-full max-w-[1440px] justify-between px-4",
-          isShrunk ? "cursor-pointer" : "",
-        )}
+        className="flex w-full max-w-[1440px] justify-between px-4"
         onClickCapture={(e) => {
           if (!isShrunk) return;
           e.preventDefault();
@@ -91,15 +93,19 @@ export default function ShrinkingHeader({
           expand();
         }}
       >
-        <LogoArea isShrunk={isShrunk} />
+        <div
+          className={cn("pointer-events-auto", isShrunk && "cursor-pointer")}
+        >
+          <LogoArea isShrunk={isShrunk} />
+        </div>
 
         <motion.div
           animate={{ scale: activeMenu ? 0.95 : 1 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className={cn(
-            "relative isolate flex h-fit items-center rounded-full",
+            "pointer-events-auto relative isolate flex h-fit items-center rounded-full",
             "header-transition-[gap,padding]",
-            isShrunk ? "gap-1 p-1" : "gap-2 p-2",
+            isShrunk ? "cursor-pointer gap-1 p-1" : "gap-2 p-2",
           )}
         >
           <div
