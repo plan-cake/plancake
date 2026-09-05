@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
+import { GlobeIcon, PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
 
 import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
@@ -103,6 +103,21 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   );
 
   /* DISPLAY SETTINGS */
+  const renderTimezoneSelector = (id: string) => (
+    <div className="text-sm">
+      <div className="flex items-center gap-1">
+        <GlobeIcon className="h-3.5 w-3.5" />
+        Displaying event in
+      </div>
+      <TimeZoneSelector
+        id={id}
+        value={timezone}
+        onChange={handleTZChange}
+        drawerNesting={0}
+      />
+    </div>
+  );
+
   const availabilityFilters = (
     <motion.div
       key="availability-filters"
@@ -129,18 +144,6 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       />
     </div>
   ) : null;
-
-  const renderTimezoneSelector = (id: string) => (
-    <>
-      Displaying event in
-      <TimeZoneSelector
-        id={id}
-        value={timezone}
-        onChange={handleTZChange}
-        drawerNesting={0}
-      />
-    </>
-  );
 
   const doViewTransition = useViewTransition();
 

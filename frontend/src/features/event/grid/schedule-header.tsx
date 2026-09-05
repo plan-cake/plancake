@@ -10,7 +10,6 @@ import {
   SIDE_WIDTH,
   TIME_LABEL_WIDTH,
 } from "@/features/event/grid/lib/constants";
-import { useHeaderSize } from "@/features/header/context";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
@@ -73,21 +72,18 @@ export default function ScheduleHeader({
   onNextPage,
   direction = 0,
 }: ScheduleHeaderProps) {
-  const { topMarginClass } = useHeaderSize();
-
   const isMobile = useCheckMobile();
   const compact = useMemo(
     () => (isMobile ? visibleDays.length > 4 : visibleDays.length > 7),
     [isMobile, visibleDays.length],
   );
-
   return (
     <div
       className={cn(
         preview ? "bg-background md:bg-panel" : "bg-background",
-        topMarginClass,
         scrollbarPresent && "pr-4",
-        "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
+        "sticky top-[var(--header-height)] md:top-0",
+        "z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
       )}
       style={{
         gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 10}px`,
