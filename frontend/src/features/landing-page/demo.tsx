@@ -425,6 +425,8 @@ export default function Demo() {
             fill
             showPath
             paused={true}
+            pathColor="currentColor"
+            className="text-foreground/75"
           />
         </div>
       </div>
