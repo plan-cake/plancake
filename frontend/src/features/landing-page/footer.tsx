@@ -12,6 +12,11 @@ const NAV_SECTIONS = [
       { label: "New Event", href: "/new-event" },
       { label: "Dashboard", href: "/dashboard" },
       { label: "What's New", href: "/version-history" },
+      {
+        label: "Feedback",
+        href: "#",
+        external: true,
+      },
     ],
   },
   {
@@ -59,7 +64,10 @@ export default function Footer() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="opacity-80 hover:opacity-100"
+                        className="hover:text-accent opacity-80 hover:font-semibold hover:opacity-100"
+                        {...(link.external
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : {})}
                       >
                         {link.label}
                       </Link>
