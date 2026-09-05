@@ -42,55 +42,48 @@ export default function CalendarGrid({
   return (
     <div
       className={cn(
-        "grid-rows[auto_1fr] relative grid h-full w-full grid-cols-[1fr]",
-        mode === "preview" ? "bg-background md:bg-panel" : "bg-background",
+        "w-full select-none p-2",
+        !isMobile && "overflow-y-auto",
+        mode === "preview" ? "bg-background md:bg-panel pb-6" : "bg-background",
       )}
       style={{ viewTransitionName: "grid" }}
       id={GRID_ID}
     >
       <div
-        className={cn(
-          "relative grow select-none p-2",
-          !isMobile && "overflow-y-auto",
-          mode !== "preview" && "pb-6",
-        )}
+        className="relative flex flex-col gap-2"
+        onMouseLeave={() => {
+          if (mode === "view") {
+            setHoveredSlot(null);
+          }
+        }}
       >
-        <div
-          className="relative flex flex-grow flex-col gap-2"
-          onMouseLeave={() => {
-            if (mode === "view") {
-              setHoveredSlot(null);
-            }
-          }}
-        >
-          {weekBlocks.map((weekBlock, index) => {
-            if (mode === "preview") {
-              return <PreviewWeekBlock key={index} weeks={weekBlock} />;
-            } else if (mode === "paint") {
-              return (
-                <InteractiveWeekBlock
-                  key={index}
-                  weeks={weekBlock}
-                  timeslots={timeslots}
-                  availability={userAvailability}
-                  onToggle={onToggleSlot}
-                />
-              );
-            } else if (mode === "view") {
-              return (
-                <ResultsWeekBlock
-                  key={index}
-                  weeks={weekBlock}
-                  hoveredDay={hoveredSlot}
-                  availabilities={availabilities}
-                  numParticipants={numParticipants}
-                  highestMatchCount={getHighestMatchCount(availabilities)}
-                  onHoverDay={setHoveredSlot}
-                />
-              );
-            }
-          })}
-        </div>
+        {weekBlocks.map((weekBlock, index) => {
+          if (mode === "preview") {
+            return <PreviewWeekBlock key={index} weeks={weekBlock} />;
+          } else if (mode === "paint") {
+            return (
+              <InteractiveWeekBlock
+                key={index}
+                weeks={weekBlock}
+                timeslots={timeslots}
+                availability={userAvailability}
+                onToggle={onToggleSlot}
+              />
+            );
+          } else if (mode === "view") {
+            return (
+              <ResultsWeekBlock
+                key={index}
+                weeks={weekBlock}
+                hoveredDay={hoveredSlot}
+                availabilities={availabilities}
+                numParticipants={numParticipants}
+                highestMatchCount={getHighestMatchCount(availabilities)}
+                onHoverDay={setHoveredSlot}
+              />
+            );
+          }
+        })}
       </div>
     </div>
   );
