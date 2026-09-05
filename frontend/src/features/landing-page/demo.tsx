@@ -76,7 +76,7 @@ function OrbitNode({
         }
         className={cn(
           "bg-lion hover:ring-10 hover:ring-bone/50 text-violet hover:cursor-pointer",
-          "flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 font-semibold",
+          "flex items-center gap-2 whitespace-nowrap rounded-full px-2 py-2 pr-3 font-semibold",
           "hover:cursor-pointer",
         )}
       >
@@ -177,7 +177,7 @@ export default function Demo() {
 
   const step1 = (
     <div key="step1" className="p-4 text-center">
-      <div className="mb-2 text-lg font-bold">Create your event</div>
+      <div className="mb-2 text-lg font-bold">Create Your Event</div>
       <div className="text-background/70 text-sm">
         Pick a range of dates and times you think might work.
       </div>
@@ -186,7 +186,7 @@ export default function Demo() {
 
   const step2 = (
     <div key="step2" className="p-4 text-center">
-      <div className="mb-2 text-lg font-bold">Share with your friends</div>
+      <div className="mb-2 text-lg font-bold">Share with Your Friends</div>
       <div className="text-background/70 text-sm">
         Anyone can join from the event link, no account required.
       </div>
@@ -196,9 +196,10 @@ export default function Demo() {
   const step3 = (
     <div key="step3" className="p-4">
       <div className="mb-4 text-center">
-        <div className="text-lg font-bold">Paint your availability</div>
+        <div className="text-lg font-bold">Paint Your Availability</div>
         <div className="text-background/70 text-sm">
-          Click and drag on the grid to fill in the times you&apos;re free.
+          Click and drag on the grid to fill in the times you&apos;re free. Try
+          it here!
         </div>
       </div>
       <div className="bg-background text-foreground rounded-2xl p-4">
@@ -225,7 +226,7 @@ export default function Demo() {
   const step4 = (
     <div key="step4" className="w-full p-4">
       <div className="mb-4 text-center">
-        <div className="text-lg font-bold">Watch the results stack up</div>
+        <div className="text-lg font-bold">Watch the Results Stack Up</div>
         <div className="text-background/70 text-sm">
           See which times work best for everyone as soon as they respond.
         </div>
@@ -307,17 +308,17 @@ export default function Demo() {
     { title: string; description: string; body?: React.ReactNode }
   > = {
     1: {
-      title: "Create your event",
+      title: "Create Your Event",
       description: "Pick a range of dates and times you think might work.",
     },
     2: {
-      title: "Share with your friends",
+      title: "Share with Your Friends",
       description: "Anyone can join from the event link, no account required.",
     },
     3: {
-      title: "Paint your availability",
+      title: "Paint Your Availability",
       description:
-        "Click and drag on the grid to fill in the times you're free.",
+        "Try it here! Click and drag on the grid to fill in the times you're free.",
       body: (
         <div className="bg-background text-foreground rounded-2xl p-4">
           <ScheduleGrid
@@ -340,7 +341,7 @@ export default function Demo() {
       ),
     },
     4: {
-      title: "Watch the results stack up",
+      title: "Watch the Results Stack Up",
       description:
         "See which times work best for everyone as soon as they respond.",
       body: (
@@ -387,8 +388,8 @@ export default function Demo() {
           the perfect recipe
         </h2>
         <p className="text-foreground/80 max-w-md text-lg md:text-xl">
-          Four simple steps to stack up your next group event without the messy
-          back-and-forth.
+          Four simple steps to coordinate your next group event without the
+          messy back-and-forth.
         </p>
       </div>
 

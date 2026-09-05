@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils/classname";
 
 const NAV_SECTIONS = [
   {
-    title: "Product",
+    title: "Plancake",
     links: [
-      { label: "Start Planning", href: "/new-event" },
+      { label: "New Event", href: "/new-event" },
       { label: "Dashboard", href: "/dashboard" },
       { label: "What's New", href: "/version-history" },
     ],
@@ -84,8 +84,8 @@ export default function Footer() {
           </div>
 
           <p className="text-sm opacity-70">
-            &copy; {new Date().getFullYear()} Plancake. Perfect plans, one
-            pancake at a time.
+            &copy; {new Date().getFullYear()} Plancake. Stacking up perfect
+            plans since 1900. All rights reserved.
           </p>
         </div>
       </div>

@@ -124,7 +124,7 @@ export default function OrbitImages({
   height = 10,
   className = "",
   showPath = true,
-  pathColor = "rgba(150, 150, 150, 0.3)",
+  pathColor = "var(--orbit-path-color)",
   pathWidth = 2,
   pathDasharray = "6 6", // Dotted path
   pathFill = "none",

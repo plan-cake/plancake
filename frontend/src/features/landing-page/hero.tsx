@@ -153,7 +153,7 @@ export default function Hero() {
             <div className="relative z-10 mx-auto mt-28 max-w-7xl text-center md:mt-16">
               <div className="mb-6 flex justify-center">
                 <span className="bg-bone text-violet inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold tracking-wide">
-                  finally making it outta the group chat.
+                  finally making it out of the group chat.
                 </span>
               </div>
 
@@ -163,14 +163,14 @@ export default function Hero() {
                   className="relative block text-5xl tracking-tight md:text-8xl"
                 >
                   <span className="font-display text-foreground block">
-                    plans made
+                    stacking up
                   </span>
                   <motion.span
                     aria-hidden
                     style={{ clipPath }}
                     className="font-display text-accent pointer-events-none absolute inset-0 block"
                   >
-                    plans made
+                    stacking up
                   </motion.span>
                 </span>
 
@@ -183,9 +183,9 @@ export default function Hero() {
                     }}
                     className="font-display text-bone relative z-10 block text-center text-5xl leading-none tracking-tight md:text-8xl"
                   >
-                    stack
+                    perfect
                     <br />
-                    simple
+                    plans
                   </motion.span>
                 </span>
               </h1>
@@ -205,7 +205,7 @@ export default function Hero() {
                   <LinkButton
                     buttonStyle="primary"
                     icon={<PlusIcon />}
-                    label="Mix Your First Plan"
+                    label="Start Planning"
                     href="/new-event"
                   />
                   <LinkButton

@@ -1,27 +1,28 @@
 "use client";
 
-import { Blend, Layers, Zap } from "lucide-react";
+import { Blend, MessagesSquare, Rabbit } from "lucide-react";
 
 import { Banner } from "@/features/system-feedback";
 import { cn } from "@/lib/utils/classname";
 
 const PILLARS = [
   {
-    title: "Stack Simple",
+    title: "Out of the Chat",
     description:
-      "Every response layers into one clear view, so nobody scrolls through fifty messages to find a time.",
-    icon: Layers,
+      "Every response layers into one clear view, so nobody scrolls through fifty messages to find a good time.",
+    icon: MessagesSquare,
+  },
+  {
+    title: "Get In, Get Out",
+    description:
+      "No accounts required. Share a link and watch the plan come together.",
+    icon: Rabbit,
   },
   {
     title: "Built for Groups",
     description:
-      "From a two-person coffee chat to a twenty-person offsite, everyone's availability overlaps in real time.",
+      "From a 3-person project meeting to a large family reunion, everyone's availability updates in real time.",
     icon: Blend,
-  },
-  {
-    title: "Flip Fast",
-    description: "No accounts. Share a link and watch the plan come together.",
-    icon: Zap,
   },
 ];
 
@@ -38,8 +39,8 @@ export default function Pillars() {
             <span className="text-lg font-bold">Just trust the process.</span>
             <br />
             <span className="text-lg">
-              Plancake takes some scheduling stress out of the chat and stacks
-              it into one link everyone can check.
+              Plancake takes scheduling stress out of the chat and simplifies
+              the planning into one link everyone can check.
             </span>
           </Banner>
         </div>
