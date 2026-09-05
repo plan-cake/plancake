@@ -1,8 +1,11 @@
-"use client";
-
 import ChangePasswordDialog from "@/features/account/setting-dialogs/change-password/main-dialog";
+import SessionManager from "@/features/account/settings/security/components/session-manager";
+import { ROUTES } from "@/lib/utils/api/endpoints";
+import { serverGet } from "@/lib/utils/api/server-fetch";
 
-export default function Page() {
+export default async function Page() {
+  const activeSessions = await serverGet(ROUTES.account.getActiveSessions);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="bg-panel flex flex-col gap-4 rounded-3xl border-none p-6 md:p-8">
@@ -17,6 +20,8 @@ export default function Page() {
           <ChangePasswordDialog />
         </div>
       </div>
+
+      <SessionManager sessions={activeSessions} />
     </div>
   );
 }
