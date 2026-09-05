@@ -8,6 +8,7 @@ import {
   ResultsAvailabilityMap,
 } from "@/core/availability/types";
 import { createEmptyUserAvailability } from "@/core/availability/utils";
+import { GRID_ID } from "@/features/event/grid/lib/constants";
 import useGridinfo from "@/features/event/grid/lib/use-grid";
 import ScheduleHeader from "@/features/event/grid/schedule-header";
 import TimeColumn from "@/features/event/grid/time-column";
@@ -133,7 +134,14 @@ export default function ScheduleGrid({
   if (error) return <GridMessage error={true} message={error} />;
 
   return (
-    <div className="relative grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]">
+    <div
+      className={cn(
+        "relative grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]",
+        mode === "preview" ? "bg-background md:bg-panel" : "bg-background",
+      )}
+      style={{ viewTransitionName: "grid" }}
+      id={GRID_ID}
+    >
       <ScheduleHeader
         preview={mode === "preview"}
         visibleDays={visibleDays}

@@ -1,8 +1,9 @@
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
+import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import {
   MAX_DURATION,
   MAX_TITLE_LENGTH,
-} from "@/features/event/editor/validate-data";
+} from "@/features/event/editor/constants";
 
 export const MESSAGES = {
   // generic errors
@@ -19,13 +20,14 @@ export const MESSAGES = {
   ERROR_RESET_TOKEN_INVALID: "Invalid or expired reset token.",
 
   // availability errors
+  ERROR_NAME_LENGTH: `Name must be ${MAX_DISPLAY_NAME_LENGTH} characters or less.`,
   ERROR_NAME_MISSING: "Missing name.",
-  ERROR_NAME_TAKEN: "This name is unavailable. Please choose another.",
+  ERROR_NAME_TAKEN: "This name is unavailable.",
   ERROR_AVAILABILITY_MISSING: "Please select your availability on the grid.",
 
   // event errors
   ERROR_EVENT_NAME_MISSING: "Missing event name.",
-  ERROR_EVENT_NAME_LENGTH: `Event name must be under ${MAX_TITLE_LENGTH} characters.`,
+  ERROR_EVENT_NAME_LENGTH: `Event name must be ${MAX_TITLE_LENGTH} characters or less.`,
   ERROR_EVENT_CODE_TAKEN: "This code is unavailable. Please choose another.",
   ERROR_EVENT_DATES_MISSING: "Please select possible dates for this event.",
   ERROR_EVENT_WEEKDAYS_MISSING: "Please select possible days for this event.",
@@ -67,9 +69,8 @@ export const MESSAGES = {
     "Select dates and times to see a preview of the event grid.",
   INFO_UNSELECTED_WEEK_RANGE:
     "Select days and times to see a preview of the event grid.",
-  INFO_NO_MUTUAL_AVAILABILITY:
-    "There are no times with more than 1 person available. The plans are NOT making it out of the group chat...",
-  INFO_NO_IDEAL_TIMES: "There are no times where everyone is available.",
-  INFO_NO_IDEAL_TIMES_BANNER:
-    "There are no times where everyone is available. Times with an indicator are the best options.",
+  INFO_NO_OVERLAP:
+    "Literally no one is free at the same time. This is NOT making it out of the group chat...",
+  INFO_NO_IDEAL_TIMES:
+    "There are no times that work for everyone. Times with an indicator are the best options.",
 };

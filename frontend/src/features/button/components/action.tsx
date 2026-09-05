@@ -12,6 +12,7 @@ const ActionButton = forwardRef<Ref, ActionButtonProps>(
       icon,
       label,
       shrinkOnMobile = false,
+      tooltip,
       loading = false,
       disabled = false,
       onClick,
@@ -28,6 +29,7 @@ const ActionButton = forwardRef<Ref, ActionButtonProps>(
         icon={icon}
         label={label}
         shrinkOnMobile={shrinkOnMobile}
+        tooltip={tooltip}
         loading={loading}
         disabled={disabled}
         onClick={onClick}

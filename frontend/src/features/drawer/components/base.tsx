@@ -1,4 +1,6 @@
-import { useRef, useState } from "react";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 
 import { XIcon } from "lucide-react";
 import { Drawer } from "vaul";
@@ -28,6 +30,7 @@ export default function BaseDrawer({
   showOverlay = !frostedGlass && modal,
   nested = false,
   hideCloseButton = false,
+  viewTransitionName,
   ...rest
 }: DrawerProps) {
   useDrawerResize();
@@ -35,10 +38,20 @@ export default function BaseDrawer({
 
   const contentRef = useRef<HTMLDivElement>(null);
   const wasDraggingRef = useRef(false);
+  const animatingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
   useVaulStickyFooter(contentRef, isDragging || isAnimating);
+
+  // Animating timeout cleanup
+  useEffect(() => {
+    return () => {
+      if (animatingTimeoutRef.current) {
+        clearTimeout(animatingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   /**
    * CONDITIONAL PROPS BASED ON VARIANT
@@ -128,7 +141,7 @@ export default function BaseDrawer({
       <Drawer.Portal>
         {showOverlay && (
           <Drawer.Overlay
-            onClick={() => onOpenChange?.(false)}
+            onClick={(e) => e.stopPropagation()}
             className={cn(
               "fixed inset-0",
               frostedGlass ? "bg-black/1" : "bg-black/30",
@@ -139,12 +152,18 @@ export default function BaseDrawer({
 
         <Drawer.Content
           ref={contentRef}
+          onClick={(e) => e.stopPropagation()}
           className={cn(
             "fixed bottom-0 left-0 right-0 flex outline-none",
             _type !== "floating" && "h-[100dvh]",
             contentClassName,
           )}
-          style={{ zIndex: contentZIndex }}
+          style={{
+            zIndex: contentZIndex,
+            viewTransitionName: viewTransitionName
+              ? viewTransitionName
+              : undefined,
+          }}
         >
           <div
             className="flex w-full flex-col"
@@ -188,9 +207,17 @@ export default function BaseDrawer({
                 onClick={() => {
                   if (wasDraggingRef.current) return;
                   if (isPill) {
+                    if (animatingTimeoutRef.current) {
+                      clearTimeout(animatingTimeoutRef.current);
+                    }
+
                     setIsAnimating(true);
                     setSnap(snapPoints?.[1] ?? null);
-                    setIsAnimating(false);
+                    // Let the footer observer update before setting isAnimating to false
+                    animatingTimeoutRef.current = setTimeout(() => {
+                      setIsAnimating(false);
+                      animatingTimeoutRef.current = null;
+                    }, 0);
                   }
                 }}
                 className={cn(

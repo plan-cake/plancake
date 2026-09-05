@@ -73,7 +73,7 @@ DATABASES = {
         "PASSWORD": env("DB_PASSWORD"),
         "HOST": env("DB_HOST"),
         "PORT": env("DB_PORT"),
-        "CONN_MAX_AGE": 0 if DEBUG else 600,  # Don't persist connections in development
+        "CONN_MAX_AGE": 0,  # Don't persist connections
     }
 }
 
@@ -125,7 +125,7 @@ REST_FRAMEWORK = {
         ThrottleScopes.PASSWORD_RESET.key: "10/hour",
         ThrottleScopes.EVENT_CREATION.key: "25/hour",
         ThrottleScopes.AVAILABILITY_ADD.key: "50/hour",
-        ThrottleScopes.CODE_CHECK.key: "50/hour",
+        ThrottleScopes.CODE_CHECK.key: "10/min",
     },
 }
 
@@ -168,6 +168,17 @@ CELERY_BEAT_SCHEDULE = {
 }
 CELERY_BROKER_URL = "redis://localhost:6379/0"
 
+# Live updates
+LIVE_UPDATES_URL = "redis://localhost:6379/1"
+LIVE_UPDATES_HEARTBEAT_SECONDS = 1
+MAX_LIVE_CONNECTIONS_EVENT = 25
+MAX_LIVE_CONNECTIONS_GLOBAL = 500
+# For publishing updates, which is a fast and one-time operation
+REDIS_SYNC_POOL_SIZE = 20
+# For subscribing to updates, which holds a connection open
+# It's slightly higher than the max global connections to prevent hanging
+REDIS_ASYNC_POOL_SIZE = 510
+
 LOG_DIR = env("LOG_DIR")
 os.makedirs(LOG_DIR, exist_ok=True)  # Make the log directory if it doesn't exist
 LOGGING = {
@@ -195,7 +206,7 @@ LOGGING = {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": f"{LOG_DIR}/django.log",
             "formatter": "verbose",
-            "level": "DEBUG",
+            "level": "DEBUG" if DEBUG else "INFO",
             "maxBytes": 1024 * 1024 * 5,  # 5 MB
             "backupCount": 5,
         },
@@ -209,6 +220,11 @@ LOGGING = {
         "api": {
             "handlers": ["console", "file"],
             "level": "DEBUG",
+            "propagate": False,
+        },
+        "uvicorn": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
             "propagate": False,
         },
     },

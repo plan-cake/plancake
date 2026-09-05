@@ -1,13 +1,11 @@
 import { EventInformation, WeekdayRange } from "@/core/event/types";
 import { findRangeFromWeekdayArray } from "@/core/event/weekday-utils";
+import {
+  MAX_DURATION_MS,
+  MAX_TITLE_LENGTH,
+} from "@/features/event/editor/constants";
 import { EventEditorType } from "@/features/event/editor/types";
 import { MESSAGES } from "@/lib/messages";
-
-const MAX_DAYS = 64;
-export const MAX_DURATION_MS = MAX_DAYS * 24 * 60 * 60 * 1000;
-export const MAX_DURATION = `${MAX_DAYS} days`;
-
-export const MAX_TITLE_LENGTH = 50;
 
 export async function validateEventData(
   editorType: EventEditorType,

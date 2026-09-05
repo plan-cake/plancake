@@ -3,24 +3,26 @@
 import { useEffect, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
-import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
 import Checkbox from "@/components/checkbox";
 import MobileFooterIsland from "@/components/mobile-footer-island";
+import TextInputField from "@/components/text-input-field";
 import { useAvailability } from "@/core/availability/use-availability";
 import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
-import LinkButton from "@/features/button/components/link";
+import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { ScheduleGrid } from "@/features/event/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,
   RateLimitBanner,
   useToast,
 } from "@/features/system-feedback";
+import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -44,7 +46,7 @@ export default function ClientPage({
   timeslots: Date[];
   initialData: SelfAvailability | null;
 }) {
-  const router = useRouter();
+  const doViewTransition = useViewTransition();
 
   // AVAILABILITY STATE
   const { state, setDisplayName, setTimeZone, toggleSlot } = useAvailability(
@@ -87,23 +89,12 @@ export default function ClientPage({
   //   return () => removeToast(toastId);
   // }, [addToast, removeToast]);
 
-  const handleNameChange = useDebouncedCallback(async (displayName) => {
-    if (errors.displayName) setErrors((prev) => ({ ...prev, displayName: "" }));
-
-    if (displayName === "") {
-      setErrors((prev) => ({
-        ...prev,
-        displayName: MESSAGES.ERROR_NAME_MISSING,
-      }));
-      return;
-    }
-
+  const checkNameAvailability = useDebouncedCallback(async (displayName) => {
     try {
       await clientPost(ROUTES.availability.checkDisplayName, {
         event_code: eventCode,
         display_name: displayName,
       });
-      setErrors((prev) => ({ ...prev, displayName: "" }));
     } catch (e) {
       const error = e as ApiErrorResponse;
       if (error.badRequest) {
@@ -116,6 +107,26 @@ export default function ClientPage({
       }
     }
   }, 300);
+
+  const handleNameChange = (value: string) => {
+    setDisplayName(value);
+    if (value === "") {
+      checkNameAvailability.cancel();
+      setErrors((prev) => ({
+        ...prev,
+        displayName: MESSAGES.ERROR_NAME_MISSING,
+      }));
+    } else if (value.length > MAX_DISPLAY_NAME_LENGTH) {
+      checkNameAvailability.cancel();
+      setErrors((prev) => ({
+        ...prev,
+        displayName: MESSAGES.ERROR_NAME_LENGTH,
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, displayName: "" }));
+      checkNameAvailability(value);
+    }
+  };
 
   // DEFAULT NAME SETTING
   const [saveDefaultName, setSaveDefaultName] = useState(false);
@@ -138,12 +149,12 @@ export default function ClientPage({
     // If the user has a default name, use it to autofill the name field
     const newName = session.user.defaultName;
     setDisplayName(newName);
-    handleNameChange(newName);
+    checkNameAvailability(newName);
     addToast("success", MESSAGES.INFO_NAME_AUTOFILLED, {
       title: "NAME AUTOFILLED",
     });
     nameInitialized.current = true;
-  }, [session, setDisplayName, addToast, handleNameChange]);
+  }, [session, setDisplayName, addToast, checkNameAvailability]);
 
   // SUBMIT AVAILABILITY
   const handleSubmitAvailability = async () => {
@@ -203,7 +214,7 @@ export default function ClientPage({
 
     try {
       await clientPost(ROUTES.availability.add, payload);
-      router.push(`/${eventCode}`);
+      doViewTransition(`/${eventCode}`, GRID_ID_SELECTOR);
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -221,10 +232,11 @@ export default function ClientPage({
 
   // BUTTONS
   const cancelButton = (
-    <LinkButton
+    <ActionButton
       buttonStyle="transparent"
       label={initialData?.display_name ? "Cancel Edits" : "Cancel"}
-      href={`/${eventCode}`}
+      onClick={() => doViewTransition(`/${eventCode}`, GRID_ID_SELECTOR)}
+      loadOnSuccess
     />
   );
   const submitButton = (
@@ -266,7 +278,6 @@ export default function ClientPage({
             errors={errors}
             session={session}
             displayName={displayName}
-            setDisplayName={setDisplayName}
             handleNameChange={handleNameChange}
             saveDefaultName={saveDefaultName}
             setSaveDefaultName={setSaveDefaultName}
@@ -313,19 +324,26 @@ export default function ClientPage({
         <MobileFooterIsland
           leftButtons={[cancelButton]}
           rightButtons={[submitButton]}
+          viewTransitionName="painting-island"
         >
           <div className="mx-3 -mt-2">
             <DisplayNameInput
               errors={errors}
               session={session}
               displayName={displayName}
-              setDisplayName={setDisplayName}
               handleNameChange={handleNameChange}
               saveDefaultName={saveDefaultName}
               setSaveDefaultName={setSaveDefaultName}
             />
           </div>
         </MobileFooterIsland>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed left-0 right-0 top-[100vh] w-[100vw] md:hidden"
+          style={{
+            viewTransitionName: "results-drawer",
+          }}
+        />
       </div>
 
       <ConfirmationDialog
@@ -362,7 +380,6 @@ function DisplayNameInput({
   errors,
   session,
   displayName,
-  setDisplayName,
   handleNameChange,
   saveDefaultName,
   setSaveDefaultName,
@@ -370,7 +387,6 @@ function DisplayNameInput({
   errors: Record<string, string>;
   session: Session;
   displayName: string;
-  setDisplayName: (name: string) => void;
   handleNameChange: (name: string) => void;
   saveDefaultName: boolean;
   setSaveDefaultName: (save: boolean) => void;
@@ -379,26 +395,20 @@ function DisplayNameInput({
     <div className="h-fit w-full shrink-0 space-y-4 overflow-y-auto md:w-80">
       <div className="space-y-2">
         <div className="w-fit">
-          <p
-            className={`text-error text-right text-xs ${errors.displayName ? "visible" : "invisible"}`}
-          >
-            {errors.displayName ? errors.displayName : "Error Placeholder"}
-          </p>
           Hi,{" "}
-          <input
-            required
+          <TextInputField
+            id="displayName"
             type="text"
+            label="Display name"
+            style="inline"
             value={displayName}
-            onChange={(e) => {
-              setDisplayName(e.target.value);
-              handleNameChange(e.target.value);
-            }}
+            onChange={handleNameChange}
             placeholder="add your name"
-            className={`inline-block w-auto border-b bg-transparent px-1 focus:outline-none ${
-              errors.displayName
-                ? "border-error placeholder:text-error"
-                : "border-gray-400"
-            }`}
+            error={errors.displayName}
+            maxLength={{
+              length: MAX_DISPLAY_NAME_LENGTH,
+              error: MESSAGES.ERROR_NAME_LENGTH,
+            }}
           />
           <br />
           add your availabilities here

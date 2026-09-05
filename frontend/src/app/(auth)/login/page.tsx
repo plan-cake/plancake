@@ -10,6 +10,7 @@ import AuthPageLayout from "@/components/layout/auth-page";
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
 import ActionButton from "@/features/button/components/action";
+import { DONT_SHOW_AGAIN_KEY } from "@/features/guest-import/constants";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -24,7 +25,7 @@ export default function Page() {
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  const callbackUrl = getSafeRedirectUrl(searchParams.get("callbackUrl"));
+  const callbackUrl = searchParams.get("callbackUrl");
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
@@ -54,12 +55,22 @@ export default function Page() {
     }
 
     try {
+      let dontShowGuestImport = false;
+      try {
+        dontShowGuestImport =
+          localStorage.getItem(DONT_SHOW_AGAIN_KEY) === "true";
+      } catch {}
+      const redirectUrl = getSafeRedirectUrl(
+        callbackUrl,
+        dontShowGuestImport ? undefined : "/guest-import/login",
+      );
+
       await clientPost(ROUTES.auth.login, {
         email,
         password,
         remember_me: rememberMe,
       });
-      router.push(callbackUrl);
+      router.push(redirectUrl);
       router.refresh();
       return true;
     } catch (e) {
@@ -93,7 +104,7 @@ export default function Page() {
           label="Email*"
           value={email}
           onChange={handleEmailChange}
-          outlined
+          style="outlined"
           error={errors.email || errors.api}
         />,
 
@@ -105,7 +116,7 @@ export default function Page() {
           label="Password*"
           value={password}
           onChange={handlePasswordChange}
-          outlined
+          style="outlined"
           error={errors.password || errors.api}
         />,
       ]}

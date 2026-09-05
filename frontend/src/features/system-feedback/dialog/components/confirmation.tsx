@@ -1,9 +1,12 @@
+"use client";
+
 import { useCallback, useState } from "react";
 
 import ActionButton from "@/features/button/components/action";
 import BaseModal from "@/features/system-feedback/dialog/components/base";
 import { DIALOG_CONFIG } from "@/features/system-feedback/dialog/config";
 import { ConfirmationDialogProps } from "@/features/system-feedback/dialog/props";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 export default function ConfirmationDialog({
@@ -25,6 +28,9 @@ export default function ConfirmationDialog({
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : uncontrolledOpen;
+
+  const isMobile = useCheckMobile();
+  const effectiveAsNestedDrawer = asNestedDrawer || isMobile;
 
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
@@ -80,7 +86,7 @@ export default function ConfirmationDialog({
       trigger={trigger}
       open={open}
       onOpenChange={handleOpenChange}
-      asNestedDrawer={asNestedDrawer}
+      asNestedDrawer={effectiveAsNestedDrawer}
       triggerDisabled={triggerDisabled}
       showCloseButton={showCloseButton}
       overlayClassName={cn(
