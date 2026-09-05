@@ -89,7 +89,7 @@ function CalendarDay({
         isHovered &&
           cn(
             "-inset-x-0.5 -inset-y-0.5 h-[calc(100%+0.25rem)] w-[calc(100%+0.25rem)]",
-            "z-5 rounded-lg border-none shadow-xl ring-2",
+            "z-5 ring-foreground rounded-lg border-none shadow-xl ring-2",
           ),
       )}
       style={{
