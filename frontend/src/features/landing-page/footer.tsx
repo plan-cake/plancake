@@ -14,7 +14,7 @@ const NAV_SECTIONS = [
       { label: "What's New", href: "/version-history" },
       {
         label: "Feedback",
-        href: "https://docs.google.com/forms/d/e/1FAIpQLScjNB4rbzhmWuUgs9vitxIypTRpJn1yiJSc5LDTAK8FSYj88Q/viewform",
+        href: process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL ?? "#",
         external: true,
       },
     ],
