@@ -2,23 +2,26 @@ type MajorVersionNumber = `v${number}.${number}`;
 type MinorVersionNumber = `${MajorVersionNumber}.${number}`;
 
 type ReleaseDate = {
-    year: number; // full year, e.g., 2025
-    month: number; // 0-indexed month, e.g., 0 for January
-    day: number; // day of the month, e.g., 15
+  year: number; // full year, e.g., 2025
+  month: number; // 1-indexed month, e.g., 1 for January
+  day: number; // day of the month, e.g., 15
 };
 
-export type MinorVersionData = {
-    version: MinorVersionNumber;
-    releaseDate: ReleaseDate;
-    changes: string[];
+type VersionData = {
+  releaseDate: ReleaseDate;
+  added: string[];
+  changed: string[];
+  fixed: string[];
 };
 
-export type MajorVersionData = {
-    version: MajorVersionNumber;
-    releaseDate: ReleaseDate;
-    changes: string[];
-    bugFixes?: string[];
-    minorVersions?: MinorVersionData[];
+export type MinorVersionData = VersionData & {
+  version: MinorVersionNumber;
+};
+
+export type MajorVersionData = VersionData & {
+  version: MajorVersionNumber;
+  tag?: string;
+  minorVersions: MinorVersionData[];
 };
 
 export type VersionHistoryData = MajorVersionData[];

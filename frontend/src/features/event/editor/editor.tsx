@@ -2,7 +2,7 @@
 
 import { memo, useState } from "react";
 
-import { TriangleAlertIcon } from "lucide-react";
+import { ClockIcon, TriangleAlertIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import Captcha from "@/components/captcha";
@@ -184,12 +184,15 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         <DateRangeSelection editing={type === "edit"} />
 
         <div className="flex flex-col gap-1">
-          <p
+          <div
             className={`flex items-center gap-2 font-bold md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
           >
+            <ClockIcon className="h-4 w-4" strokeWidth={2} />
             Possible Times
-            {errors.timeRange && <TriangleAlertIcon className="h-4 w-4" />}
-          </p>
+            {errors.timeRange && (
+              <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
+            )}
+          </div>
           <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
             <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
               <TimeSelector

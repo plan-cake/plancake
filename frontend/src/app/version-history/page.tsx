@@ -1,7 +1,10 @@
 import { Metadata } from "next";
 
 import ClientPage from "@/app/version-history/page-client";
-import { getVersionHistoryData } from "@/features/version-history/data";
+import {
+  getCurrentVersion,
+  VERSION_DATA,
+} from "@/features/version-history/data";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
 
 export function generateMetadata(): Metadata {
@@ -12,5 +15,10 @@ export function generateMetadata(): Metadata {
 }
 
 export default function Page() {
-  return <ClientPage versionHistoryData={getVersionHistoryData()} />;
+  return (
+    <ClientPage
+      versionHistoryData={VERSION_DATA}
+      currentVersion={getCurrentVersion(false)}
+    />
+  );
 }

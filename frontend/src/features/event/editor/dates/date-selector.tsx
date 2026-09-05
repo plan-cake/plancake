@@ -1,5 +1,9 @@
 import { parseISO } from "date-fns";
-import { TriangleAlertIcon } from "lucide-react";
+import {
+  CalendarRangeIcon,
+  CalendarsIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
 import {
@@ -15,6 +19,7 @@ import WeekdayRangeDrawer from "@/features/event/editor/dates/weekday-range/draw
 import WeekdayRangePopover from "@/features/event/editor/dates/weekday-range/popover";
 import EventTypeSelect from "@/features/event/editor/event-type-select";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { cn } from "@/lib/utils/classname";
 
 export default function DateRangeSelection({
   editing = false,
@@ -27,20 +32,28 @@ export default function DateRangeSelection({
   return (
     <div className="contents">
       <div className="flex w-fit flex-col gap-1">
-        <label htmlFor="event-type-select" className="font-bold">
-          Type
+        <label
+          htmlFor="event-type-select"
+          className="flex items-center gap-2 font-bold"
+        >
+          <CalendarsIcon className="h-4 w-4" strokeWidth={2} />
+          Event Type
         </label>
         <EventTypeSelect id="event-type-select" disabled={editing} />
       </div>
       <div className="flex w-fit flex-col gap-1">
-        <p
-          className={`flex items-center gap-2 font-bold ${errors.dateRange || errors.weekdayRange ? "text-error" : ""}`}
+        <div
+          className={cn(
+            "flex items-center gap-2 font-bold",
+            errors.dateRange || errors.weekdayRange ? "text-error" : "",
+          )}
         >
+          <CalendarRangeIcon className="h-4 w-4" strokeWidth={2} />
           {rangeType === "weekday" ? "Possible Days" : "Possible Dates"}
           {(errors.dateRange || errors.weekdayRange) && (
             <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
-        </p>
+        </div>
 
         {eventRange?.type === "weekday" ? (
           <WeekdayPicker weekdays={(eventRange as WeekdayRange).weekdays} />

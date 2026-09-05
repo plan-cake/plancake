@@ -7,7 +7,6 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { SIDE_WIDTH, TIME_LABEL_WIDTH } from "@/features/event/grid/constants";
-import { useHeaderSize } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
 interface DateHeaderProps {
@@ -54,14 +53,13 @@ export default function DateHeader({
   onNextPage,
   direction = 0,
 }: DateHeaderProps) {
-  const { topMarginClass } = useHeaderSize();
-
   return (
     <div
       className={cn(
-        preview ? "md:bg-panel top-0" : cn(topMarginClass, "bg-background"),
+        preview ? "bg-background md:bg-panel" : "bg-background",
         scrollbarPresent && "pr-4",
-        "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
+        "sticky top-[var(--header-height)] md:top-0",
+        "z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
       )}
       style={{
         gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 0}px`,
