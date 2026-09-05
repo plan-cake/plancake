@@ -1,5 +1,9 @@
 import { parseISO } from "date-fns";
-import { TriangleAlertIcon } from "lucide-react";
+import {
+  CalendarRangeIcon,
+  CalendarsIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
 import { SpecificDateRange } from "@/core/event/types";
@@ -10,6 +14,7 @@ import EventTypeSelect from "@/features/event/editor/date-range/event-type-selec
 import DateRangePopover from "@/features/event/editor/date-range/popover";
 import ShortcutTrigger from "@/features/system-feedback/hotkeys/components/shortcut-trigger";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { cn } from "@/lib/utils/classname";
 
 export default function DateRangeSelection({
   editing = false,
@@ -22,8 +27,12 @@ export default function DateRangeSelection({
   return (
     <div className="contents">
       <div className="flex w-fit flex-col gap-1">
-        <label htmlFor="event-type-select" className="font-bold">
-          Type
+        <label
+          htmlFor="event-type-select"
+          className="flex items-center gap-2 font-bold"
+        >
+          <CalendarsIcon className="h-4 w-4" strokeWidth={2} />
+          Event Type
         </label>
         <ShortcutTrigger
           hotkey="t"
@@ -34,15 +43,19 @@ export default function DateRangeSelection({
           <EventTypeSelect id="event-type-select" disabled={editing} />
         </ShortcutTrigger>
       </div>
-      <div className="flex w-fit flex-col gap-1">
-        <p
-          className={`flex items-center gap-2 font-bold ${errors.dateRange || errors.weekdayRange ? "text-error" : ""}`}
+      <div className="flex w-fit flex-col justify-center gap-1">
+        <div
+          className={cn(
+            "flex items-center gap-2 font-bold",
+            errors.dateRange || errors.weekdayRange ? "text-error" : "",
+          )}
         >
+          <CalendarRangeIcon className="h-4 w-4" strokeWidth={2} />
           {rangeType === "specific" ? "Possible Dates" : "Possible Days"}
           {(errors.dateRange || errors.weekdayRange) && (
-            <TriangleAlertIcon className="text-error h-4 w-4" />
+            <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
           )}
-        </p>
+        </div>
 
         {eventRange?.type === "specific" ? (
           <ShortcutTrigger hotkey="d" tooltipSide="right">
