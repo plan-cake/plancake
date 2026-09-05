@@ -40,7 +40,7 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
         error: MESSAGES.ERROR_EVENT_RANGE_INVALID,
       };
 
-    const sortedDates = timeslots.sort();
+    const sortedDates = timeslots.sort((a, b) => a.getTime() - b.getTime());
 
     const weeks = {} as Record<string, CalendarGridWeek>;
     const months = new Set<string>();
@@ -52,17 +52,10 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
         weeks[weekStartString] = createWeek(weekStart);
       }
       const currentBlock = weeks[weekStartString];
-      const dayBlock = currentBlock.days.find(
-        (day) => day.dayString === format(date, "yyyy-MM-dd"),
-      );
+      const dayBlock = currentBlock.days[date.getDay()];
       const monthString = format(date, "yyyy-MM");
       const newMonth = !months.has(monthString);
       months.add(monthString);
-      if (!dayBlock) {
-        throw new Error(
-          `Date ${format(date, "yyyy-MM-dd")} is not in the week starting ${weekStartString}`,
-        );
-      }
       dayBlock.exists = true;
       dayBlock.firstOfMonth = newMonth;
     }
