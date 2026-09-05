@@ -29,6 +29,7 @@ export default function BaseWeekBlock({
         week.days.map((day, dIndex) => {
           const commonProps = {
             dayString: day.dayString,
+            firstOfMonth: day.firstOfMonth,
             gridColumn: dIndex + 1,
             gridRow: wIndex + 1,
             numRows: weeks.length,

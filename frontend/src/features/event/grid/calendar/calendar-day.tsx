@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils/classname";
 export interface CalendarDayProps {
   dayString: string;
   exists?: boolean;
+  firstOfMonth?: boolean;
   isHovered?: boolean;
 
   disableSelect?: boolean;
@@ -33,6 +34,7 @@ export interface CalendarDayProps {
 function CalendarDay({
   dayString,
   exists = true,
+  firstOfMonth = false,
   isHovered,
   disableSelect,
   dynamicStyle: style,
@@ -66,6 +68,12 @@ function CalendarDay({
 
   const dayObj = parse(dayString, "yyyy-MM-dd", new Date());
   const dayNum = dayObj.getDate();
+  const shortMonthString = dayObj.toLocaleString("default", {
+    month: "short",
+  });
+  const longMonthString = dayObj.toLocaleString("default", {
+    month: "long",
+  });
 
   return (
     <div
@@ -97,10 +105,20 @@ function CalendarDay({
     >
       <div
         data-day-string={dayString}
-        className="flex h-full w-full flex-col justify-between p-2"
+        className="relative flex h-full w-full flex-col justify-between p-2"
       >
         <span className="text-left leading-none">{dayNum}</span>
         {!!icon && <div className="flex w-full justify-end">{icon}</div>}
+        {firstOfMonth && (
+          <div
+            className={cn(
+              "bg-foreground text-background absolute -top-2.5 left-[50%] translate-x-[-50%] rounded-full px-1.5 py-0.5 text-sm leading-none",
+            )}
+          >
+            <span className="lg:hidden">{shortMonthString}</span>
+            <span className="hidden lg:block">{longMonthString}</span>
+          </div>
+        )}
       </div>
     </div>
   );
