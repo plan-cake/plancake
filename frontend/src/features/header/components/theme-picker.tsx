@@ -6,11 +6,11 @@ import KebabMenu from "@/components/kebab-menu";
 import SegmentedControl from "@/components/segmented-control";
 import EmptyButton from "@/features/button/components/empty";
 import ShrinkingHeaderButton from "@/features/header/components/buttons/shrinking-header";
-import { useHeaderSize } from "@/features/header/context";
+import { useHeader } from "@/features/header/context";
 import { useThemeToggle } from "@/lib/hooks/use-theme-toggle";
 
 export default function ThemePicker() {
-  const { activeMenu, setActiveMenu } = useHeaderSize();
+  const { activeMenu, setActiveMenu } = useHeader();
   const { theme = "system", toggleTheme } = useThemeToggle();
 
   const isMenuOpen = activeMenu === "theme";
