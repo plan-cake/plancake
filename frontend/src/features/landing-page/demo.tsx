@@ -153,14 +153,22 @@ export default function Demo() {
     const you = PARTICIPANTS[3];
 
     setAvailabilities((prev) => {
+      const nextAvailabilities: Record<string, string[]> = {};
+
       for (const slotIso of Object.keys(prev)) {
         if (userAvailability.has(slotIso)) {
-          if (!prev[slotIso].includes(you)) prev[slotIso].push(you);
+          // Create a new array when adding a participant
+          if (!prev[slotIso].includes(you)) {
+            nextAvailabilities[slotIso] = [...prev[slotIso], you];
+          } else {
+            nextAvailabilities[slotIso] = prev[slotIso]; // Unchanged
+          }
         } else {
-          prev[slotIso] = prev[slotIso].filter((p) => p !== you);
+          // .filter() automatically returns a new array
+          nextAvailabilities[slotIso] = prev[slotIso].filter((p) => p !== you);
         }
       }
-      return { ...prev };
+      return nextAvailabilities;
     });
 
     setAllowSubmit(false);
@@ -205,6 +213,7 @@ export default function Demo() {
       <div className="bg-background text-foreground rounded-2xl p-4">
         <ScheduleGrid
           mode="paint"
+          viewTransitionName="none"
           staticHeader
           timeslots={TIMESLOTS}
           timezone="America/New_York"
@@ -234,6 +243,7 @@ export default function Demo() {
       <div className="bg-background text-foreground rounded-2xl p-4">
         <ScheduleGrid
           mode="view"
+          viewTransitionName="none"
           staticHeader
           timeslots={TIMESLOTS}
           timezone="America/New_York"
@@ -247,6 +257,7 @@ export default function Demo() {
             <ParticipantChip
               key={p}
               areSelected={false}
+              includedInSlider={false}
               index={0}
               isAvailable={currentlyAvailable.includes(p)}
               isRemoving={false}
@@ -323,6 +334,7 @@ export default function Demo() {
         <div className="bg-background text-foreground rounded-2xl p-4">
           <ScheduleGrid
             mode="paint"
+            viewTransitionName="none"
             staticHeader
             timeslots={TIMESLOTS}
             timezone="America/New_York"
@@ -348,6 +360,7 @@ export default function Demo() {
         <div className="bg-background text-foreground rounded-2xl p-4">
           <ScheduleGrid
             mode="view"
+            viewTransitionName="none"
             staticHeader
             timeslots={TIMESLOTS}
             timezone="America/New_York"
@@ -361,6 +374,7 @@ export default function Demo() {
               <ParticipantChip
                 key={p}
                 areSelected={false}
+                includedInSlider={false}
                 index={0}
                 isAvailable={currentlyAvailable.includes(p)}
                 isRemoving={false}
