@@ -2,13 +2,15 @@ import { useTimezoneSelect, allTimezones } from "react-timezone-select";
 
 import Selector from "@/features/selector/components/selector";
 import { BaseSelectorWrapperProps } from "@/features/selector/types";
+import ShortcutTrigger from "@/features/system-feedback/hotkeys/components/shortcut-trigger";
 
 const labelStyle = "original";
 const timezones = allTimezones;
 
-export default function TimeZoneSelector(
-  props: BaseSelectorWrapperProps<string>,
-) {
+export default function TimeZoneSelector({
+  useShortcut,
+  ...props
+}: BaseSelectorWrapperProps<string> & { useShortcut: boolean }) {
   const { options, parseTimezone } = useTimezoneSelect({
     labelStyle,
     timezones,
@@ -16,7 +18,7 @@ export default function TimeZoneSelector(
 
   const parsedValue = parseTimezone(props.value)?.value || "";
 
-  return (
+  const selector = (
     <Selector
       {...props}
       value={parsedValue}
@@ -25,5 +27,18 @@ export default function TimeZoneSelector(
       dialogDescription="Select a timezone from the list"
       textStart
     />
+  );
+
+  return useShortcut ? (
+    <ShortcutTrigger
+      hotkey="z"
+      className="w-fit"
+      tooltipSide="right"
+      selector={`#${props.id}`}
+    >
+      {selector}
+    </ShortcutTrigger>
+  ) : (
+    selector
   );
 }

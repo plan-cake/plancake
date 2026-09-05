@@ -24,6 +24,7 @@ import {
   RateLimitBanner,
   useToast,
 } from "@/features/system-feedback";
+import ShortcutTrigger from "@/features/system-feedback/hotkeys/components/shortcut-trigger";
 import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -251,15 +252,16 @@ export default function ClientPage({
   };
 
   // BUTTONS
-  const cancelButton = (
+  const cancelButton = (desktop: boolean) => (
     <ActionButton
       buttonStyle="transparent"
       label={initialData?.display_name ? "Cancel Edits" : "Cancel"}
       onClick={() => doViewTransition(`/${eventCode}`, GRID_ID_SELECTOR)}
+      hotkey={desktop ? { keys: "c", type: "shortcut" } : undefined}
       loadOnSuccess
     />
   );
-  const submitButton = (
+  const submitButton = (desktop: boolean) => (
     <ActionButton
       buttonStyle="primary"
       label={
@@ -270,6 +272,7 @@ export default function ClientPage({
       onClick={handleSubmitAvailability}
       loadOnSuccess
       disabled={captchaInitError}
+      hotkey={desktop ? { keys: "mod+enter" } : undefined}
     />
   );
 
@@ -300,8 +303,8 @@ export default function ClientPage({
       <div className="flex w-full flex-wrap justify-between md:flex-row">
         <h1 className="text-2xl font-bold">{eventName}</h1>
         <div className="hidden items-center gap-2 md:flex">
-          {cancelButton}
-          {submitButton}
+          {cancelButton(true)}
+          {submitButton(true)}
         </div>
       </div>
 
@@ -311,6 +314,7 @@ export default function ClientPage({
         <div className="hidden w-80 shrink-0 space-y-4 md:block">
           <DisplayNameInput
             errors={errors}
+            useShortcut={true}
             session={session}
             displayName={displayName}
             handleNameChange={handleNameChange}
@@ -327,6 +331,7 @@ export default function ClientPage({
               id="timezone-select"
               value={timeZone}
               onChange={setTimeZone}
+              useShortcut={true}
             />
           </div>
         </div>
@@ -356,6 +361,7 @@ export default function ClientPage({
             id="timezone-select"
             value={timeZone}
             onChange={setTimeZone}
+            useShortcut={false}
           />
         </div>
       </div>
@@ -363,13 +369,14 @@ export default function ClientPage({
       {/* This z-index is necessary to avoid the time column overlapping */}
       <div className="z-10">
         <MobileFooterIsland
-          leftButtons={[cancelButton]}
-          rightButtons={[submitButton]}
+          leftButtons={[cancelButton(false)]}
+          rightButtons={[submitButton(false)]}
           viewTransitionName="painting-island"
         >
           <div className="mx-3 -mt-2">
             <DisplayNameInput
               errors={errors}
+              useShortcut={false}
               session={session}
               displayName={displayName}
               handleNameChange={handleNameChange}
@@ -380,7 +387,7 @@ export default function ClientPage({
         </MobileFooterIsland>
         <div
           aria-hidden="true"
-          className="pointer-events-none fixed left-0 right-0 top-[100vh] w-[100vw] md:hidden"
+          className="pointer-events-none fixed left-0 right-0 top-[100vh] w-screen md:hidden"
           style={{
             viewTransitionName: "results-drawer",
           }}
@@ -419,6 +426,7 @@ export default function ClientPage({
 
 function DisplayNameInput({
   errors,
+  useShortcut,
   session,
   displayName,
   handleNameChange,
@@ -426,31 +434,47 @@ function DisplayNameInput({
   setSaveDefaultName,
 }: {
   errors: Record<string, string>;
+  useShortcut: boolean;
   session: Session;
   displayName: string;
   handleNameChange: (name: string) => void;
   saveDefaultName: boolean;
   setSaveDefaultName: (save: boolean) => void;
 }) {
+  const displayNameField = (
+    <TextInputField
+      id="displayName"
+      type="text"
+      label="Display name"
+      style="inline"
+      value={displayName}
+      onChange={handleNameChange}
+      placeholder="add your name"
+      error={errors.displayName}
+      maxLength={{
+        length: MAX_DISPLAY_NAME_LENGTH,
+        error: MESSAGES.ERROR_NAME_LENGTH,
+      }}
+    />
+  );
+
   return (
     <div className="h-fit w-full shrink-0 space-y-4 overflow-y-auto md:w-80">
       <div className="space-y-2">
         <div className="w-fit">
           Hi,{" "}
-          <TextInputField
-            id="displayName"
-            type="text"
-            label="Display name"
-            style="inline"
-            value={displayName}
-            onChange={handleNameChange}
-            placeholder="add your name"
-            error={errors.displayName}
-            maxLength={{
-              length: MAX_DISPLAY_NAME_LENGTH,
-              error: MESSAGES.ERROR_NAME_LENGTH,
-            }}
-          />
+          {useShortcut ? (
+            <ShortcutTrigger
+              hotkey="n"
+              selector="#displayName"
+              tooltipSide="right"
+              className="inline w-fit"
+            >
+              <div className="inline">{displayNameField}</div>
+            </ShortcutTrigger>
+          ) : (
+            displayNameField
+          )}
           <br />
           add your availabilities here
         </div>

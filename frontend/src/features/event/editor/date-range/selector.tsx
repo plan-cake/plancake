@@ -12,6 +12,7 @@ import { DateRangeProps } from "@/features/event/editor/date-range/date-range-pr
 import DateRangeDrawer from "@/features/event/editor/date-range/drawer";
 import EventTypeSelect from "@/features/event/editor/date-range/event-type-select";
 import DateRangePopover from "@/features/event/editor/date-range/popover";
+import ShortcutTrigger from "@/features/system-feedback/hotkeys/components/shortcut-trigger";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
@@ -33,7 +34,14 @@ export default function DateRangeSelection({
           <CalendarsIcon className="h-4 w-4" strokeWidth={2} />
           Event Type
         </label>
-        <EventTypeSelect id="event-type-select" disabled={editing} />
+        <ShortcutTrigger
+          hotkey="t"
+          selector="#event-type-select"
+          tooltipSide="right"
+          disabled={editing}
+        >
+          <EventTypeSelect id="event-type-select" disabled={editing} />
+        </ShortcutTrigger>
       </div>
       <div className="flex w-fit flex-col justify-center gap-1">
         <div
@@ -50,11 +58,13 @@ export default function DateRangeSelection({
         </div>
 
         {eventRange?.type === "specific" ? (
-          <SpecificDateRangeDisplay
-            eventRange={eventRange}
-            editing={editing}
-            originalEventRange={originalEventRange as SpecificDateRange}
-          />
+          <ShortcutTrigger hotkey="d" tooltipSide="right">
+            <SpecificDateRangeDisplay
+              eventRange={eventRange}
+              editing={editing}
+              originalEventRange={originalEventRange as SpecificDateRange}
+            />
+          </ShortcutTrigger>
         ) : (
           <WeekdayCalendar
             selectedDays={eventRange?.weekdays}
