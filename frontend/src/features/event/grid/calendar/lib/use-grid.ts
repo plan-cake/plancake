@@ -60,16 +60,14 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
       dayBlock.firstOfMonth = newMonth;
     }
 
-    const sortedWeeks = Object.values(weeks).sort((a, b) =>
-      a.weekStart < b.weekStart ? -1 : 1,
-    );
+    const weekValues = Object.values(weeks); // Already sorted from timeslot sorting
 
     const weekBlocks: CalendarGridWeek[][] = [];
-    let currentWeekBlock = [sortedWeeks[0]];
-    for (let i = 1; i < sortedWeeks.length; i++) {
-      const week = sortedWeeks[i];
+    let currentWeekBlock = [weekValues[0]];
+    for (let i = 1; i < weekValues.length; i++) {
+      const week = weekValues[i];
       const weekStart = new Date(week.weekStart);
-      const prevWeekStart = new Date(sortedWeeks[i - 1].weekStart);
+      const prevWeekStart = new Date(weekValues[i - 1].weekStart);
       const dateDiff =
         (Date.UTC(
           weekStart.getFullYear(),
