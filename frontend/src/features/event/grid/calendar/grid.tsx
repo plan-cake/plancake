@@ -1,4 +1,5 @@
 import { createEmptyUserAvailability } from "@/core/availability/utils";
+import { ALL_WEEKDAYS } from "@/core/event/types";
 import useCalendarGridInfo from "@/features/event/grid/calendar/lib/use-grid";
 import InteractiveWeekBlock from "@/features/event/grid/calendar/weekblocks/interactive";
 import PreviewWeekBlock from "@/features/event/grid/calendar/weekblocks/preview";
@@ -42,13 +43,31 @@ export default function CalendarGrid({
   return (
     <div
       className={cn(
-        "w-full select-none p-2",
+        "relative flex w-full select-none flex-col gap-3 p-2",
         !isMobile && "overflow-y-auto",
         mode === "preview" ? "bg-background md:bg-panel pb-6" : "bg-background",
       )}
       style={{ viewTransitionName: "grid" }}
       id={GRID_ID}
     >
+      <div
+        className={cn(
+          mode === "preview" ? "bg-background md:bg-panel" : "bg-background",
+          "sticky top-[var(--header-height)] md:top-0",
+          "z-10 flex h-[25px] w-full",
+        )}
+      >
+        {ALL_WEEKDAYS.map((day, index) => {
+          return (
+            <div
+              key={index}
+              className="flex h-full w-full items-center justify-center text-sm"
+            >
+              {day}
+            </div>
+          );
+        })}
+      </div>
       <div
         className="relative flex flex-col gap-2"
         onMouseLeave={() => {
