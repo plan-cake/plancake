@@ -80,30 +80,21 @@ function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
   if (checkUnselectedRange(range)) return [];
 
   // Validate Duration
-  const startDate = parseISO(range.dateRange.from!.split("T")[0]);
-  const endDate = parseISO(range.dateRange.to!.split("T")[0]);
-
-  if (checkDateRange(startDate, endDate)) {
+  if (checkDateRange(new Set(range.dates))) {
     return [];
   }
 
   // Generate Slots
   const slots: Date[] = [];
-  const days = eachDayOfInterval({
-    start: startDate,
-    end: endDate,
-  });
 
   const nonNullTimeRange = {
     from: range.timeRange.from!,
     to: range.timeRange.to!,
   };
 
-  for (const day of days) {
-    const dayStr = format(day, "yyyy-MM-dd");
-
+  for (const day of range.dates) {
     const { startUTC, endUTC } = getDailyBoundariesInUTC(
-      dayStr,
+      day,
       range.timezone,
       nonNullTimeRange,
     );
@@ -138,7 +129,7 @@ function generateSlotsForWeekdayRange(range: WeekdayRange): Date[] {
     const currentDayIndex = getDay(currentDay);
     const dayName = ALL_WEEKDAYS[currentDayIndex];
 
-    if (range.weekdays.includes(dayName)) {
+    if (range.weekdays.has(dayName)) {
       const dayStr = format(currentDay, "yyyy-MM-dd");
 
       const { startUTC, endUTC } = getDailyBoundariesInUTC(

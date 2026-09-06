@@ -65,6 +65,7 @@ export default function useGridInfo(
  * grid components.
  *
  * @returns:
+ * - dateBlocks: Array of dateblocks for the visible date ranges
  * - timeblocks: Array of timeblocks with start and end hours
  * - days: Array of unique days the timeslots span
  * - slotsByDay: Map of day string to array of timeslots on that day
@@ -104,23 +105,61 @@ function processTimeslots(timeslots: Date[], timezone: string) {
   const startHour = start.getHours();
   const endHour = end.getHours();
 
-  const timeblocks = [];
+  const timeBlocks = [];
   if (endHour < startHour) {
-    timeblocks.push({ startHour: 0, endHour: endHour });
-    timeblocks.push({ startHour: startHour, endHour: 23 });
+    timeBlocks.push({ startHour: 0, endHour: endHour });
+    timeBlocks.push({ startHour: startHour, endHour: 23 });
   } else {
-    timeblocks.push({ startHour: startHour, endHour: endHour });
+    timeBlocks.push({ startHour: startHour, endHour: endHour });
   }
 
-  return { timeblocks, days, slotsByDay };
+  /* DATEBLOCKS */
+  const dateBlocks = [];
+  days.sort((a, b) => (a.dayKey < b.dayKey ? -1 : 1));
+  let lastBlock: { start: number; end: number } | null = null;
+  for (let i = 0; i < days.length; i++) {
+    const day = days[i];
+    if (lastBlock) {
+      const lastDate = new Date(days[lastBlock.end].dayKey);
+      const currentDate = new Date(day.dayKey);
+      const diffDays =
+        (currentDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+
+      if (diffDays > 1) {
+        dateBlocks.push({
+          startDay: lastBlock.start,
+          endDay: lastBlock.end,
+        });
+        lastBlock = {
+          start: i,
+          end: i,
+        };
+      }
+    } else {
+      lastBlock = {
+        start: i,
+        end: i,
+      };
+    }
+
+    lastBlock.end = i;
+  }
+  if (lastBlock) {
+    dateBlocks.push({
+      startDay: lastBlock.start,
+      endDay: lastBlock.end,
+    });
+  }
+
+  return { dateBlocks, timeBlocks, days, slotsByDay };
 }
 
 /**
  * Organizes the processed timeslot data into a view suitable for the grid,
- * applying pagination and preparing timeblocks for the visible days.
+ * applying pagination and preparing dateblocks and timeblocks for the visible days.
  *
  * @returns:
- * - timeBlocks: Array of processed timeblocks for the visible days
+ * - dateBlocks: Array of processed dateblocks with timeblocks for the visible days
  * - visibleDays: Array of days to be displayed on the current page
  * - totalPages: Total number of pages based on daysPerPage
  * - error: Error message if applicable
@@ -132,28 +171,71 @@ function organizeGridView(
 ) {
   if (!data) {
     return {
-      timeBlocks: [],
+      dateBlocks: [],
+      dateBlockGaps: {
+        startGap: false,
+        endGap: false,
+        middleGaps: new Set<number>(),
+      },
       visibleDays: [],
       totalPages: 1,
       error: MESSAGES.ERROR_EVENT_RANGE_INVALID,
     };
   }
 
-  const { days, slotsByDay, timeblocks } = data;
+  const { days, slotsByDay, dateBlocks, timeBlocks } = data;
 
   /* PAGINATION LOGIC */
   const totalPages = Math.max(1, Math.ceil(days.length / daysPerPage));
   const safePage = Math.min(Math.max(0, currentPage), totalPages - 1);
   const startIndex = safePage * daysPerPage;
+  const endIndex = startIndex + daysPerPage - 1;
   const visibleDays = days.slice(startIndex, startIndex + daysPerPage);
+  const processedDateBlocks = [];
+  const dateBlockGaps = {
+    startGap: false,
+    endGap: false,
+    middleGaps: new Set<number>(),
+  };
 
-  /* PROCESS TIMEBLOCKS */
-  const timeBlocks = timeblocks.map((block) =>
-    processTimeblock(block, visibleDays, slotsByDay),
-  );
+  const currentBlocks = dateBlocks.filter((block) => {
+    return block.startDay <= endIndex && block.endDay >= startIndex;
+  });
+
+  let runningDayCount = 0;
+  for (let i = 0; i < currentBlocks.length; i++) {
+    const block = currentBlocks[i];
+
+    const startDay = Math.max(block.startDay, startIndex);
+    const endDay = Math.min(block.endDay, endIndex);
+    const blockDays = days.slice(startDay, endDay + 1);
+    const isLastBlock = i === currentBlocks.length - 1;
+
+    /* PROCESS TIMEBLOCKS */
+    const processedTimeBlocks = timeBlocks.map((timeBlock) =>
+      processTimeblock(timeBlock, blockDays, slotsByDay),
+    );
+
+    if (!isLastBlock) {
+      runningDayCount += blockDays.length;
+      dateBlockGaps.middleGaps.add(runningDayCount - 1);
+    }
+    if (i === 0 && block.startDay === startDay && safePage > 0) {
+      dateBlockGaps.startGap = true;
+    }
+    if (isLastBlock && block.endDay === endDay && safePage < totalPages - 1) {
+      dateBlockGaps.endGap = true;
+    }
+
+    processedDateBlocks.push({
+      numDays: blockDays.length,
+      timeBlocks: processedTimeBlocks,
+    });
+  }
 
   return {
-    timeBlocks,
+    dateBlocks: processedDateBlocks,
+    dateBlockGaps,
     visibleDays,
     totalPages,
     error: null,

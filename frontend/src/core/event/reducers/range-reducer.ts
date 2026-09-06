@@ -12,11 +12,11 @@ export type EventRangeAction =
   | { type: "SET_RANGE_TYPE"; payload: EventType }
   | {
       type: "SET_DATE_RANGE";
-      payload: { from: string | null; to: string | null };
+      payload: Set<string>;
     }
   | { type: "SET_START_TIME"; payload: string | null }
   | { type: "SET_END_TIME"; payload: string | null }
-  | { type: "SET_WEEKDAYS"; payload: Weekday[] }
+  | { type: "SET_WEEKDAYS"; payload: Set<Weekday> }
   | { type: "SET_TIMEZONE"; payload: string }
   | { type: "RESET" };
 
@@ -45,7 +45,7 @@ export function EventRangeReducer(
         return {
           ...baseEvent,
           type: "specific",
-          dateRange: DEFAULT_RANGE_SPECIFIC.dateRange,
+          dates: DEFAULT_RANGE_SPECIFIC.dates,
         };
       } else {
         return {
@@ -63,10 +63,7 @@ export function EventRangeReducer(
 
       return {
         ...state,
-        dateRange: {
-          from: action.payload.from,
-          to: action.payload.to,
-        },
+        dates: action.payload,
       };
     }
 

@@ -6,15 +6,11 @@ export default function PreviewTimeBlock({
   numQuarterHours,
   timeslots,
   numVisibleDays,
-  hasNext = false,
-  hasPrev = false,
 }: PreviewTimeBlockProps) {
   return (
     <BaseTimeBlock
       numQuarterHours={numQuarterHours}
       visibleDaysCount={numVisibleDays}
-      hasNext={hasNext}
-      hasPrev={hasPrev}
     >
       {timeslots.map(({ iso, coords, cellClasses }) => {
         const { row: gridRow, column: gridColumn } = coords;

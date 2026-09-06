@@ -75,8 +75,7 @@ export type EventDetails = {
   time_zone: string;
   is_creator: boolean;
   event_type: ApiEventType;
-  start_date: string;
-  end_date: string;
+  dates: string[];
   start_time: string;
   end_time: string;
 }
@@ -116,8 +115,7 @@ export type AllAvailability = {
 export type DashboardEvent = {
   title: string;
   event_type: ApiEventType;
-  start_date: string;
-  end_date: string;
+  dates: string[];
   start_time: string;
   end_time: string;
   time_zone: string;

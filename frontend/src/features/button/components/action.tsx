@@ -17,6 +17,7 @@ const ActionButton = forwardRef<Ref, ActionButtonProps>(
       disabled = false,
       onClick,
       loadOnSuccess = false,
+      fullWidth = false,
       className,
       ...props
     },
@@ -34,6 +35,7 @@ const ActionButton = forwardRef<Ref, ActionButtonProps>(
         disabled={disabled}
         onClick={onClick}
         loadOnSuccess={loadOnSuccess}
+        fullWidth={fullWidth}
         className={className}
         ref={ref}
         {...props}
