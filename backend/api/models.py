@@ -97,6 +97,7 @@ class UserEvent(models.Model):
     class EventType(models.TextChoices):
         GENERIC = "GENERIC", "Generic"
         SPECIFIC = "SPECIFIC", "Specific"
+        CALENDAR = "CALENDAR", "Calendar"
 
     date_type = models.CharField(
         max_length=20,
@@ -205,6 +206,30 @@ class EventDateTimeslot(models.Model):
         indexes = [models.Index(fields=["user_event", "utc_timeslot"])]
 
 
+class EventCalendarTimeslot(models.Model):
+    """
+    Timeslot for calendar events.
+
+    The timeslots in this model are stored as dates only. They are not affected by time
+    zones or daylight saving time.
+    """
+
+    event_calendar_timeslot_id = models.AutoField(primary_key=True)
+    user_event = models.ForeignKey(
+        UserEvent, on_delete=models.CASCADE, related_name="calendar_timeslots"
+    )
+    date = models.DateField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user_event", "date"],
+                name="unique_calendar_timeslot_per_event",
+            )
+        ]
+        indexes = [models.Index(fields=["user_event", "date"])]
+
+
 class EventWeekdayAvailability(models.Model):
     event_weekday_availability_id = models.AutoField(primary_key=True)
     event_participant = models.ForeignKey(
@@ -254,6 +279,33 @@ class EventDateAvailability(models.Model):
             models.UniqueConstraint(
                 fields=["event_participant", "event_date_timeslot"],
                 name="unique_participant_date_timeslot",
+            )
+        ]
+        indexes = [models.Index(fields=["event_participant"])]
+
+
+class EventCalendarAvailability(models.Model):
+    event_calendar_availability_id = models.AutoField(primary_key=True)
+    event_participant = models.ForeignKey(
+        EventParticipant,
+        on_delete=models.CASCADE,
+        related_name="event_calendar_availabilities",
+    )
+    event_calendar_timeslot = models.ForeignKey(
+        EventCalendarTimeslot,
+        on_delete=models.CASCADE,
+        related_name="participant_availabilities",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=AvailabilityStatus.choices,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["event_participant", "event_calendar_timeslot"],
+                name="unique_participant_calendar_timeslot",
             )
         ]
         indexes = [models.Index(fields=["event_participant"])]
