@@ -1,8 +1,10 @@
 "use client";
 
-import { cloneElement, ReactElement, useEffect, useRef, useState } from "react";
+import { cloneElement, ReactElement } from "react";
 
-import { useHeaderSize } from "@/features/header/context";
+import { motion, useTransform } from "framer-motion";
+
+import { useHeader } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
 type HeaderButtonStyle = "frosted glass inset" | "primary";
@@ -18,26 +20,24 @@ export default function ShrinkingHeaderButton({
   label?: string;
   children: React.ReactNode;
 }) {
-  const { isShrunk } = useHeaderSize();
-  const [showButton, setShowButton] = useState(!isShrunk);
-  const buttonShowTimeout = useRef<NodeJS.Timeout | null>(null);
+  const { isFullSize, shrinkAmount } = useHeader();
 
-  useEffect(() => {
-    if (buttonShowTimeout.current) {
-      clearTimeout(buttonShowTimeout.current);
-    }
-    if (isShrunk) {
-      setShowButton(false);
-    } else {
-      buttonShowTimeout.current = setTimeout(() => setShowButton(true), 250);
-    }
-
-    return () => {
-      if (buttonShowTimeout.current) {
-        clearTimeout(buttonShowTimeout.current);
-      }
-    };
-  }, [isShrunk]);
+  const iconStyle = useTransform(shrinkAmount, [0, 1], {
+    height: [24, 0],
+    width: [24, 0],
+    padding: [2, 0],
+    opacity: [1, 0],
+  });
+  const textStyle = useTransform(shrinkAmount, [0, 1], {
+    height: [24, 0],
+    paddingLeft: [8, 4],
+    paddingRight: [8, 4],
+    opacity: [1, 0],
+    fontSize: ["16px", "0px"],
+  });
+  const containerStyle = useTransform(shrinkAmount, [0, 1], {
+    padding: [8, 6],
+  });
 
   if (icon && label) {
     throw new Error("ShrinkingHeaderButton cannot have both icon and label");
@@ -53,42 +53,33 @@ export default function ShrinkingHeaderButton({
       : "frosted-glass-inset text-foreground";
 
   // Same as the button component, setting the icon size here
-  const iconComponent =
-    icon &&
-    cloneElement(icon as ReactElement<{ className: string }>, {
-      className: cn(
-        "header-transition-[height,width,padding,opacity]",
-        isShrunk ? "h-0 w-0 p-0 opacity-0" : "h-6 w-6 p-0.5",
-      ),
-    });
+  const iconComponent = icon && (
+    <motion.div style={iconStyle}>
+      {cloneElement(icon as ReactElement<{ className: string }>, {
+        className: "h-full w-full",
+      })}
+    </motion.div>
+  );
 
   // This is honestly pretty tailored to the "Log In" button size, but no other text
   // buttons exist in the header on mobile and probably never will
   const textComponent = label && (
-    <div
-      className={cn(
-        "header-transition-[height,padding,opacity,font-size]",
-        isShrunk ? "h-0 px-1 text-[0px] opacity-0" : "h-6 px-2 opacity-100",
-      )}
-    >
-      {label}
-    </div>
+    <motion.div style={textStyle}>{label}</motion.div>
   );
 
   return (
     <div>
-      <div
+      <motion.div
         className={cn(
           "rounded-full",
-          "header-transition-[padding]",
-          isShrunk ? "p-1.5" : "p-2",
-          showButton ? "absolute opacity-0" : "",
+          isFullSize ? "absolute opacity-0" : "",
           styleClass,
         )}
+        style={containerStyle}
       >
         {icon ? iconComponent : textComponent}
-      </div>
-      <div className={showButton ? "" : "hidden"}>{children}</div>
+      </motion.div>
+      <div className={isFullSize ? "" : "hidden"}>{children}</div>
     </div>
   );
 }
