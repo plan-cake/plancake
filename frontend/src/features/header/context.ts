@@ -2,32 +2,28 @@
 
 import { createContext, useContext } from "react";
 
-import { HeaderHeightClass, HeaderMarginClass } from "@/features/header/type";
+import { MotionValue } from "framer-motion";
 
-export const HeaderSizeContext = createContext<{
-  isShrunk: boolean;
-  heightClass: HeaderHeightClass;
-  topMarginClass: HeaderMarginClass;
-  shrink: () => void;
+export const HeaderContext = createContext<{
+  isFullSize: boolean;
+  shrinkAmount: MotionValue;
   expand: () => void;
   activeMenu: string | null;
   setActiveMenu: (menu: string | null) => void;
 }>({
-  isShrunk: false,
-  heightClass: "header-transition-[height] h-23",
-  topMarginClass: "header-transition-[top] top-23",
-  shrink: () => {},
+  isFullSize: true,
+  shrinkAmount: new MotionValue(0),
   expand: () => {},
   activeMenu: null,
   setActiveMenu: () => {},
 });
 
-export function useHeaderSize() {
-  const context = useContext(HeaderSizeContext);
+export function useHeader() {
+  const context = useContext(HeaderContext);
   if (!context) {
-    throw new Error("useHeaderSize must be used within a HeaderSizeProvider");
+    throw new Error("useHeader must be used within a HeaderProvider");
   }
   return context;
 }
 
-export default HeaderSizeContext;
+export default HeaderContext;
