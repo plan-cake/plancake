@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { TriangleAlertIcon } from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
-import { StandardDrawer } from "@/features/drawer";
+import { FloatingDrawer } from "@/features/drawer";
 import {
   Calendar,
   CalendarHandle,
@@ -35,7 +35,7 @@ export default function DateRangeDrawer({
   }, [open]);
 
   return (
-    <StandardDrawer
+    <FloatingDrawer
       open={open}
       onOpenChange={setOpen}
       contentClassName="h-2/3"
@@ -77,6 +77,6 @@ export default function DateRangeDrawer({
         setDateRange={setDateRange}
         dateRangeError={errors.dateRange}
       />
-    </StandardDrawer>
+    </FloatingDrawer>
   );
 }

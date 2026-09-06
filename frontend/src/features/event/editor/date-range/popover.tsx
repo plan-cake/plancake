@@ -31,7 +31,7 @@ export default function DateRangePopover({
           align="start"
           sideOffset={10}
           className={cn(
-            "bg-background z-50 rounded-2xl border border-gray-400 p-4 shadow-lg",
+            "bg-background border-accent z-50 rounded-2xl border p-4 shadow-lg",
             "data-[state=open]:animate-slideUpAndFade",
             "data-[state=closed]:animate-slideDownAndFadeOut",
           )}
