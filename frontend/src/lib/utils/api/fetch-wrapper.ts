@@ -18,6 +18,11 @@ export class ApiErrorResponse extends Error {
    */
   readonly rateLimited: boolean;
   /**
+   * If the error is due to a failed CAPTCHA verification (status code 400 with a specific
+   * error message)
+   */
+  readonly captchaFailed: boolean;
+  /**
    * If the error is due to a server error (status code 500-599)
    */
   readonly serverError: boolean;
@@ -32,6 +37,9 @@ export class ApiErrorResponse extends Error {
     this.data = data;
     this.badRequest = status >= 400 && status < 500;
     this.rateLimited = status === 429;
+    this.captchaFailed =
+      status === 400 &&
+      (data.error.general?.includes("CAPTCHA verification failed.") ?? false);
     this.serverError = status >= 500;
     this.formattedMessage = formatApiError(data);
   }

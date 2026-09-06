@@ -2,9 +2,10 @@
 
 import { memo, useMemo, useState } from "react";
 
-import { TriangleAlertIcon } from "lucide-react";
+import { ClockIcon, TriangleAlertIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import Captcha from "@/components/captcha";
 import MobileFooterIsland from "@/components/mobile-footer-island";
 import SegmentedControl from "@/components/segmented-control";
 import TextInputField from "@/components/text-input-field";
@@ -59,10 +60,18 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   const { title, customCode, eventRange, timeslots } = state;
   const router = useRouter();
 
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
+
   const [mobileTab, setMobileTab] = useState<SegmentedControlOption>("details");
 
   // CHECK FIELDS
   const invalidForm = useMemo(() => {
+    if (captchaInitError) {
+      return MESSAGES.ERROR_CAPTCHA_BLOCKED;
+    }
+
     let eventNotEdited = false;
     if (type === "edit" && initialData && initialData.originalEventRange) {
       const sameTitle = title.trim() === initialData.title.trim();
@@ -105,7 +114,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         : Object.keys(errors).length || title.length > MAX_TITLE_LENGTH
           ? MESSAGES.FORM_HAS_ERRORS
           : undefined;
-  }, [title, eventRange, type, initialData, errors]);
+  }, [captchaInitError, title, eventRange, type, initialData, errors]);
 
   // SUBMIT EVENT INFO
   const submitEventInfo = async () => {
@@ -113,8 +122,14 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
     try {
       const validationErrors = await validateEventData(type, state);
+
       if (Object.keys(validationErrors).length > 0) {
         batchHandleErrors(validationErrors);
+        return false;
+      }
+
+      if (type == "new" && !captchaToken) {
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
         return false;
       }
 
@@ -122,6 +137,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         { title, code: customCode, eventRange, timeslots },
         type,
         eventRange.type,
+        captchaToken,
         (code: string) => router.push(`/${code}`),
         handleError,
       );
@@ -149,7 +165,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       label={type === "edit" ? "Update Event" : "Create Event"}
       tooltip={desktop && invalidForm ? invalidForm : undefined}
       onClick={submitEventInfo}
-      disabled={desktop && !!invalidForm}
+      disabled={(desktop && !!invalidForm) || captchaInitError}
       loadOnSuccess
     />
   );
@@ -170,6 +186,15 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       {/* Rate Limit Error */}
       {errors.rate_limit && (
         <RateLimitBanner>{errors.rate_limit}</RateLimitBanner>
+      )}
+
+      {type === "new" && (
+        <Captcha
+          backendVerificationFailed={!!errors.captcha}
+          onTokenChange={setCaptchaToken}
+          onClearBackendError={() => handleError("captcha", "")}
+          onInitError={() => setCaptchaInitError(true)}
+        />
       )}
 
       <div className="-mb-1 flex w-full items-center justify-between">
@@ -204,12 +229,15 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         <DateRangeSelection editing={type === "edit"} />
 
         <div className="flex flex-col gap-1">
-          <p
+          <div
             className={`flex items-center gap-2 font-bold md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
           >
+            <ClockIcon className="h-4 w-4" strokeWidth={2} />
             Possible Times
-            {errors.timeRange && <TriangleAlertIcon className="h-4 w-4" />}
-          </p>
+            {errors.timeRange && (
+              <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
+            )}
+          </div>
           <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
             <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
               <TimeSelector

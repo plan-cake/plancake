@@ -1,25 +1,33 @@
+import { motion, useTransform } from "framer-motion";
 import Link from "next/link";
 
 import LinkText from "@/components/link-text";
 import Logo from "@/components/logo";
+import { useHeader } from "@/features/header/context";
 import { getCurrentVersion } from "@/features/version-history/data";
 import { cn } from "@/lib/utils/classname";
 
-export default function LogoArea({ isShrunk = false }: { isShrunk?: boolean }) {
+export default function LogoArea() {
+  const { isFullSize, shrinkAmount } = useHeader();
+
+  const versionStyle = useTransform(shrinkAmount, [0, 1], {
+    opacity: [1, 0],
+  });
+
   return (
     <div>
       <Link href="/">
-        <Logo oneLine={isShrunk} />
+        <Logo shrinkOnScroll />
       </Link>
-      <Link
-        href="/version-history"
-        className={cn(
-          "header-transition-[opacity] text-xs",
-          isShrunk ? "opacity-0" : "opacity-100",
-        )}
-      >
-        <LinkText unbolded>{getCurrentVersion()}</LinkText>
-      </Link>
+      <motion.div style={versionStyle}>
+        <Link
+          href="/version-history"
+          className={cn("text-xs", !isFullSize && "pointer-events-none")}
+          tabIndex={isFullSize ? undefined : -1}
+        >
+          <LinkText unbolded>{getCurrentVersion()}</LinkText>
+        </Link>
+      </motion.div>
     </div>
   );
 }

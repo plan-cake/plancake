@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
+import { GlobeIcon } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
+import Captcha from "@/components/captcha";
 import Checkbox from "@/components/checkbox";
 import MobileFooterIsland from "@/components/mobile-footer-island";
 import TextInputField from "@/components/text-input-field";
@@ -56,6 +58,10 @@ export default function ClientPage({
   );
   const { displayName, timeZone, userAvailability } = state;
 
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
+
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
   const { errors, handleError, clearAllErrors } = useFormErrors();
@@ -92,6 +98,10 @@ export default function ClientPage({
 
   // FORM VALIDATION
   const invalidForm = useMemo(() => {
+    if (captchaInitError) {
+      return MESSAGES.ERROR_CAPTCHA_BLOCKED;
+    }
+
     const hasName = displayName && displayName.trim();
     const hasAvailability = userAvailability && userAvailability.size > 0;
 
@@ -104,7 +114,7 @@ export default function ClientPage({
         : !hasAvailability
           ? "Please select your availability on the grid."
           : undefined;
-  }, [displayName, userAvailability, errors]);
+  }, [captchaInitError, displayName, userAvailability, errors]);
 
   const checkNameAvailability = useDebouncedCallback(async (displayName) => {
     try {
@@ -189,6 +199,11 @@ export default function ClientPage({
       }
     }
 
+    if (!captchaToken) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      return false;
+    }
+
     // Save the default name if checkbox checked
     if (saveDefaultName) {
       if (session.isLoggedIn) {
@@ -218,6 +233,7 @@ export default function ClientPage({
       display_name: displayName,
       availability: payload_availability,
       time_zone: timeZone,
+      captcha_token: captchaToken,
     };
 
     try {
@@ -231,6 +247,8 @@ export default function ClientPage({
           "rate_limit",
           error.formattedMessage || MESSAGES.ERROR_RATE_LIMIT,
         );
+      } else if (error.captchaFailed) {
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       } else {
         addToast("error", error.formattedMessage);
       }
@@ -257,7 +275,7 @@ export default function ClientPage({
       }
       tooltip={desktop && invalidForm ? invalidForm : undefined}
       onClick={handleSubmitAvailability}
-      disabled={desktop && !!invalidForm}
+      disabled={(desktop && !!invalidForm) || captchaInitError}
       loadOnSuccess
     />
   );
@@ -270,6 +288,14 @@ export default function ClientPage({
       {errors.rate_limit && (
         <RateLimitBanner>{errors.rate_limit}</RateLimitBanner>
       )}
+
+      {/* CAPTCHA + Error */}
+      <Captcha
+        backendVerificationFailed={!!errors.captcha}
+        onTokenChange={setCaptchaToken}
+        onClearBackendError={() => handleError("captcha", "")}
+        onInitError={() => setCaptchaInitError(true)}
+      />
 
       {/* Header and Button Row */}
       <div className="flex w-full flex-wrap justify-between md:flex-row">
@@ -294,7 +320,10 @@ export default function ClientPage({
           />
 
           <div className="bg-panel rounded-3xl p-6 text-sm">
-            Displaying event in
+            <div className="flex items-center gap-1">
+              <GlobeIcon className="h-3.5 w-3.5" />
+              Displaying event in
+            </div>
             <TimeZoneSelector
               id="timezone-select"
               value={timeZone}
@@ -320,7 +349,10 @@ export default function ClientPage({
         />
 
         <div className="bg-panel rounded-3xl p-6 text-sm md:hidden">
-          Displaying event in
+          <div className="flex items-center gap-1">
+            <GlobeIcon className="h-3.5 w-3.5" />
+            Displaying event in
+          </div>
           <TimeZoneSelector
             id="timezone-select"
             value={timeZone}

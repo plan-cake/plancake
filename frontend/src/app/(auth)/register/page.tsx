@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import Captcha from "@/components/captcha";
 import AuthPageLayout from "@/components/layout/auth-page";
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
@@ -26,6 +27,10 @@ export default function Page() {
   const router = useRouter();
   const isMobile = useCheckMobile();
 
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
+
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
@@ -35,18 +40,27 @@ export default function Page() {
 
   // CHECK FIELDS
   const invalidForm = useMemo(() => {
-    return !email || !email.trim() || !password
-      ? MESSAGES.FORM_NOT_FILLED
-      : !passwordIsStrong()
-        ? MESSAGES.ERROR_PASSWORD_WEAK
-        : !confirmPassword
-          ? MESSAGES.FORM_NOT_FILLED
-          : password !== confirmPassword
-            ? MESSAGES.ERROR_PASSWORD_MISMATCH
-            : Object.keys(errors).length
-              ? MESSAGES.FORM_HAS_ERRORS
-              : undefined;
-  }, [email, password, confirmPassword, passwordIsStrong, errors]);
+    return captchaInitError
+      ? MESSAGES.ERROR_CAPTCHA_BLOCKED
+      : !email || !email.trim() || !password
+        ? MESSAGES.FORM_NOT_FILLED
+        : !passwordIsStrong()
+          ? MESSAGES.ERROR_PASSWORD_WEAK
+          : !confirmPassword
+            ? MESSAGES.FORM_NOT_FILLED
+            : password !== confirmPassword
+              ? MESSAGES.ERROR_PASSWORD_MISMATCH
+              : Object.keys(errors).length
+                ? MESSAGES.FORM_HAS_ERRORS
+                : undefined;
+  }, [
+    captchaInitError,
+    email,
+    password,
+    confirmPassword,
+    passwordIsStrong,
+    errors,
+  ]);
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
@@ -90,9 +104,17 @@ export default function Page() {
       handleError("confirmPassword", MESSAGES.ERROR_PASSWORD_MISMATCH);
       return false;
     }
+    if (!captchaToken) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      return false;
+    }
 
     try {
-      await clientPost(ROUTES.auth.register, { email, password });
+      await clientPost(ROUTES.auth.register, {
+        email,
+        password,
+        captcha_token: captchaToken,
+      });
       sessionStorage.setItem("register_email", email);
       router.push("/register/email-sent");
       return true;
@@ -100,6 +122,8 @@ export default function Page() {
       const error = e as ApiErrorResponse;
       if (error.rateLimited) {
         handleError("rate_limit", error.formattedMessage);
+      } else if (error.captchaFailed) {
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       } else if (error.formattedMessage.includes("Email:")) {
         handleError("email", error.formattedMessage.split("Email:")[1].trim());
       } else if (error.formattedMessage.includes("Password:")) {
@@ -166,15 +190,23 @@ export default function Page() {
         />,
       ]}
     >
-      <div className="flex w-full justify-end">
-        <ActionButton
-          buttonStyle="primary"
-          label="Register"
-          tooltip={invalidForm}
-          onClick={handleSubmit}
-          disabled={!isMobile && !!invalidForm}
-          loadOnSuccess
+      <div className="space-y-4">
+        <Captcha
+          backendVerificationFailed={!!errors.captcha}
+          onTokenChange={setCaptchaToken}
+          onClearBackendError={() => handleError("captcha", "")}
+          onInitError={() => setCaptchaInitError(true)}
         />
+        <div className="flex w-full justify-end">
+          <ActionButton
+            buttonStyle="primary"
+            label="Register"
+            tooltip={invalidForm}
+            onClick={handleSubmit}
+            disabled={(!isMobile && !!invalidForm) || captchaInitError}
+            loadOnSuccess
+          />
+        </div>
       </div>
       <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
         <Link href="/forgot-password">
