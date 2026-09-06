@@ -47,9 +47,9 @@ class InvalidTimeslotError(Exception):
 
 
 @api_endpoint("POST")
-@require_captcha
 @require_auth
 @validate_json_input(AvailabilityAddSerializer)
+@require_captcha
 @validate_output(MessageOutputSerializer)
 def add_availability(request):
     """

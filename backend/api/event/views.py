@@ -76,9 +76,9 @@ INVALID_TIMESLOT_TIME_ERROR = Response(
 
 
 @api_endpoint("POST")
-@require_captcha
 @require_auth
 @validate_json_input(DateEventCreateSerializer)
+@require_captcha
 @validate_output(EventCodeSerializer)
 def create_date_event(request):
     """
@@ -140,9 +140,9 @@ def create_date_event(request):
 
 
 @api_endpoint("POST")
-@require_captcha
 @require_auth
 @validate_json_input(WeekEventCreateSerializer)
+@require_captcha
 @validate_output(EventCodeSerializer)
 def create_week_event(request):
     """
