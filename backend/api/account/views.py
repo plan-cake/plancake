@@ -29,6 +29,7 @@ from api.models import AuthedPasswordResetCode, UserSession
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
     AUTHED_PWD_RESET_EXP_SECONDS,
+    GENERIC_ERR_RESPONSE,
     LONG_SESS_EXP_SECONDS,
     SEND_EMAILS,
     SESS_EXP_SECONDS,
@@ -107,11 +108,13 @@ def get_active_sessions(request):
         user_account=user,
     ).order_by("-last_used")
 
-    active_sessions = []
+    current_session = None
+    other_sessions = []
 
     for session in sessions:
         session_data = {
             "public_id": session.public_id,
+            "created_at": session.created_at,
             "last_used": session.last_used,
             "is_current": session.session_token
             == request.COOKIES.get(ACCOUNT_COOKIE_NAME),
@@ -123,9 +126,26 @@ def get_active_sessions(request):
             session_data["os_version"] = device.os_version() or None
             session_data["client_name"] = device.client_name() or None
             session_data["client_version"] = device.client_version() or None
-        active_sessions.append(session_data)
 
-    return Response({"sessions": active_sessions}, status=200)
+        if session_data["is_current"]:
+            if current_session is not None:
+                logger.error(
+                    f"Multiple sessions matching session token for user: {user.id}."
+                )
+            current_session = session_data
+        else:
+            other_sessions.append(session_data)
+
+    if current_session is None:
+        logger.error(
+            f"No session matching session token for user, despite being authenticated: {user.id}."
+        )
+        return GENERIC_ERR_RESPONSE
+
+    return Response(
+        {"current_session": current_session, "other_sessions": other_sessions},
+        status=200,
+    )
 
 
 @api_endpoint("POST")
