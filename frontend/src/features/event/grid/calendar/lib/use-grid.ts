@@ -31,6 +31,16 @@ function createWeek(weekStart: Date): CalendarGridWeek {
   };
 }
 
+function getShiftedDate(date: Date, daysToShift: number): Date {
+  const shiftedDate = new Date(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+  );
+  shiftedDate.setDate(shiftedDate.getDate() + daysToShift);
+  return shiftedDate;
+}
+
 export default function useCalendarGridInfo(timeslots: Date[]) {
   // Organize into weekblocks
   return useMemo(() => {
@@ -81,10 +91,20 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
           )) /
         (1000 * 60 * 60 * 24);
 
-      if (dateDiff > 7) {
+      if (dateDiff > 21) {
         weekBlocks.push(currentWeekBlock);
         currentWeekBlock = [week];
       } else {
+        if (dateDiff > 7) {
+          const nextWeekStart = getShiftedDate(prevWeekStart, 7);
+          const emptyWeek = createWeek(nextWeekStart);
+          currentWeekBlock.push(emptyWeek);
+        }
+        if (dateDiff > 14) {
+          const nextWeekStart = getShiftedDate(prevWeekStart, 14);
+          const emptyWeek = createWeek(nextWeekStart);
+          currentWeekBlock.push(emptyWeek);
+        }
         currentWeekBlock.push(week);
       }
     }
