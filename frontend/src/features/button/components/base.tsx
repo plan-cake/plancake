@@ -33,6 +33,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       loading = false,
       disabled = false,
       href,
+      target,
       onClick,
       loadOnSuccess = false,
       fullWidth = false,
@@ -149,6 +150,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
             fullWidth && "block w-full",
           )}
           href={href!}
+          target={target ?? undefined}
         >
           {buttonContent}
         </Link>
