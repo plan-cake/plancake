@@ -120,7 +120,9 @@ function CalendarDay({
         {firstOfMonth && (
           <div
             className={cn(
-              "bg-foreground text-background absolute -top-2.5 left-[50%] translate-x-[-50%] rounded-full px-1.5 py-0.5 text-sm leading-none",
+              "absolute -top-2.5 left-[50%] translate-x-[-50%]",
+              "rounded-full px-1.5 py-0.5 text-xs leading-none",
+              `bg-${backgroundColor} border-foreground border`,
             )}
           >
             <span className="lg:hidden">{shortMonthString}</span>
