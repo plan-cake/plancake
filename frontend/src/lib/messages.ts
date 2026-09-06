@@ -9,6 +9,7 @@ export const MESSAGES = {
   // generic errors
   ERROR_GENERIC: "An error occurred. Please try again.",
   ERROR_RATE_LIMIT: "Too many requests. Please try again later.",
+  ERROR_CAPTCHA_FAILED: "CAPTCHA verification failed. Please try again.",
 
   // auth errors
   ERROR_EMAIL_MISSING: "Missing email.",
