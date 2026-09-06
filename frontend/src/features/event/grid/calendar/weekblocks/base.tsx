@@ -5,9 +5,11 @@ import { CalendarGridWeek } from "@/features/event/grid/calendar/types";
 
 export default function BaseWeekBlock({
   weeks,
+  backgroundColor,
   getDayProps,
 }: {
   weeks: CalendarGridWeek[];
+  backgroundColor: string;
   getDayProps?: (dayString: string) => Partial<CalendarDayProps>;
 }) {
   return (
@@ -33,6 +35,7 @@ export default function BaseWeekBlock({
             gridColumn: dIndex + 1,
             gridRow: wIndex + 1,
             numRows: weeks.length,
+            backgroundColor,
           };
 
           if (!day.exists) {

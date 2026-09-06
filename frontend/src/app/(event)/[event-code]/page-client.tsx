@@ -193,6 +193,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           mode="view"
           eventType={eventRange.type}
           timezone={timezone}
+          backgroundColor="background"
           hoveredSlot={hoveredSlot}
           setHoveredSlot={setHoveredSlot}
           availabilities={filteredAvailabilities}

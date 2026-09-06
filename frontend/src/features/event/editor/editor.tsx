@@ -25,6 +25,7 @@ import DateTimeGrid from "@/features/event/grid/date-time/grid";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { RateLimitBanner } from "@/features/system-feedback";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { MESSAGES } from "@/lib/messages";
 import submitEvent from "@/lib/utils/api/submit-event";
 import { cn } from "@/lib/utils/classname";
@@ -61,6 +62,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   } = useEventContext();
   const { title, customCode, eventRange, timeslots } = state;
   const router = useRouter();
+  const isMobile = useCheckMobile();
 
   const Grid =
     state.eventRange.type === "calendar"
@@ -128,6 +130,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     <Grid
       mode="preview"
       eventType={eventRange.type}
+      backgroundColor={isMobile ? "background" : "panel"}
       unselectedRange={checkUnselectedRange(eventRange)}
       timezone={eventRange.timezone}
       timeslots={timeslots}

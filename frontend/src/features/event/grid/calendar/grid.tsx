@@ -13,8 +13,9 @@ import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
 
 export default function CalendarGrid({
-  timeslots,
   mode,
+  timeslots,
+  backgroundColor,
   unselectedRange = false,
   availabilities = {},
   numParticipants = 0,
@@ -45,16 +46,17 @@ export default function CalendarGrid({
       className={cn(
         "relative flex w-full select-none flex-col gap-3 p-2",
         !isMobile && "overflow-y-auto",
-        mode === "preview" ? "bg-background md:bg-panel pb-6" : "bg-background",
+        mode === "preview" && "pb-6",
+        `bg-${backgroundColor}`,
       )}
       style={{ viewTransitionName: "grid" }}
       id={GRID_ID}
     >
       <div
         className={cn(
-          mode === "preview" ? "bg-background md:bg-panel" : "bg-background",
           "sticky top-[var(--header-height)] md:top-0",
           "z-10 flex h-[25px] w-full",
+          `bg-${backgroundColor}`,
         )}
       >
         {ALL_WEEKDAYS.map((day, index) => {
@@ -78,12 +80,19 @@ export default function CalendarGrid({
       >
         {weekBlocks.map((weekBlock, index) => {
           if (mode === "preview") {
-            return <PreviewWeekBlock key={index} weeks={weekBlock} />;
+            return (
+              <PreviewWeekBlock
+                key={index}
+                weeks={weekBlock}
+                backgroundColor={backgroundColor}
+              />
+            );
           } else if (mode === "paint") {
             return (
               <InteractiveWeekBlock
                 key={index}
                 weeks={weekBlock}
+                backgroundColor={backgroundColor}
                 timeslots={timeslots}
                 availability={userAvailability}
                 onToggle={onToggleSlot}
@@ -94,6 +103,7 @@ export default function CalendarGrid({
               <ResultsWeekBlock
                 key={index}
                 weeks={weekBlock}
+                backgroundColor={backgroundColor}
                 hoveredDay={hoveredSlot}
                 availabilities={availabilities}
                 numParticipants={numParticipants}

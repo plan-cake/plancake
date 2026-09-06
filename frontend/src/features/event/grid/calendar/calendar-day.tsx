@@ -19,6 +19,7 @@ export interface CalendarDayProps {
   gridColumn: number;
   gridRow: number;
   numRows: number;
+  backgroundColor: string;
 
   icon?: React.ReactElement;
 
@@ -41,6 +42,7 @@ function CalendarDay({
   gridColumn,
   gridRow,
   numRows,
+  backgroundColor,
   icon,
   dayClasses = "",
   ...eventHandlers
@@ -86,9 +88,10 @@ function CalendarDay({
       draggable={false}
       onContextMenu={(e) => e.preventDefault()}
       className={cn(
-        "bg-background relative flex-1",
+        `bg-${backgroundColor}`,
+        "relative flex-1",
         borderClasses,
-        disableSelect ? "md:bg-panel cursor-not-allowed" : "cursor-pointer",
+        disableSelect ? "cursor-not-allowed" : "cursor-pointer",
         dayClasses,
         "select-none",
         isHovered &&

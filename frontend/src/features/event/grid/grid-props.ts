@@ -9,6 +9,7 @@ export interface GridProps {
   timeslots: Date[];
   timezone: string;
   eventType: EventRange["type"];
+  backgroundColor: string;
 
   unselectedRange?: boolean;
 

@@ -6,6 +6,7 @@ import { CalendarGridWeek } from "@/features/event/grid/calendar/types";
 
 type CommonBlockProps = {
   weeks: CalendarGridWeek[];
+  backgroundColor: string;
 };
 
 export type PreviewWeekBlockProps = CommonBlockProps;

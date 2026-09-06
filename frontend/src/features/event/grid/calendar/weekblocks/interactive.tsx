@@ -6,6 +6,7 @@ import { dateToISOString } from "@/lib/utils/date-time-format";
 
 export default function InteractiveWeekBlock({
   weeks,
+  backgroundColor,
   timeslots,
   availability,
   onToggle,
@@ -23,6 +24,7 @@ export default function InteractiveWeekBlock({
   return (
     <BaseWeekBlock
       weeks={weeks}
+      backgroundColor={backgroundColor}
       getDayProps={(day) => {
         const dayIso = dateToISOString(day);
         const isSelected = availability.has(dayIso);
@@ -39,12 +41,12 @@ export default function InteractiveWeekBlock({
         } else if (isHovered || isToggling) {
           dayClasses = cn(
             dayClasses,
-            "bg-[color-mix(in_srgb,var(--color-background),var(--color-accent)_40%)]",
+            `bg-[color-mix(in_srgb,var(--color-${backgroundColor}),var(--color-accent)_40%)]`,
           );
         } else if (isSelected) {
           dayClasses = cn(dayClasses, "bg-accent text-white");
         } else {
-          dayClasses = cn(dayClasses, "bg-background");
+          dayClasses = cn(dayClasses, `bg-${backgroundColor}`);
         }
 
         return {

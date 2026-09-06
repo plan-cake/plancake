@@ -342,6 +342,7 @@ export default function ClientPage({
           mode="paint"
           eventType={eventRange.type}
           timezone={timeZone}
+          backgroundColor="background"
           onToggleSlot={toggleSlot}
           userAvailability={userAvailability}
           timeslots={timeslots}

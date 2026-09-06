@@ -7,6 +7,7 @@ import { dateToISOString } from "@/lib/utils/date-time-format";
 
 export default function ResultsWeekBlock({
   weeks,
+  backgroundColor,
   availabilities,
   numParticipants,
   highestMatchCount,
@@ -16,6 +17,7 @@ export default function ResultsWeekBlock({
   return (
     <BaseWeekBlock
       weeks={weeks}
+      backgroundColor={backgroundColor}
       getDayProps={(day) => {
         const dayIso = dateToISOString(day);
         const matchCount =
@@ -32,7 +34,7 @@ export default function ResultsWeekBlock({
         };
         const dayClasses = cn(
           "cursor-default",
-          "bg-[color-mix(in_srgb,var(--color-accent)_var(--opacity-percent),var(--color-background))]",
+          `bg-[color-mix(in_srgb,var(--color-accent)_var(--opacity-percent),var(--color-${backgroundColor}))]`,
           opacityPercent > 50 ? "text-white" : "text-foreground",
         );
 
