@@ -33,6 +33,7 @@ def check_custom_code(code):
         "api",
         "dashboard",
         "forgot-password",
+        "guest-import",
         "login",
         "new-event",
         "settings",

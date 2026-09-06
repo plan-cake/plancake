@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { CircleQuestionMarkIcon } from "lucide-react";
 
 import { FloatingDrawer } from "@/features/drawer";
 import Tooltip, { TooltipSide } from "@/features/system-feedback/tooltip/base";
+import usePointerType from "@/lib/hooks/use-pointer-type";
 
 type InfoPointProps = {
   /**
@@ -44,21 +45,13 @@ export default function InfoPoint({
   className,
 }: InfoPointProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(pointer: coarse)");
-    setIsTouchDevice(mediaQuery.matches);
-
-    const listener = (e: MediaQueryListEvent) => setIsTouchDevice(e.matches);
-    mediaQuery.addEventListener("change", listener);
-    return () => mediaQuery.removeEventListener("change", listener);
-  }, []);
+  const pointerType = usePointerType();
 
   return (
     <>
       <Tooltip side={tooltipSide} content={tooltipContent}>
         <button
-          onClick={() => setDrawerOpen(isTouchDevice)}
+          onClick={() => setDrawerOpen(pointerType === "coarse")}
           aria-label={description}
         >
           <CircleQuestionMarkIcon className={className} />

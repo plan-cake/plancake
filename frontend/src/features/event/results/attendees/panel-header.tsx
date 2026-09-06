@@ -1,10 +1,17 @@
 import { Key, useRef } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckIcon, DoorOpenIcon, EraserIcon, Undo2Icon } from "lucide-react";
+import {
+  CheckIcon,
+  DoorOpenIcon,
+  EraserIcon,
+  Undo2Icon,
+  UsersIcon,
+} from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { useResultsContext } from "@/features/event/results/context";
+import usePointerType from "@/lib/hooks/use-pointer-type";
 import { cn } from "@/lib/utils/classname";
 
 type PanelHeaderProps = {
@@ -47,6 +54,8 @@ export default function PanelHeader({
     currentUser &&
     participants.some((p) => p.display_name === currentUser);
 
+  const pointerType = usePointerType();
+
   const formatHoveredSlot = () => {
     const date = new Date(hoveredSlot!);
 
@@ -69,47 +78,50 @@ export default function PanelHeader({
 
   const headerContent = () => {
     return (
-      <TransitioningText motionStateKey={String(totalParticipants === 0)}>
-        {totalParticipants === 0 ? (
-          "No Attendees Yet"
-        ) : isRemoving ? (
-          "Removing attendees"
-        ) : activeCount === null ? (
-          hasSelection ? (
-            <span>
-              <TransitioningText motionStateKey={totalParticipants}>
-                {selectedParticipants.length}
-              </TransitioningText>
-              <span className="whitespace-pre"> Attendee</span>
-              <TransitioningText motionStateKey={totalParticipants}>
-                {selectedParticipants.length !== 1 ? "s" : ""}
-              </TransitioningText>
-              <span className="whitespace-pre"> Selected</span>
-            </span>
+      <div className="flex items-center gap-1.5">
+        {!isRemoving && <UsersIcon className="h-4 w-4" strokeWidth={2} />}
+        <TransitioningText motionStateKey={String(totalParticipants === 0)}>
+          {totalParticipants === 0 ? (
+            "No Attendees Yet"
+          ) : isRemoving ? (
+            "Removing attendees"
+          ) : activeCount === null ? (
+            hasSelection ? (
+              <span>
+                <TransitioningText motionStateKey={totalParticipants}>
+                  {selectedParticipants.length}
+                </TransitioningText>
+                <span className="whitespace-pre"> Attendee</span>
+                <TransitioningText motionStateKey={totalParticipants}>
+                  {selectedParticipants.length !== 1 ? "s" : ""}
+                </TransitioningText>
+                <span className="whitespace-pre"> Selected</span>
+              </span>
+            ) : (
+              <span>
+                <TransitioningText motionStateKey={totalParticipants}>
+                  {totalParticipants}
+                </TransitioningText>
+                <span className="whitespace-pre"> Attendee</span>
+                <TransitioningText motionStateKey={totalParticipants}>
+                  {totalParticipants !== 1 ? "s" : ""}
+                </TransitioningText>
+              </span>
+            )
           ) : (
             <span>
               <TransitioningText motionStateKey={totalParticipants}>
-                {totalParticipants}
+                {activeCount}
               </TransitioningText>
-              <span className="whitespace-pre"> Attendee</span>
+              <span>/</span>
               <TransitioningText motionStateKey={totalParticipants}>
-                {totalParticipants !== 1 ? "s" : ""}
+                {gridNumParticipants}
               </TransitioningText>
+              <span className="whitespace-pre"> Available</span>
             </span>
-          )
-        ) : (
-          <span>
-            <TransitioningText motionStateKey={totalParticipants}>
-              {activeCount}
-            </TransitioningText>
-            <span>/</span>
-            <TransitioningText motionStateKey={totalParticipants}>
-              {gridNumParticipants}
-            </TransitioningText>
-            <span className="whitespace-pre"> Available</span>
-          </span>
-        )}
-      </TransitioningText>
+          )}
+        </TransitioningText>
+      </div>
     );
   };
 
@@ -121,13 +133,17 @@ export default function PanelHeader({
       )}
     >
       <div className="flex flex-col items-start">
-        <h2 className="text-md font-semibold">{headerContent()}</h2>
+        <h2 className="font-semibold">{headerContent()}</h2>
         {gridNumParticipants > 0 && (
           <span className="text-sm opacity-75">
             {isRemoving
-              ? `Select to remove`
+              ? pointerType === "coarse"
+                ? "Tap to remove"
+                : "Click to remove"
               : hoveredSlot === null
-                ? "Hover grid for availability"
+                ? pointerType === "coarse"
+                  ? "Tap grid for availability"
+                  : "Hover grid for availability"
                 : formatHoveredSlot()}
           </span>
         )}

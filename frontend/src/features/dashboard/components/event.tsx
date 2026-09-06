@@ -1,13 +1,19 @@
 import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
-import { ClockIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import {
+  CalendarRangeIcon,
+  ClockIcon,
+  PencilIcon,
+  Trash2Icon,
+  UsersIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { EventType } from "@/core/event/types";
-import DashboardCopyButton from "@/features/dashboard/components/copy-button";
 import DateRangeRow from "@/features/dashboard/components/date-range-row";
 import ParticipantRow from "@/features/dashboard/components/participant-row";
+import DashboardShareButton from "@/features/dashboard/components/share-button";
 import WeekdayRow from "@/features/dashboard/components/weekday-row";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
@@ -168,7 +174,8 @@ export default function DashboardEvent({
     >
       {titleContent}
       <div className="text-sm opacity-50">{code}</div>
-      <div className="mb-2 mt-1">
+      <div className="mb-2 mt-1 flex items-center gap-2">
+        <CalendarRangeIcon className="h-5 w-5" />
         {type === "specific" && (
           <DateRangeRow startDate={start.date} endDate={end.date} />
         )}
@@ -180,11 +187,14 @@ export default function DashboardEvent({
         <ClockIcon className="h-5 w-5" />
         {formatTimeRange(start.time, end.time)}
       </div>
-      <div className="mt-1.5 bg-inherit" ref={participantRowRef}>
-        <ParticipantRow participants={participants} numIcons={numIcons} />
+      <div className="mt-1.5 flex w-full items-center gap-2 bg-inherit">
+        <UsersIcon className="h-5 w-5 shrink-0" />
+        <div className="w-full bg-inherit" ref={participantRowRef}>
+          <ParticipantRow participants={participants} numIcons={numIcons} />
+        </div>
       </div>
       <div data-actions className="mt-2.5 flex items-center gap-2">
-        <DashboardCopyButton code={code} />
+        <DashboardShareButton title={title} code={code} />
         {myEvent && (
           <>
             <Tooltip content="Edit Event">

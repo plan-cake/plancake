@@ -13,7 +13,6 @@ import { ResultsInformation } from "@/features/event/results/lib/types";
 import { useLiveUpdates } from "@/features/event/results/lib/use-live-updates";
 import { findConsensusAndConflicts } from "@/features/event/results/lib/utils";
 import { useToast } from "@/features/system-feedback/toast/context";
-import { MESSAGES } from "@/lib/messages";
 import {
   LiveUpdateAddUpdateEvent,
   LiveUpdateRemoveEvent,
@@ -44,8 +43,9 @@ export function useEventResults(initialData: ResultsInformation) {
   );
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
   const [showOnlyBestTimes, setShowOnlyBestTimes] = useState<boolean>(false);
+  const [minAvailability, setMinAvailability] = useState<number>(1);
+
   const [timezone, setTimezone] = useState(
-    // Lazy initialization to avoid the lookup on every render
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
   );
 
@@ -72,9 +72,7 @@ export function useEventResults(initialData: ResultsInformation) {
   /* ACTIONS */
   const handleSetHoveredParticipant = useCallback((person: string | null) => {
     setHoveredParticipant(person);
-    if (person) {
-      setHoveredSlot(null);
-    }
+    if (person) setHoveredSlot(null);
   }, []);
 
   const toggleParticipant = (person: string) => {
@@ -88,7 +86,6 @@ export function useEventResults(initialData: ResultsInformation) {
   const handleRemoveParticipant = async (person: string) => {
     const isRemovingSelf = currentUser === person;
 
-    // Immediate UI update
     if (selectedParticipants.includes(person)) {
       setSelectedParticipants((prev) => prev.filter((p) => p !== person));
     }
@@ -101,20 +98,15 @@ export function useEventResults(initialData: ResultsInformation) {
       }
     });
 
-    // Server Action
     const result = await removePerson(eventCode, person, isCreator);
-
     if (!result.success) {
       addToast("error", result.error || "Error removing participant");
     } else {
       addToast(
         "success",
-        isRemovingSelf
-          ? "You have been removed from the event."
-          : `${person} has been removed from the event.`,
+        isRemovingSelf ? "You have been removed." : `${person} removed.`,
       );
     }
-
     return result.success;
   };
 
@@ -299,71 +291,105 @@ export function useEventResults(initialData: ResultsInformation) {
     [optimisticParticipants, optimisticAvailabilities, initialData],
   );
 
-  /* DERIVED LOGIC */
-  const { filteredAvailabilities, gridNumParticipants, hasNoConsensus } =
-    useMemo(() => {
-      if (showOnlyBestTimes) {
-        const { allAvailableSlots } = findConsensusAndConflicts(
-          optimisticAvailabilities,
-          optimisticParticipants,
-        );
+  /* FILTERING LOGIC */
 
-        const noConsensus = allAvailableSlots.length === 0;
-
-        const filtered: ResultsAvailabilityMap = {};
-        for (const slot of allAvailableSlots) {
-          filtered[slot] = optimisticAvailabilities[slot];
-        }
-
-        return {
-          filteredAvailabilities: filtered,
-          gridNumParticipants: optimisticParticipants.length,
-          hasNoConsensus: noConsensus,
-        };
-      }
-
-      let activeParticipants: string[] = [];
-
-      if (selectedParticipants.length > 0) {
-        activeParticipants = selectedParticipants;
-      } else if (hoveredParticipant) {
-        activeParticipants = [hoveredParticipant];
-      } else {
-        return {
-          filteredAvailabilities: optimisticAvailabilities,
-          gridNumParticipants: optimisticParticipants.length,
-        };
-      }
-
-      const filtered: ResultsAvailabilityMap = {};
-      for (const slot in optimisticAvailabilities) {
-        const availablePeople = optimisticAvailabilities[slot];
-        const intersection = availablePeople.filter((p) =>
-          activeParticipants.includes(p),
-        );
-        if (intersection.length > 0) {
-          filtered[slot] = intersection;
-        }
-      }
-
-      return {
-        filteredAvailabilities: filtered,
-        gridNumParticipants: activeParticipants.length,
-        hasNoConsensus: false,
-      };
-    }, [
-      showOnlyBestTimes,
+  /**
+   * Returns a cache of the best timeslots where all participants are available.
+   * Since this can be an expensive computation, it is memoized and only recalculated
+   * when availabilities or participants change
+   */
+  const bestTimesCache = useMemo(() => {
+    const { allAvailableSlots } = findConsensusAndConflicts(
       optimisticAvailabilities,
       optimisticParticipants,
-      selectedParticipants,
-      hoveredParticipant,
-    ]);
+    );
+    return {
+      slotsSet: new Set(allAvailableSlots),
+    };
+  }, [optimisticAvailabilities, optimisticParticipants]);
 
-  useEffect(() => {
-    if (showOnlyBestTimes && hasNoConsensus) {
-      addToast("info", MESSAGES.INFO_NO_MUTUAL_AVAILABILITY);
+  const { globalFilteredMap, validParticipantsForList } = useMemo(() => {
+    const map: ResultsAvailabilityMap = {};
+    const validSet = new Set<string>();
+
+    for (const [slot, availablePeople] of Object.entries(
+      optimisticAvailabilities,
+    )) {
+      if (availablePeople.length < minAvailability) continue;
+      if (showOnlyBestTimes && !bestTimesCache.slotsSet.has(slot)) continue;
+
+      map[slot] = availablePeople;
+      availablePeople.forEach((p) => validSet.add(p));
     }
-  }, [hasNoConsensus, showOnlyBestTimes, addToast]);
+
+    return {
+      globalFilteredMap: map,
+      validParticipantsForList: Array.from(validSet),
+    };
+  }, [
+    optimisticAvailabilities,
+    minAvailability,
+    showOnlyBestTimes,
+    bestTimesCache,
+  ]);
+
+  /**
+   * This is the final filtered availabilities map that is used for rendering the
+   * grid. It applies the following filters before rendering:
+   *  - slider filter (based on min availability)
+   *  - best times filter (if showOnlyBestTimes is true)
+   *
+   * @returns The filtered availabilities map and the list of valid participants to
+   *          show in the participant list.
+   */
+  const { filteredAvailabilities, gridNumParticipants } = useMemo(() => {
+    const hasSelections = selectedParticipants.length > 0;
+    const isHovering = !hasSelections && hoveredParticipant !== null;
+
+    const active = hasSelections
+      ? selectedParticipants
+      : isHovering
+        ? [hoveredParticipant]
+        : [];
+
+    const targetSet = new Set(active);
+    const isFiltering = active.length > 0;
+
+    const sourceMap = globalFilteredMap;
+
+    if (!isFiltering) {
+      return {
+        filteredAvailabilities: sourceMap,
+        gridNumParticipants: optimisticParticipants.length,
+      };
+    }
+
+    const finalMap: ResultsAvailabilityMap = {};
+    for (const [slot, availablePeople] of Object.entries(sourceMap)) {
+      const relevantPeople = availablePeople.filter((p) => targetSet.has(p));
+      if (relevantPeople.length > 0) finalMap[slot] = relevantPeople;
+    }
+
+    return {
+      filteredAvailabilities: finalMap,
+      gridNumParticipants: active.length,
+    };
+  }, [
+    selectedParticipants,
+    hoveredParticipant,
+    globalFilteredMap,
+    optimisticParticipants.length,
+  ]);
+
+  // Clamp min availability to never be higher than the total participants.
+  // Keep it within the slider's [1..N] bounds, even if the list becomes empty.
+  useEffect(() => {
+    setMinAvailability((prev) => {
+      const max = optimisticParticipants.length;
+      if (max === 0) return 1;
+      return Math.min(Math.max(prev, 1), max);
+    });
+  }, [optimisticParticipants.length]);
 
   useLiveUpdates(
     eventCode,
@@ -379,6 +405,7 @@ export function useEventResults(initialData: ResultsInformation) {
     availabilities: optimisticAvailabilities,
     filteredAvailabilities,
     gridNumParticipants,
+    validParticipantsForList,
 
     // User Info
     currentUser: optimisticCurrentUser,
@@ -390,6 +417,7 @@ export function useEventResults(initialData: ResultsInformation) {
     selectedParticipants,
     showOnlyBestTimes,
     timezone,
+    minAvailability,
 
     // Actions
     clearSelectedParticipants: () => setSelectedParticipants([]),
@@ -399,5 +427,6 @@ export function useEventResults(initialData: ResultsInformation) {
     handleRemoveParticipant,
     setShowOnlyBestTimes,
     setTimezone,
+    setMinAvailability,
   };
 }

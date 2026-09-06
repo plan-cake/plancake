@@ -9,6 +9,7 @@ export const MESSAGES = {
   // generic errors
   ERROR_GENERIC: "An error occurred. Please try again.",
   ERROR_RATE_LIMIT: "Too many requests. Please try again later.",
+  ERROR_CAPTCHA_FAILED: "CAPTCHA verification failed. Please try again.",
 
   // auth errors
   ERROR_EMAIL_MISSING: "Missing email.",
@@ -69,9 +70,8 @@ export const MESSAGES = {
     "Select dates and times to see a preview of the event grid.",
   INFO_UNSELECTED_WEEK_RANGE:
     "Select days and times to see a preview of the event grid.",
-  INFO_NO_MUTUAL_AVAILABILITY:
-    "There are no times with more than 1 person available. The plans are NOT making it out of the group chat...",
-  INFO_NO_IDEAL_TIMES: "There are no times where everyone is available.",
-  INFO_NO_IDEAL_TIMES_BANNER:
-    "There are no times where everyone is available. Times with an indicator are the best options.",
+  INFO_NO_OVERLAP:
+    "Literally no one is free at the same time. This is NOT making it out of the group chat...",
+  INFO_NO_IDEAL_TIMES:
+    "There are no times that work for everyone. Times with an indicator are the best options.",
 };
