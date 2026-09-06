@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import MessagePage from "@/components/layout/message-page";
+import InboxLinks from "@/features/auth/components/inbox-links";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import { useToast } from "@/features/system-feedback";
@@ -81,7 +82,9 @@ export default function Page() {
             href="/login"
           />,
         ]}
-      />
+      >
+        <InboxLinks email={email} />
+      </MessagePage>
     </div>
   );
 }

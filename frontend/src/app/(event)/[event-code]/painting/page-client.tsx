@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
+import { GlobeIcon } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
 import Captcha from "@/components/captcha";
@@ -318,7 +319,10 @@ export default function ClientPage({
           />
 
           <div className="bg-panel rounded-3xl p-6 text-sm">
-            Displaying event in
+            <div className="flex items-center gap-1">
+              <GlobeIcon className="h-3.5 w-3.5" />
+              Displaying event in
+            </div>
             <TimeZoneSelector
               id="timezone-select"
               value={timeZone}
@@ -344,7 +348,10 @@ export default function ClientPage({
         />
 
         <div className="bg-panel rounded-3xl p-6 text-sm md:hidden">
-          Displaying event in
+          <div className="flex items-center gap-1">
+            <GlobeIcon className="h-3.5 w-3.5" />
+            Displaying event in
+          </div>
           <TimeZoneSelector
             id="timezone-select"
             value={timeZone}
