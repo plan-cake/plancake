@@ -62,12 +62,17 @@ function CalendarDay({
         gridRow < numRows && "border-b",
       );
 
-  if (!exists) {
-    return <div className={borderClasses}></div>;
-  }
-
   const dayObj = parse(dayString, "yyyy-MM-dd", new Date());
   const dayNum = dayObj.getDate();
+
+  if (!exists) {
+    return (
+      <div className={borderClasses}>
+        <div className="p-2 leading-none opacity-50">{dayNum}</div>
+      </div>
+    );
+  }
+
   const shortMonthString = dayObj.toLocaleString("default", {
     month: "short",
   });
