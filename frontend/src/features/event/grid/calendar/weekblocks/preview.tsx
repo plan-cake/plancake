@@ -3,11 +3,15 @@ import { PreviewWeekBlockProps } from "@/features/event/grid/calendar/weekblocks
 
 export default function PreviewWeekBlock({
   weeks,
+  hasNext,
+  hasPrev,
   backgroundColor,
 }: PreviewWeekBlockProps) {
   return (
     <BaseWeekBlock
       weeks={weeks}
+      hasNext={hasNext}
+      hasPrev={hasPrev}
       backgroundColor={backgroundColor}
       getDayProps={() => ({ disableSelect: true })}
     />

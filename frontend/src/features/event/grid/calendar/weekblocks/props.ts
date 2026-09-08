@@ -6,6 +6,8 @@ import { CalendarGridWeek } from "@/features/event/grid/calendar/types";
 
 type CommonBlockProps = {
   weeks: CalendarGridWeek[];
+  hasNext: boolean;
+  hasPrev: boolean;
   backgroundColor: string;
 };
 

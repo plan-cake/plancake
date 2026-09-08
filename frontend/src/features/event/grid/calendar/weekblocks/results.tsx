@@ -7,6 +7,8 @@ import { dateToISOString } from "@/lib/utils/date-time-format";
 
 export default function ResultsWeekBlock({
   weeks,
+  hasNext,
+  hasPrev,
   backgroundColor,
   availabilities,
   numParticipants,
@@ -17,6 +19,8 @@ export default function ResultsWeekBlock({
   return (
     <BaseWeekBlock
       weeks={weeks}
+      hasNext={hasNext}
+      hasPrev={hasPrev}
       backgroundColor={backgroundColor}
       getDayProps={(day) => {
         const dayIso = dateToISOString(day);

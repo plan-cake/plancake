@@ -71,7 +71,7 @@ export default function CalendarGrid({
         })}
       </div>
       <div
-        className="relative flex flex-col gap-2"
+        className="relative flex flex-col gap-4"
         onMouseLeave={() => {
           if (mode === "view") {
             setHoveredSlot(null);
@@ -79,20 +79,20 @@ export default function CalendarGrid({
         }}
       >
         {weekBlocks.map((weekBlock, index) => {
+          const commonProps = {
+            weeks: weekBlock,
+            hasNext: index < weekBlocks.length - 1,
+            hasPrev: index > 0,
+            backgroundColor,
+          };
+
           if (mode === "preview") {
-            return (
-              <PreviewWeekBlock
-                key={index}
-                weeks={weekBlock}
-                backgroundColor={backgroundColor}
-              />
-            );
+            return <PreviewWeekBlock key={index} {...commonProps} />;
           } else if (mode === "paint") {
             return (
               <InteractiveWeekBlock
                 key={index}
-                weeks={weekBlock}
-                backgroundColor={backgroundColor}
+                {...commonProps}
                 timeslots={timeslots}
                 availability={userAvailability}
                 onToggle={onToggleSlot}
@@ -102,8 +102,7 @@ export default function CalendarGrid({
             return (
               <ResultsWeekBlock
                 key={index}
-                weeks={weekBlock}
-                backgroundColor={backgroundColor}
+                {...commonProps}
                 hoveredDay={hoveredSlot}
                 availabilities={availabilities}
                 numParticipants={numParticipants}
