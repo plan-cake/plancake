@@ -62,12 +62,15 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
         weeks[weekStartString] = createWeek(weekStart);
       }
       const currentBlock = weeks[weekStartString];
+      for (const day of currentBlock.days) {
+        const monthString = day.dayString.slice(0, 7);
+        if (!months.has(monthString)) {
+          months.add(monthString);
+          day.firstOfMonth = true;
+        }
+      }
       const dayBlock = currentBlock.days[date.getDay()];
-      const monthString = format(date, "yyyy-MM");
-      const newMonth = !months.has(monthString);
-      months.add(monthString);
       dayBlock.exists = true;
-      dayBlock.firstOfMonth = newMonth;
     }
 
     const weekValues = Object.values(weeks); // Already sorted from timeslot sorting

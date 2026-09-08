@@ -67,20 +67,33 @@ function CalendarDay({
   const dayObj = parse(dayString, "yyyy-MM-dd", new Date());
   const dayNum = dayObj.getDate();
 
-  if (!exists) {
-    return (
-      <div className={borderClasses}>
-        <div className="p-2 leading-none opacity-50">{dayNum}</div>
-      </div>
-    );
-  }
-
   const shortMonthString = dayObj.toLocaleString("default", {
     month: "short",
   });
   const longMonthString = dayObj.toLocaleString("default", {
     month: "long",
   });
+  const monthBadge = (
+    <div
+      className={cn(
+        "absolute -top-2.5 left-[50%] translate-x-[-50%]",
+        "rounded-full px-1.5 py-0.5 text-xs leading-none",
+        `bg-${backgroundColor} border-foreground border`,
+      )}
+    >
+      <span className="lg:hidden">{shortMonthString}</span>
+      <span className="hidden lg:block">{longMonthString}</span>
+    </div>
+  );
+
+  if (!exists) {
+    return (
+      <div className={cn(borderClasses, "relative")}>
+        <div className="p-2 leading-none opacity-50">{dayNum}</div>
+        {firstOfMonth && monthBadge}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -117,18 +130,7 @@ function CalendarDay({
       >
         <span className="text-left leading-none">{dayNum}</span>
         {!!icon && <div className="flex w-full justify-end">{icon}</div>}
-        {firstOfMonth && (
-          <div
-            className={cn(
-              "absolute -top-2.5 left-[50%] translate-x-[-50%]",
-              "rounded-full px-1.5 py-0.5 text-xs leading-none",
-              `bg-${backgroundColor} border-foreground border`,
-            )}
-          >
-            <span className="lg:hidden">{shortMonthString}</span>
-            <span className="hidden lg:block">{longMonthString}</span>
-          </div>
-        )}
+        {firstOfMonth && monthBadge}
       </div>
     </div>
   );
