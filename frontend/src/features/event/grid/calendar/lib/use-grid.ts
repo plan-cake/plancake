@@ -53,7 +53,6 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
     const sortedDates = timeslots.sort((a, b) => a.getTime() - b.getTime());
 
     const weeks = {} as Record<string, CalendarGridWeek>;
-    const months = new Set<string>();
     for (const date of sortedDates) {
       const weekStart = getWeekStart(new Date(date));
       const weekStartString = format(weekStart, "yyyy-MM-dd");
@@ -62,13 +61,6 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
         weeks[weekStartString] = createWeek(weekStart);
       }
       const currentBlock = weeks[weekStartString];
-      for (const day of currentBlock.days) {
-        const monthString = day.dayString.slice(0, 7);
-        if (!months.has(monthString)) {
-          months.add(monthString);
-          day.firstOfMonth = true;
-        }
-      }
       const dayBlock = currentBlock.days[date.getDay()];
       dayBlock.exists = true;
     }
@@ -76,6 +68,7 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
     const weekValues = Object.values(weeks); // Already sorted from timeslot sorting
 
     const weekBlocks: CalendarGridWeek[][] = [];
+    const months = new Set<string>();
     let currentWeekBlock = [weekValues[0]];
     for (let i = 1; i < weekValues.length; i++) {
       const week = weekValues[i];
@@ -112,6 +105,18 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
       }
     }
     weekBlocks.push(currentWeekBlock);
+
+    for (const block of weekBlocks) {
+      for (const week of block) {
+        for (const day of week.days) {
+          const monthString = day.dayString.slice(0, 7);
+          if (!months.has(monthString)) {
+            months.add(monthString);
+            day.firstOfMonth = true;
+          }
+        }
+      }
+    }
 
     return { weekBlocks, error: null };
   }, [timeslots]);
