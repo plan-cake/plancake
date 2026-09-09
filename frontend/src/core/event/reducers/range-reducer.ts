@@ -47,7 +47,10 @@ export function EventRangeReducer(
           return {
             ...baseEvent,
             type: "specific",
-            dates: DEFAULT_RANGE_SPECIFIC.dates,
+            dates:
+              state.type === "calendar"
+                ? state.dates
+                : DEFAULT_RANGE_SPECIFIC.dates,
           };
         case "weekday":
           return {
@@ -59,7 +62,10 @@ export function EventRangeReducer(
           return {
             ...baseEvent,
             type: "calendar",
-            dates: DEFAULT_RANGE_CALENDAR.dates,
+            dates:
+              state.type === "specific"
+                ? state.dates
+                : DEFAULT_RANGE_CALENDAR.dates,
             timeRange: DEFAULT_RANGE_CALENDAR.timeRange,
           };
       }
