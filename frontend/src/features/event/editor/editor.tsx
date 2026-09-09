@@ -186,38 +186,40 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       >
         <DateRangeSelection editing={type === "edit"} />
 
-        <div className="flex flex-col gap-1">
-          <div
-            className={`flex items-center gap-2 font-bold md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
-          >
-            <ClockIcon className="h-4 w-4" strokeWidth={2} />
-            Possible Times
-            {errors.timeRange && (
-              <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
-            )}
-          </div>
-          <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
-            <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
-              <TimeSelector
-                id="from-time-dropdown"
-                value={eventRange.timeRange.from}
-                onChange={setStartTime}
-                placeholder="Start Time"
-                dialogTitle="Select Start Time"
-              />
-            </FormSelectorField>
+        {state.eventRange.type !== "calendar" && (
+          <div className="flex flex-col gap-1">
+            <div
+              className={`flex items-center gap-2 font-bold md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
+            >
+              <ClockIcon className="h-4 w-4" strokeWidth={2} />
+              Possible Times
+              {errors.timeRange && (
+                <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
+              )}
+            </div>
+            <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
+              <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
+                <TimeSelector
+                  id="from-time-dropdown"
+                  value={eventRange.timeRange.from}
+                  onChange={setStartTime}
+                  placeholder="Start Time"
+                  dialogTitle="Select Start Time"
+                />
+              </FormSelectorField>
 
-            <FormSelectorField label="UNTIL" htmlFor="to-time-dropdown">
-              <TimeSelector
-                id="to-time-dropdown"
-                value={eventRange.timeRange.to}
-                onChange={setEndTime}
-                placeholder="End Time"
-                dialogTitle="Select End Time"
-              />
-            </FormSelectorField>
+              <FormSelectorField label="UNTIL" htmlFor="to-time-dropdown">
+                <TimeSelector
+                  id="to-time-dropdown"
+                  value={eventRange.timeRange.to}
+                  onChange={setEndTime}
+                  placeholder="End Time"
+                  dialogTitle="Select End Time"
+                />
+              </FormSelectorField>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="md:content md:col-start-1 md:row-start-10 md:flex md:max-w-[250px] md:items-end">
           <AdvancedOptions isEditing={type === "edit"} errors={errors} />
