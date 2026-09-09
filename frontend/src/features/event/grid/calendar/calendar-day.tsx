@@ -25,6 +25,8 @@ export interface CalendarDayProps {
 
   dayClasses?: string;
 
+  clearHoveredSlot?: () => void;
+
   // Event handlers
   onPointerDown?: () => void;
   onPointerEnter?: () => void;
@@ -45,6 +47,7 @@ function CalendarDay({
   backgroundColor,
   icon,
   dayClasses = "",
+  clearHoveredSlot,
   ...eventHandlers
 }: CalendarDayProps) {
   if (icon) {
@@ -88,7 +91,10 @@ function CalendarDay({
 
   if (!exists) {
     return (
-      <div className={cn(borderClasses, "relative")}>
+      <div
+        className={cn(borderClasses, "relative")}
+        onPointerEnter={clearHoveredSlot}
+      >
         <div className="p-2 leading-none opacity-50">{dayNum}</div>
         {firstOfMonth && monthBadge}
       </div>

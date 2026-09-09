@@ -11,12 +11,14 @@ export default function BaseWeekBlock({
   hasPrev,
   backgroundColor,
   getDayProps,
+  clearHoveredSlot,
 }: {
   weeks: CalendarGridWeek[];
   hasNext: boolean;
   hasPrev: boolean;
   backgroundColor: string;
   getDayProps?: (dayString: string) => Partial<CalendarDayProps>;
+  clearHoveredSlot?: () => void;
 }) {
   return (
     <div
@@ -48,7 +50,12 @@ export default function BaseWeekBlock({
 
             if (!day.exists) {
               return (
-                <CalendarDay key={dIndex} exists={false} {...commonProps} />
+                <CalendarDay
+                  key={dIndex}
+                  exists={false}
+                  {...commonProps}
+                  clearHoveredSlot={clearHoveredSlot}
+                />
               );
             }
 

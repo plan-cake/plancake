@@ -60,6 +60,7 @@ export default function ResultsWeekBlock({
           dynamicStyle,
         };
       }}
+      clearHoveredSlot={() => onHoverDay(null)}
     />
   );
 }
