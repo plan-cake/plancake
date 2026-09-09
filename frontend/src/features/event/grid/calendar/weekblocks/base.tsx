@@ -2,6 +2,7 @@ import CalendarDay, {
   CalendarDayProps,
 } from "@/features/event/grid/calendar/calendar-day";
 import { CalendarGridWeek } from "@/features/event/grid/calendar/types";
+import { NONEXISTENT_SLOT_PATTERN } from "@/features/event/grid/constants";
 import { cn } from "@/lib/utils/classname";
 
 export default function BaseWeekBlock({
@@ -20,13 +21,7 @@ export default function BaseWeekBlock({
   return (
     <div
       style={{
-        backgroundImage: `repeating-linear-gradient(
-          45deg,
-          color-mix(in srgb, var(--color-foreground) 10%, transparent) 0px,
-          color-mix(in srgb, var(--color-foreground) 10%, transparent) 8px,
-          color-mix(in srgb, var(--color-background) 10%, transparent) 8px,
-          color-mix(in srgb, var(--color-background) 10%, transparent) 9.5px
-        )`,
+        backgroundImage: NONEXISTENT_SLOT_PATTERN,
       }}
     >
       {hasPrev && <BlockEnd side="top" backgroundColor={backgroundColor} />}
