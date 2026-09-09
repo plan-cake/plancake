@@ -71,7 +71,10 @@ export default function CalendarGrid({
         })}
       </div>
       <div
-        className="relative flex flex-col gap-4"
+        className={cn(
+          "relative flex flex-col gap-4",
+          mode === "preview" && "cursor-not-allowed",
+        )}
         onMouseLeave={() => {
           if (mode === "view") {
             setHoveredSlot(null);

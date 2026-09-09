@@ -104,7 +104,7 @@ function CalendarDay({
         `bg-${backgroundColor}`,
         "relative flex-1",
         borderClasses,
-        disableSelect ? "cursor-not-allowed" : "cursor-pointer",
+        !disableSelect && "cursor-cell",
         dayClasses,
         "select-none",
         isHovered &&
