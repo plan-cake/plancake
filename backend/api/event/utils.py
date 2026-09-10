@@ -150,8 +150,12 @@ def validate_calendar_timeslots(
     if not timeslots:
         return {"timeslots": ["At least one timeslot is required."]}
 
-    start_date = min(ts.date() for ts in timeslots)
-    end_date = max(ts.date() for ts in timeslots)
+    dates = set()
+    start_date = None
+    for ts in timeslots:
+        dates.add(ts.date())
+        if start_date is None or ts.date() < start_date:
+            start_date = ts.date()
 
     errors = {}
 
@@ -169,7 +173,7 @@ def validate_calendar_timeslots(
             )
         else:
             add_error("Event must start today or in the future.")
-    if (end_date - start_date).days > MAX_EVENT_DAYS:
+    if len(dates) > MAX_EVENT_DAYS:
         add_error(f"Max event length is {MAX_EVENT_DAYS} days.")
 
     return errors
