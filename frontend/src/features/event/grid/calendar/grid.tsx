@@ -44,9 +44,9 @@ export default function CalendarGrid({
   return (
     <div
       className={cn(
-        "flex w-full select-none flex-col gap-1",
+        "flex h-full w-full select-none flex-col gap-1",
         !isMobile && "overflow-y-auto",
-        mode === "preview" && "pb-6",
+        mode !== "preview" && "pb-4",
         `bg-${backgroundColor}`,
       )}
       style={{ viewTransitionName: "grid" }}
