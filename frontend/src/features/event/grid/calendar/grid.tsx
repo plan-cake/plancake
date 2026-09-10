@@ -44,7 +44,7 @@ export default function CalendarGrid({
   return (
     <div
       className={cn(
-        "relative flex w-full select-none flex-col gap-3 p-2",
+        "flex w-full select-none flex-col gap-3 p-2",
         !isMobile && "overflow-y-auto",
         mode === "preview" && "pb-6",
         `bg-${backgroundColor}`,
@@ -72,7 +72,7 @@ export default function CalendarGrid({
       </div>
       <div
         className={cn(
-          "relative flex flex-col gap-4",
+          "flex flex-col gap-4",
           mode === "preview" && "cursor-not-allowed",
         )}
         onMouseLeave={() => {
