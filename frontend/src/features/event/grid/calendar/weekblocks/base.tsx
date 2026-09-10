@@ -25,6 +25,7 @@ export default function BaseWeekBlock({
       style={{
         backgroundImage: NONEXISTENT_SLOT_PATTERN,
       }}
+      className="[--week-height:60px] md:[--week-height:80px]"
     >
       {hasPrev && (
         <BlockEnd
@@ -35,10 +36,10 @@ export default function BaseWeekBlock({
       )}
 
       <div
-        className={cn("border-foreground/75 grid border")}
+        className="border-foreground/75 grid border"
         style={{
           gridTemplateColumns: "repeat(7, 1fr)",
-          gridTemplateRows: `repeat(${weeks.length}, minmax(80px, 1fr))`,
+          gridTemplateRows: `repeat(${weeks.length}, minmax(var(--week-height), 1fr))`,
           borderTopStyle: hasPrev ? "dashed" : undefined,
           borderBottomStyle: hasNext ? "dashed" : undefined,
         }}
