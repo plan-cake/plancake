@@ -26,7 +26,13 @@ export default function BaseWeekBlock({
         backgroundImage: NONEXISTENT_SLOT_PATTERN,
       }}
     >
-      {hasPrev && <BlockEnd side="top" backgroundColor={backgroundColor} />}
+      {hasPrev && (
+        <BlockEnd
+          side="top"
+          backgroundColor={backgroundColor}
+          clearHoveredSlot={clearHoveredSlot}
+        />
+      )}
 
       <div
         className={cn("border-foreground/75 grid border")}
@@ -66,7 +72,13 @@ export default function BaseWeekBlock({
         )}
       </div>
 
-      {hasNext && <BlockEnd side="bottom" backgroundColor={backgroundColor} />}
+      {hasNext && (
+        <BlockEnd
+          side="bottom"
+          backgroundColor={backgroundColor}
+          clearHoveredSlot={clearHoveredSlot}
+        />
+      )}
     </div>
   );
 }
@@ -74,9 +86,11 @@ export default function BaseWeekBlock({
 function BlockEnd({
   side,
   backgroundColor,
+  clearHoveredSlot,
 }: {
   side: "top" | "bottom";
   backgroundColor: string;
+  clearHoveredSlot?: () => void;
 }) {
   const maskImage =
     side === "top"
@@ -88,6 +102,7 @@ function BlockEnd({
       style={{
         backgroundImage: `linear-gradient(to ${side}, transparent, var(--color-${backgroundColor}))`,
       }}
+      onPointerEnter={clearHoveredSlot}
     >
       <div
         style={{
