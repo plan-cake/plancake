@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils/classname";
 export default function AvailabilityFilters() {
   const controls = useAnimation();
   const {
+    eventType,
     participants,
     minAvailability,
     setMinAvailability,
@@ -58,6 +59,8 @@ export default function AvailabilityFilters() {
     });
   }, [displayedAvailability, controls]);
 
+  const slotName = eventType === "calendar" ? "dates" : "times";
+
   return (
     <div className="flex flex-col pb-6">
       <AnimatePresence initial={false}>
@@ -72,9 +75,7 @@ export default function AvailabilityFilters() {
             <div className="pb-3">
               <Banner
                 type="error"
-                subtitle={
-                  "There are no good times, try adjusting your filters!"
-                }
+                subtitle={`There are no good ${slotName}, try adjusting your filters!`}
               />
             </div>
           </motion.div>
@@ -83,7 +84,7 @@ export default function AvailabilityFilters() {
 
       <section className="space-y-3">
         <Checkbox
-          label="Show times that work for everyone"
+          label={`Show ${slotName} that work for everyone`}
           checked={showOnlyBestTimes}
           onChange={handleCheckboxChange}
           textSize="sm"
