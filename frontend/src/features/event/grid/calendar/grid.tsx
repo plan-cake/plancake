@@ -54,8 +54,8 @@ export default function CalendarGrid({
     >
       <div
         className={cn(
-          "sticky top-[var(--header-height)] md:top-0",
-          "z-10 flex h-[25px] w-full",
+          "top-(--header-height) sticky md:top-0",
+          "h-6.25 z-10 flex w-full",
           `bg-${backgroundColor}`,
         )}
       >
