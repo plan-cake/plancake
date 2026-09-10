@@ -44,7 +44,7 @@ export default function CalendarGrid({
   return (
     <div
       className={cn(
-        "flex w-full select-none flex-col gap-3 p-2",
+        "flex w-full select-none flex-col gap-1",
         !isMobile && "overflow-y-auto",
         mode === "preview" && "pb-6",
         `bg-${backgroundColor}`,
@@ -54,7 +54,7 @@ export default function CalendarGrid({
     >
       <div
         className={cn(
-          "top-(--header-height) sticky md:top-0",
+          "top-(--header-height) sticky px-2 md:top-0",
           "h-6.25 z-10 flex w-full",
           `bg-${backgroundColor}`,
         )}
@@ -72,7 +72,7 @@ export default function CalendarGrid({
       </div>
       <div
         className={cn(
-          "flex flex-col gap-4",
+          "flex flex-col gap-4 p-2",
           mode === "preview" && "cursor-not-allowed",
         )}
         onMouseLeave={() => {
