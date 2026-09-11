@@ -201,7 +201,7 @@ export default function DashboardEvent({
       <div className="text-sm opacity-50">{code}</div>
       <div className="mb-2 mt-1 flex items-center gap-2">
         <CalendarRangeIcon className="h-5 w-5" />
-        {type === "specific" && (
+        {(type === "specific" || type === "calendar") && (
           <DateRangeRow
             startDate={dateDetails.startDate}
             endDate={dateDetails.endDate}
@@ -211,10 +211,16 @@ export default function DashboardEvent({
       </div>
       <div className="flex items-center gap-2">
         <ClockIcon className="h-5 w-5" />
-        <span>
-          {timeRange.display}
-          {timeRange.pastMidnight && <sup className=""> +1</sup>}
-        </span>
+        {type === "calendar" ? (
+          <span className="text-sm opacity-50">—</span>
+        ) : (
+          <>
+            <span>
+              {timeRange.display}
+              {timeRange.pastMidnight && <sup className=""> +1</sup>}
+            </span>
+          </>
+        )}
       </div>
       <div className="mt-1.5 flex w-full items-center gap-2 bg-inherit">
         <UsersIcon className="h-5 w-5 shrink-0" />
