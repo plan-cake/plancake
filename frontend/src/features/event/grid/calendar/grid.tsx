@@ -1,9 +1,9 @@
 import { createEmptyUserAvailability } from "@/core/availability/utils";
 import { ALL_WEEKDAYS } from "@/core/event/types";
 import useCalendarGridInfo from "@/features/event/grid/calendar/lib/use-grid";
-import InteractiveWeekBlock from "@/features/event/grid/calendar/weekblocks/interactive";
-import PreviewWeekBlock from "@/features/event/grid/calendar/weekblocks/preview";
-import ResultsWeekBlock from "@/features/event/grid/calendar/weekblocks/results";
+import InteractiveMonthBlock from "@/features/event/grid/calendar/month-blocks/interactive";
+import PreviewMonthBlock from "@/features/event/grid/calendar/month-blocks/preview";
+import ResultsMonBlock from "@/features/event/grid/calendar/month-blocks/results";
 import { GRID_ID } from "@/features/event/grid/constants";
 import GridMessage from "@/features/event/grid/grid-message";
 import { GridProps } from "@/features/event/grid/grid-props";
@@ -26,7 +26,7 @@ export default function CalendarGrid({
 }: GridProps) {
   const isMobile = useCheckMobile();
 
-  const { weekBlocks, error } = useCalendarGridInfo(timeslots);
+  const { monthBlocks, error } = useCalendarGridInfo(timeslots);
 
   if (unselectedRange) {
     return (
@@ -72,7 +72,7 @@ export default function CalendarGrid({
       </div>
       <div
         className={cn(
-          "flex flex-col gap-4 p-2",
+          "flex flex-col gap-2 px-2 pb-2",
           mode === "preview" && "cursor-not-allowed",
         )}
         onMouseLeave={() => {
@@ -81,19 +81,17 @@ export default function CalendarGrid({
           }
         }}
       >
-        {weekBlocks.map((weekBlock, index) => {
+        {monthBlocks.map((monthBlock, index) => {
           const commonProps = {
-            weeks: weekBlock,
-            hasNext: index < weekBlocks.length - 1,
-            hasPrev: index > 0,
+            month: monthBlock,
             backgroundColor,
           };
 
           if (mode === "preview") {
-            return <PreviewWeekBlock key={index} {...commonProps} />;
+            return <PreviewMonthBlock key={index} {...commonProps} />;
           } else if (mode === "paint") {
             return (
-              <InteractiveWeekBlock
+              <InteractiveMonthBlock
                 key={index}
                 {...commonProps}
                 timeslots={timeslots}
@@ -103,7 +101,7 @@ export default function CalendarGrid({
             );
           } else if (mode === "view") {
             return (
-              <ResultsWeekBlock
+              <ResultsMonBlock
                 key={index}
                 {...commonProps}
                 hoveredDay={hoveredSlot}

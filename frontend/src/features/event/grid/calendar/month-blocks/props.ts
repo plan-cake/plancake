@@ -2,24 +2,22 @@ import {
   AvailabilitySet,
   ResultsAvailabilityMap,
 } from "@/core/availability/types";
-import { CalendarGridWeek } from "@/features/event/grid/calendar/types";
+import { CalendarGridMonth } from "@/features/event/grid/calendar/types";
 
 type CommonBlockProps = {
-  weeks: CalendarGridWeek[];
-  hasNext: boolean;
-  hasPrev: boolean;
+  month: CalendarGridMonth;
   backgroundColor: string;
 };
 
-export type PreviewWeekBlockProps = CommonBlockProps;
+export type PreviewMonthBlockProps = CommonBlockProps;
 
-export type InteractiveWeekBlockProps = CommonBlockProps & {
+export type InteractiveMonthBlockProps = CommonBlockProps & {
   timeslots: Date[];
   availability: AvailabilitySet;
   onToggle: (dayString: string, togglingOn: boolean) => void;
 };
 
-export type ResultsWeekBlockProps = CommonBlockProps & {
+export type ResultsMonthBlockProps = CommonBlockProps & {
   hoveredDay: string | null | undefined;
   availabilities: ResultsAvailabilityMap;
   numParticipants: number;

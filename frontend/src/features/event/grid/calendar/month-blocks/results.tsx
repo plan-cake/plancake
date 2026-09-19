@@ -1,26 +1,22 @@
 import { CircleSmallIcon, ThumbsUpIcon } from "lucide-react";
 
-import BaseWeekBlock from "@/features/event/grid/calendar/weekblocks/base";
-import { ResultsWeekBlockProps } from "@/features/event/grid/calendar/weekblocks/props";
+import BaseMonthBlock from "@/features/event/grid/calendar/month-blocks/base";
+import { ResultsMonthBlockProps } from "@/features/event/grid/calendar/month-blocks/props";
 import { cn } from "@/lib/utils/classname";
 import { dateToISOString } from "@/lib/utils/date-time-format";
 
-export default function ResultsWeekBlock({
-  weeks,
-  hasNext,
-  hasPrev,
+export default function ResultsMonthBlock({
+  month,
   backgroundColor,
   availabilities,
   numParticipants,
   highestMatchCount,
   hoveredDay,
   onHoverDay,
-}: ResultsWeekBlockProps) {
+}: ResultsMonthBlockProps) {
   return (
-    <BaseWeekBlock
-      weeks={weeks}
-      hasNext={hasNext}
-      hasPrev={hasPrev}
+    <BaseMonthBlock
+      month={month}
       backgroundColor={backgroundColor}
       getDayProps={(day) => {
         const dayIso = dateToISOString(day);
@@ -60,7 +56,6 @@ export default function ResultsWeekBlock({
           dynamicStyle,
         };
       }}
-      clearHoveredSlot={() => onHoverDay(null)}
     />
   );
 }

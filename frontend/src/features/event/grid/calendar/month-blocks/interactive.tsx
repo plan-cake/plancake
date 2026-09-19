@@ -1,18 +1,16 @@
 import useCalendarDrag from "@/features/event/grid/calendar/lib/use-calendar-drag";
-import BaseWeekBlock from "@/features/event/grid/calendar/weekblocks/base";
-import { InteractiveWeekBlockProps } from "@/features/event/grid/calendar/weekblocks/props";
+import BaseMonthBlock from "@/features/event/grid/calendar/month-blocks/base";
+import { InteractiveMonthBlockProps } from "@/features/event/grid/calendar/month-blocks/props";
 import { cn } from "@/lib/utils/classname";
 import { dateToISOString } from "@/lib/utils/date-time-format";
 
-export default function InteractiveWeekBlock({
-  weeks,
-  hasNext,
-  hasPrev,
+export default function InteractiveMonthBlock({
+  month,
   backgroundColor,
   timeslots,
   availability,
   onToggle,
-}: InteractiveWeekBlockProps) {
+}: InteractiveMonthBlockProps) {
   const {
     draggedDays,
     hoveredDay,
@@ -24,10 +22,8 @@ export default function InteractiveWeekBlock({
   } = useCalendarDrag(onToggle, timeslots);
 
   return (
-    <BaseWeekBlock
-      weeks={weeks}
-      hasNext={hasNext}
-      hasPrev={hasPrev}
+    <BaseMonthBlock
+      month={month}
       backgroundColor={backgroundColor}
       getDayProps={(day) => {
         const dayIso = dateToISOString(day);

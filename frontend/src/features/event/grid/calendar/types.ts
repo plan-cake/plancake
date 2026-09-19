@@ -1,18 +1,6 @@
-type CalendarGridWeekDay = {
-  dayString: string;
-  exists: boolean;
-  firstOfMonth: boolean;
+export type CalendarGridMonth = {
+  month: string;
+  activeDays: Set<string>;
 };
 
-export type CalendarGridWeek = {
-  weekStart: string;
-  days: [
-    CalendarGridWeekDay,
-    CalendarGridWeekDay,
-    CalendarGridWeekDay,
-    CalendarGridWeekDay,
-    CalendarGridWeekDay,
-    CalendarGridWeekDay,
-    CalendarGridWeekDay,
-  ];
-};
+export type CalendarGridDayDisplay = "empty" | "disabled" | "active";

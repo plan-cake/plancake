@@ -4,12 +4,12 @@ import { cloneElement, memo } from "react";
 
 import { parse } from "date-fns";
 
+import { CalendarGridDayDisplay } from "@/features/event/grid/calendar/types";
 import { cn } from "@/lib/utils/classname";
 
 export interface CalendarDayProps {
   dayString: string;
-  exists?: boolean;
-  firstOfMonth?: boolean;
+  display: CalendarGridDayDisplay;
   isHovered?: boolean;
 
   disableSelect?: boolean;
@@ -20,6 +20,7 @@ export interface CalendarDayProps {
   gridRow: number;
   numRows: number;
   backgroundColor: string;
+  rightBorder: boolean;
 
   icon?: React.ReactElement;
 
@@ -36,8 +37,7 @@ export interface CalendarDayProps {
 
 function CalendarDay({
   dayString,
-  exists = true,
-  firstOfMonth = false,
+  display,
   isHovered,
   disableSelect,
   dynamicStyle: style,
@@ -45,6 +45,7 @@ function CalendarDay({
   gridRow,
   numRows,
   backgroundColor,
+  rightBorder,
   icon,
   dayClasses = "",
   clearHoveredSlot,
@@ -62,42 +63,29 @@ function CalendarDay({
   const borderClasses = isHovered
     ? "border-none"
     : cn(
-        "border-dashed border-foreground/75",
-        gridColumn < 7 && "border-r",
-        gridRow < numRows && "border-b",
+        "border-dashed border-foreground/75 border-b border-r",
+        gridColumn === 1 && "border-l",
       );
 
   const dayObj = parse(dayString, "yyyy-MM-dd", new Date());
   const dayNum = dayObj.getDate();
 
-  const shortMonthString = dayObj.toLocaleString("default", {
-    month: "short",
-  });
-  const longMonthString = dayObj.toLocaleString("default", {
-    month: "long",
-  });
-  const monthBadge = (
-    <div
-      className={cn(
-        "absolute -top-2.5 left-[50%] translate-x-[-50%]",
-        "rounded-full px-1.5 py-0.5 text-xs leading-none",
-        `bg-${backgroundColor} border-foreground border`,
-      )}
-    >
-      <span className="lg:hidden">{shortMonthString}</span>
-      <span className="hidden lg:block">{longMonthString}</span>
-    </div>
-  );
-
-  if (!exists) {
+  if (display === "disabled") {
+    return (
+      <div className={borderClasses} onPointerEnter={clearHoveredSlot}>
+        <div className="p-2 leading-none opacity-50">{dayNum}</div>
+      </div>
+    );
+  } else if (display === "empty") {
     return (
       <div
-        className={cn(borderClasses, "relative")}
-        onPointerEnter={clearHoveredSlot}
-      >
-        <div className="p-2 leading-none opacity-50">{dayNum}</div>
-        {firstOfMonth && monthBadge}
-      </div>
+        className={cn(
+          `bg-${backgroundColor}`,
+          "border-foreground/75 border-dashed",
+          gridRow < numRows && "border-b",
+          rightBorder && "border-r",
+        )}
+      />
     );
   }
 
@@ -132,11 +120,10 @@ function CalendarDay({
     >
       <div
         data-day-string={dayString}
-        className="relative flex h-full w-full flex-col justify-between p-2"
+        className="flex h-full w-full flex-col justify-between p-2"
       >
         <span className="text-left leading-none">{dayNum}</span>
         {!!icon && <div className="flex w-full justify-end">{icon}</div>}
-        {firstOfMonth && monthBadge}
       </div>
     </div>
   );
