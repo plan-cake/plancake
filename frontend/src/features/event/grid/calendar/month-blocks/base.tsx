@@ -20,7 +20,7 @@ export default function BaseMonthBlock({
   backgroundColor: string;
   getDayProps?: (dayString: string) => Partial<CalendarDayProps>;
 }) {
-  const weeks = useMemo(() => {
+  const { weeks, firstWeekday } = useMemo(() => {
     const firstDayOfMonth = new Date(
       parseInt(month.month.split("-")[0]),
       parseInt(month.month.split("-")[1]) - 1,
@@ -80,7 +80,7 @@ export default function BaseMonthBlock({
       weeks.push(currentWeek);
     }
 
-    return weeks;
+    return { weeks, firstWeekday: firstDayOfMonthWeekday };
   }, [month]);
 
   const monthDisplay = useMemo(() => {
@@ -112,7 +112,23 @@ export default function BaseMonthBlock({
         </div>
       </div>
       {/* Slight spacer to avoid hovered slot being cut off by the header */}
-      <div className="border-foreground/75 h-1 w-full border-b border-dashed" />
+      <div className="h-1" />
+      <div
+        className="grid"
+        style={{
+          gridTemplateColumns: "repeat(7, 1fr)",
+        }}
+      >
+        <div
+          className={cn(
+            "border-foreground/75 border-b border-dashed",
+            firstWeekday > 0 && "-ml-px",
+          )}
+          style={{
+            gridColumn: `${firstWeekday + 1} / -1`,
+          }}
+        />
+      </div>
       <div
         style={{
           backgroundImage: NONEXISTENT_SLOT_PATTERN,
