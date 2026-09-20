@@ -95,7 +95,6 @@ export default function BaseMonthBlock({
         className={cn(
           "top-(--header-height) sticky z-10 md:top-0",
           `bg-${backgroundColor}`,
-          "border-foreground/75 w-full border-b border-dashed",
         )}
       >
         <div className="text-lg font-bold">{monthDisplay}</div>
@@ -112,6 +111,8 @@ export default function BaseMonthBlock({
           })}
         </div>
       </div>
+      {/* Slight spacer to avoid hovered slot being cut off by the header */}
+      <div className="border-foreground/75 h-1 w-full border-b border-dashed" />
       <div
         style={{
           backgroundImage: NONEXISTENT_SLOT_PATTERN,
