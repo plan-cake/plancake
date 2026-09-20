@@ -123,8 +123,6 @@ export default function BaseMonthBlock({
           style={{
             gridTemplateColumns: "repeat(7, 1fr)",
             gridTemplateRows: `repeat(${weeks.length}, minmax(var(--week-height), 1fr))`,
-            // borderTopStyle: hasPrev ? "dashed" : undefined,
-            // borderBottomStyle: hasNext ? "dashed" : undefined,
           }}
         >
           {weeks.map((week, wIndex) =>
