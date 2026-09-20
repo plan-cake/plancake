@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import { ALL_WEEKDAYS } from "@/core/event/types";
 import CalendarDay, {
   CalendarDayProps,
 } from "@/features/event/grid/calendar/calendar-day";
@@ -8,6 +9,7 @@ import {
   CalendarGridMonth,
 } from "@/features/event/grid/calendar/types";
 import { NONEXISTENT_SLOT_PATTERN } from "@/features/event/grid/constants";
+import { cn } from "@/lib/utils/classname";
 
 export default function BaseMonthBlock({
   month,
@@ -89,8 +91,26 @@ export default function BaseMonthBlock({
 
   return (
     <div>
-      <div className="border-foreground/75 w-full border-b border-dashed text-lg font-bold">
-        {monthDisplay}
+      <div
+        className={cn(
+          "top-(--header-height) sticky z-10 md:top-0",
+          `bg-${backgroundColor}`,
+          "border-foreground/75 w-full border-b border-dashed",
+        )}
+      >
+        <div className="text-lg font-bold">{monthDisplay}</div>
+        <div className="h-6.25 flex w-full">
+          {ALL_WEEKDAYS.map((day, index) => {
+            return (
+              <div
+                key={index}
+                className="flex h-full w-full items-center justify-center text-sm"
+              >
+                {day}
+              </div>
+            );
+          })}
+        </div>
       </div>
       <div
         style={{

@@ -1,9 +1,8 @@
 import { createEmptyUserAvailability } from "@/core/availability/utils";
-import { ALL_WEEKDAYS } from "@/core/event/types";
 import useCalendarGridInfo from "@/features/event/grid/calendar/lib/use-grid";
 import InteractiveMonthBlock from "@/features/event/grid/calendar/month-blocks/interactive";
 import PreviewMonthBlock from "@/features/event/grid/calendar/month-blocks/preview";
-import ResultsMonBlock from "@/features/event/grid/calendar/month-blocks/results";
+import ResultsMonthBlock from "@/features/event/grid/calendar/month-blocks/results";
 import { GRID_ID } from "@/features/event/grid/constants";
 import GridMessage from "@/features/event/grid/grid-message";
 import { GridProps } from "@/features/event/grid/grid-props";
@@ -54,24 +53,6 @@ export default function CalendarGrid({
     >
       <div
         className={cn(
-          "top-(--header-height) sticky px-2 md:top-0",
-          "h-6.25 z-10 flex w-full",
-          `bg-${backgroundColor}`,
-        )}
-      >
-        {ALL_WEEKDAYS.map((day, index) => {
-          return (
-            <div
-              key={index}
-              className="flex h-full w-full items-center justify-center text-sm"
-            >
-              {day}
-            </div>
-          );
-        })}
-      </div>
-      <div
-        className={cn(
           "flex flex-col gap-2 px-2 pb-2",
           mode === "preview" && "cursor-not-allowed",
         )}
@@ -101,7 +82,7 @@ export default function CalendarGrid({
             );
           } else if (mode === "view") {
             return (
-              <ResultsMonBlock
+              <ResultsMonthBlock
                 key={index}
                 {...commonProps}
                 hoveredDay={hoveredSlot}
