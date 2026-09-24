@@ -10,25 +10,25 @@ export const HERO_IMAGES: Record<
     desktop: {
       light: {
         src: "/images/specific-desktop-light.png",
-        width: 2880,
-        height: 1622,
+        width: 1440,
+        height: 725,
       },
       dark: {
         src: "/images/specific-desktop-dark.png",
-        width: 2880,
-        height: 1618,
+        width: 1440,
+        height: 725,
       },
     },
     mobile: {
       light: {
         src: "/images/specific-mobile-light.png",
-        width: 1206,
-        height: 2622,
+        width: 1204,
+        height: 2141,
       },
       dark: {
         src: "/images/specific-mobile-dark.png",
-        width: 1206,
-        height: 2622,
+        width: 1204,
+        height: 2141,
       },
     },
   },
@@ -36,25 +36,25 @@ export const HERO_IMAGES: Record<
     desktop: {
       light: {
         src: "/images/weekly-desktop-light.png",
-        width: 2880,
-        height: 1626,
+        width: 1440,
+        height: 725,
       },
       dark: {
         src: "/images/weekly-desktop-dark.png",
-        width: 2880,
-        height: 1622,
+        width: 1440,
+        height: 725,
       },
     },
     mobile: {
       light: {
         src: "/images/weekly-mobile-light.png",
-        width: 1206,
-        height: 2622,
+        width: 1204,
+        height: 2141,
       },
       dark: {
         src: "/images/weekly-mobile-dark.png",
-        width: 1206,
-        height: 2622,
+        width: 1204,
+        height: 2141,
       },
     },
   },

@@ -15,6 +15,7 @@ export default function Hero() {
   const stickyRef = useRef<HTMLDivElement>(null);
   const plansMadeRef = useRef<HTMLSpanElement>(null);
   const [clipCenter, setClipCenter] = useState({ x: 0, y: 0 });
+  const [screenDim, setScreenDim] = useState({ vmax: 1000 });
 
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -27,13 +28,6 @@ export default function Hero() {
     offset: ["start start", "end end"],
   });
 
-  const circleScale = useTransform(scrollYProgress, [0.1, 1], [0.035, 1]);
-  const clipRadiusVmax = useTransform(scrollYProgress, [0.1, 1], [3.5, 100]);
-  const clipPath = useTransform(
-    clipRadiusVmax,
-    (r) => `circle(${r}vmax at ${clipCenter.x}px ${clipCenter.y}px)`,
-  );
-
   useLayoutEffect(() => {
     const measure = () => {
       if (!stickyRef.current || !plansMadeRef.current) return;
@@ -43,30 +37,52 @@ export default function Hero() {
         x: stickyRect.left + stickyRect.width / 2 - textRect.left,
         y: stickyRect.top + stickyRect.height / 2 - textRect.top,
       });
+      setScreenDim({
+        vmax: Math.max(window.innerWidth, window.innerHeight),
+      });
     };
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, []);
 
+  // Cap the starting radius so it isn't too large on large screens
+  const startRadius = Math.min(50, Math.max(50, screenDim.vmax * 0.035));
+  const endRadius = screenDim.vmax * 1.5;
+
+  const radius = useTransform(
+    scrollYProgress,
+    [0.1, 1],
+    [startRadius, endRadius],
+  );
+  const circleDiameter = useTransform(radius, (r) => r * 2);
+  const clipPath = useTransform(
+    radius,
+    (r) => `circle(${r}px at ${clipCenter.x}px ${clipCenter.y}px)`,
+  );
+
   const stackOpacity = useTransform(scrollYProgress, [0.2, 0.5], [0, 1]);
   const stackY = useTransform(scrollYProgress, [0.2, 0.5], [24, 0]);
   const restOpacity = useTransform(scrollYProgress, [0.4, 0.8], [0, 1]);
   const restY = useTransform(scrollYProgress, [0.4, 0.8], [24, 0]);
   const imageY = useTransform(scrollYProgress, [0.2, 1], ["110%", "90%"]);
-
-  // Fades out the arrow quickly during the first 5% of the scroll
   const arrowOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
+  const borderWidth = useTransform(scrollYProgress, [0.1, 1], [8, 100]);
 
   return (
     <div className="relative left-1/2 w-[100vw] -translate-x-1/2">
-      <div ref={trackRef} className="bg-lion relative z-10 h-[220vh]">
+      <div ref={trackRef} className="bg-lion relative z-10 h-[250vh]">
         <div ref={stickyRef} className="sticky top-0 h-screen w-full">
           <div className="bg-background absolute inset-0 flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
             <motion.div
               aria-hidden
-              style={{ scale: circleScale, willChange: "transform" }}
-              className="bg-lion border-bone pointer-events-none absolute left-1/2 top-1/2 z-0 h-[200vmax] w-[200vmax] -translate-x-1/2 -translate-y-1/2 rounded-full border-[100px]"
+              style={{
+                width: circleDiameter,
+                height: circleDiameter,
+                borderWidth,
+                willChange: "width, height, border-width",
+              }}
+              className="border-bone bg-lion pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2 rounded-full border-solid"
             />
 
             <HeroContent
@@ -97,7 +113,8 @@ export default function Hero() {
           aria-hidden
           className="pointer-events-none mx-auto w-[90vw] max-w-[1296px]"
         >
-          <div className="aspect-[1/1.25] w-full sm:aspect-square md:aspect-[2/1.125]" />
+          <div className="h-24 md:h-0" />
+          <div className="aspect-[1/1.25] w-full md:aspect-[2/1.125]" />
         </div>
       </div>
     </div>

@@ -31,9 +31,9 @@ export default function HeroImage({ imageY, theme }: HeroImageProps) {
         willChange: "transform",
         transform: "translateZ(0)",
       }}
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto w-[90vw] max-w-[1296px]"
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto w-full max-w-[1296px] md:w-[80vw]"
     >
-      <div className="pointer-events-auto relative z-10 mx-auto mb-4 w-64">
+      <div className="pointer-events-auto relative z-10 mx-auto mb-2 w-64">
         <SegmentedControl
           options={[
             { label: "Specific Dates", value: "specific-dates" },
@@ -73,7 +73,7 @@ export default function HeroImage({ imageY, theme }: HeroImageProps) {
       </div>
 
       <div
-        className="relative mx-auto block w-3/5 max-w-[260px] md:hidden"
+        className="relative mx-auto block w-4/5 max-w-[300px] md:hidden"
         style={{ aspectRatio: `${mobileImage.width} / ${mobileImage.height}` }}
       >
         <AnimatePresence initial={false}>
