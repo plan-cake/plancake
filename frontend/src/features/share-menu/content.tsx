@@ -1,6 +1,9 @@
-import { useEffect, useMemo, useRef } from "react";
+"use client";
 
-import { ShareIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { AnimatePresence, motion } from "framer-motion";
+import { QrCodeIcon, ShareIcon } from "lucide-react";
 import QRCodeStyling from "qr-code-styling";
 
 import CopyToastButton from "@/components/copy-toast-button";
@@ -16,6 +19,8 @@ export default function ShareMenuContent({
   eventTitle: string;
   eventCode: string;
 }) {
+  const [qrCodeShown, setQrCodeShown] = useState(false);
+
   const { addToast } = useToast();
 
   const shareButton: React.ReactNode =
@@ -61,7 +66,26 @@ export default function ShareMenuContent({
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
-      <QRCode url={currentURL} />
+      <div className="flex flex-col items-center">
+        <AnimatePresence>
+          {qrCodeShown && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+              animate={{ opacity: 1, height: "auto", marginBottom: "1rem" }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+              className="overflow-hidden"
+            >
+              <QRCode url={currentURL} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <ActionButton
+          buttonStyle="semi-transparent"
+          icon={<QrCodeIcon />}
+          label={`${qrCodeShown ? "Hide" : "Show"} QR Code`}
+          onClick={() => setQrCodeShown(!qrCodeShown)}
+        />
+      </div>
       <div className="flex flex-col items-center gap-1">
         <div className="text-center">{eventTitle}</div>
         <div

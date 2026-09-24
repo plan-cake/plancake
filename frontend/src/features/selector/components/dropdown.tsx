@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { cloneElement, forwardRef, ReactElement } from "react";
 
 import * as Select from "@radix-ui/react-select";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
@@ -61,7 +61,16 @@ export default function Dropdown<TValue extends string | number | null>({
                 key={option.value?.toString() || ""}
                 value={option.value}
               >
-                {option.label}
+                <div className="flex items-center gap-1.5">
+                  {option.icon &&
+                    cloneElement(
+                      option.icon as ReactElement<{ className: string }>,
+                      {
+                        className: "h-4.5 w-4.5",
+                      },
+                    )}
+                  {option.label}
+                </div>
               </DropdownItem>
             ))}
           </Select.Viewport>

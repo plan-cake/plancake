@@ -17,6 +17,7 @@ class EndpointSerializer(serializers.Serializer):
     output_format = serializers.JSONField(allow_null=True)
     min_auth_required = serializers.CharField(allow_null=True)
     rate_limit = serializers.CharField(allow_null=True)
+    captcha_required = serializers.BooleanField()
 
 
 class DocsSerializer(serializers.Serializer):
@@ -49,6 +50,7 @@ def get_docs(request):
                 ),
                 "min_auth_required": metadata.min_auth_required,
                 "rate_limit": metadata.rate_limit,
+                "captcha_required": metadata.captcha_required,
             }
         )
     return Response({"endpoints": endpoints})
