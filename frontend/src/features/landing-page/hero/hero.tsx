@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { motion, useScroll, useTransform } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { HeroImageTheme } from "@/features/landing-page/hero/config";
@@ -54,6 +55,9 @@ export default function Hero() {
   const restY = useTransform(scrollYProgress, [0.4, 0.8], [24, 0]);
   const imageY = useTransform(scrollYProgress, [0.2, 1], ["110%", "90%"]);
 
+  // Fades out the arrow quickly during the first 5% of the scroll
+  const arrowOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
+
   return (
     <div className="relative left-1/2 w-[100vw] -translate-x-1/2">
       <div ref={trackRef} className="bg-lion relative z-10 h-[220vh]">
@@ -73,6 +77,16 @@ export default function Hero() {
               restY={restY}
               plansMadeRef={plansMadeRef}
             />
+
+            <motion.div
+              style={{ opacity: arrowOpacity }}
+              className="text-foreground pointer-events-none absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 animate-bounce flex-col items-center"
+            >
+              <span className="text-foreground/70 text-sm font-semibold tracking-wide">
+                Scroll!
+              </span>
+              <ChevronDown className="h-6 w-6" />
+            </motion.div>
           </div>
 
           <HeroImage imageY={imageY} theme={heroImageTheme} />
