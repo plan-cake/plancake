@@ -85,6 +85,7 @@ function CalendarDay({
           gridRow < numRows && "border-b",
           rightBorder && "border-r",
         )}
+        onPointerEnter={clearHoveredSlot}
       />
     );
   }

@@ -15,10 +15,12 @@ export default function BaseMonthBlock({
   month,
   backgroundColor,
   getDayProps,
+  clearHoveredSlot,
 }: {
   month: CalendarGridMonth;
   backgroundColor: string;
   getDayProps?: (dayString: string) => Partial<CalendarDayProps>;
+  clearHoveredSlot?: () => void;
 }) {
   const { weeks, firstWeekday } = useMemo(() => {
     const firstDayOfMonth = new Date(
@@ -134,6 +136,7 @@ export default function BaseMonthBlock({
           backgroundImage: NONEXISTENT_SLOT_PATTERN,
         }}
         className="[--week-height:60px] md:[--week-height:80px]"
+        onPointerLeave={clearHoveredSlot}
       >
         <div
           className="grid"
@@ -152,6 +155,8 @@ export default function BaseMonthBlock({
                 gridRow: wIndex + 1,
                 numRows: weeks.length,
                 backgroundColor,
+                clearHoveredSlot:
+                  day.display !== "active" ? clearHoveredSlot : undefined,
               };
 
               const dayProps =
