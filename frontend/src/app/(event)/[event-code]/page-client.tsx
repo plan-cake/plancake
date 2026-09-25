@@ -3,7 +3,13 @@
 import { useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { GlobeIcon, PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
+import {
+  Columns3Icon,
+  GlobeIcon,
+  PencilIcon,
+  ShareIcon,
+  SquarePenIcon,
+} from "lucide-react";
 
 import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
@@ -169,7 +175,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       >
         {showGridPageDaysSelector && (
           <div>
-            <p>Days per page</p>
+            <div className="flex items-center gap-1">
+              <Columns3Icon className="h-3.5 w-3.5" />
+              <p>Days per page</p>
+            </div>
             <GridPageDaysSelector
               id="grid-page-days-selector"
               value={gridPageDays}

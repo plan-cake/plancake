@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
-import { GlobeIcon } from "lucide-react";
+import { Columns3Icon, GlobeIcon } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
 import Captcha from "@/components/captcha";
@@ -300,7 +300,10 @@ export default function ClientPage({
       >
         {showGridPageDaysSelector && (
           <div>
-            <p>Days per page</p>
+            <div className="flex items-center gap-1">
+              <Columns3Icon className="h-3.5 w-3.5" />
+              <p>Days per page</p>
+            </div>
             <GridPageDaysSelector
               id="grid-page-days-selector"
               value={gridPageDays}
