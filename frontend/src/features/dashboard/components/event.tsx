@@ -199,33 +199,35 @@ export default function DashboardEvent({
     >
       {titleContent}
       <div className="text-sm opacity-50">{code}</div>
-      <div className="mb-2 mt-1 flex items-center gap-2">
-        <CalendarRangeIcon className="h-5 w-5" />
-        {(type === "specific" || type === "calendar") && (
-          <DateRangeRow
-            startDate={dateDetails.startDate}
-            endDate={dateDetails.endDate}
-          />
-        )}
-        {type === "weekday" && <WeekdayRow weekdays={dateDetails.weekdays} />}
-      </div>
-      <div className="flex items-center gap-2 text-sm">
-        <ClockIcon className="h-5 w-5" />
-        {type === "calendar" ? (
-          <span className="opacity-50">—</span>
-        ) : (
-          <>
-            <span>
-              {timeRange.display}
-              {timeRange.pastMidnight && <sup className=""> +1</sup>}
-            </span>
-          </>
-        )}
-      </div>
-      <div className="mt-1.5 flex w-full items-center gap-2 bg-inherit">
-        <UsersIcon className="h-5 w-5 shrink-0" />
-        <div className="w-full bg-inherit" ref={participantRowRef}>
-          <ParticipantRow participants={participants} numIcons={numIcons} />
+      <div className="flex flex-col gap-2 bg-inherit">
+        <div className="mt-1 flex items-center gap-2">
+          <CalendarRangeIcon className="h-5 w-5" />
+          {(type === "specific" || type === "calendar") && (
+            <DateRangeRow
+              startDate={dateDetails.startDate}
+              endDate={dateDetails.endDate}
+            />
+          )}
+          {type === "weekday" && <WeekdayRow weekdays={dateDetails.weekdays} />}
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <ClockIcon className="h-5 w-5" />
+          {type === "calendar" ? (
+            <span className="opacity-50">—</span>
+          ) : (
+            <>
+              <span>
+                {timeRange.display}
+                {timeRange.pastMidnight && <sup className=""> +1</sup>}
+              </span>
+            </>
+          )}
+        </div>
+        <div className="flex w-full items-center gap-2 bg-inherit">
+          <UsersIcon className="h-5 w-5 shrink-0" />
+          <div className="w-full bg-inherit" ref={participantRowRef}>
+            <ParticipantRow participants={participants} numIcons={numIcons} />
+          </div>
         </div>
       </div>
       <div data-actions className="mt-2.5 flex items-center gap-2">
