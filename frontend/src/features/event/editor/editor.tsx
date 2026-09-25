@@ -248,7 +248,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         <div className="hidden flex-1 md:col-start-2 md:row-span-9 md:row-start-2 md:block">
           <div className="relative h-full w-full grow">
             <div className="bg-panel absolute inset-0 flex flex-col justify-between gap-2 rounded-3xl px-2 py-4">
-              <div className="min-h-0 flex-1 pr-2">{grid}</div>
+              <div className="min-h-0 flex-1 px-2">{grid}</div>
               {gridDisplayed && (
                 <div className="flex items-center justify-between pl-4 pr-2 text-sm">
                   {previewText}
