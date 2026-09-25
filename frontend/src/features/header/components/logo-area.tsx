@@ -23,6 +23,7 @@ export default function LogoArea() {
         <Link
           href="/version-history"
           className={cn("text-xs", !isFullSize && "pointer-events-none")}
+          aria-hidden={!isFullSize}
           tabIndex={isFullSize ? undefined : -1}
         >
           <LinkText unbolded>{getCurrentVersion()}</LinkText>
