@@ -10,10 +10,12 @@ import { EventInformation } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
+import GridPageDaysSelector from "@/features/event/components/selectors/grid-page-days";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import CalendarGrid from "@/features/event/grid/calendar/grid";
 import { GRID_ID_SELECTOR } from "@/features/event/grid/constants";
 import DateTimeGrid from "@/features/event/grid/date-time/grid";
+import useGridPageDays from "@/features/event/grid/date-time/lib/use-page-days";
 import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
 import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
 import { getResultBanner } from "@/features/event/results/banner";
@@ -27,6 +29,7 @@ import HeaderSpacer from "@/features/header/components/header-spacer";
 import ShareMenu from "@/features/share-menu/menu";
 import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { cn } from "@/lib/utils/classname";
+import { getDatesFromTimeslots } from "@/lib/utils/date-time-format";
 
 export default function ClientPage({
   eventData,
@@ -73,6 +76,13 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     setTimezone(newTZ.toString());
   };
 
+  /* GRID PAGE DAYS */
+  const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
+    useGridPageDays();
+  const showGridPageDaysSelector =
+    getDatesFromTimeslots(timeslots, timezone).size >
+    Math.min(...gridPageDaysOptions);
+
   /* MOBILE DRAWER SPACING */
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);
   const getSpacerHeight = () => {
@@ -98,7 +108,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
   /* DISPLAY SETTINGS */
   const renderTimezoneSelector = (id: string) => (
-    <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
+    <div className="text-sm">
       <div className="flex items-center gap-1">
         <GlobeIcon className="h-3.5 w-3.5" />
         Displaying event in
@@ -126,6 +136,18 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       </div>
     </motion.div>
   );
+
+  const daysPerPageSelector = showGridPageDaysSelector ? (
+    <div className="mb-2">
+      <p>Days per page</p>
+      <GridPageDaysSelector
+        id="grid-page-days-selector"
+        value={gridPageDays}
+        options={gridPageDaysOptions}
+        onChange={setGridPageDays}
+      />
+    </div>
+  ) : null;
 
   const doViewTransition = useViewTransition();
 
@@ -199,9 +221,11 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           availabilities={filteredAvailabilities}
           numParticipants={gridNumParticipants}
           timeslots={timeslots}
+          pageDays={gridPageDays}
         />
 
-        <div className="md:hidden">
+        <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm md:hidden">
+          {daysPerPageSelector}
           {renderTimezoneSelector("timezone-select-mobile")}
         </div>
 
@@ -240,7 +264,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             <AnimatePresence initial={false}>
               {participants.length > 1 && availabilityFilters}
             </AnimatePresence>
-            {renderTimezoneSelector("timezone-select-desktop")}
+            <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
+              {daysPerPageSelector}
+              {renderTimezoneSelector("timezone-select-desktop")}
+            </div>
           </div>
         </div>
       </div>

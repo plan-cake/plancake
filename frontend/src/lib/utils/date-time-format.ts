@@ -184,6 +184,7 @@ export function formatDate(date: string, fmt: string): string {
 }
 
 /**
+<<<<<<< HEAD
  * Formats an arbitrary set of dates into a readable string. The dates are not expected to
  * be contiguous, and the function will group them into ranges.
  *
@@ -329,6 +330,23 @@ export function formatWeekdaySet(weekdays: Set<Weekday>): string | null {
       }
     })
     .join(", ");
+}
+
+/**
+ * Given an array of timeslots (Date objects) and a timezone, returns a Set of unique
+ * dates in "yyyy-MM-dd" format.
+ *
+ * @param timeslots
+ * @param timezone
+ * @returns
+ */
+export function getDatesFromTimeslots(
+  timeslots: Date[],
+  timezone: string,
+): Set<string> {
+  return new Set(
+    timeslots.map((slot) => formatInTimeZone(slot, timezone, "yyyy-MM-dd")),
+  );
 }
 
 /* TIME UTILS */

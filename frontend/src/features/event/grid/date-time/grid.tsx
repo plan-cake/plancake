@@ -42,9 +42,11 @@ const variants = {
 export default function DateTimeGrid({
   timeslots,
   timezone,
+  pageDays,
   mode = "preview",
   eventType,
   unselectedRange = false,
+  setGridDisplayed = () => {},
   availabilities = {},
   numParticipants = 0,
   hoveredSlot,
@@ -64,17 +66,23 @@ export default function DateTimeGrid({
     direction,
     paginate,
     error,
-  } = useDateTimeGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPageUpdate);
+  } = useDateTimeGridinfo(timeslots, timezone, pageDays, onPageUpdate);
 
   // Initial onPageUpdate callback to report pagination info to parent
   // Also triggers if the user changes between mobile and desktop layouts
   const reportedTotalPages = useRef<number | null>(null);
   useEffect(() => {
+    let effectiveCurrentPage = currentPage;
+    if (currentPage >= totalPages) {
+      // If out of bounds, go to the last page
+      effectiveCurrentPage = totalPages - 1;
+      paginate(totalPages - 1 - currentPage);
+    }
     if (reportedTotalPages.current !== totalPages) {
-      onPageUpdate(currentPage, totalPages);
+      onPageUpdate(effectiveCurrentPage, totalPages);
       reportedTotalPages.current = totalPages;
     }
-  }, [onPageUpdate, currentPage, totalPages]);
+  }, [onPageUpdate, currentPage, totalPages, paginate]);
 
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < totalPages - 1;
@@ -95,6 +103,11 @@ export default function DateTimeGrid({
 
     return () => resizeObserver.disconnect();
   });
+
+  const isGridDisplayed = !unselectedRange && !error;
+  useEffect(() => {
+    setGridDisplayed(isGridDisplayed);
+  }, [isGridDisplayed, setGridDisplayed]);
 
   // Dateblocks logic
   const numQuarterHours =

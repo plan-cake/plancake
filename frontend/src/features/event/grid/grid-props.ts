@@ -8,10 +8,12 @@ export interface GridProps {
   mode: "paint" | "view" | "preview";
   timeslots: Date[];
   timezone: string;
+  pageDays: number;
   eventType: EventRange["type"];
   backgroundColor: string;
 
   unselectedRange?: boolean;
+  setGridDisplayed?: (displayed: boolean) => void;
 
   // for "view" mode
   availabilities?: ResultsAvailabilityMap;

@@ -268,7 +268,26 @@ export const VERSION_DATA: VersionHistoryData = [
       "Event codes are now case-insensitive",
     ],
     fixed: [],
-    minorVersions: [],
+    minorVersions: [
+      {
+        version: "v0.5.1",
+        releaseDate: { year: 2026, month: 9, day: 5 },
+        added: [
+          "Icons were added to event-related pages and account settings",
+          "Invisible CAPTCHA verifications were implemented",
+          "Email verification pages now display links to Gmail and Outlook",
+        ],
+        changed: [
+          "The share menu QR code is now initially hidden",
+          "The header shrinking animation is now tied to scroll progress",
+          "Categorized and rewrote version history changes",
+        ],
+        fixed: [
+          "Header submenus are now scaled correctly",
+          "Header buttons no longer shift when switching pages",
+        ],
+      },
+    ],
   },
 ] as const;
 

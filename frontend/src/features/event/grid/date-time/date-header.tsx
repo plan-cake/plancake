@@ -1,12 +1,14 @@
 "use client";
 
 import { Fragment } from "react";
+import { useMemo } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { SIDE_WIDTH, TIME_LABEL_WIDTH } from "@/features/event/grid/constants";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 interface DateHeaderProps {
@@ -41,6 +43,27 @@ const variants = {
   }),
 };
 
+const MONTH_TO_NUM: Record<string, number> = {
+  Jan: 1,
+  Feb: 2,
+  Mar: 3,
+  Apr: 4,
+  May: 5,
+  Jun: 6,
+  Jul: 7,
+  Aug: 8,
+  Sep: 9,
+  Oct: 10,
+  Nov: 11,
+  Dec: 12,
+} as const;
+const condenseMonth = (month: string) => {
+  return MONTH_TO_NUM[month] ?? month;
+};
+const condenseWeekday = (weekday: string) => {
+  return weekday === "Thu" ? "R" : weekday === "Sun" ? "U" : weekday[0];
+};
+
 export default function DateHeader({
   preview = false,
   visibleDays,
@@ -53,6 +76,12 @@ export default function DateHeader({
   onNextPage,
   direction = 0,
 }: DateHeaderProps) {
+  const isMobile = useCheckMobile();
+  const compact = useMemo(
+    () => (isMobile ? visibleDays.length > 4 : visibleDays.length > 7),
+    [isMobile, visibleDays.length],
+  );
+
   return (
     <div
       className={cn(
@@ -98,13 +127,34 @@ export default function DateHeader({
 
               return (
                 <Fragment key={`header-fragment-${i}`}>
-                  <div className="flex flex-1 flex-col items-center justify-center text-sm font-medium leading-tight">
+                  <div
+                    className={cn(
+                      "flex flex-1 flex-col items-center justify-center text-sm leading-tight",
+                      ["Sat", "Sun"].includes(weekday) && "opacity-60",
+                      compact && "tracking-tighter lg:tracking-normal",
+                    )}
+                  >
                     <div>
-                      {isWeekdayEvent ? weekday.toUpperCase() : weekday}
+                      <span className={compact ? "lg:hidden" : "hidden"}>
+                        {condenseWeekday(weekday)}
+                      </span>
+                      <span className={compact ? "hidden lg:block" : ""}>
+                        {isWeekdayEvent ? weekday.toUpperCase() : weekday}
+                      </span>
                     </div>
                     {!isWeekdayEvent && (
-                      <div>
-                        {month} {day.replace(/^0+/, "")}
+                      <div className="flex">
+                        <span className={compact ? "xl:hidden" : "hidden"}>
+                          {condenseMonth(month)}/
+                        </span>
+                        <span
+                          className={
+                            compact ? "hidden xl:mr-1 xl:block" : "mr-1"
+                          }
+                        >
+                          {month}
+                        </span>
+                        <span>{day.replace(/^0+/, "")}</span>
                       </div>
                     )}
                   </div>
