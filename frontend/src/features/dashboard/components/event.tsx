@@ -209,10 +209,10 @@ export default function DashboardEvent({
         )}
         {type === "weekday" && <WeekdayRow weekdays={dateDetails.weekdays} />}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 text-sm">
         <ClockIcon className="h-5 w-5" />
         {type === "calendar" ? (
-          <span className="text-sm opacity-50">—</span>
+          <span className="opacity-50">—</span>
         ) : (
           <>
             <span>
