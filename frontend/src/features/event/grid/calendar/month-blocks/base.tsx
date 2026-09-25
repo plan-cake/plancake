@@ -123,7 +123,7 @@ export default function BaseMonthBlock({
       >
         <div
           className={cn(
-            "border-foreground/75 border-b border-dashed",
+            "border-foreground/75 border-b",
             firstWeekday > 0 && "-ml-px",
           )}
           style={{

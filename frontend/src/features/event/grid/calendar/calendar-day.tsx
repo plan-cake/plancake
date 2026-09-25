@@ -63,7 +63,7 @@ function CalendarDay({
   const borderClasses = isHovered
     ? "border-none"
     : cn(
-        "border-dashed border-foreground/75 border-b border-r",
+        "border-foreground/75 border-b border-r",
         gridColumn === 1 && "border-l",
       );
 
@@ -81,7 +81,7 @@ function CalendarDay({
       <div
         className={cn(
           `bg-${backgroundColor}`,
-          "border-foreground/75 border-dashed",
+          "border-foreground/75",
           gridRow < numRows && "border-b",
           rightBorder && "border-r",
         )}
