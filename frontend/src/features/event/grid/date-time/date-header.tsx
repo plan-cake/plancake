@@ -139,7 +139,7 @@ export default function DateHeader({
                         {condenseWeekday(weekday)}
                       </span>
                       <span className={compact ? "hidden lg:block" : ""}>
-                        {isWeekdayEvent ? weekday.toUpperCase() : weekday}
+                        {weekday}
                       </span>
                     </div>
                     {!isWeekdayEvent && (
