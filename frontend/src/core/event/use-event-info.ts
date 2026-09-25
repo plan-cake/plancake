@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 
 import { DEFAULT_RANGE_SPECIFIC } from "@/core/event/lib/default-range";
 import { expandEventRange } from "@/core/event/lib/expand-event-range";
@@ -42,6 +42,29 @@ export function useEventInfo(initialData?: EventInformation) {
     clearAllErrors,
     batchHandleErrors,
   } = useFormErrors();
+
+  const checkDates = useCallback(
+    (dates?: Set<string>) => {
+      if (state.eventRange.type === "weekday") {
+        handleError("dateRange", "");
+        return;
+      }
+
+      handleError(
+        "dateRange",
+        checkDateRange(dates || state.eventRange.dates, state.eventRange.type),
+      );
+    },
+    [handleError, state.eventRange],
+  );
+  const checkDatesRef = useRef(checkDates);
+  useEffect(() => {
+    checkDatesRef.current = checkDates;
+  }, [checkDates]);
+  // Check the date range when the event type changes (e.g. from specific to calendar)
+  useEffect(() => {
+    checkDatesRef.current();
+  }, [state.eventRange.type]);
 
   // DISPATCHERS (checks input, sets errors if needed)
   const setTitle = useCallback(
@@ -110,18 +133,13 @@ export function useEventInfo(initialData?: EventInformation) {
 
   const setDates = useCallback(
     (dates: Set<string>) => {
-      if (checkDateRange(dates)) {
-        handleError("dateRange", MESSAGES.ERROR_EVENT_RANGE_TOO_LONG);
-      } else {
-        handleError("dateRange", "");
-      }
-
       dispatch({
         type: "SET_DATE_RANGE",
         payload: dates,
       });
+      checkDates(dates);
     },
-    [handleError],
+    [checkDates],
   );
 
   const setWeekdayRange = useCallback(

@@ -1,5 +1,9 @@
 import { EventInformation } from "@/core/event/types";
-import { MAX_DAYS, MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
+import {
+  MAX_CALENDAR_DAYS,
+  MAX_DATE_TIME_DAYS,
+  MAX_TITLE_LENGTH,
+} from "@/features/event/editor/constants";
 import { EventEditorType } from "@/features/event/editor/types";
 import { MESSAGES } from "@/lib/messages";
 
@@ -22,9 +26,14 @@ export async function validateEventData(
     if (!eventRange.dates.size) {
       errors.dateRange = MESSAGES.ERROR_EVENT_DATES_MISSING;
     } else {
-      // check if there are more than 64 days selected
-      if (eventRange.dates.size > MAX_DAYS) {
-        errors.dateRange = MESSAGES.ERROR_EVENT_RANGE_TOO_LONG;
+      if (eventRange.type === "specific") {
+        if (eventRange.dates.size > MAX_DATE_TIME_DAYS) {
+          errors.dateRange = MESSAGES.ERROR_DATE_TIME_EVENT_RANGE_TOO_LONG;
+        }
+      } else {
+        if (eventRange.dates.size > MAX_CALENDAR_DAYS) {
+          errors.dateRange = MESSAGES.ERROR_CALENDAR_EVENT_RANGE_TOO_LONG;
+        }
       }
     }
   }
@@ -49,8 +58,19 @@ export async function validateEventData(
   return errors;
 }
 
-export function checkDateRange(dates: Set<string>): boolean {
-  return dates.size > MAX_DAYS;
+export function checkDateRange(
+  dates: Set<string>,
+  eventType: "specific" | "calendar",
+): string {
+  if (eventType === "specific") {
+    return dates.size > MAX_DATE_TIME_DAYS
+      ? MESSAGES.ERROR_DATE_TIME_EVENT_RANGE_TOO_LONG
+      : "";
+  } else {
+    return dates.size > MAX_CALENDAR_DAYS
+      ? MESSAGES.ERROR_CALENDAR_EVENT_RANGE_TOO_LONG
+      : "";
+  }
 }
 
 export function checkTimeRange(startTime: string, endTime: string): boolean {

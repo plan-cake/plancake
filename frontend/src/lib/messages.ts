@@ -1,7 +1,8 @@
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import {
-  MAX_DURATION,
+  MAX_DATE_TIME_DURATION,
+  MAX_CALENDAR_DURATION,
   MAX_TITLE_LENGTH,
 } from "@/features/event/editor/constants";
 
@@ -35,7 +36,8 @@ export const MESSAGES = {
   ERROR_EVENT_TIMES_MISSING: "Please select possible times for this event.",
   ERROR_EVENT_RANGE_INVALID: "Please select a valid date/time range.",
   ERROR_EVENT_TIMES_INVALID: "Please select a valid time range.",
-  ERROR_EVENT_RANGE_TOO_LONG: `Too many days selected. Max is ${MAX_DURATION}.`,
+  ERROR_DATE_TIME_EVENT_RANGE_TOO_LONG: `Too many days selected. Max is ${MAX_DATE_TIME_DURATION}.`,
+  ERROR_CALENDAR_EVENT_RANGE_TOO_LONG: `Too many days selected. Max is ${MAX_CALENDAR_DURATION}.`,
 
   // default name errors
   ERROR_DEFAULT_NAME_LENGTH: `Max ${MAX_DEFAULT_NAME_LENGTH} characters.`,
