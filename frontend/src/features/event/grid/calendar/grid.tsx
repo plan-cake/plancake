@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { createEmptyUserAvailability } from "@/core/availability/utils";
 import useCalendarGridInfo from "@/features/event/grid/calendar/lib/use-grid";
 import InteractiveMonthBlock from "@/features/event/grid/calendar/month-blocks/interactive";
@@ -16,6 +18,7 @@ export default function CalendarGrid({
   timeslots,
   backgroundColor,
   unselectedRange = false,
+  setGridDisplayed = () => {},
   availabilities = {},
   numParticipants = 0,
   hoveredSlot,
@@ -26,6 +29,11 @@ export default function CalendarGrid({
   const isMobile = useCheckMobile();
 
   const { monthBlocks, error } = useCalendarGridInfo(timeslots);
+
+  const isGridDisplayed = !unselectedRange && !error;
+  useEffect(() => {
+    setGridDisplayed(isGridDisplayed);
+  }, [isGridDisplayed, setGridDisplayed]);
 
   if (unselectedRange) {
     return (
