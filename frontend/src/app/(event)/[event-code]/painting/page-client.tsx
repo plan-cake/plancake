@@ -33,6 +33,7 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { SelfAvailability } from "@/lib/utils/api/types";
+import { cn } from "@/lib/utils/classname";
 import {
   getDatesFromTimeslots,
   timeslotToISOString,
@@ -289,32 +290,38 @@ export default function ClientPage({
     />
   );
 
-  const displaySettings = (
-    <div className="bg-panel flex flex-col gap-2 rounded-3xl p-6 text-sm">
-      {showGridPageDaysSelector && (
+  const displaySettings = (desktop: boolean) =>
+    eventRange.type !== "calendar" && (
+      <div
+        className={cn(
+          "bg-panel flex-col gap-2 rounded-3xl p-6 text-sm",
+          desktop ? "hidden md:flex" : "flex md:hidden",
+        )}
+      >
+        {showGridPageDaysSelector && (
+          <div>
+            <p>Days per page</p>
+            <GridPageDaysSelector
+              id="grid-page-days-selector"
+              value={gridPageDays}
+              options={gridPageDaysOptions}
+              onChange={setGridPageDays}
+            />
+          </div>
+        )}
         <div>
-          <p>Days per page</p>
-          <GridPageDaysSelector
-            id="grid-page-days-selector"
-            value={gridPageDays}
-            options={gridPageDaysOptions}
-            onChange={setGridPageDays}
+          <div className="flex items-center gap-1">
+            <GlobeIcon className="h-3.5 w-3.5" />
+            Displaying event in
+          </div>
+          <TimeZoneSelector
+            id={"timezone-select-" + (desktop ? "desktop" : "mobile")}
+            value={timeZone}
+            onChange={setTimeZone}
           />
         </div>
-      )}
-      <div className="text-sm">
-        <div className="flex items-center gap-1">
-          <GlobeIcon className="h-3.5 w-3.5" />
-          Displaying event in
-        </div>
-        <TimeZoneSelector
-          id="timezone-select"
-          value={timeZone}
-          onChange={setTimeZone}
-        />
       </div>
-    </div>
-  );
+    );
 
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
@@ -361,7 +368,7 @@ export default function ClientPage({
             setSaveDefaultName={setSaveDefaultName}
           />
 
-          {displaySettings}
+          {displaySettings(true)}
         </div>
 
         {/* Right Panel */}
@@ -381,7 +388,7 @@ export default function ClientPage({
           pageDays={gridPageDays}
         />
 
-        <div className="md:hidden">{displaySettings}</div>
+        {displaySettings(false)}
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}

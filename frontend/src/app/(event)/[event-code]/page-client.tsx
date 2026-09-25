@@ -106,22 +106,6 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     isCreator,
   );
 
-  /* DISPLAY SETTINGS */
-  const renderTimezoneSelector = (id: string) => (
-    <div className="text-sm">
-      <div className="flex items-center gap-1">
-        <GlobeIcon className="h-3.5 w-3.5" />
-        Displaying event in
-      </div>
-      <TimeZoneSelector
-        id={id}
-        value={timezone}
-        onChange={handleTZChange}
-        drawerNesting={0}
-      />
-    </div>
-  );
-
   const availabilityFilters = (
     <motion.div
       key="availability-filters"
@@ -136,18 +120,6 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       </div>
     </motion.div>
   );
-
-  const daysPerPageSelector = showGridPageDaysSelector ? (
-    <div className="mb-2">
-      <p>Days per page</p>
-      <GridPageDaysSelector
-        id="grid-page-days-selector"
-        value={gridPageDays}
-        options={gridPageDaysOptions}
-        onChange={setGridPageDays}
-      />
-    </div>
-  ) : null;
 
   const doViewTransition = useViewTransition();
 
@@ -187,6 +159,39 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     />
   );
 
+  const displaySettings = (desktop: boolean) =>
+    eventData.eventRange.type !== "calendar" && (
+      <div
+        className={cn(
+          "bg-panel flex-col gap-2 rounded-3xl p-6 text-sm",
+          desktop ? "hidden md:flex" : "flex md:hidden",
+        )}
+      >
+        {showGridPageDaysSelector && (
+          <div>
+            <p>Days per page</p>
+            <GridPageDaysSelector
+              id="grid-page-days-selector"
+              value={gridPageDays}
+              options={gridPageDaysOptions}
+              onChange={setGridPageDays}
+            />
+          </div>
+        )}
+        <div>
+          <div className="flex items-center gap-1">
+            <GlobeIcon className="h-3.5 w-3.5" />
+            Displaying event in
+          </div>
+          <TimeZoneSelector
+            id={"timezone-select-" + (desktop ? "desktop" : "mobile")}
+            value={timezone}
+            onChange={handleTZChange}
+          />
+        </div>
+      </div>
+    );
+
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
       <HeaderSpacer />
@@ -224,10 +229,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           pageDays={gridPageDays}
         />
 
-        <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm md:hidden">
-          {daysPerPageSelector}
-          {renderTimezoneSelector("timezone-select-mobile")}
-        </div>
+        {displaySettings(false)}
 
         {/* Mobile Spacer & Drawer */}
         <div
@@ -264,10 +266,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             <AnimatePresence initial={false}>
               {participants.length > 1 && availabilityFilters}
             </AnimatePresence>
-            <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
-              {daysPerPageSelector}
-              {renderTimezoneSelector("timezone-select-desktop")}
-            </div>
+            {displaySettings(true)}
           </div>
         </div>
       </div>
