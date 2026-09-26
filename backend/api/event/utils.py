@@ -14,7 +14,12 @@ from api.models import (
     UrlCode,
     UserEvent,
 )
-from api.settings import MAX_EVENT_DAYS, RAND_URL_CODE_ATTEMPTS, RAND_URL_CODE_LENGTH
+from api.settings import (
+    MAX_DATE_TIME_EVENT_DAYS,
+    MAX_CALENDAR_EVENT_DAYS,
+    RAND_URL_CODE_ATTEMPTS,
+    RAND_URL_CODE_LENGTH,
+)
 
 logger = logging.getLogger("api")
 
@@ -126,8 +131,8 @@ def validate_date_timeslots(
             )
         else:
             add_error("Event must start today or in the future.")
-    if len(dates) > MAX_EVENT_DAYS:
-        add_error(f"Max event length is {MAX_EVENT_DAYS} days.")
+    if len(dates) > MAX_DATE_TIME_EVENT_DAYS:
+        add_error(f"Max event length is {MAX_DATE_TIME_EVENT_DAYS} days.")
 
     if not check_timeslot_times(timeslots):
         add_error("Timeslots must be on 15-minute intervals.")
@@ -173,8 +178,8 @@ def validate_calendar_timeslots(
             )
         else:
             add_error("Event must start today or in the future.")
-    if len(dates) > MAX_EVENT_DAYS:
-        add_error(f"Max event length is {MAX_EVENT_DAYS} days.")
+    if len(dates) > MAX_CALENDAR_EVENT_DAYS:
+        add_error(f"Max event length is {MAX_CALENDAR_EVENT_DAYS} days.")
 
     return errors
 
