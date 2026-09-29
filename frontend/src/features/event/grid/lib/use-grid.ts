@@ -54,7 +54,7 @@ export default function useGridInfo(
     }
   };
 
-  return { ...view, currentPage, direction, paginate };
+  return { ...view, currentPage, direction, paginate, maxColumns: daysPerPage };
 }
 
 /* HELPER FUNCTIONS */

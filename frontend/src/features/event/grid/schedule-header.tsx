@@ -15,6 +15,7 @@ interface ScheduleHeaderProps {
   visibleDays: { dayKey: string; dayDisplay: string }[];
   currentPage: number;
   totalPages: number;
+  maxColumns: number;
   scrollbarPresent?: boolean;
   isWeekdayEvent?: boolean;
   onPrevPage: () => void;
@@ -42,41 +43,50 @@ export default function ScheduleHeader({
   visibleDays,
   currentPage,
   totalPages,
+  maxColumns,
   scrollbarPresent = false,
   isWeekdayEvent = false,
   onPrevPage,
   onNextPage,
   direction = 0,
 }: ScheduleHeaderProps) {
+  const visibleDaysCount = visibleDays.length;
+  const emptyColumnsCount = maxColumns - visibleDaysCount;
+
   return (
     <div
       className={cn(
-        preview ? "bg-background md:bg-panel" : "bg-background",
-        scrollbarPresent && "pr-4",
-        "sticky top-[var(--header-height)] md:top-0",
-        "z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
+       preview ? "bg-background md:bg-panel" : "bg-background",
+       scrollbarPresent && "pr-4",
+       "sticky top-[var(--header-height)] md:top-0",
+       "z-10 col-span-2 grid h-[50px] w-full items-center justify-start",
       )}
       style={{
-        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 10}px`,
+        gridTemplateColumns: `${TIME_LABEL_WIDTH}px repeat(${visibleDaysCount}, 1fr) ${
+          emptyColumnsCount > 0 ? `repeat(${emptyColumnsCount}, 1fr)` : ""
+        } ${SIDE_WIDTH}px`,
       }}
     >
-      {currentPage > 0 ? (
-        <div>
+      <div className="flex h-full items-center justify-center">
+        {currentPage > 0 && (
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronLeftIcon />}
             onClick={onPrevPage}
-            className="ml-3 p-1.5"
+            className="p-1.5"
             aria-label="Previous Page"
             tooltip="Previous Page"
           />
-        </div>
-      ) : (
-        <div style={{ width: `${SIDE_WIDTH}px` }} />
-      )}
+        )}
+      </div>
 
-      {/* This container takes up the '1fr' space */}
-      <div className="relative grid h-full select-none overflow-hidden">
+       {/* This container takes up the '1fr' space */}
+      <div
+        className="relative h-full w-full select-none overflow-hidden"
+        style={{
+          gridColumn: `2 / span ${visibleDaysCount}`,
+        }}
+      >
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div
             key={currentPage}
@@ -88,7 +98,7 @@ export default function ScheduleHeader({
             transition={{ type: "tween", ease: "easeInOut" }}
             className="absolute inset-0 grid h-full w-full items-center"
             style={{
-              gridTemplateColumns: `repeat(${visibleDays.length}, 1fr)`,
+              gridTemplateColumns: `repeat(${visibleDaysCount}, 1fr)`,
             }}
           >
             {visibleDays.map(({ dayDisplay }, i) => {
@@ -112,8 +122,11 @@ export default function ScheduleHeader({
         </AnimatePresence>
       </div>
 
-      {currentPage < totalPages - 1 ? (
-        <div>
+      <div
+        className="flex h-full items-center justify-center"
+        style={{ gridColumn: maxColumns + 2 }}
+      >
+        {currentPage < totalPages - 1 && (
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronRightIcon />}
@@ -122,10 +135,8 @@ export default function ScheduleHeader({
             aria-label="Next Page"
             tooltip="Next Page"
           />
-        </div>
-      ) : (
-        <div style={{ width: `${SIDE_WIDTH}px` }} />
-      )}
+        )}
+      </div>
     </div>
   );
 }
