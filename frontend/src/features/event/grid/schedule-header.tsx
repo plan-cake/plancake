@@ -53,7 +53,8 @@ export default function ScheduleHeader({
 }: ScheduleHeaderProps) {
   const { topMarginClass } = useHeaderSize();
 
-  const gridWidth = (visibleDays.length / maxColumns) * 100;
+  const visibleDaysCount = visibleDays.length;
+  const emptyColumnsCount = maxColumns - visibleDaysCount;
 
   return (
     <div
@@ -63,7 +64,9 @@ export default function ScheduleHeader({
         "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-start",
       )}
       style={{
-        gridTemplateColumns: `${TIME_LABEL_WIDTH}px minmax(0, ${gridWidth}%) ${SIDE_WIDTH}px`,
+        gridTemplateColumns: `${TIME_LABEL_WIDTH}px repeat(${visibleDaysCount}, 1fr) ${
+          emptyColumnsCount > 0 ? `repeat(${emptyColumnsCount}, 1fr)` : ""
+        } ${SIDE_WIDTH}px`,
       }}
     >
       <div className="flex h-full items-center justify-center">
@@ -79,8 +82,13 @@ export default function ScheduleHeader({
         )}
       </div>
 
-      {/* This container takes up the '1fr' space */}
-      <div className="relative h-full w-full select-none overflow-hidden">
+       {/* This container takes up the '1fr' space */}
+      <div
+        className="relative h-full w-full select-none overflow-hidden"
+        style={{
+          gridColumn: `2 / span ${visibleDaysCount}`,
+        }}
+      >
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div
             key={currentPage}
@@ -92,7 +100,7 @@ export default function ScheduleHeader({
             transition={{ type: "tween", ease: "easeInOut" }}
             className="absolute inset-0 grid h-full w-full items-center"
             style={{
-              gridTemplateColumns: `repeat(${visibleDays.length}, 1fr)`,
+              gridTemplateColumns: `repeat(${visibleDaysCount}, 1fr)`,
             }}
           >
             {visibleDays.map(({ dayDisplay }, i) => {
@@ -116,7 +124,10 @@ export default function ScheduleHeader({
         </AnimatePresence>
       </div>
 
-      <div className="flex h-full items-center justify-center">
+      <div
+        className="flex h-full items-center justify-center"
+        style={{ gridColumn: maxColumns + 2 }}
+      >
         {currentPage < totalPages - 1 && (
           <ActionButton
             buttonStyle="semi-transparent"

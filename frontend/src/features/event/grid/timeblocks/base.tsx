@@ -14,14 +14,16 @@ export default function BaseTimeBlock({
   hasPrev = false,
   onMouseLeave,
 }: TimeBlockProps) {
-  const gridWidth = (visibleDaysCount / maxColumns) * 100;
+  const emptyColumnsCount = maxColumns - visibleDaysCount;
 
   return (
     <div
-      className="relative isolate grid"
+      className="relative isolate grid w-full"
       onMouseLeave={onMouseLeave}
       style={{
-        gridTemplateColumns: `${TIME_LABEL_WIDTH}px minmax(0, ${gridWidth}%) auto`,
+        gridTemplateColumns: `${TIME_LABEL_WIDTH}px repeat(${visibleDaysCount}, 1fr) ${
+          emptyColumnsCount > 0 ? `repeat(${emptyColumnsCount}, 1fr)` : ""
+        } ${SIDE_WIDTH}px`,
       }}
     >
       <div
@@ -47,13 +49,15 @@ export default function BaseTimeBlock({
 
       <div
         className={cn(
-          "bg-foreground border-foreground/75 grid w-full gap-x-[1px] border",
+          "bg-foreground border-foreground/75 grid border",
           hasPrev && "border-l-0",
           hasNext && "border-r-0",
         )}
         style={{
+          gridColumn: `2 / span ${visibleDaysCount}`,
           gridTemplateColumns: `repeat(${visibleDaysCount}, 1fr)`,
           gridTemplateRows: `repeat(${numQuarterHours}, minmax(20px, 1fr))`,
+          gap: "1px",
         }}
       >
         {Array.from({ length: visibleDaysCount }).map((_, idx) => (
@@ -85,6 +89,7 @@ export default function BaseTimeBlock({
             "divide-foreground/75 border-foreground/75 divide-y divide-dashed border border-r-0",
         )}
         style={{
+          gridColumn: maxColumns + 2,
           gridTemplateColumns: `${SIDE_WIDTH}px`,
           gridTemplateRows: `repeat(${numQuarterHours}, minmax(20px, 1fr))`,
           maskImage: "linear-gradient(to right, black, transparent)",
