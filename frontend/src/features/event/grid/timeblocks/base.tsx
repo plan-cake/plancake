@@ -57,7 +57,7 @@ export default function BaseTimeBlock({
           gridColumn: `2 / span ${visibleDaysCount}`,
           gridTemplateColumns: `repeat(${visibleDaysCount}, 1fr)`,
           gridTemplateRows: `repeat(${numQuarterHours}, minmax(20px, 1fr))`,
-          gap: "1px",
+          columnGap: "1px",
         }}
       >
         {Array.from({ length: visibleDaysCount }).map((_, idx) => (
