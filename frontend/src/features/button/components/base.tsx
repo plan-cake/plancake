@@ -33,6 +33,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       loading = false,
       disabled = false,
       href,
+      target,
       onClick,
       loadOnSuccess = false,
       className,
@@ -144,6 +145,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
           {...props}
           className={"group focus:outline-none"}
           href={href!}
+          target={target ?? undefined}
         >
           {buttonContent}
         </Link>

@@ -41,6 +41,7 @@ class APIMetadata:
         self.output_serializer_class = None
         self.rate_limit = None
         self.min_auth_required = None
+        self.captcha_required = False
 
 
 def get_metadata(func):

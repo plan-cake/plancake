@@ -8,7 +8,6 @@ import {
   SIDE_WIDTH,
   TIME_LABEL_WIDTH,
 } from "@/features/event/grid/lib/constants";
-import { useHeaderSize } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
 interface ScheduleHeaderProps {
@@ -59,9 +58,10 @@ export default function ScheduleHeader({
   return (
     <div
       className={cn(
-        preview ? "md:bg-panel top-0" : cn(topMarginClass, "bg-background"),
-        scrollbarPresent && "pr-4",
-        "sticky z-10 col-span-2 grid h-[50px] w-full items-center justify-start",
+       preview ? "bg-background md:bg-panel" : "bg-background",
+       scrollbarPresent && "pr-4",
+       "sticky top-[var(--header-height)] md:top-0",
+       "z-10 col-span-2 grid h-[50px] w-full items-center justify-start",
       )}
       style={{
         gridTemplateColumns: `${TIME_LABEL_WIDTH}px repeat(${visibleDaysCount}, 1fr) ${
