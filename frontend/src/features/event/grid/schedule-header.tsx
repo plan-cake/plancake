@@ -50,8 +50,6 @@ export default function ScheduleHeader({
   onNextPage,
   direction = 0,
 }: ScheduleHeaderProps) {
-  const { topMarginClass } = useHeaderSize();
-
   const visibleDaysCount = visibleDays.length;
   const emptyColumnsCount = maxColumns - visibleDaysCount;
 
