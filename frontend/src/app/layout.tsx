@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import type { Metadata } from "next";
 import { Modak, Nunito } from "next/font/google";
 
@@ -94,6 +95,7 @@ export default async function RootLayout({
             </CookieGuard>
           </Providers>
           <Analytics />
+          <SpeedInsights />
         </div>
       </body>
     </html>
