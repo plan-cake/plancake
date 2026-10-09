@@ -67,7 +67,7 @@ export type EventEditData = {
   event_code: string;
 }
 
-type ApiEventType = "Date" | "Week";
+type ApiEventType = "Date" | "Week" | "Calendar";
 
 export type EventDetails = {
   title: string;
