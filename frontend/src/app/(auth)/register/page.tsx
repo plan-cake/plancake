@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import ActionButton from "@/features/button/components/action";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -24,6 +25,7 @@ export default function Page() {
   const [passwordCriteria, setPasswordCriteria] = useState({});
   const [showPasswordCriteria, setShowPasswordCriteria] = useState(false);
   const router = useRouter();
+  const isMobile = useCheckMobile();
 
   // CAPTCHA STATES
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -32,14 +34,44 @@ export default function Page() {
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
-  function passwordIsStrong() {
+  const passwordIsStrong = useCallback(() => {
     return Object.values(passwordCriteria).every((value) => value === true);
-  }
+  }, [passwordCriteria]);
+
+  // CHECK FIELDS
+  const invalidForm = useMemo(() => {
+    return captchaInitError
+      ? MESSAGES.ERROR_CAPTCHA_BLOCKED
+      : !email || !email.trim() || !password
+        ? MESSAGES.FORM_NOT_FILLED
+        : !passwordIsStrong()
+          ? MESSAGES.ERROR_PASSWORD_WEAK
+          : !confirmPassword
+            ? MESSAGES.FORM_NOT_FILLED
+            : password !== confirmPassword
+              ? MESSAGES.ERROR_PASSWORD_MISMATCH
+              : Object.keys(errors).length
+                ? MESSAGES.FORM_HAS_ERRORS
+                : undefined;
+  }, [
+    captchaInitError,
+    email,
+    password,
+    confirmPassword,
+    passwordIsStrong,
+    errors,
+  ]);
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
     handleError("api", "");
     setEmail(value);
+  };
+
+  const handlePasswordChange = (value: string) => {
+    handleError("password", "");
+    handleError("api", "");
+    setPassword(value);
   };
 
   const handleConfirmPasswordChange = (value: string) => {
@@ -131,7 +163,7 @@ export default function Page() {
           label="Password*"
           value={password}
           onChange={(value) => {
-            setPassword(value);
+            handlePasswordChange(value);
           }}
           onFocus={() => setShowPasswordCriteria(true)}
           onBlur={() => {
@@ -169,9 +201,10 @@ export default function Page() {
           <ActionButton
             buttonStyle="primary"
             label="Register"
+            tooltip={invalidForm}
             onClick={handleSubmit}
+            disabled={(!isMobile && !!invalidForm) || captchaInitError}
             loadOnSuccess
-            disabled={captchaInitError}
           />
         </div>
       </div>

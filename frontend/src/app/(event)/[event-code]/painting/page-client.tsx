@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
 import { GlobeIcon } from "lucide-react";
@@ -24,6 +24,7 @@ import {
   RateLimitBanner,
   useToast,
 } from "@/features/system-feedback";
+import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -64,7 +65,7 @@ export default function ClientPage({
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { errors, handleError, clearAllErrors } = useFormErrors();
 
   // VISITED LAST PAGE STATE
   const [maxVisitedPage, setMaxVisitedPage] = useState(0);
@@ -96,6 +97,26 @@ export default function ClientPage({
   //   return () => removeToast(toastId);
   // }, [addToast, removeToast]);
 
+  // FORM VALIDATION
+  const invalidForm = useMemo(() => {
+    if (captchaInitError) {
+      return MESSAGES.ERROR_CAPTCHA_BLOCKED;
+    }
+
+    const hasName = displayName && displayName.trim();
+    const hasAvailability = userAvailability && userAvailability.size > 0;
+
+    return !hasName
+      ? !hasAvailability
+        ? "Please fill out your name and availability."
+        : "Please fill out your name."
+      : Object.keys(errors).length
+        ? MESSAGES.FORM_HAS_ERRORS
+        : !hasAvailability
+          ? "Please select your availability on the grid."
+          : undefined;
+  }, [captchaInitError, displayName, userAvailability, errors]);
+
   const checkNameAvailability = useDebouncedCallback(async (displayName) => {
     try {
       await clientPost(ROUTES.availability.checkDisplayName, {
@@ -105,10 +126,7 @@ export default function ClientPage({
     } catch (e) {
       const error = e as ApiErrorResponse;
       if (error.badRequest) {
-        setErrors((prev) => ({
-          ...prev,
-          displayName: MESSAGES.ERROR_NAME_TAKEN,
-        }));
+        handleError("displayName", MESSAGES.ERROR_NAME_TAKEN);
       } else {
         addToast("error", error.formattedMessage);
       }
@@ -117,20 +135,14 @@ export default function ClientPage({
 
   const handleNameChange = (value: string) => {
     setDisplayName(value);
-    if (value === "") {
+    if (value.trim() === "") {
       checkNameAvailability.cancel();
-      setErrors((prev) => ({
-        ...prev,
-        displayName: MESSAGES.ERROR_NAME_MISSING,
-      }));
+      handleError("displayName", MESSAGES.ERROR_NAME_MISSING);
     } else if (value.length > MAX_DISPLAY_NAME_LENGTH) {
       checkNameAvailability.cancel();
-      setErrors((prev) => ({
-        ...prev,
-        displayName: MESSAGES.ERROR_NAME_LENGTH,
-      }));
+      handleError("displayName", MESSAGES.ERROR_NAME_LENGTH);
     } else {
-      setErrors((prev) => ({ ...prev, displayName: "" }));
+      handleError("displayName", "");
       checkNameAvailability(value);
     }
   };
@@ -165,14 +177,14 @@ export default function ClientPage({
 
   // SUBMIT AVAILABILITY
   const handleSubmitAvailability = async () => {
-    setErrors({}); // reset errors
+    clearAllErrors(); // reset errors
 
     const validationErrors = await validateAvailabilityData(state);
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      Object.values(validationErrors).forEach((error) =>
-        addToast("error", error),
-      );
+      for (const [field, message] of Object.entries(validationErrors)) {
+        handleError(field, message);
+        addToast("error", message);
+      }
       return false;
     }
 
@@ -189,10 +201,7 @@ export default function ClientPage({
     }
 
     if (!captchaToken) {
-      setErrors((prev) => ({
-        ...prev,
-        captcha: MESSAGES.ERROR_CAPTCHA_FAILED,
-      }));
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       return false;
     }
 
@@ -243,15 +252,12 @@ export default function ClientPage({
     } catch (e) {
       const error = e as ApiErrorResponse;
       if (error.rateLimited) {
-        setErrors((prev) => ({
-          ...prev,
-          rate_limit: error.formattedMessage || MESSAGES.ERROR_RATE_LIMIT,
-        }));
+        handleError(
+          "rate_limit",
+          error.formattedMessage || MESSAGES.ERROR_RATE_LIMIT,
+        );
       } else if (error.captchaFailed) {
-        setErrors((prev) => ({
-          ...prev,
-          captcha: MESSAGES.ERROR_CAPTCHA_FAILED,
-        }));
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       } else {
         addToast("error", error.formattedMessage);
       }
@@ -268,7 +274,7 @@ export default function ClientPage({
       loadOnSuccess
     />
   );
-  const submitButton = (
+  const submitButton = (desktop: boolean) => (
     <ActionButton
       buttonStyle="primary"
       label={
@@ -276,9 +282,10 @@ export default function ClientPage({
           ? "Update Availability"
           : "Submit Availability"
       }
+      tooltip={desktop && invalidForm ? invalidForm : undefined}
       onClick={handleSubmitAvailability}
+      disabled={(desktop && !!invalidForm) || captchaInitError}
       loadOnSuccess
-      disabled={captchaInitError}
     />
   );
 
@@ -295,13 +302,7 @@ export default function ClientPage({
       <Captcha
         backendVerificationFailed={!!errors.captcha}
         onTokenChange={setCaptchaToken}
-        onClearBackendError={() =>
-          setErrors((prev) => {
-            const newErrors = { ...prev };
-            delete newErrors.captcha;
-            return newErrors;
-          })
-        }
+        onClearBackendError={() => handleError("captcha", "")}
         onInitError={() => setCaptchaInitError(true)}
       />
 
@@ -310,7 +311,7 @@ export default function ClientPage({
         <h1 className="text-2xl font-bold">{eventName}</h1>
         <div className="hidden items-center gap-2 md:flex">
           {cancelButton}
-          {submitButton}
+          {submitButton(true)}
         </div>
       </div>
 
@@ -373,7 +374,7 @@ export default function ClientPage({
       <div className="z-10">
         <MobileFooterIsland
           leftButtons={[cancelButton]}
-          rightButtons={[submitButton]}
+          rightButtons={[submitButton(false)]}
           viewTransitionName="painting-island"
         >
           <div className="mx-3 -mt-2">
