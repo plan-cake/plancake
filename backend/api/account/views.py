@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 import bcrypt
 from device_detector import DeviceDetector
-from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Q
 from rest_framework.response import Response
@@ -30,15 +29,16 @@ from api.settings import (
     ACCOUNT_COOKIE_NAME,
     AUTHED_PWD_RESET_EXP_SECONDS,
     LONG_SESS_EXP_SECONDS,
-    SEND_EMAILS,
     SESS_EXP_SECONDS,
     ThrottleScopes,
 )
 from api.utils import (
+    EmailTemplateKey,
     MessageOutputSerializer,
     check_rate_limit,
     delete_session_cookie,
     prune_account_sessions,
+    send_templated_email,
 )
 
 logger = logging.getLogger("api")
@@ -244,14 +244,11 @@ def start_authed_password_reset(request):
     )
     logger.debug("Authed password reset code for %s: %s", user.email, reset_code)
 
-    if SEND_EMAILS:
-        send_mail(
-            subject="Plancake - Password Reset Code",
-            message=f"Your password reset code is: {reset_code}.\n\nNot you? You should change your password immediately to protect your account.",
-            from_email=None,  # Use the default from settings
-            recipient_list=[user.email],
-            fail_silently=False,
-        )
+    send_templated_email(
+        to_email=user.email,
+        template_key=EmailTemplateKey.PASSWORD_RESET_CODE,
+        context={"code": reset_code},
+    )
 
     return Response(
         {"message": ["An email has been sent to your address with the reset code."]},
