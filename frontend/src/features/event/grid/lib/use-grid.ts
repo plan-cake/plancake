@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { formatInTimeZone, toZonedTime } from "date-fns-tz";
+import { format, toZonedTime } from "date-fns-tz";
 
 import { MESSAGES } from "@/lib/messages";
 
@@ -29,14 +29,15 @@ import { MESSAGES } from "@/lib/messages";
 export default function useGridInfo(
   timeslots: Date[],
   timezone: string,
+  isWeekdayEvent: boolean,
   daysPerPage: number,
   onPaginate: (index: number, pages: number) => void,
 ) {
   const [[currentPage, direction], setCurrentPage] = useState([0, 0]);
 
   const data = useMemo(
-    () => processTimeslots(timeslots, timezone),
-    [timeslots, timezone],
+    () => processTimeslots(timeslots, timezone, isWeekdayEvent),
+    [timeslots, timezone, isWeekdayEvent],
   );
 
   const view = useMemo(
@@ -60,6 +61,44 @@ export default function useGridInfo(
 /* HELPER FUNCTIONS */
 
 /**
+ * Processes a single timeslot into components for displaying in the grid.
+ *
+ * If the event is a weekday event, the timeslot is normalized to the reference week to
+ * ensure the grid only displays 7 days maximum.
+ *
+ * @param slot The timeslot Date object to process
+ * @param timezone The user's timezone to convert the timeslot into
+ * @param isWeekdayEvent If the event is a weekday event
+ * @returns An object containing the day key, display string, hour, and minute components
+ */
+function getSlotComponents(
+  slot: Date,
+  timezone: string,
+  isWeekdayEvent: boolean,
+) {
+  const slotInTZ = toZonedTime(slot, timezone);
+  let normalizedSlot = slotInTZ;
+
+  if (isWeekdayEvent) {
+    // Normalize to the reference week dates (2012-01-01 - 2012-01-07)
+    normalizedSlot = new Date(
+      2012,
+      0,
+      slotInTZ.getDay() + 1,
+      slotInTZ.getHours(),
+      slotInTZ.getMinutes(),
+    );
+  }
+
+  const [dayKey, dayDisplay, hour, minute] = format(
+    normalizedSlot,
+    "yyyy-MM-dd:EEE MMM dd:HH:mm",
+  ).split(":");
+
+  return { dayKey, dayDisplay, hour, minute };
+}
+
+/**
  * Processes the given timeslots into structured timeblocks and converts
  * them to the display timezone, grouped by day for easier reference from
  * grid components.
@@ -69,7 +108,11 @@ export default function useGridInfo(
  * - days: Array of unique days the timeslots span
  * - slotsByDay: Map of day string to array of timeslots on that day
  */
-function processTimeslots(timeslots: Date[], timezone: string) {
+function processTimeslots(
+  timeslots: Date[],
+  timezone: string,
+  isWeekdayEvent: boolean,
+) {
   if (!timeslots || timeslots.length === 0) return null;
 
   const slotsByDay = new Map<
@@ -81,9 +124,11 @@ function processTimeslots(timeslots: Date[], timezone: string) {
 
   /* GROUP SLOTS BY DAY */
   for (const slot of timeslots) {
-    const dayKey = formatInTimeZone(slot, timezone, "yyyy-MM-dd");
-    const dayDisplay = formatInTimeZone(slot, timezone, "EEE MMM dd");
-    const [hour, minute] = formatInTimeZone(slot, timezone, "HH:mm").split(":");
+    const { dayKey, dayDisplay, hour, minute } = getSlotComponents(
+      slot,
+      timezone,
+      isWeekdayEvent,
+    );
 
     if (!seen.has(dayKey)) {
       seen.add(dayKey);
@@ -97,6 +142,8 @@ function processTimeslots(timeslots: Date[], timezone: string) {
       minute: parseInt(minute, 10),
     });
   }
+
+  days.sort((a, b) => (a.dayKey < b.dayKey ? -1 : 1));
 
   /* RAW TIMEBLOCKS */
   const start = toZonedTime(timeslots[0], timezone);
