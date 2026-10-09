@@ -54,6 +54,7 @@ export default function ClientPage({
   const { state, setDisplayName, setTimeZone, toggleSlot } = useAvailability(
     initialData,
     eventRange.type,
+    eventRange.timezone,
   );
   const { displayName, timeZone, userAvailability } = state;
 
@@ -214,10 +215,18 @@ export default function ClientPage({
       }
     }
 
+    console.log(userAvailability);
+
     const payload_availability = Array.from(userAvailability).map((iso) => {
       const date = parseISO(iso);
-      return timeslotToISOString(date, timeZone, eventRange.type);
+      if (eventRange.type === "weekday") {
+        return timeslotToISOString(date, eventRange.timezone, eventRange.type);
+      } else {
+        return timeslotToISOString(date, timeZone, eventRange.type);
+      }
     });
+
+    console.log(payload_availability);
 
     const payload = {
       event_code: eventCode,
