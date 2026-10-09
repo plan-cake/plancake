@@ -88,7 +88,7 @@ export default function ScheduleGrid({
     direction,
     paginate,
     error,
-  } = useGridinfo(timeslots, timezone, pageDays, onPageUpdate);
+  } = useGridinfo(timeslots, timezone, isWeekdayEvent, pageDays, onPageUpdate);
 
   // Initial onPageUpdate callback to report pagination info to parent
   // Also triggers if the user changes between mobile and desktop layouts

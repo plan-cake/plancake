@@ -12,14 +12,19 @@ import { formatDateTime } from "@/lib/utils/date-time-format";
 export function useAvailability(
   initialData: SelfAvailability | null,
   eventType: EventType,
+  eventTimezone: string,
 ) {
   const initialTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const isoStrings = [];
   if (initialData && initialData.available_dates) {
     for (const dateStr of initialData.available_dates) {
-      isoStrings.push(
-        formatDateTime(dateStr, initialData.time_zone, eventType),
-      );
+      if (eventType === "weekday") {
+        isoStrings.push(formatDateTime(dateStr, eventTimezone, eventType));
+      } else {
+        isoStrings.push(
+          formatDateTime(dateStr, initialData.time_zone, eventType),
+        );
+      }
     }
   }
 
