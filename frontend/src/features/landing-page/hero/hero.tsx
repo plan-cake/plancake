@@ -34,8 +34,8 @@ export default function Hero() {
   // CSS clamp handles the responsive starting radius without any post-paint JS measuring!
   // Mobile text-5xl width is ~300px (160px radius).
   // Desktop text-8xl width is ~600px (320px radius).
-  const clipPath = useMotionTemplate`circle(calc(clamp(160px, 40vw, 320px) + ${expandProgress} * 150vmax) at 50% 50%)`;
-  const circleDiameter = useMotionTemplate`calc((clamp(160px, 40vw, 320px) * 2) + ${expandProgress} * 300vmax)`;
+  const clipPath = useMotionTemplate`circle(calc(clamp(220px, 40vw, 320px) + ${expandProgress} * 150vmax) at 50% 50%)`;
+  const circleDiameter = useMotionTemplate`calc((clamp(220px, 40vw, 320px) * 2) + ${expandProgress} * 300vmax)`;
 
   const restOpacity = useTransform(scrollYProgress, [0.4, 0.8], [0, 1]);
   const restY = useTransform(scrollYProgress, [0.5, 0.8], [24, 0]);

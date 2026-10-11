@@ -120,8 +120,7 @@ export default function ConversationAnimation({
     <div
       className={cn(
         "bg-background relative mx-auto flex w-full max-w-md flex-col justify-end rounded-3xl p-4",
-        // Restored the fixed-height hidden overflow mechanics
-        "h-3/4 overflow-hidden md:h-[320px]",
+        "h-[320px] overflow-hidden",
         "[mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_100%)]",
         className,
       )}
