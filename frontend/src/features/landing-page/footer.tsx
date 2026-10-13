@@ -1,4 +1,5 @@
-import { PlusIcon } from "lucide-react";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { PlusIcon, MailIcon } from "lucide-react";
 import Link from "next/link";
 
 import Logo from "@/components/logo";
@@ -91,10 +92,31 @@ export default function Footer() {
             <Logo />
           </div>
 
-          <p className="text-sm opacity-70">
-            &copy; {new Date().getFullYear()} Plancake. Stacking up perfect
-            plans since 1900. All rights reserved.
-          </p>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-end gap-4">
+              <a
+                href="https://github.com/plan-cake"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent opacity-80 transition-colors hover:opacity-100"
+                aria-label="Plancake GitHub Organization"
+              >
+                <GitHubLogoIcon className="h-6 w-6" />
+              </a>
+              <a
+                href="mailto:plancakeapp.support@gmail.com"
+                className="hover:text-accent opacity-80 transition-colors hover:opacity-100"
+                aria-label="Email Plancake Support"
+              >
+                <MailIcon className="h-6 w-6" />
+              </a>
+            </div>
+
+            <p className="text-sm opacity-70">
+              &copy; {new Date().getFullYear()} Plancake. Stacking up perfect
+              plans since 1900. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
     </footer>
