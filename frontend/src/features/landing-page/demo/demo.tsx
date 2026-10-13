@@ -30,7 +30,7 @@ export default function HowItWorksSection() {
       <div className="w-full p-4">
         <div className={cn("text-center", body && "mb-4")}>
           <div className="text-lg font-bold">{config.title}</div>
-          <div className="text-background/70 text-sm">{config.description}</div>
+          <div className="text-background/70">{config.description}</div>
         </div>
         {body}
       </div>
@@ -56,7 +56,7 @@ export default function HowItWorksSection() {
   }));
 
   return (
-    <div className="bg-panel rounded-4xl flex flex-col overflow-visible p-12">
+    <div className="bg-panel rounded-4xl flex flex-col overflow-visible p-12 md:pb-0">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-6">
         <h2 className="text-foreground font-display text-5xl tracking-wide md:text-6xl">
           the perfect recipe
@@ -73,7 +73,7 @@ export default function HowItWorksSection() {
         </div>
       </div>
 
-      <div className="relative mt-4 flex w-full items-center justify-center">
+      <div className="relative mt-4 flex w-full items-center justify-center md:-mt-8">
         <div className="mx-auto w-full max-w-[900px]">
           <OrbitImages
             images={orbitNodes}
