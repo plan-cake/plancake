@@ -28,7 +28,7 @@ export default function PaintAvailabilityStep({
         userAvailability={userAvailability}
         onToggleSlot={onToggleSlot}
       />
-      <div className="flex items-center justify-center pt-2">
+      <div className="flex items-center justify-center">
         <ActionButton
           buttonStyle="primary"
           label="Submit"

@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatePresence } from "framer-motion";
+
 import ScheduleGrid from "@/features/event/grid/grid";
 import ParticipantChip from "@/features/event/results/attendees/participant-chip";
 import { PARTICIPANTS, TIMESLOTS } from "@/features/landing-page/demo/utils";
@@ -30,22 +32,24 @@ export default function ViewResultsStep({
         hoveredSlot={hoveredSlot}
         setHoveredSlot={onHoverSlot}
       />
-      <ul className="pointer-events-none flex flex-wrap items-center justify-center gap-2 px-2 pt-2">
-        {PARTICIPANTS.map((p, index) => (
-          <ParticipantChip
-            key={p.toLowerCase()}
-            areSelected={false}
-            includedInSlider={true}
-            index={index}
-            isAvailable={currentlyAvailable.includes(p)}
-            isRemoving={false}
-            isSelected={false}
-            onClick={() => {}}
-            onHoverChange={() => {}}
-            onRemove={() => {}}
-            person={p}
-          />
-        ))}
+      <ul className="pointer-events-none flex flex-wrap items-center justify-center gap-2">
+        <AnimatePresence initial={false}>
+          {PARTICIPANTS.map((p, index) => (
+            <ParticipantChip
+              key={p.toLowerCase()}
+              areSelected={false}
+              includedInSlider={true}
+              index={index}
+              isAvailable={currentlyAvailable.includes(p)}
+              isRemoving={false}
+              isSelected={false}
+              onClick={() => {}}
+              onHoverChange={() => {}}
+              onRemove={() => {}}
+              person={p}
+            />
+          ))}
+        </AnimatePresence>
       </ul>
     </div>
   );

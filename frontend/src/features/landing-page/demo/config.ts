@@ -31,7 +31,6 @@ export const DEMO_STEPS_CONFIG: DemoStepConfig[] = [
     step: 4,
     label: "View Results",
     title: "Watch the Results Stack Up",
-    description:
-      "See which times work best for everyone as soon as they respond.",
+    description: "See which times work best for everyone!",
   },
 ];
