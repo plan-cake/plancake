@@ -17,7 +17,7 @@ export type VerificationCode = {
 
 export type AccountData = {
   email: string;
-  default_display_name: string;
+  default_display_name: string | null;
 }
 
 export type LoginData = {

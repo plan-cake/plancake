@@ -8,7 +8,6 @@ import {
   SIDE_WIDTH,
   TIME_LABEL_WIDTH,
 } from "@/features/event/grid/lib/constants";
-import { useHeaderSize } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
 interface ScheduleHeaderProps {
@@ -45,20 +44,17 @@ export default function ScheduleHeader({
   currentPage,
   totalPages,
   scrollbarPresent = false,
-  isStatic = false,
   isWeekdayEvent = false,
   onPrevPage,
   onNextPage,
   direction = 0,
 }: ScheduleHeaderProps) {
-  const { topMarginClass } = useHeaderSize();
-
   return (
     <div
       className={cn(
-        preview ? "md:bg-panel" : cn(topMarginClass, "bg-background"),
+        preview ? "bg-background md:bg-panel" : "bg-background",
         scrollbarPresent && "pr-4",
-        isStatic ? "" : cn("sticky", preview ? "top-0" : ""),
+        "sticky top-[var(--header-height)] md:top-0",
         "z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
       )}
       style={{

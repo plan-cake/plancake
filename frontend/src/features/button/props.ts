@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 
 export type ButtonStyle =
   | "primary"
@@ -80,6 +80,10 @@ export type BaseButtonProps = {
    */
   href?: string;
   /**
+   * The target attribute for the link. This is only used for Link buttons.
+   */
+  target?: AnchorHTMLAttributes<HTMLAnchorElement>["target"];
+  /**
    * The function to call when the button is clicked. Required for Action buttons.
    *
    * The function should return a boolean or a Promise that resolves to a boolean if
@@ -133,6 +137,8 @@ export type ActionButtonProps = CommonButtonProps & {
 export type LinkButtonProps = CommonButtonProps & {
   /** @inheritdoc BaseButtonProps */
   href: string;
+  /** @inheritdoc BaseButtonProps */
+  target?: AnchorHTMLAttributes<HTMLAnchorElement>["target"];
 };
 
 export type EmptyButtonProps = CommonButtonProps;

@@ -3,19 +3,7 @@ import CarouselDrawer from "@/features/drawer/components/carousel";
 import {
   FloatingDrawerProps,
   MorphingDrawerProps,
-  StandardDrawerProps,
 } from "@/features/drawer/props";
-
-export function StandardDrawer({
-  children,
-  ...props
-}: Omit<StandardDrawerProps, "_type">) {
-  return (
-    <BaseDrawer _type="standard" {...props}>
-      {children}
-    </BaseDrawer>
-  );
-}
 
 export function MorphingDrawer({
   children,

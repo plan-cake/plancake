@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-export type DrawerType = "standard" | "floating" | "morphing";
+export type DrawerType = "floating" | "morphing";
 
 type BaseDrawerProps = {
   /** Drawer open states */
@@ -36,6 +36,8 @@ type BaseDrawerProps = {
    * @default true
    */
   scrollableBody?: boolean;
+  /** Optional content to render in the drawer footer, outside of the scrollable body */
+  footerContent?: ReactNode;
   /**
    * Whether to show the Vaul top drag handle.
    * @default true
@@ -77,22 +79,6 @@ type BaseDrawerProps = {
   viewTransitionName?: string;
 };
 
-export type StandardDrawerProps = BaseDrawerProps & {
-  /**
-   * The type of drawer, which can determine it's behavior and appearance:
-   * - `standard`: A regular drawer that stretches full width and slides in from
-   * the bottom of the screen.
-   */
-  _type?: "standard";
-  /** Optional content to render in the drawer footer, outside of the scrollable body */
-  footerContent?: ReactNode;
-
-  /** Snap point logic */
-  snapPoints?: (number | string)[];
-  activeSnapPoint?: number | string | null;
-  setActiveSnapPoint?: (snap: number | string | null) => void;
-};
-
 export type MorphingDrawerProps = BaseDrawerProps & {
   /**
    * The type of drawer, which can determine it's behavior and appearance:
@@ -100,8 +86,6 @@ export type MorphingDrawerProps = BaseDrawerProps & {
    * on the active snap point. At the lowest snap point, it is a pill.
    */
   _type: "morphing";
-  /** Optional content to render in the drawer footer, outside of the scrollable body */
-  footerContent?: ReactNode;
   /**
    * Optional alternative header content to display ONLY when the drawer is in its pill form.
    * If not provided, it falls back to `headerContent` or `title`.
@@ -133,7 +117,4 @@ export type FloatingDrawerProps = BaseDrawerProps & {
   pillHeaderContent?: ReactNode;
 };
 
-export type DrawerProps =
-  | StandardDrawerProps
-  | MorphingDrawerProps
-  | FloatingDrawerProps;
+export type DrawerProps = MorphingDrawerProps | FloatingDrawerProps;

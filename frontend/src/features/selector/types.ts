@@ -1,6 +1,7 @@
 export type Option<TValue extends string | number | null> = {
   label: string;
   value: TValue;
+  icon?: React.ReactNode;
 };
 
 export type BaseSelectorProps<TValue extends string | number | null> = {

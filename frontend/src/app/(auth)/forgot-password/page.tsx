@@ -4,10 +4,12 @@ import { useState } from "react";
 
 import Link from "next/link";
 
+import Captcha from "@/components/captcha";
 import AuthPageLayout from "@/components/layout/auth-page";
 import MessagePage from "@/components/layout/message-page";
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
+import InboxLinks from "@/features/auth/components/inbox-links";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
@@ -19,6 +21,10 @@ import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 export default function Page() {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
@@ -36,15 +42,24 @@ export default function Page() {
       handleError("email", MESSAGES.ERROR_EMAIL_MISSING);
       return false;
     }
+    if (!captchaToken) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      return false;
+    }
 
     try {
-      await clientPost(ROUTES.auth.startPasswordReset, { email });
+      await clientPost(ROUTES.auth.startPasswordReset, {
+        email,
+        captcha_token: captchaToken,
+      });
       setEmailSent(true);
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
       if (error.rateLimited) {
         handleError("rate_limit", error.formattedMessage);
+      } else if (error.captchaFailed) {
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       } else if (error.formattedMessage.includes("Email:")) {
         handleError("email", error.formattedMessage.split("Email:")[1].trim());
       } else {
@@ -68,7 +83,9 @@ export default function Page() {
               href="/login"
             />,
           ]}
-        />
+        >
+          <InboxLinks email={email} />
+        </MessagePage>
       ) : (
         <AuthPageLayout
           title="forgot password"
@@ -86,13 +103,22 @@ export default function Page() {
           ]}
           rateLimitError={errors.rate_limit}
         >
-          <div className="flex justify-end">
-            <ActionButton
-              buttonStyle="primary"
-              label="Send Link"
-              onClick={handleSubmit}
-              loadOnSuccess
+          <div className="space-y-4">
+            <Captcha
+              backendVerificationFailed={!!errors.captcha}
+              onTokenChange={setCaptchaToken}
+              onClearBackendError={() => handleError("captcha", "")}
+              onInitError={() => setCaptchaInitError(true)}
             />
+            <div className="flex justify-end">
+              <ActionButton
+                buttonStyle="primary"
+                label="Send Link"
+                onClick={handleSubmit}
+                loadOnSuccess
+                disabled={captchaInitError}
+              />
+            </div>
           </div>
           <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
             <Link href="/login">

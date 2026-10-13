@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import Captcha from "@/components/captcha";
 import AuthPageLayout from "@/components/layout/auth-page";
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
@@ -23,6 +24,10 @@ export default function Page() {
   const [passwordCriteria, setPasswordCriteria] = useState({});
   const [showPasswordCriteria, setShowPasswordCriteria] = useState(false);
   const router = useRouter();
+
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
@@ -67,9 +72,17 @@ export default function Page() {
       handleError("confirmPassword", MESSAGES.ERROR_PASSWORD_MISMATCH);
       return false;
     }
+    if (!captchaToken) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      return false;
+    }
 
     try {
-      await clientPost(ROUTES.auth.register, { email, password });
+      await clientPost(ROUTES.auth.register, {
+        email,
+        password,
+        captcha_token: captchaToken,
+      });
       sessionStorage.setItem("register_email", email);
       router.push("/register/email-sent");
       return true;
@@ -77,6 +90,8 @@ export default function Page() {
       const error = e as ApiErrorResponse;
       if (error.rateLimited) {
         handleError("rate_limit", error.formattedMessage);
+      } else if (error.captchaFailed) {
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       } else if (error.formattedMessage.includes("Email:")) {
         handleError("email", error.formattedMessage.split("Email:")[1].trim());
       } else if (error.formattedMessage.includes("Password:")) {
@@ -143,13 +158,22 @@ export default function Page() {
         />,
       ]}
     >
-      <div className="flex w-full justify-end">
-        <ActionButton
-          buttonStyle="primary"
-          label="Register"
-          onClick={handleSubmit}
-          loadOnSuccess
+      <div className="space-y-4">
+        <Captcha
+          backendVerificationFailed={!!errors.captcha}
+          onTokenChange={setCaptchaToken}
+          onClearBackendError={() => handleError("captcha", "")}
+          onInitError={() => setCaptchaInitError(true)}
         />
+        <div className="flex w-full justify-end">
+          <ActionButton
+            buttonStyle="primary"
+            label="Register"
+            onClick={handleSubmit}
+            loadOnSuccess
+            disabled={captchaInitError}
+          />
+        </div>
       </div>
       <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
         <Link href="/forgot-password">
