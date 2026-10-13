@@ -4,7 +4,10 @@ import { AnimatePresence } from "framer-motion";
 
 import ScheduleGrid from "@/features/event/grid/grid";
 import ParticipantChip from "@/features/event/results/attendees/participant-chip";
-import { PARTICIPANTS, TIMESLOTS } from "@/features/landing-page/demo/utils";
+import {
+  PARTICIPANTS,
+  TIMESLOTS,
+} from "@/features/landing-page/demo/lib/utils";
 
 interface ViewResultsStepProps {
   availabilities: Record<string, string[]>;

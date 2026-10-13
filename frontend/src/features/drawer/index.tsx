@@ -1,4 +1,5 @@
 import BaseDrawer from "@/features/drawer/components/base";
+import CarouselDrawer from "@/features/drawer/components/carousel";
 import {
   FloatingDrawerProps,
   MorphingDrawerProps,
@@ -37,3 +38,5 @@ export function FloatingDrawer({
     </BaseDrawer>
   );
 }
+
+export { CarouselDrawer };

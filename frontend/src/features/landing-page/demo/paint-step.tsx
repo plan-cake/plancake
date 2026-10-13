@@ -2,7 +2,7 @@
 
 import ActionButton from "@/features/button/components/action";
 import ScheduleGrid from "@/features/event/grid/grid";
-import { TIMESLOTS } from "@/features/landing-page/demo/utils";
+import { TIMESLOTS } from "@/features/landing-page/demo/lib/utils";
 
 interface PaintAvailabilityStepProps {
   userAvailability: Set<string>;
@@ -28,7 +28,7 @@ export default function PaintAvailabilityStep({
         userAvailability={userAvailability}
         onToggleSlot={onToggleSlot}
       />
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center pt-2">
         <ActionButton
           buttonStyle="primary"
           label="Submit"

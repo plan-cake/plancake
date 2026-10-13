@@ -175,7 +175,7 @@ export default function ScheduleGrid({
           ))}
         </div>
 
-        <div className="relative flex-grow">
+        <div className="relative flex-grow" data-no-swipe="true">
           <AnimatePresence initial={false} custom={direction} mode="popLayout">
             <motion.div
               key={currentPage}
