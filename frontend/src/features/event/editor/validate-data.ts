@@ -1,9 +1,5 @@
-import { EventInformation, WeekdayRange } from "@/core/event/types";
-import { findRangeFromWeekdayArray } from "@/core/event/weekday-utils";
-import {
-  MAX_DURATION_MS,
-  MAX_TITLE_LENGTH,
-} from "@/features/event/editor/constants";
+import { EventInformation } from "@/core/event/types";
+import { MAX_DAYS, MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
 import { EventEditorType } from "@/features/event/editor/types";
 import { MESSAGES } from "@/lib/messages";
 
@@ -23,23 +19,18 @@ export async function validateEventData(
 
   // Validate event range
   if (eventRange.type === "specific") {
-    if (!eventRange.dateRange?.from || !eventRange.dateRange?.to) {
+    if (!eventRange.dates.size) {
       errors.dateRange = MESSAGES.ERROR_EVENT_DATES_MISSING;
     } else {
-      // check if the date range is more than 64 days
-      const fromDate = new Date(eventRange.dateRange.from);
-      const toDate = new Date(eventRange.dateRange.to);
-      if (checkDateRange(fromDate, toDate)) {
+      // check if there are more than 64 days selected
+      if (eventRange.dates.size > MAX_DAYS) {
         errors.dateRange = MESSAGES.ERROR_EVENT_RANGE_TOO_LONG;
       }
     }
   }
 
   if (eventRange.type === "weekday") {
-    const weekdayRange = findRangeFromWeekdayArray(
-      (data.eventRange as WeekdayRange).weekdays,
-    );
-    if (weekdayRange.startDay === null || weekdayRange.endDay === null) {
+    if (!eventRange.weekdays.size) {
       errors.weekdayRange = MESSAGES.ERROR_EVENT_WEEKDAYS_MISSING;
     }
   }
@@ -56,15 +47,8 @@ export async function validateEventData(
   return errors;
 }
 
-export function checkDateRange(
-  start: Date | undefined,
-  end: Date | undefined,
-): boolean {
-  if (start && end) {
-    const diffTime = end.getTime() - start.getTime();
-    return diffTime > MAX_DURATION_MS;
-  }
-  return false;
+export function checkDateRange(dates: Set<string>): boolean {
+  return dates.size > MAX_DAYS;
 }
 
 export function checkTimeRange(startTime: string, endTime: string): boolean {

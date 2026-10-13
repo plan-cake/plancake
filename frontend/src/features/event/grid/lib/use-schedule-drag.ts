@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 import { generateDragSlots } from "@/core/availability/utils";
+import { TimeSlot } from "@/features/event/grid/timeblocks/props";
 
 type DragState = {
   startSlot: string | null;
@@ -17,6 +18,7 @@ type DragState = {
 export default function useScheduleDrag(
   onToggle: (slotIso: string, togglingOn: boolean) => void,
   mode: "paint" | "view" | "preview",
+  timeslots: TimeSlot[],
 ) {
   const [draggedSlots, setDraggedSlots] = useState<Set<string>>(new Set());
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
@@ -29,6 +31,10 @@ export default function useScheduleDrag(
     lastToggledSlot: null,
   });
   const isDragging = useRef(false);
+  const timeslotIsoSet = useMemo(
+    () => new Set(timeslots.map((slot) => slot.iso)),
+    [timeslots],
+  );
 
   useEffect(() => {
     const preventScroll = (e: TouchEvent) => {
@@ -117,7 +123,9 @@ export default function useScheduleDrag(
   useEffect(() => {
     const stopDragging = () => {
       for (const slotIso of draggedSlots) {
-        onToggleRef.current(slotIso, dragState.current.togglingOn!);
+        if (timeslotIsoSet.has(slotIso)) {
+          onToggleRef.current(slotIso, dragState.current.togglingOn!);
+        }
       }
       // save last toggled slot for shift-dragging
       if (dragState.current.endSlot) {
@@ -134,7 +142,7 @@ export default function useScheduleDrag(
       window.removeEventListener("mouseup", stopDragging);
       window.removeEventListener("touchend", stopDragging);
     };
-  }, [draggedSlots]);
+  }, [draggedSlots, timeslotIsoSet]);
 
   /* EVENT HANDLERS */
 

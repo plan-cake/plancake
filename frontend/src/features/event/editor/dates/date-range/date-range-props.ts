@@ -3,7 +3,6 @@ export type DateRangeProps = {
 };
 
 export type SpecificDateRangeDisplayProps = {
-  earliestDate: Date;
-  startDate: Date | null;
-  endDate: Date | null;
+  earliestDate?: Date;
+  dates: Set<string>;
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { TriangleAlertIcon } from "lucide-react";
 
@@ -9,16 +9,18 @@ import { FloatingDrawer } from "@/features/drawer";
 import {
   Calendar,
   CalendarHandle,
-} from "@/features/event/editor/date-range/calendars/month";
-import { SpecificDateRangeDisplayProps } from "@/features/event/editor/date-range/date-range-props";
-import SpecificDateRangeDisplay from "@/features/event/editor/date-range/specific-date-display";
+} from "@/features/event/editor/dates/date-range/calendar";
+import { SpecificDateRangeDisplayProps } from "@/features/event/editor/dates/date-range/date-range-props";
+import DateRangePresets from "@/features/event/editor/dates/date-range/presets";
+import SpecificDateRangeDisplay from "@/features/event/editor/dates/date-range/specific-date-display";
+import { MESSAGES } from "@/lib/messages";
+import { formatDateSet } from "@/lib/utils/date-time-format";
 
 export default function DateRangeDrawer({
   earliestDate,
-  startDate,
-  endDate,
+  dates,
 }: SpecificDateRangeDisplayProps) {
-  const { errors, setDateRange } = useEventContext();
+  const { errors, setDates } = useEventContext();
 
   const [open, setOpen] = useState(false);
   const calendarRef = useRef<CalendarHandle>(null);
@@ -34,33 +36,31 @@ export default function DateRangeDrawer({
     }
   }, [open]);
 
+  const dateDisplay = useMemo(() => formatDateSet(dates), [dates]);
+
   return (
     <FloatingDrawer
       open={open}
       onOpenChange={setOpen}
-      contentClassName="h-2/3"
+      footerContent={<DateRangePresets dates={dates} setDates={setDates} />}
       title="Select Date Range"
-      description="Select a date range using the calendar below"
+      description="Select dates using the calendar below"
       trigger={
-        <div onClick={() => setOpen(!open)}>
-          <SpecificDateRangeDisplay
-            startDate={startDate}
-            endDate={endDate}
-            open={open}
-          />
-        </div>
+        <button onClick={() => setOpen(!open)}>
+          <SpecificDateRangeDisplay dates={dates} open={open} />
+        </button>
       }
       headerContent={
-        <div className="flex flex-col text-lg font-semibold">
-          Select Specific Date Range
+        <div className="flex flex-col items-center text-lg font-semibold">
+          Select Possible Dates
           {errors.dateRange ? (
-            <span className="text-error flex items-center gap-2 text-sm">
+            <span className="text-error flex items-center gap-1 text-sm">
               <TriangleAlertIcon className="h-4 w-4" />
               {errors.dateRange}
             </span>
           ) : (
             <span className="text-accent text-sm font-normal">
-              Choose a start and end date
+              {dateDisplay || MESSAGES.INFO_DRAG_DATES}
             </span>
           )}
         </div>
@@ -69,13 +69,8 @@ export default function DateRangeDrawer({
       <Calendar
         ref={calendarRef}
         earliestDate={earliestDate}
-        className="w-fit"
-        selectedRange={{
-          from: startDate || undefined,
-          to: endDate || undefined,
-        }}
-        setDateRange={setDateRange}
-        dateRangeError={errors.dateRange}
+        selectedDates={dates}
+        setDates={setDates}
       />
     </FloatingDrawer>
   );

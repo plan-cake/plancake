@@ -8,14 +8,11 @@ import { EventRange } from "@/core/event/types";
  */
 export default function checkUnselectedRange(eventRange: EventRange) {
   if (eventRange.type === "specific") {
-    if (
-      eventRange.dateRange.from === null ||
-      eventRange.dateRange.to === null
-    ) {
+    if (!eventRange.dates.size) {
       return true;
     }
   } else {
-    if (eventRange.weekdays.length === 0) {
+    if (!eventRange.weekdays.size) {
       return true;
     }
   }

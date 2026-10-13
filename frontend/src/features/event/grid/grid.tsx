@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { TriangleAlertIcon } from "lucide-react";
@@ -8,8 +8,13 @@ import {
   ResultsAvailabilityMap,
 } from "@/core/availability/types";
 import { createEmptyUserAvailability } from "@/core/availability/utils";
-import { GRID_ID } from "@/features/event/grid/lib/constants";
+import {
+  GRID_ID,
+  SIDE_WIDTH,
+  TIME_LABEL_WIDTH,
+} from "@/features/event/grid/lib/constants";
 import useGridinfo from "@/features/event/grid/lib/use-grid";
+import GridPageIndicator from "@/features/event/grid/page-indicator";
 import ScheduleHeader from "@/features/event/grid/schedule-header";
 import TimeColumn from "@/features/event/grid/time-column";
 import InteractiveTimeBlock from "@/features/event/grid/timeblocks/interactive";
@@ -76,7 +81,8 @@ export default function ScheduleGrid({
   const isMobile = useCheckMobile();
 
   const {
-    timeBlocks,
+    dateBlocks,
+    dateBlockGaps,
     visibleDays,
     currentPage,
     totalPages,
@@ -115,6 +121,10 @@ export default function ScheduleGrid({
     return () => resizeObserver.disconnect();
   });
 
+  // Dateblocks logic
+  const numQuarterHours =
+    dateBlocks[0]?.timeBlocks?.map((block) => block.numQuarterHours) || [];
+
   if (unselectedRange)
     return (
       <GridMessage
@@ -143,6 +153,7 @@ export default function ScheduleGrid({
         visibleDays={visibleDays}
         currentPage={currentPage}
         totalPages={totalPages}
+        dateBlockGaps={dateBlockGaps}
         scrollbarPresent={scrollbarPresent}
         isWeekdayEvent={isWeekdayEvent}
         onPrevPage={() => paginate(-1)}
@@ -158,8 +169,8 @@ export default function ScheduleGrid({
           mode === "preview" ? "pb-1" : "pb-6",
         )}
       >
-        <div className="z-5 pointer-events-none absolute left-0 top-2 flex w-full flex-col gap-4">
-          {timeBlocks.map((block, i) => (
+        <div className="z-5 pointer-events-none absolute left-0 top-2 flex w-full flex-col gap-3">
+          {dateBlocks[0]?.timeBlocks.map((block, i) => (
             <TimeColumn
               key={`labels-${i}`}
               numQuarterHours={block.numQuarterHours}
@@ -179,42 +190,92 @@ export default function ScheduleGrid({
               animate="center"
               exit="exit"
               transition={{ type: "tween", ease: "easeInOut" }}
-              className="flex flex-col gap-4"
+              className="flex"
             >
-              {timeBlocks.map((block, i) => {
-                const commonProps = {
-                  numQuarterHours: block.numQuarterHours,
-                  numVisibleDays: visibleDays.length,
-                  timeslots: block.timeslots,
-                  hasPrev: hasPrevPage,
-                  hasNext: hasNextPage,
-                };
+              <div
+                className={cn(
+                  "flex flex-col gap-2",
+                  !hasPrevPage && "invisible",
+                )}
+              >
+                <GridPageIndicator
+                  side="left"
+                  width={TIME_LABEL_WIDTH}
+                  gapPresent={dateBlockGaps.startGap}
+                  numQuarterHours={numQuarterHours}
+                  numTimeBlocks={dateBlocks[0]?.timeBlocks.length}
+                />
+              </div>
 
-                if (mode === "preview") {
-                  return <PreviewTimeBlock key={i} {...commonProps} />;
-                } else if (mode === "paint") {
-                  return (
-                    <InteractiveTimeBlock
-                      key={i}
-                      {...commonProps}
-                      availability={userAvailability}
-                      onToggle={onToggleSlot}
-                    />
-                  );
-                } else if (mode === "view") {
-                  return (
-                    <ResultsTimeBlock
-                      key={i}
-                      {...commonProps}
-                      hoveredSlot={hoveredSlot}
-                      availabilities={availabilities}
-                      numParticipants={numParticipants}
-                      highestMatchCount={getHighestMatchCount(availabilities)}
-                      onHoverSlot={setHoveredSlot}
-                    />
-                  );
-                }
+              {dateBlockGaps.startGap && <div className="w-2" />}
+
+              {dateBlocks.map((dBlock, dIndex) => {
+                const isLastDateBlock = dIndex === dateBlocks.length - 1;
+
+                return (
+                  <Fragment key={`date-block-fragment-${dIndex}`}>
+                    <div
+                      className="flex flex-col gap-2"
+                      style={{
+                        flex: dBlock.numDays,
+                      }}
+                    >
+                      {dBlock.timeBlocks.map((tBlock, tIndex) => {
+                        const commonProps = {
+                          numQuarterHours: tBlock.numQuarterHours,
+                          numVisibleDays: dBlock.numDays,
+                          timeslots: tBlock.timeslots,
+                        };
+
+                        if (mode === "preview") {
+                          return (
+                            <PreviewTimeBlock
+                              key={`preview-${dIndex}-${tIndex}`}
+                              {...commonProps}
+                            />
+                          );
+                        } else if (mode === "paint") {
+                          return (
+                            <InteractiveTimeBlock
+                              key={`interactive-${dIndex}-${tIndex}`}
+                              {...commonProps}
+                              availability={userAvailability}
+                              onToggle={onToggleSlot}
+                            />
+                          );
+                        } else if (mode === "view") {
+                          return (
+                            <ResultsTimeBlock
+                              key={`results-${dIndex}-${tIndex}`}
+                              {...commonProps}
+                              hoveredSlot={hoveredSlot}
+                              availabilities={availabilities}
+                              numParticipants={numParticipants}
+                              highestMatchCount={getHighestMatchCount(
+                                availabilities,
+                              )}
+                              onHoverSlot={setHoveredSlot}
+                            />
+                          );
+                        }
+                      })}
+                    </div>
+                    {!isLastDateBlock && <div className="w-2" />}
+                  </Fragment>
+                );
               })}
+
+              {dateBlockGaps.endGap && <div className="w-2" />}
+
+              {hasNextPage && (
+                <GridPageIndicator
+                  side="right"
+                  width={SIDE_WIDTH}
+                  gapPresent={dateBlockGaps.endGap}
+                  numQuarterHours={numQuarterHours}
+                  numTimeBlocks={dateBlocks[0]?.timeBlocks.length}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
