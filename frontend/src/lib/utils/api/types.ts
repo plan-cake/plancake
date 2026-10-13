@@ -136,17 +136,35 @@ export type DisplayName = {
 
 export type ActiveSession = {
   public_id: string;
-  device_type: string | null;
+  device_type:
+    | "desktop"
+    | "smartphone"
+    | "tablet"
+    | "feature phone"
+    | "console"
+    | "tv"
+    | "car browser"
+    | "smart display"
+    | "camera"
+    | "portable media player"
+    | "phablet"
+    | "smart speaker"
+    | "wearable"
+    | "peripheral"
+    | ""
+    | null;
   os_name: string | null;
   os_version: string | null;
   client_name: string | null;
   client_version: string | null;
+  created_at: string;
   last_used: string;
   is_current: boolean;
 }
 
 export type ActiveSessionList = {
-  sessions: ActiveSession[];
+  current_session: ActiveSession;
+  other_sessions: ActiveSession[];
 }
 
 export type SessionId = {
