@@ -39,12 +39,9 @@ export default function SegmentedControl<T extends string>({
     <div
       className={cn(
         "bg-panel relative isolate grid w-full rounded-full",
-        !hidePadding && "p-2",
+        !hidePadding && "px-3 py-2",
         className,
       )}
-      style={{
-        gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))`,
-      }}
     >
       <div
         className={cn(
@@ -54,25 +51,32 @@ export default function SegmentedControl<T extends string>({
         style={pillStyle}
       />
 
-      {options.map((option) => {
-        const isSelected = option.value === value;
-        return (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => onChange(option.value)}
-            aria-label={option.ariaLabel}
-            className={cn(
-              "z-10 flex w-full items-center justify-center rounded-full py-2 focus:outline-none",
-              isSelected
-                ? "text-accent-text font-bold"
-                : "text-foreground hover:bg-accent/15 cursor-pointer",
-            )}
-          >
-            {option.label}
-          </button>
-        );
-      })}
+      <div
+        className="relative z-10 grid w-full grid-cols-1 gap-1"
+        style={{
+          gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))`,
+        }}
+      >
+        {options.map((option) => {
+          const isSelected = option.value === value;
+          return (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onChange(option.value)}
+              aria-label={option.ariaLabel}
+              className={cn(
+                "z-10 flex w-full items-center justify-center rounded-full py-2 focus:outline-none",
+                isSelected
+                  ? "text-accent-text font-bold"
+                  : "text-foreground hover:bg-accent/15 cursor-pointer",
+              )}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
