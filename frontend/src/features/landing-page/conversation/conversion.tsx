@@ -119,7 +119,7 @@ export default function ConversationAnimation({
   return (
     <div
       className={cn(
-        "bg-background relative mx-auto flex w-full max-w-md flex-col justify-end rounded-3xl p-4",
+        "bg-background relative mx-auto flex w-full max-w-2xl flex-col justify-end p-6",
         "h-[320px] overflow-hidden",
         "[mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_100%)]",
         className,
