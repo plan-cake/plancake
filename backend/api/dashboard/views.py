@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from api.decorators import api_endpoint, check_auth, validate_output
 from api.models import (
+    EventCalendarTimeslot,
     EventDateTimeslot,
     EventParticipant,
     EventWeekdayTimeslot,
@@ -18,7 +19,9 @@ logger = logging.getLogger("api")
 
 class DashboardEventSerializer(serializers.Serializer):
     title = serializers.CharField(required=True, max_length=255)
-    event_type = serializers.ChoiceField(required=True, choices=["Date", "Week"])
+    event_type = serializers.ChoiceField(
+        required=True, choices=["Date", "Week", "Calendar"]
+    )
     dates = serializers.ListField(
         child=serializers.DateField(), required=True, allow_empty=False
     )
@@ -80,6 +83,10 @@ def get_dashboard(request):
                 ),
             ),
             Prefetch(
+                "calendar_timeslots",
+                queryset=EventCalendarTimeslot.objects.order_by("date"),
+            ),
+            Prefetch(
                 "participants",
                 queryset=EventParticipant.objects.order_by("created_at"),
             ),
@@ -104,6 +111,10 @@ def get_dashboard(request):
                 queryset=EventWeekdayTimeslot.objects.order_by(
                     "weekday", "local_timeslot"
                 ),
+            ),
+            Prefetch(
+                "user_event__calendar_timeslots",
+                queryset=EventCalendarTimeslot.objects.order_by("date"),
             ),
             Prefetch(
                 "user_event__participants",

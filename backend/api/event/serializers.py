@@ -28,25 +28,19 @@ class EventInfoSerializer(serializers.Serializer):
     time_zone = TimeZoneField(required=True)
 
 
-class DateEventCreateSerializer(EventInfoSerializer, CustomCodeSerializer):
+class EventCreateSerializer(EventInfoSerializer, CustomCodeSerializer):
     pass
 
 
-class WeekEventCreateSerializer(EventInfoSerializer, CustomCodeSerializer):
-    pass
-
-
-class DateEventEditSerializer(EventInfoSerializer, EventCodeSerializer):
-    pass
-
-
-class WeekEventEditSerializer(EventInfoSerializer, EventCodeSerializer):
+class EventEditSerializer(EventInfoSerializer, EventCodeSerializer):
     pass
 
 
 class EventDetailSerializer(EventInfoSerializer):
     is_creator = serializers.BooleanField(required=True)
-    event_type = serializers.ChoiceField(required=True, choices=["Date", "Week"])
+    event_type = serializers.ChoiceField(
+        required=True, choices=["Date", "Week", "Calendar"]
+    )
     dates = serializers.ListField(
         child=serializers.DateField(), required=True, allow_empty=False
     )
