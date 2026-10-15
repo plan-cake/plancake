@@ -1,4 +1,4 @@
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { Github } from "@thesvg/react";
 import { PlusIcon, MailIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -101,7 +101,7 @@ export default function Footer() {
                 className="hover:text-accent opacity-80 transition-colors hover:opacity-100"
                 aria-label="Plancake GitHub Organization"
               >
-                <GitHubLogoIcon className="h-6 w-6" />
+                <Github className="h-6 w-6" />
               </a>
               <a
                 href="mailto:plancakeapp.support@gmail.com"
