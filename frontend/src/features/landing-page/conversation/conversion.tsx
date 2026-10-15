@@ -39,9 +39,9 @@ const LOOP_SCRIPT = [
 
 const BOUNCY_SPRING: Transition = {
   type: "spring",
-  damping: 14,
-  stiffness: 180,
-  mass: 0.8,
+  damping: 15,
+  stiffness: 140,
+  mass: 0.9,
 };
 
 function TypingIndicator() {
@@ -77,7 +77,9 @@ export default function ConversationAnimation({
 
     const runAnimation = async () => {
       const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-      await sleep(400);
+
+      // initial delay before starting the animation
+      await sleep(600);
 
       let iteration = 0;
 
@@ -90,12 +92,13 @@ export default function ConversationAnimation({
         };
 
         setMessages((prev) => {
-          // Keep the DOM lean by removing old off-screen messages
           const next = [...prev, newMsg];
           return next.slice(-12);
         });
 
-        await sleep(600);
+        // typing indicator duration
+        await sleep(1000);
+
         if (!isMounted) return;
 
         setMessages((prev) =>
@@ -104,7 +107,9 @@ export default function ConversationAnimation({
           ),
         );
 
-        await sleep(800);
+        // pause before next message
+        await sleep(1000);
+
         iteration++;
       }
     };
@@ -119,7 +124,7 @@ export default function ConversationAnimation({
   return (
     <div
       className={cn(
-        "bg-background relative mx-auto flex w-full max-w-2xl flex-col justify-end p-6",
+        "bg-background relative mx-auto flex w-full max-w-2xl flex-col justify-end p-6 pb-0",
         "h-[320px] overflow-hidden",
         "[mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_100%)]",
         className,
@@ -147,7 +152,6 @@ export default function ConversationAnimation({
                 layout
                 initial={{ opacity: 0, y: 20, scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                // exit animation ensures messages vanishing at the top don't cause sudden snapping
                 exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                 transition={BOUNCY_SPRING}
                 className={cn(

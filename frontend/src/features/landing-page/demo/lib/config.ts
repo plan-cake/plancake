@@ -17,7 +17,7 @@ export const DEMO_STEPS_CONFIG: DemoStepConfig[] = [
     step: 2,
     label: "Share Link",
     title: "Share with Your Friends",
-    description: "Anyone can join from the event link, no account required.",
+    description: "Anyone can join from the event link, no account required!",
   },
   {
     step: 3,
