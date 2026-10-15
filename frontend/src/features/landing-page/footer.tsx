@@ -78,13 +78,6 @@ export default function Footer() {
               </div>
             ))}
           </nav>
-
-          <div className="flex flex-col items-center">
-            <span className="text-5xl font-black tracking-wide lg:text-5xl">
-              100+
-            </span>
-            <p className="mt-1 text-sm opacity-70">Plans made and counting</p>
-          </div>
         </div>
 
         <div className="border-violet/15 mt-10 flex flex-col items-center gap-4 border-t pt-6 text-center md:flex-row md:items-center md:justify-between md:text-left">
