@@ -56,7 +56,12 @@ export function useDemo() {
     });
 
     setAllowSubmit(false);
-    setActiveStep(4); // Advance to the results step
+
+    // Only advance to step 4 (the results drawer) if on a mobile screen
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    if (isMobile) {
+      setActiveStep(4);
+    }
   };
 
   const handleResultsHover = (slotIso: string | null) => {
