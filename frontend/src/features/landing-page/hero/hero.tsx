@@ -34,7 +34,6 @@ export default function Hero() {
   // CSS clamp handles the responsive starting radius without any post-paint JS measuring!
   // Mobile text-5xl width is ~300px (160px radius).
   // Desktop text-8xl width is ~600px (320px radius).
-  const clipPath = useMotionTemplate`circle(calc(clamp(220px, 40vw, 320px) + ${expandProgress} * 150vmax) at 50% 50%)`;
   const circleDiameter = useMotionTemplate`calc((clamp(220px, 40vw, 320px) * 2) + ${expandProgress} * 300vmax)`;
 
   const restOpacity = useTransform(scrollYProgress, [0.4, 0.8], [0, 1]);
@@ -49,7 +48,6 @@ export default function Hero() {
         <div className="sticky top-0 h-screen w-full">
           <div className="bg-background absolute inset-0 flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
             <HeroContent
-              clipPath={clipPath}
               circleDiameter={circleDiameter}
               borderWidth={borderWidth}
               restOpacity={restOpacity}

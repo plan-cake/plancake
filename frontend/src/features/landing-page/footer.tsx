@@ -95,14 +95,12 @@ export default function Footer() {
                 href="https://github.com/plan-cake"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-accent opacity-80 transition-colors hover:opacity-100"
                 aria-label="Plancake GitHub Organization"
               >
                 <Github className="h-6 w-6" />
               </a>
               <a
                 href="mailto:plancakeapp.support@gmail.com"
-                className="hover:text-accent opacity-80 transition-colors hover:opacity-100"
                 aria-label="Email Plancake Support"
               >
                 <MailIcon className="h-6 w-6" />

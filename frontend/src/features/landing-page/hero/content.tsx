@@ -6,7 +6,6 @@ import { LayoutDashboardIcon, PlusIcon } from "lucide-react";
 import LinkButton from "@/features/button/components/link";
 
 interface HeroContentProps {
-  clipPath: MotionValue<string>;
   circleDiameter: MotionValue<string>;
   borderWidth: MotionValue<number>;
   restOpacity: MotionValue<number>;
@@ -14,7 +13,6 @@ interface HeroContentProps {
 }
 
 export default function HeroContent({
-  clipPath,
   circleDiameter,
   borderWidth,
   restOpacity,
@@ -41,33 +39,7 @@ export default function HeroContent({
           <div className="relative z-10 mb-6 flex justify-center">
             <span className="bg-bone text-violet inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold tracking-wide">
               finally making it out
-              <br className="md:hidden" />
-              of the group chat.
-            </span>
-          </div>
-
-          <h1 className="relative z-0 mb-10 text-6xl tracking-tight md:mb-4 md:text-8xl">
-            <span className="font-display text-foreground block">
-              stacking up
-              <br />
-              <span className="text-bone">perfect</span>
-              <br />
-              <span className="text-bone">plans</span>
-            </span>
-          </h1>
-        </div>
-
-        {/* Mask Layer in Grid Cell 1 */}
-        <motion.div
-          aria-hidden
-          style={{ clipPath }}
-          className="pointer-events-none col-start-1 row-start-1 flex flex-col items-center"
-        >
-          <div className="relative z-10 mb-6 flex justify-center">
-            <span className="bg-bone text-violet inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold tracking-wide">
-              finally making it out
-              <br className="md:hidden" />
-              of the group chat.
+              <br className="md:hidden" /> of the group chat.
             </span>
           </div>
 
@@ -80,7 +52,7 @@ export default function HeroContent({
               <span className="text-bone">plans</span>
             </span>
           </h1>
-        </motion.div>
+        </div>
       </div>
 
       <motion.div
