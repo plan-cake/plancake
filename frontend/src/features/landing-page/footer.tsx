@@ -90,7 +90,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-end gap-4">
+            <div className="flex items-center gap-4 md:justify-end justify-center">
               <a
                 href="https://github.com/plan-cake"
                 target="_blank"
