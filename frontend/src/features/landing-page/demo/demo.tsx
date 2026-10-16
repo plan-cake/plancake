@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils/classname";
 
 export default function HowItWorksSection() {
   const { activeStep, setActiveStep, getStepBody } = useDemo();
+  const bodyInDrawer = activeStep !== null;
 
   const [orbitScale, setOrbitScale] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -24,7 +25,7 @@ export default function HowItWorksSection() {
   }, []);
 
   const orbitNodes = [...DEMO_STEPS_CONFIG].reverse().map((config) => {
-    const body = getStepBody(config.step);
+    const body = bodyInDrawer ? null : getStepBody(config.step);
 
     const hoverCard = (
       <div className="w-full p-4">
@@ -52,7 +53,8 @@ export default function HowItWorksSection() {
   // Map configuration to the format for CarouselDrawer
   const carouselSteps = DEMO_STEPS_CONFIG.map((config) => ({
     ...config,
-    content: getStepBody(config.step),
+    // Only mount the body in the drawer if the drawer is actually open
+    content: bodyInDrawer ? getStepBody(config.step) : null,
   }));
 
   return (

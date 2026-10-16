@@ -51,8 +51,8 @@ export default function OrbitNode({
       onMouseEnter={handleMouseEnter}
     >
       <button
-        onClick={() => {
-          if (!window.matchMedia("(hover: hover)").matches) {
+        onClick={(e) => {
+          if (!window.matchMedia("(hover: hover)").matches || e.detail === 0) {
             onSelect();
           }
         }}

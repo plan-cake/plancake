@@ -13,11 +13,15 @@ const NAV_SECTIONS = [
       { label: "New Event", href: "/new-event" },
       { label: "Dashboard", href: "/dashboard" },
       { label: "What's New", href: "/version-history" },
-      {
-        label: "Feedback",
-        href: process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL ?? "#",
-        external: true,
-      },
+      ...(process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL
+        ? [
+            {
+              label: "Feedback",
+              href: process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL,
+              external: true,
+            },
+          ]
+        : []),
     ],
   },
   {

@@ -4,7 +4,7 @@ export const generateTimeslots = () => {
   const slots = [];
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 12; j++) {
-      const date = new Date(2025, 9, 19 + i, 8);
+      const date = new Date(Date.UTC(2025, 9, 19 + i, 12));
       // advance by 15 minutes each
       date.setMinutes(date.getMinutes() + j * 15);
       slots.push(date);
