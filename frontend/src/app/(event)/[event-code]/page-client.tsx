@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { GlobeIcon, PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
@@ -75,9 +75,12 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   /* GRID PAGE DAYS */
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
-  const showGridPageDaysSelector =
-    getDatesFromTimeslots(timeslots, timezone).size >
-    Math.min(...gridPageDaysOptions);
+  const showGridPageDaysSelector = useMemo(() => {
+    return (
+      getDatesFromTimeslots(timeslots, timezone).size >
+      Math.min(...gridPageDaysOptions)
+    );
+  }, [timeslots, timezone, gridPageDaysOptions]);
 
   /* MOBILE DRAWER SPACING */
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);
