@@ -64,8 +64,8 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
   const showGridPageDaysSelector =
-    getDatesFromTimeslots(timeslots, eventRange.timezone).size >
-    Math.min(...gridPageDaysOptions);
+    getDatesFromTimeslots(timeslots, eventRange.timezone, eventRange.type)
+      .size > Math.min(...gridPageDaysOptions);
   const [gridDisplayed, setGridDisplayed] = useState(false);
   const router = useRouter();
 

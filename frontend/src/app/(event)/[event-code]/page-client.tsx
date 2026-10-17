@@ -77,10 +77,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     useGridPageDays();
   const showGridPageDaysSelector = useMemo(() => {
     return (
-      getDatesFromTimeslots(timeslots, timezone).size >
-      Math.min(...gridPageDaysOptions)
+      getDatesFromTimeslots(timeslots, timezone, eventData.eventRange.type)
+        .size > Math.min(...gridPageDaysOptions)
     );
-  }, [timeslots, timezone, gridPageDaysOptions]);
+  }, [timeslots, timezone, eventData.eventRange.type, gridPageDaysOptions]);
 
   /* MOBILE DRAWER SPACING */
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);

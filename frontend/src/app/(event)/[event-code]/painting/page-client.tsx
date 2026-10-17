@@ -68,7 +68,7 @@ export default function ClientPage({
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
   const showGridPageDaysSelector =
-    getDatesFromTimeslots(timeslots, timeZone).size >
+    getDatesFromTimeslots(timeslots, timeZone, eventRange.type).size >
     Math.min(...gridPageDaysOptions);
 
   // CAPTCHA STATES

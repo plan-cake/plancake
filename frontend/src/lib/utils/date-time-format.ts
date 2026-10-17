@@ -1,5 +1,5 @@
 import { format, parse, parseISO } from "date-fns";
-import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
+import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
 
 import { EventType } from "@/core/event/types";
 
@@ -178,9 +178,15 @@ export function formatDate(date: string, fmt: string): string {
 export function getDatesFromTimeslots(
   timeslots: Date[],
   timezone: string,
+  eventType: EventType,
 ): Set<string> {
   return new Set(
-    timeslots.map((slot) => formatInTimeZone(slot, timezone, "yyyy-MM-dd")),
+    timeslots.map((slot) => {
+      const slotInTZ = toZonedTime(slot, timezone);
+      const normalizedSlot =
+        eventType === "weekday" ? normalizeWeekdayTimeslot(slotInTZ) : slotInTZ;
+      return format(normalizedSlot, "yyyy-MM-dd");
+    }),
   );
 }
 
