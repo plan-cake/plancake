@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 
@@ -8,6 +8,7 @@ import AuthPageLayout from "@/components/layout/auth-page";
 import TextInputField from "@/components/text-input-field";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import ActionButton from "@/features/button/components/action";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -20,6 +21,7 @@ export default function Page() {
   const [passwordCriteria, setPasswordCriteria] = useState({});
   const [showPasswordCriteria, setShowPasswordCriteria] = useState(false);
   const router = useRouter();
+  const isMobile = useCheckMobile();
 
   const searchParams = useSearchParams();
   const pwdResetToken = searchParams.get("token");
@@ -27,12 +29,33 @@ export default function Page() {
     notFound(); // If no token is provided, show 404 page
   }
 
-  function passwordIsStrong() {
+  const passwordIsStrong = useCallback(() => {
     return Object.values(passwordCriteria).every((value) => value === true);
-  }
+  }, [passwordCriteria]);
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
+
+  // CHECK FIELDS
+  const invalidForm = useMemo(() => {
+    return !newPassword
+      ? MESSAGES.FORM_NOT_FILLED
+      : !passwordIsStrong()
+        ? MESSAGES.ERROR_PASSWORD_WEAK
+        : !confirmPassword
+          ? MESSAGES.FORM_NOT_FILLED
+          : newPassword !== confirmPassword
+            ? MESSAGES.ERROR_PASSWORD_MISMATCH
+            : Object.keys(errors).length
+              ? MESSAGES.FORM_HAS_ERRORS
+              : undefined;
+  }, [newPassword, passwordIsStrong, confirmPassword, errors]);
+
+  const handleNewPasswordChange = (value: string) => {
+    handleError("password", "");
+    handleError("api", "");
+    setNewPassword(value);
+  };
 
   const handleConfirmPasswordChange = (value: string) => {
     handleError("confirmPassword", "");
@@ -93,7 +116,7 @@ export default function Page() {
           label="New Password*"
           value={newPassword}
           onChange={(value) => {
-            setNewPassword(value);
+            handleNewPasswordChange(value);
           }}
           onFocus={() => setShowPasswordCriteria(true)}
           onBlur={() => {
@@ -125,7 +148,9 @@ export default function Page() {
         <ActionButton
           buttonStyle="primary"
           label="Change Password"
+          tooltip={invalidForm}
           onClick={handleSubmit}
+          disabled={!isMobile && !!invalidForm}
           loadOnSuccess
         />
       </div>

@@ -72,19 +72,18 @@ export function timeslotToISOString(
   }
 }
 
-
 /**
  * Checks if two timezones are equivalent even if they represent different locations.
- * 
+ *
  * For example, "America/New_York" and "America/Detroit" are equal because they are both
  * in Eastern Time.
- * 
+ *
  * IMPORTANT: This function also checks if the timezones have the same DST rules by
  * comparing offsets in January and July.
- * 
+ *
  * For example, "America/New_York" and "America/Caracas" are NOT equal because Caracas
  * does not observe DST, despite both having the same offset during part of the year.
- * 
+ *
  * @param tz1 The first timezone to compare
  * @param tz2 The second timezone to compare
  * @returns `true` if the timezones are equivalent, `false` otherwise
@@ -166,6 +165,23 @@ export function formatDateRange(fromDate: string, toDate: string): string {
 export function formatDate(date: string, fmt: string): string {
   const parsedDate = parse(date, "yyyy-MM-dd", new Date());
   return format(parsedDate, fmt);
+}
+
+/**
+ * Given an array of timeslots (Date objects) and a timezone, returns a Set of unique
+ * dates in "yyyy-MM-dd" format.
+ *
+ * @param timeslots
+ * @param timezone
+ * @returns
+ */
+export function getDatesFromTimeslots(
+  timeslots: Date[],
+  timezone: string,
+): Set<string> {
+  return new Set(
+    timeslots.map((slot) => formatInTimeZone(slot, timezone, "yyyy-MM-dd")),
+  );
 }
 
 /* TIME UTILS */
