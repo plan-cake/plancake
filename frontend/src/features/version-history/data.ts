@@ -287,6 +287,19 @@ export const VERSION_DATA: VersionHistoryData = [
           "Header buttons no longer shift when switching pages",
         ],
       },
+      {
+        version: "v0.5.2",
+        releaseDate: { year: 2026, month: 10, day: 17 },
+        added: ["An option was added to display more days per grid page"],
+        changed: [
+          "Submit buttons are now disabled on desktop if fields are empty or have errors",
+        ],
+        fixed: [
+          "Weekday events viewed from a different time zone no longer display duplicated days",
+          "Weekday event timeslots now convert between time zones correctly on the painting page",
+          'The time label for midnight now displays "12 AM" instead of "12 PM"',
+        ],
+      },
     ],
   },
 ] as const;
