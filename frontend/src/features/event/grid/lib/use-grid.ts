@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { format, toZonedTime } from "date-fns-tz";
 
 import { MESSAGES } from "@/lib/messages";
+import { normalizeWeekdayTimeslot } from "@/lib/utils/date-time-format";
 
 /**
  * This hook manages the state and logic for displaying the grid view. It
@@ -80,18 +81,9 @@ function getSlotComponents(
   isWeekdayEvent: boolean,
 ) {
   const slotInTZ = toZonedTime(slot, timezone);
-  let normalizedSlot = slotInTZ;
-
-  if (isWeekdayEvent) {
-    // Normalize to the reference week dates (2012-01-01 - 2012-01-07)
-    normalizedSlot = new Date(
-      2012,
-      0,
-      slotInTZ.getDay() + 1,
-      slotInTZ.getHours(),
-      slotInTZ.getMinutes(),
-    );
-  }
+  const normalizedSlot = isWeekdayEvent
+    ? normalizeWeekdayTimeslot(slotInTZ)
+    : slotInTZ;
 
   const [dayKey, dayDisplay, hour, minute] = format(
     normalizedSlot,
