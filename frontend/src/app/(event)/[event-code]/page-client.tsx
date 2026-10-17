@@ -75,12 +75,12 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   /* GRID PAGE DAYS */
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
-  const showGridPageDaysSelector = useMemo(() => {
-    return (
+  const showGridPageDaysSelector = useMemo(
+    () =>
       getDatesFromTimeslots(timeslots, timezone, eventData.eventRange.type)
-        .size > Math.min(...gridPageDaysOptions)
-    );
-  }, [timeslots, timezone, eventData.eventRange.type, gridPageDaysOptions]);
+        .size > Math.min(...gridPageDaysOptions),
+    [timeslots, timezone, eventData.eventRange.type, gridPageDaysOptions],
+  );
 
   /* MOBILE DRAWER SPACING */
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);

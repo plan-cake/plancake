@@ -67,9 +67,12 @@ export default function ClientPage({
   // GRID PAGE DAYS
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
-  const showGridPageDaysSelector =
-    getDatesFromTimeslots(timeslots, timeZone, eventRange.type).size >
-    Math.min(...gridPageDaysOptions);
+  const showGridPageDaysSelector = useMemo(
+    () =>
+      getDatesFromTimeslots(timeslots, timeZone, eventRange.type).size >
+      Math.min(...gridPageDaysOptions),
+    [timeslots, timeZone, eventRange.type, gridPageDaysOptions],
+  );
 
   // CAPTCHA STATES
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
