@@ -15,7 +15,7 @@ export default function BaseTimeBlock({
 }: TimeBlockProps) {
   return (
     <div
-      className="relative isolate grid"
+      className="relative isolate grid overflow-x-clip"
       onMouseLeave={onMouseLeave}
       style={{
         gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${hasNext ? SIDE_WIDTH : 10}px`,
