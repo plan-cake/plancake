@@ -44,7 +44,7 @@ export default function Hero() {
 
   return (
     <div className="relative left-1/2 w-[100vw] -translate-x-1/2">
-      <div ref={trackRef} className="bg-lion relative z-10 h-[250vh]">
+      <div ref={trackRef} className="bg-background relative z-10 h-[250vh]">
         <div className="sticky top-0 h-screen w-full">
           <div className="bg-background absolute inset-0 flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
             <HeroContent
