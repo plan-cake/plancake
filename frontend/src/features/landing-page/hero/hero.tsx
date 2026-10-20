@@ -2,12 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useMotionTemplate,
-} from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -31,16 +26,10 @@ export default function Hero() {
 
   const expandProgress = useTransform(scrollYProgress, [0.1, 1], [0, 1]);
 
-  // CSS clamp handles the responsive starting radius without any post-paint JS measuring!
-  // Mobile text-5xl width is ~300px (160px radius).
-  // Desktop text-8xl width is ~600px (320px radius).
-  const circleDiameter = useMotionTemplate`calc((clamp(220px, 40vw, 320px) * 2) + ${expandProgress} * 300vmax)`;
-
   const restOpacity = useTransform(scrollYProgress, [0.4, 0.8], [0, 1]);
   const restY = useTransform(scrollYProgress, [0.5, 0.8], [24, 0]);
   const imageY = useTransform(scrollYProgress, [0.2, 1], ["110%", "90%"]);
   const arrowOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
-  const borderWidth = useTransform(scrollYProgress, [0.1, 1], [20, 100]);
 
   return (
     <div className="relative left-1/2 w-[100vw] -translate-x-1/2">
@@ -48,8 +37,7 @@ export default function Hero() {
         <div className="sticky top-0 h-screen w-full">
           <div className="bg-background absolute inset-0 flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
             <HeroContent
-              circleDiameter={circleDiameter}
-              borderWidth={borderWidth}
+              expandProgress={expandProgress}
               restOpacity={restOpacity}
               restY={restY}
             />

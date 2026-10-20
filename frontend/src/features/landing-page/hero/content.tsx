@@ -1,37 +1,86 @@
 "use client";
 
-import { motion, MotionValue } from "framer-motion";
+import { useLayoutEffect, useRef } from "react";
+
+import {
+  motion,
+  MotionValue,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
 import { LayoutDashboardIcon, PlusIcon } from "lucide-react";
 
 import LinkButton from "@/features/button/components/link";
 
+// Thickness of the bone ring around the circle, in px
+const RING_START = 20;
+const RING_END = 100;
+
 interface HeroContentProps {
-  circleDiameter: MotionValue<string>;
-  borderWidth: MotionValue<number>;
+  /** 0 → 1 as the circle grows from behind the heading to fill the screen. */
+  expandProgress: MotionValue<number>;
   restOpacity: MotionValue<number>;
   restY: MotionValue<number>;
 }
 
 export default function HeroContent({
-  circleDiameter,
-  borderWidth,
+  expandProgress,
   restOpacity,
   restY,
 }: HeroContentProps) {
+  // The circle is rendered at its starting size and grown with transforms
+  // instead of animating width/height/border-width, which forced layout and
+  // a full repaint on every scroll frame (very choppy on mobile Safari).
+  // The bone ring is a separate circle behind the lion one (rather than a
+  // border) so its thickness can grow independently of the scale.
+  const circleRef = useRef<HTMLDivElement>(null);
+  const baseDiameter = useMotionValue(0);
+  const vmax = useMotionValue(0);
+
+  useLayoutEffect(() => {
+    const update = () => {
+      baseDiameter.set(circleRef.current?.offsetWidth ?? 0);
+      vmax.set(Math.max(window.innerWidth, window.innerHeight));
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [baseDiameter, vmax]);
+
+  // Same geometry as before: the outer diameter grows by 300vmax while the
+  // ring grows from RING_START to RING_END.
+  const outerDiameter = useTransform(
+    [expandProgress, baseDiameter, vmax],
+    ([p, d0, v]: number[]) => d0 + p * 3 * v,
+  );
+  const outerScale = useTransform(
+    [outerDiameter, baseDiameter],
+    ([d, d0]: number[]) => (d0 ? d / d0 : 1),
+  );
+  const innerScale = useTransform(
+    [outerDiameter, baseDiameter, expandProgress],
+    ([d, d0, p]: number[]) => {
+      const ring = RING_START + p * (RING_END - RING_START);
+      const innerBase = d0 - 2 * RING_START;
+      return innerBase > 0 ? (d - 2 * ring) / innerBase : 1;
+    },
+  );
+
   return (
     <div className="relative z-10 mx-auto mt-28 max-w-7xl text-center md:mt-16">
       {/* Unified Grid Container for both Tagline and H1 */}
       <div className="relative mx-auto grid w-fit justify-items-center">
         {/* The Expanding Background Circle (Now centered behind both) */}
         <motion.div
+          ref={circleRef}
           aria-hidden
-          style={{
-            width: circleDiameter,
-            height: circleDiameter,
-            borderWidth,
-            willChange: "width, height, border-width",
-          }}
-          className="border-bone bg-lion pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border-solid"
+          style={{ x: "-50%", y: "-50%", scale: outerScale }}
+          className="bg-bone pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[calc(clamp(220px,40vw,320px)*2)] rounded-full will-change-transform"
+        />
+        <motion.div
+          aria-hidden
+          style={{ x: "-50%", y: "-50%", scale: innerScale }}
+          className="bg-lion pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[calc(clamp(220px,40vw,320px)*2-40px)] rounded-full will-change-transform"
         />
 
         {/* Base Layer in Grid Cell 1 */}
