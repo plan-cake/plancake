@@ -39,12 +39,11 @@ export default function Footer() {
       className={cn(
         "bg-lion ring-bone ring-100 relative mt-16",
         "[border-radius:50%_50%_0_0/100px_100px_0_0]",
-        "md:[border-radius:50%_50%_0_0/150px_150px_0_0]",
-        "lg:left-1/2 lg:aspect-[2/1] lg:w-[min(90vw,1440px)] lg:-translate-x-1/2 lg:rounded-none lg:rounded-t-full",
+        "md:left-1/2 md:aspect-[2/1] md:w-[clamp(1300px,90vw,1440px)] md:-translate-x-1/2 md:rounded-none md:rounded-t-full",
       )}
     >
-      <div className="mx-auto max-w-7xl px-4 pt-16 text-center sm:px-6 lg:absolute lg:inset-x-0 lg:top-[25%] lg:px-8 lg:pt-0">
-        <h2 className="font-display text-violet relative mb-4 text-6xl tracking-wide lg:text-8xl">
+      <div className="mx-auto max-w-7xl px-4 pt-16 text-center sm:px-6 md:absolute md:inset-x-0 md:top-[25%] md:max-w-[min(100vw,80rem)] md:pt-0 lg:px-8">
+        <h2 className="font-display text-violet relative mb-4 text-6xl tracking-wide md:text-8xl">
           PLAN TODAY
         </h2>
         <div className="relative flex justify-center">
@@ -56,7 +55,7 @@ export default function Footer() {
           />
         </div>
       </div>
-      <div className="text-violet mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 lg:absolute lg:inset-x-0 lg:bottom-0 lg:px-8 lg:pt-0">
+      <div className="text-violet mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 md:absolute md:inset-x-0 md:bottom-0 md:max-w-[min(100vw,80rem)] md:pt-0 lg:px-8">
         <div className="flex flex-col items-center gap-10 px-6 text-center md:flex-row md:items-start md:justify-evenly">
           <nav className="contents">
             {NAV_SECTIONS.map((section) => (
@@ -90,7 +89,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-4 md:justify-end justify-center">
+            <div className="flex items-center justify-center gap-4 md:justify-end">
               <a
                 href="https://github.com/plan-cake"
                 target="_blank"
