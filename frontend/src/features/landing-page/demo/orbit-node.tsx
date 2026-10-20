@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 
-import usePointerType from "@/lib/hooks/use-pointer-type";
 import { cn } from "@/lib/utils/classname";
 
 const BASE_FONT_PX = 16;
@@ -14,7 +13,8 @@ interface OrbitNodeProps {
   hoverCard: React.ReactNode;
   onSelect: () => void;
   orbitScale: number | null;
-  isMobile: boolean;
+  /** Open the step in the drawer on click instead of showing the hover card. */
+  usesDrawer: boolean;
   cardPosition?: "above" | "left";
 }
 
@@ -24,14 +24,9 @@ export default function OrbitNode({
   hoverCard,
   onSelect,
   orbitScale,
-  isMobile,
+  usesDrawer,
   cardPosition,
 }: OrbitNodeProps) {
-  const pointerType = usePointerType();
-  // Small screens and touch devices open steps in the drawer instead of
-  // the hover card, which gets cramped or cut off in narrow layouts.
-  const usesDrawer = isMobile || pointerType === "coarse";
-
   const containerRef = useRef<HTMLDivElement>(null);
   const [opensLeft, setOpensLeft] = useState(false);
 

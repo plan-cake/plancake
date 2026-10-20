@@ -7,6 +7,7 @@ import { DEMO_STEPS_CONFIG } from "@/features/landing-page/demo/lib/config";
 import { useDemo } from "@/features/landing-page/demo/lib/use-demo";
 import Orbit from "@/features/landing-page/demo/orbit";
 import OrbitNode from "@/features/landing-page/demo/orbit-node";
+import usePointerType from "@/lib/hooks/use-pointer-type";
 import { cn } from "@/lib/utils/classname";
 
 export default function HowItWorksSection() {
@@ -23,6 +24,9 @@ export default function HowItWorksSection() {
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
   }, []);
+
+  const pointerType = usePointerType();
+  const usesDrawer = isMobile || pointerType === "coarse";
 
   const orbitNodes = [...DEMO_STEPS_CONFIG].reverse().map((config) => {
     const body = bodyInDrawer ? null : getStepBody(config.step);
@@ -45,7 +49,7 @@ export default function HowItWorksSection() {
         hoverCard={hoverCard}
         onSelect={() => setActiveStep(config.step)}
         orbitScale={orbitScale}
-        isMobile={isMobile}
+        usesDrawer={usesDrawer}
         cardPosition={config.cardPosition}
       />
     );
@@ -70,8 +74,8 @@ export default function HowItWorksSection() {
             messy back-and-forth.
           </p>
           <p className="text-foreground mt-2 text-sm font-semibold md:text-lg">
-            Try it out by <span className="max-md:hidden">hovering over</span>
-            <span className="md:hidden">tapping</span> the steps below!
+            Try it out by {usesDrawer ? "tapping" : "hovering over"} the steps
+            below!
           </p>
         </div>
       </div>
