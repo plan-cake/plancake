@@ -8,6 +8,7 @@ import {
 } from "@/features/landing-page/demo/lib/utils";
 import PaintAvailabilityStep from "@/features/landing-page/demo/paint-step";
 import ViewResultsStep from "@/features/landing-page/demo/results-step";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 export function useDemo() {
   const [userAvailability, setUserAvailability] = useState<Set<string>>(
@@ -22,6 +23,7 @@ export function useDemo() {
   const [allowSubmit, setAllowSubmit] = useState(false);
 
   const [activeStep, setActiveStep] = useState<number | null>(null);
+  const isMobile = useCheckMobile();
 
   const paintSlot = (slotIso: string, togglingOn: boolean) => {
     setUserAvailability((prev) => {
@@ -57,8 +59,6 @@ export function useDemo() {
 
     setAllowSubmit(false);
 
-    // Only advance to step 4 (the results drawer) if on a mobile screen
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     if (isMobile) {
       setActiveStep(4);
     }
