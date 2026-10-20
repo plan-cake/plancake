@@ -3,7 +3,8 @@ export interface DemoStepConfig {
   label: string;
   title: string;
   description: string;
-  openAbove?: boolean;
+  /** Fixed side for the hover card. Defaults to the right, flipping left if it would overflow. */
+  cardPosition?: "above" | "left";
 }
 
 export const DEMO_STEPS_CONFIG: DemoStepConfig[] = [
@@ -18,6 +19,7 @@ export const DEMO_STEPS_CONFIG: DemoStepConfig[] = [
     label: "Share Link",
     title: "Share with Your Friends",
     description: "Anyone can join from the event link, no account required!",
+    cardPosition: "left",
   },
   {
     step: 3,
@@ -25,7 +27,7 @@ export const DEMO_STEPS_CONFIG: DemoStepConfig[] = [
     title: "Paint Your Availability",
     description:
       "Try it here! Click and drag on the grid to fill in the times you're free.",
-    openAbove: true,
+    cardPosition: "above",
   },
   {
     step: 4,

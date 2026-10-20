@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { CarouselDrawer } from "@/features/drawer";
 import { DEMO_STEPS_CONFIG } from "@/features/landing-page/demo/lib/config";
 import { useDemo } from "@/features/landing-page/demo/lib/use-demo";
-import OrbitImages from "@/features/landing-page/demo/orbit-images";
+import Orbit from "@/features/landing-page/demo/orbit";
 import OrbitNode from "@/features/landing-page/demo/orbit-node";
 import { cn } from "@/lib/utils/classname";
 
@@ -45,7 +45,8 @@ export default function HowItWorksSection() {
         hoverCard={hoverCard}
         onSelect={() => setActiveStep(config.step)}
         orbitScale={orbitScale}
-        openAbove={config.openAbove}
+        isMobile={isMobile}
+        cardPosition={config.cardPosition}
       />
     );
   });
@@ -77,22 +78,14 @@ export default function HowItWorksSection() {
 
       <div className="relative mt-4 flex w-full items-center justify-center md:-mt-8">
         <div className="mx-auto w-full max-w-[900px]">
-          <OrbitImages
+          <Orbit
             images={orbitNodes}
-            shape="ellipse"
             baseWidth={900}
             radiusX={300}
             radiusY={isMobile ? 320 : 230}
             rotation={-20}
-            duration={45}
             itemSize={160}
-            responsive={true}
             onScaleChange={setOrbitScale}
-            direction="normal"
-            fill
-            showPath
-            paused={true}
-            pathColor="currentColor"
             className="text-foreground/75"
           />
         </div>

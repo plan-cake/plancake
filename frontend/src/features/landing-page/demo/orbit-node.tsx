@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 
+import usePointerType from "@/lib/hooks/use-pointer-type";
 import { cn } from "@/lib/utils/classname";
 
 const BASE_FONT_PX = 16;
@@ -13,7 +14,8 @@ interface OrbitNodeProps {
   hoverCard: React.ReactNode;
   onSelect: () => void;
   orbitScale: number | null;
-  openAbove?: boolean;
+  isMobile: boolean;
+  cardPosition?: "above" | "left";
 }
 
 export default function OrbitNode({
@@ -22,13 +24,19 @@ export default function OrbitNode({
   hoverCard,
   onSelect,
   orbitScale,
-  openAbove = false,
+  isMobile,
+  cardPosition,
 }: OrbitNodeProps) {
+  const pointerType = usePointerType();
+  // Small screens and touch devices open steps in the drawer instead of
+  // the hover card, which gets cramped or cut off in narrow layouts.
+  const usesDrawer = isMobile || pointerType === "coarse";
+
   const containerRef = useRef<HTMLDivElement>(null);
   const [opensLeft, setOpensLeft] = useState(false);
 
   const handleMouseEnter = () => {
-    if (openAbove) return;
+    if (cardPosition) return;
     if (containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       if (rect.right + 576 + 20 > window.innerWidth) {
@@ -52,7 +60,8 @@ export default function OrbitNode({
     >
       <button
         onClick={(e) => {
-          if (!window.matchMedia("(hover: hover)").matches || e.detail === 0) {
+          // e.detail === 0 means keyboard activation, which can't hover
+          if (usesDrawer || e.detail === 0) {
             onSelect();
           }
         }}
@@ -78,23 +87,25 @@ export default function OrbitNode({
         {label}
       </button>
 
-      <div
-        className={cn(
-          "w-xl pointer-events-none absolute opacity-0 transition-all duration-300 ease-out hover:z-50 group-hover:pointer-events-auto group-hover:opacity-100",
-          openAbove
-            ? "bottom-full left-1/2 origin-bottom -translate-x-1/2 scale-95 pb-4 group-hover:scale-100"
-            : cn(
-                "top-1/2 -translate-y-1/2",
-                opensLeft
-                  ? "right-full origin-right scale-95 pr-4 group-hover:scale-100"
-                  : "left-full origin-left scale-95 pl-4 group-hover:scale-100",
-              ),
-        )}
-      >
-        <div className="bg-foreground text-background overflow-hidden rounded-3xl shadow-2xl">
-          {hoverCard}
+      {!usesDrawer && (
+        <div
+          className={cn(
+            "w-xl pointer-events-none absolute opacity-0 transition-all duration-300 ease-out hover:z-50 group-hover:pointer-events-auto group-hover:opacity-100",
+            cardPosition === "above"
+              ? "bottom-full left-1/2 origin-bottom -translate-x-1/2 scale-95 pb-4 group-hover:scale-100"
+              : cn(
+                  "top-1/2 -translate-y-1/2",
+                  cardPosition === "left" || opensLeft
+                    ? "right-full origin-right scale-95 pr-4 group-hover:scale-100"
+                    : "left-full origin-left scale-95 pl-4 group-hover:scale-100",
+                ),
+          )}
+        >
+          <div className="bg-foreground text-background overflow-hidden rounded-3xl shadow-2xl">
+            {hoverCard}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
