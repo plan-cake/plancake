@@ -1,4 +1,4 @@
-export const PARTICIPANTS = ["mickey", "goofy", "donald", "you"];
+export const PARTICIPANTS = ["charlie", "marcie", "linus", "you"];
 
 export const generateTimeslots = () => {
   const slots = [];
