@@ -40,19 +40,14 @@ const NAV_SECTIONS = [
         href: "https://github.com/plan-cake/plancake/issues",
         external: true,
       },
-      {
-        label: "Source Code",
-        href: "https://github.com/plan-cake/plancake",
-        external: true,
-      },
       { label: "Contact Us", href: "mailto:plancakeapp.support@gmail.com" },
     ],
   },
 ];
 
 const LEGAL_LINKS = [
-  { label: "Terms", href: "/terms-of-service" },
-  { label: "Privacy", href: "/privacy-policy" },
+  { label: "Terms", href: "/legal/terms" },
+  { label: "Privacy", href: "/legal/privacy" },
 ];
 
 export default function Footer() {
@@ -78,10 +73,13 @@ export default function Footer() {
         </div>
       </div>
       <div className="text-violet mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 md:absolute md:inset-x-0 md:bottom-0 md:max-w-[min(100vw,80rem)] md:pt-0 lg:px-8">
-        <div className="flex flex-col items-center gap-10 px-6 text-left md:flex-row md:items-start md:justify-center md:gap-24">
+        <div className="flex flex-col items-center gap-10 px-6 text-center md:flex-row md:items-start md:justify-center md:gap-24 md:text-left">
           <nav className="contents">
             {NAV_SECTIONS.map((section) => (
-              <div key={section.title} className="flex flex-col items-start">
+              <div
+                key={section.title}
+                className="flex flex-col items-center md:items-start"
+              >
                 <h3 className="text-accent mb-3 text-sm font-semibold tracking-wide opacity-60">
                   {section.title}
                 </h3>
