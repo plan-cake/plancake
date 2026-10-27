@@ -2,6 +2,7 @@ import { Github } from "@thesvg/react";
 import { PlusIcon, MailIcon } from "lucide-react";
 import Link from "next/link";
 
+import LinkText from "@/components/link-text";
 import Logo from "@/components/logo";
 import LinkButton from "@/features/button/components/link";
 import { cn } from "@/lib/utils/classname";
@@ -88,12 +89,11 @@ export default function Footer() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="hover:text-accent opacity-80 hover:font-semibold hover:opacity-100"
                         {...(link.external
                           ? { target: "_blank", rel: "noopener noreferrer" }
                           : {})}
                       >
-                        {link.label}
+                        <LinkText unbolded>{link.label}</LinkText>
                       </Link>
                     </li>
                   ))}
@@ -112,12 +112,8 @@ export default function Footer() {
             <div className="flex flex-col-reverse items-center gap-4 md:flex-row md:justify-end">
               <div className="flex items-center gap-4">
                 {LEGAL_LINKS.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="hover:text-accent text-sm opacity-80 hover:font-semibold hover:opacity-100"
-                  >
-                    {link.label}
+                  <Link key={link.href} href={link.href}>
+                    <LinkText unbolded>{link.label}</LinkText>
                   </Link>
                 ))}
               </div>
