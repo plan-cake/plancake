@@ -2,12 +2,6 @@
 
 import { useLayoutEffect, useRef } from "react";
 
-import {
-  motion,
-  MotionValue,
-  useMotionValue,
-  useTransform,
-} from "framer-motion";
 import { LayoutDashboardIcon, PlusIcon } from "lucide-react";
 
 import LinkButton from "@/features/button/components/link";
@@ -16,74 +10,58 @@ import LinkButton from "@/features/button/components/link";
 const RING_START = 20;
 const RING_END = 100;
 
-interface HeroContentProps {
-  /** 0 → 1 as the circle grows from behind the heading to fill the screen. */
-  expandProgress: MotionValue<number>;
-  restOpacity: MotionValue<number>;
-  restY: MotionValue<number>;
-}
-
-export default function HeroContent({
-  expandProgress,
-  restOpacity,
-  restY,
-}: HeroContentProps) {
-  // The circle is rendered at its starting size and grown with transforms
-  // instead of animating width/height/border-width, which forced layout and
-  // a full repaint on every scroll frame (very choppy on mobile Safari).
-  // The bone ring is a separate circle behind the lion one (rather than a
-  // border) so its thickness can grow independently of the scale.
+export default function HeroContent() {
+  // The circles grow with scale (see hero-scroll.css) rather than resizing, which
+  // would repaint every frame. The ring is a separate circle so it can grow too.
+  const containerRef = useRef<HTMLDivElement>(null);
   const circleRef = useRef<HTMLDivElement>(null);
-  const baseDiameter = useMotionValue(0);
-  const vmax = useMotionValue(0);
 
   useLayoutEffect(() => {
+    let lastWidth = 0;
     const update = () => {
-      baseDiameter.set(circleRef.current?.offsetWidth ?? 0);
-      vmax.set(Math.max(window.innerWidth, window.innerHeight));
+      // iOS Safari fires resize events as its toolbar shows and hides while scrolling,
+      // which changes innerHeight and would make the circle jump mid-scroll. Only
+      // re-measure when the width changes (e.g. a real resize or rotation).
+      if (window.innerWidth === lastWidth) return;
+      lastWidth = window.innerWidth;
+
+      const container = containerRef.current;
+      const d0 = circleRef.current?.offsetWidth ?? 0;
+      if (!container || !d0) return;
+
+      // The outer diameter grows by 300vmax while the ring grows from RING_START to
+      // RING_END. These are the end scales the CSS animations grow the circles to.
+      const outerEnd = d0 + 3 * Math.max(window.innerWidth, window.innerHeight);
+      container.style.setProperty(
+        "--hero-outer-scale-end",
+        String(outerEnd / d0),
+      );
+      container.style.setProperty(
+        "--hero-inner-scale-end",
+        String((outerEnd - 2 * RING_END) / (d0 - 2 * RING_START)),
+      );
     };
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
-  }, [baseDiameter, vmax]);
-
-  // Same geometry as before: the outer diameter grows by 300vmax while the
-  // ring grows from RING_START to RING_END.
-  const outerDiameter = useTransform(
-    [expandProgress, baseDiameter, vmax],
-    ([p, d0, v]: number[]) => d0 + p * 3 * v,
-  );
-  const outerScale = useTransform(
-    [outerDiameter, baseDiameter],
-    ([d, d0]: number[]) => (d0 ? d / d0 : 1),
-  );
-  const innerScale = useTransform(
-    [outerDiameter, baseDiameter, expandProgress],
-    ([d, d0, p]: number[]) => {
-      const ring = RING_START + p * (RING_END - RING_START);
-      const innerBase = d0 - 2 * RING_START;
-      return innerBase > 0 ? (d - 2 * ring) / innerBase : 1;
-    },
-  );
+  }, []);
 
   return (
     <div className="relative z-10 mx-auto mt-28 max-w-7xl text-center md:mt-16">
-      {/* Unified Grid Container for both Tagline and H1 */}
-      <div className="relative mx-auto grid w-fit justify-items-center">
-        {/* The Expanding Background Circle (Now centered behind both) */}
-        <motion.div
+      <div
+        ref={containerRef}
+        className="relative mx-auto grid w-fit justify-items-center"
+      >
+        <div
           ref={circleRef}
           aria-hidden
-          style={{ x: "-50%", y: "-50%", scale: outerScale }}
-          className="bg-bone pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[calc(clamp(220px,40vw,320px)*2)] rounded-full will-change-transform"
+          className="hero-circle-outer bg-bone -translate-1/2 pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[calc(clamp(220px,40vw,320px)*2)] rounded-full will-change-transform"
         />
-        <motion.div
+        <div
           aria-hidden
-          style={{ x: "-50%", y: "-50%", scale: innerScale }}
-          className="bg-lion pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[calc(clamp(220px,40vw,320px)*2-40px)] rounded-full will-change-transform"
+          className="hero-circle-inner bg-lion -translate-1/2 pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[calc(clamp(220px,40vw,320px)*2-40px)] rounded-full will-change-transform"
         />
 
-        {/* Base Layer in Grid Cell 1 */}
         <div className="col-start-1 row-start-1 flex flex-col items-center">
           <div className="relative z-10 mb-6 flex justify-center">
             <span className="bg-bone text-violet inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold tracking-wide">
@@ -104,14 +82,7 @@ export default function HeroContent({
         </div>
       </div>
 
-      <motion.div
-        style={{
-          opacity: restOpacity,
-          y: restY,
-          willChange: "opacity, transform",
-        }}
-        className="relative z-10"
-      >
+      <div className="hero-rest relative z-10 will-change-[opacity,translate]">
         <h2 className="text-violet mx-auto mb-4 max-w-2xl text-lg md:text-xl">
           The easiest way to coordinate schedules and plan group events. Stack
           up availability and serve the perfect meeting time.
@@ -131,7 +102,7 @@ export default function HeroContent({
             className="text-violet"
           />
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

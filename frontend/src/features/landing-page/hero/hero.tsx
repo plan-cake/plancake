@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { motion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -11,49 +10,30 @@ import HeroContent from "@/features/landing-page/hero/content";
 import HeroImage from "@/features/landing-page/hero/image";
 
 export default function Hero() {
-  const trackRef = useRef<HTMLDivElement>(null);
-
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const heroImageTheme: HeroImageTheme =
     mounted && resolvedTheme === "dark" ? "dark" : "light";
 
-  const { scrollYProgress } = useScroll({
-    target: trackRef,
-    offset: ["start start", "end end"],
-  });
-
-  const expandProgress = useTransform(scrollYProgress, [0.1, 1], [0, 1]);
-
-  const restOpacity = useTransform(scrollYProgress, [0.4, 0.8], [0, 1]);
-  const restY = useTransform(scrollYProgress, [0.5, 0.8], [24, 0]);
-  const imageY = useTransform(scrollYProgress, [0.2, 1], ["110%", "90%"]);
-  const arrowOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
-
   return (
     <div className="relative left-1/2 w-[100vw] -translate-x-1/2">
-      <div ref={trackRef} className="bg-background relative z-10 h-[250vh]">
+      <div className="hero-track bg-background relative z-10 h-[250vh]">
         <div className="sticky top-0 h-screen w-full">
           <div className="bg-background absolute inset-0 flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
-            <HeroContent
-              expandProgress={expandProgress}
-              restOpacity={restOpacity}
-              restY={restY}
-            />
+            <HeroContent />
 
-            <motion.div
-              style={{ opacity: arrowOpacity }}
-              className="text-foreground pointer-events-none absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 animate-bounce flex-col items-center"
-            >
-              <span className="text-foreground/70 text-sm font-semibold tracking-wide">
-                Scroll!
-              </span>
-              <ChevronDown className="h-6 w-6" />
-            </motion.div>
+            <div className="hero-arrow pointer-events-none absolute bottom-8 left-1/2 z-10 -translate-x-1/2">
+              <div className="text-foreground flex animate-bounce flex-col items-center">
+                <span className="text-foreground/70 text-sm font-semibold tracking-wide">
+                  Scroll!
+                </span>
+                <ChevronDown className="h-6 w-6" />
+              </div>
+            </div>
           </div>
 
-          <HeroImage imageY={imageY} theme={heroImageTheme} />
+          <HeroImage theme={heroImageTheme} />
         </div>
       </div>
       <div className="from-lion to-background relative z-0 w-full bg-gradient-to-b">

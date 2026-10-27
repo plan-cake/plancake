@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { AnimatePresence, motion, MotionValue } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 
 import SegmentedControl from "@/components/segmented-control";
@@ -13,11 +13,10 @@ import {
 } from "@/features/landing-page/hero/config";
 
 interface HeroImageProps {
-  imageY: MotionValue<string>;
   theme: HeroImageTheme;
 }
 
-export default function HeroImage({ imageY, theme }: HeroImageProps) {
+export default function HeroImage({ theme }: HeroImageProps) {
   const [heroImageView, setHeroImageView] =
     useState<HeroImageView>("specific-dates");
 
@@ -25,14 +24,7 @@ export default function HeroImage({ imageY, theme }: HeroImageProps) {
   const mobileImage = HERO_IMAGES[heroImageView].mobile[theme];
 
   return (
-    <motion.div
-      style={{
-        y: imageY,
-        willChange: "transform",
-        transform: "translateZ(0)",
-      }}
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto w-full max-w-[1296px] md:w-[80vw]"
-    >
+    <div className="hero-image pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto w-full max-w-[1296px] will-change-[translate] md:w-[80vw]">
       <div className="pointer-events-auto relative z-10 mx-auto mb-2 w-64">
         <SegmentedControl
           options={[
@@ -96,6 +88,6 @@ export default function HeroImage({ imageY, theme }: HeroImageProps) {
           </motion.div>
         </AnimatePresence>
       </div>
-    </motion.div>
+    </div>
   );
 }
