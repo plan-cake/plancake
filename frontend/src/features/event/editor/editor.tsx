@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 import { ClockIcon, TriangleAlertIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ import checkUnselectedRange from "@/core/event/lib/unselected-range";
 import { EventInformation } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
+import GridPageDaysSelector from "@/features/event/components/selectors/grid-page-days";
 import TimeSelector from "@/features/event/components/selectors/time";
 import AdvancedOptions from "@/features/event/editor/advanced-options";
 import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
@@ -21,12 +22,14 @@ import DateRangeSelection from "@/features/event/editor/date-range/selector";
 import { EventEditorType } from "@/features/event/editor/types";
 import { validateEventData } from "@/features/event/editor/validate-data";
 import { ScheduleGrid } from "@/features/event/grid";
+import useGridPageDays from "@/features/event/grid/lib/use-page-days";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { RateLimitBanner } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import submitEvent from "@/lib/utils/api/submit-event";
 import { cn } from "@/lib/utils/classname";
+import { getDatesFromTimeslots } from "@/lib/utils/date-time-format";
 
 type EventEditorProps = {
   type: EventEditorType;
@@ -58,6 +61,15 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     setEndTime,
   } = useEventContext();
   const { title, customCode, eventRange, timeslots } = state;
+  const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
+    useGridPageDays();
+  const showGridPageDaysSelector = useMemo(
+    () =>
+      getDatesFromTimeslots(timeslots, eventRange.timezone, eventRange.type)
+        .size > Math.min(...gridPageDaysOptions),
+    [timeslots, eventRange.timezone, eventRange.type, gridPageDaysOptions],
+  );
+  const [gridDisplayed, setGridDisplayed] = useState(false);
   const router = useRouter();
 
   // CAPTCHA STATES
@@ -65,6 +77,56 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   const [captchaInitError, setCaptchaInitError] = useState(false);
 
   const [mobileTab, setMobileTab] = useState<SegmentedControlOption>("details");
+
+  // CHECK FIELDS
+  const invalidForm = useMemo(() => {
+    if (captchaInitError) {
+      return MESSAGES.ERROR_CAPTCHA_BLOCKED;
+    }
+
+    let eventNotEdited = false;
+    if (type === "edit" && initialData && initialData.originalEventRange) {
+      const sameTitle = title.trim() === initialData.title.trim();
+      const sameType = eventRange.type === initialData.originalEventRange.type;
+      const sameTimeRange =
+        eventRange.timeRange.from ===
+          initialData.originalEventRange.timeRange.from &&
+        eventRange.timeRange.to ===
+          initialData.originalEventRange.timeRange.to &&
+        eventRange.timezone === initialData.originalEventRange.timezone;
+
+      const sameDate =
+        eventRange.type === "specific" &&
+        initialData.originalEventRange.type === "specific" &&
+        eventRange.dateRange.from ===
+          initialData.originalEventRange.dateRange.from &&
+        eventRange.dateRange.to === initialData.originalEventRange.dateRange.to;
+
+      const sameWeekdays =
+        eventRange.type === "weekday" &&
+        initialData.originalEventRange.type === "weekday" &&
+        JSON.stringify(eventRange.weekdays) ===
+          JSON.stringify(initialData.originalEventRange.weekdays);
+
+      eventNotEdited =
+        sameTitle && sameType && sameTimeRange && (sameDate || sameWeekdays);
+    }
+
+    return !title ||
+      !title.trim() ||
+      (eventRange.type === "specific" &&
+        (!eventRange.dateRange.from || !eventRange.dateRange.to)) ||
+      (eventRange.type === "weekday" &&
+        (!eventRange.weekdays || eventRange.weekdays.length === 0)) ||
+      !eventRange.timeRange.from ||
+      !eventRange.timeRange.to
+      ? MESSAGES.FORM_NOT_FILLED
+      : eventNotEdited
+        ? "Please make changes to update the event."
+        : Object.keys(errors).length || title.length > MAX_TITLE_LENGTH
+          ? MESSAGES.FORM_HAS_ERRORS
+          : undefined;
+  }, [captchaInitError, title, eventRange, type, initialData, errors]);
 
   // SUBMIT EVENT INFO
   const submitEventInfo = async () => {
@@ -108,13 +170,15 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       href={`/${initialData?.customCode}`}
     />
   );
-  const submitButton = (
+
+  const submitButton = (desktop: boolean) => (
     <ActionButton
       buttonStyle="primary"
       label={type === "edit" ? "Update Event" : "Create Event"}
+      tooltip={desktop && invalidForm ? invalidForm : undefined}
       onClick={submitEventInfo}
+      disabled={(desktop && !!invalidForm) || captchaInitError}
       loadOnSuccess
-      disabled={captchaInitError}
     />
   );
   const grid = (
@@ -124,7 +188,18 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       unselectedRange={checkUnselectedRange(eventRange)}
       timezone={eventRange.timezone}
       timeslots={timeslots}
+      pageDays={gridPageDays}
+      setGridDisplayed={setGridDisplayed}
     />
+  );
+
+  const previewText = (
+    <p className="opacity-75">
+      This is a preview!{" "}
+      {type === "edit"
+        ? "Manage availability from the results page."
+        : "You'll add your availability later."}
+    </p>
   );
 
   return (
@@ -163,7 +238,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         </div>
         <div className="hidden gap-2 md:flex">
           {type === "edit" && cancelButton}
-          {submitButton}
+          {submitButton(true)}
         </div>
       </div>
 
@@ -215,8 +290,24 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         <div className="h-16 md:hidden" />
         <div className="hidden flex-1 md:col-start-2 md:row-span-9 md:row-start-2 md:block">
           <div className="relative h-full w-full grow">
-            <div className="bg-panel absolute inset-0 flex rounded-3xl pb-4 pl-2 pr-4 pt-4">
-              <div className="flex1 min-h-0 grow space-y-4">{grid}</div>
+            <div className="bg-panel absolute inset-0 flex flex-col justify-between gap-2 rounded-3xl px-2 py-4">
+              <div className="min-h-0 flex-1 pr-2">{grid}</div>
+              {gridDisplayed && (
+                <div className="flex items-center justify-between pl-4 pr-2 text-sm">
+                  {previewText}
+                  {showGridPageDaysSelector && (
+                    <div className="flex flex-none items-center gap-2">
+                      <p className="opacity-75">Days per page:</p>
+                      <GridPageDaysSelector
+                        id="grid-page-days-selector-desktop"
+                        value={gridPageDays}
+                        options={gridPageDaysOptions}
+                        onChange={setGridPageDays}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -224,18 +315,34 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
       <div
         className={cn(
-          "md:hidden",
-          mobileTab === "details" ? "hidden" : "block",
+          "flex-col gap-4 md:hidden",
+          mobileTab === "details" ? "hidden" : "flex",
         )}
       >
         {grid}
+        {gridDisplayed && (
+          <div className="bg-panel flex flex-col gap-2 rounded-3xl p-6 text-sm">
+            {previewText}
+            {showGridPageDaysSelector && (
+              <div>
+                <p>Days per page</p>
+                <GridPageDaysSelector
+                  id="grid-page-days-selector-mobile"
+                  value={gridPageDays}
+                  options={gridPageDaysOptions}
+                  onChange={setGridPageDays}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}
       <div className="z-10">
         <MobileFooterIsland
           leftButtons={type === "edit" ? [cancelButton] : undefined}
-          rightButtons={[submitButton]}
+          rightButtons={[submitButton(false)]}
         >
           <SegmentedControl
             value={mobileTab}
