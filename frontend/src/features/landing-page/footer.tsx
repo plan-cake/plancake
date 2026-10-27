@@ -8,11 +8,24 @@ import { cn } from "@/lib/utils/classname";
 
 const NAV_SECTIONS = [
   {
-    title: "Plancake",
+    title: "The Stack",
     links: [
       { label: "New Event", href: "/new-event" },
       { label: "Dashboard", href: "/dashboard" },
-      { label: "What's New", href: "/version-history" },
+      { label: "Change Log", href: "/version-history" },
+    ],
+  },
+  {
+    title: "Account",
+    links: [
+      { label: "Log In", href: "/login" },
+      { label: "Sign Up", href: "/register" },
+      { label: "Settings", href: "/settings" },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
       ...(process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL
         ? [
             {
@@ -22,15 +35,24 @@ const NAV_SECTIONS = [
             },
           ]
         : []),
+      {
+        label: "Report a Bug",
+        href: "https://github.com/plan-cake/plancake/issues",
+        external: true,
+      },
+      {
+        label: "Source Code",
+        href: "https://github.com/plan-cake/plancake",
+        external: true,
+      },
+      { label: "Contact Us", href: "mailto:plancakeapp.support@gmail.com" },
     ],
   },
-  {
-    title: "Account",
-    links: [
-      { label: "Log In", href: "/login" },
-      { label: "Sign Up", href: "/register" },
-    ],
-  },
+];
+
+const LEGAL_LINKS = [
+  { label: "Terms", href: "/terms-of-service" },
+  { label: "Privacy", href: "/privacy-policy" },
 ];
 
 export default function Footer() {
@@ -56,11 +78,11 @@ export default function Footer() {
         </div>
       </div>
       <div className="text-violet mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 md:absolute md:inset-x-0 md:bottom-0 md:max-w-[min(100vw,80rem)] md:pt-0 lg:px-8">
-        <div className="flex flex-col items-center gap-10 px-6 text-center md:flex-row md:items-start md:justify-evenly">
+        <div className="flex flex-col items-center gap-10 px-6 text-left md:flex-row md:items-start md:justify-center md:gap-24">
           <nav className="contents">
             {NAV_SECTIONS.map((section) => (
-              <div key={section.title} className="flex flex-col items-center">
-                <h3 className="mb-3 text-sm font-semibold tracking-wide opacity-60">
+              <div key={section.title} className="flex flex-col items-start">
+                <h3 className="text-accent mb-3 text-sm font-semibold tracking-wide opacity-60">
                   {section.title}
                 </h3>
                 <ul className="space-y-2 text-sm">
@@ -83,27 +105,40 @@ export default function Footer() {
           </nav>
         </div>
 
-        <div className="border-violet/15 mt-10 flex flex-col items-center gap-4 border-t pt-6 text-center md:flex-row md:items-center md:justify-between md:text-left">
+        <div className="border-violet/15 mt-10 flex flex-col items-center gap-4 border-t pt-4 text-center md:flex-row md:items-center md:justify-between md:text-left">
           <div className="flex flex-col items-center gap-3 md:flex-row md:items-center">
             <Logo />
           </div>
 
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-center gap-4 md:justify-end">
-              <a
-                href="https://github.com/plan-cake"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Plancake GitHub Organization"
-              >
-                <Github className="h-6 w-6" />
-              </a>
-              <a
-                href="mailto:plancakeapp.support@gmail.com"
-                aria-label="Email Plancake Support"
-              >
-                <MailIcon className="h-6 w-6" />
-              </a>
+            <div className="flex flex-col-reverse items-center gap-4 md:flex-row md:justify-end">
+              <div className="flex items-center gap-4">
+                {LEGAL_LINKS.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="hover:text-accent text-sm opacity-80 hover:font-semibold hover:opacity-100"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="flex items-center gap-4">
+                <a
+                  href="https://github.com/plan-cake"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Plancake GitHub Organization"
+                >
+                  <Github className="h-4 w-4" />
+                </a>
+                <a
+                  href="mailto:plancakeapp.support@gmail.com"
+                  aria-label="Email Plancake Support"
+                >
+                  <MailIcon className="h-4 w-4" />
+                </a>
+              </div>
             </div>
 
             <p className="text-sm opacity-70">
