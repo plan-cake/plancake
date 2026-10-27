@@ -292,6 +292,9 @@ export default function BaseDrawer({
                       : "pb-4",
                   )}
                   data-vaul-no-drag
+                  // Vaul captures the pointer on press, which stops pointerenter events
+                  // from reaching the body (e.g. drag-painting a grid with a mouse)
+                  onPointerDown={(e) => e.stopPropagation()}
                 >
                   {/* Wrap in an extra div to manage the opacity transition separately */}
                   <div
