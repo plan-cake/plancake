@@ -5,14 +5,12 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 
-import SegmentedControl from "@/components/segmented-control";
+// import SegmentedControl from "@/components/segmented-control";
 import {
   HERO_IMAGES,
   HeroImageTheme,
   HeroImageView,
 } from "@/features/landing-page/hero/config";
-
-const SHOW_VIEW_TOGGLE = false;
 
 interface HeroImageProps {
   theme: HeroImageTheme;
@@ -27,19 +25,17 @@ export default function HeroImage({ theme }: HeroImageProps) {
 
   return (
     <div className="hero-image pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto w-full max-w-[1296px] will-change-[translate] md:w-[80vw]">
-      {SHOW_VIEW_TOGGLE && (
-        <div className="pointer-events-auto relative z-10 mx-auto mb-2 w-64">
-          <SegmentedControl
-            options={[
-              { label: "Specific Dates", value: "specific-dates" },
-              { label: "Weekly", value: "weekly" },
-            ]}
-            value={heroImageView}
-            onChange={setHeroImageView}
-            className="bg-background shadow-lg"
-          />
-        </div>
-      )}
+      {/* <div className="pointer-events-auto relative z-10 mx-auto mb-2 w-64">
+        <SegmentedControl
+          options={[
+            { label: "Specific Dates", value: "specific-dates" },
+            { label: "Weekly", value: "weekly" },
+          ]}
+          value={heroImageView}
+          onChange={setHeroImageView}
+          className="bg-background shadow-lg"
+        />
+      </div> */}
 
       <div
         className="relative hidden w-full md:block"
