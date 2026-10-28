@@ -191,7 +191,6 @@ def get_event_range(event: UserEvent) -> EventRange:
         raise ValueError("Event has no timeslots.")
 
     if event.date_type == UserEvent.EventType.CALENDAR:
-        # Don't do any conversions for calendar events, time zones don't affect them
         return EventRange(
             dates=list(dates),
             start_time=time(hour=0, minute=0, second=0),
@@ -201,27 +200,14 @@ def get_event_range(event: UserEvent) -> EventRange:
         start_time = min(times)
         end_time = max(times)
         # End time is 15 minutes after the last timeslot
-        end_time = (
-            datetime.combine(datetime.today(), end_time) + timedelta(minutes=15)
-        ).time()
+        end_time = (datetime.combine(date.min, end_time) + timedelta(minutes=15)).time()
 
-        # datetime.combine has no time zone info, so we include the event's time zone to
-        # make sure it doesn't convert twice
-        start_time_converted = datetime.combine(datetime.today(), start_time).replace(
-            tzinfo=event_time_zone
-        )
-        end_time_converted = datetime.combine(datetime.today(), end_time).replace(
-            tzinfo=event_time_zone
-        )
-        if event.date_type == UserEvent.EventType.SPECIFIC:
-            # Convert to UTC for date events, not week events since those stay in local time
-            start_time_converted = start_time_converted.astimezone(ZoneInfo("UTC"))
-            end_time_converted = end_time_converted.astimezone(ZoneInfo("UTC"))
-
+        # Dates and times are left in the event's time zone, and the frontend handles the
+        # conversion
         return EventRange(
             dates=list(dates),
-            start_time=start_time_converted.time(),
-            end_time=end_time_converted.time(),
+            start_time=start_time,
+            end_time=end_time,
         )
 
 
