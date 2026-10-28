@@ -1,4 +1,4 @@
-Last updated: September 26, 2026
+Last updated: October 28, 2026
 
 This Privacy Policy describes how Plancake (“we”, “us”, or “our”) collects, uses, and discloses information when You use our services and website (the "Service").
 
@@ -76,7 +76,7 @@ Cookies can be "Persistent" or "Session" Cookies. Persistent Cookies remain on Y
 We use Persistent Cookies for the purposes set out below:
 
 - **Necessary / Essential Cookies**  
-  Type: Session Cookies  
+  Type: Persistent Cookies  
   Administered by: Us  
   Purpose: These Cookies are essential to provide You with services available through the Website and to enable You to use some of its features. They help to authenticate users and prevent fraudulent use of user accounts. Without these Cookies, the services that You have asked for cannot be provided, and We only use these Cookies to provide You with those services.
 
@@ -126,7 +126,7 @@ In some exceptional cases, we may be legally permitted under applicable law to p
 
 # 3\. Data Retention
 
-We will only retain your personal data for as long as your account is active or as needed to provide you with the Service. We do not automatically delete user data on a set schedule.
+We will only retain your personal data for as long as your account is active or as needed to provide you with the Service. Unverified account data is deleted automatically once it expires, through a daily cleanup job.
 
 For any category of personal data not specifically defined in this policy, and unless otherwise specified by applicable law, the retention period for any personal data will be deemed to be as long as the user has an account and is interacting with the Service.
 
@@ -207,7 +207,7 @@ The table below shows the categories of personal information we have collected i
 | ID  | Category                                                                   | Examples                                                                                                                                                                                                 | Collected |
 | :-- | :------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------- |
 | A   | Identifiers                                                                | Contact details, such as real name, alias, postal address, telephone or mobile contact number, unique personal identifier, online identifier, Internet Protocol address, email address, and account name | YES       |
-| B   | Personal information as defined in the California Customer Records statute | Name, contact information, education, employment, employment history, and financial information                                                                                                          | NO        |
+| B   | Personal information as defined in the California Customer Records statute | Name, contact information, education, employment, employment history, and financial information                                                                                                          | YES       |
 | C   | Protected classification characteristics under state or federal law        | Gender, age, date of birth, race and ethnicity, national origin, marital status, and other demographic data                                                                                              | NO        |
 | D   | Commercial information                                                     | Transaction information, purchase history, financial details, and payment information                                                                                                                    | NO        |
 | E   | Biometric Information                                                      | Fingerprints and voiceprints                                                                                                                                                                             | NO        |

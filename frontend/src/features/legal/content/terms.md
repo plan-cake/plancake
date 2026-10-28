@@ -1,4 +1,4 @@
-Last updated: September 26, 2026
+Last updated: October 28, 2026
 
 We are Plancake (“Company”, “we”, “us”, or “our”).
 
@@ -110,7 +110,6 @@ As a user of the Services, you agree not to:
 - Attempt to bypass any measures of the Services designed to prevent or restrict access to the Services, or any portion of the Services.
 - Except as may be the result of standard search engine or Internet browser usage, use, launch, develop, or distribute any automated system, including without limitation, any spider, robot, cheat utility, scraper, or offline reader that accesses the Services, or use or launch any unauthorized script or other software.
 - Make any unauthorized use of the Services, including collecting usernames and/or email addresses of users by electronic or other means for the purpose of sending unsolicited email, or creating user accounts by automated means or under false pretenses.
-- Use the Services as part of any effort to compete with us or otherwise use the Services and/or the Content for any revenue-generating endeavor or commercial enterprise.
 - Use the Services to advertise or offer to sell goods and services.
 - Sell or otherwise transfer your profile.
 
