@@ -40,6 +40,7 @@ def check_custom_code(code):
         "dashboard",
         "forgot-password",
         "guest-import",
+        "legal",
         "login",
         "new-event",
         "settings",
