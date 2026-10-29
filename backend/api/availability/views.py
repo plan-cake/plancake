@@ -219,10 +219,11 @@ def check_display_name(request):
         )
 
 
-NOT_PARTICIPATED_ERROR = Response(
-    {"error": {"general": ["User has not participated in this event."]}},
-    status=400,
-)
+def not_participated_error():
+    return Response(
+        {"error": {"general": ["User has not participated in this event."]}},
+        status=400,
+    )
 
 
 @api_endpoint("GET")
@@ -243,7 +244,7 @@ def get_self_availability(request):
 
     # We can be ambiguous to avoid creating more guest accounts
     if not user:
-        return NOT_PARTICIPATED_ERROR
+        return not_participated_error()
 
     try:
         event = event_lookup(event_code)
@@ -288,7 +289,7 @@ def get_self_availability(request):
             status=404,
         )
     except EventParticipant.DoesNotExist:
-        return NOT_PARTICIPATED_ERROR
+        return not_participated_error()
 
 
 @api_endpoint("GET")
@@ -442,7 +443,7 @@ def remove_self_availability(request):
     event_code = request.validated_data.get("event_code")
 
     if not user:
-        return NOT_PARTICIPATED_ERROR
+        return not_participated_error()
 
     try:
         event = event_lookup(event_code)
@@ -456,7 +457,7 @@ def remove_self_availability(request):
             status=404,
         )
     except EventParticipant.DoesNotExist:
-        return NOT_PARTICIPATED_ERROR
+        return not_participated_error()
 
     notify_live_update(
         LiveUpdateEvent(

@@ -65,9 +65,9 @@ from api.utils import (
 
 logger = logging.getLogger("api")
 
-EVENT_NOT_FOUND_ERROR = Response(
-    {"error": {"general": ["Event not found."]}}, status=404
-)
+
+def event_not_found_error():
+    return Response({"error": {"general": ["Event not found."]}}, status=404)
 
 
 @api_endpoint("POST")
@@ -241,7 +241,7 @@ def get_true_code(request):
     try:
         true_code = UrlCode.objects.get(url_code__iexact=event_code).url_code
     except UrlCode.DoesNotExist:
-        return EVENT_NOT_FOUND_ERROR
+        return event_not_found_error()
 
     return Response({"true_code": true_code}, status=200)
 
@@ -263,7 +263,7 @@ def edit_date_event(request):
     time_zone = request.validated_data.get("time_zone")
 
     if not user:
-        return EVENT_NOT_FOUND_ERROR
+        return event_not_found_error()
 
     user_date_local = datetime.now(ZoneInfo(time_zone)).date()
     try:
@@ -328,7 +328,7 @@ def edit_date_event(request):
             EventDateTimeslot.objects.bulk_create(to_add)
 
     except UserEvent.DoesNotExist:
-        return EVENT_NOT_FOUND_ERROR
+        return event_not_found_error()
 
     notify_live_update(
         LiveUpdateEvent(
@@ -359,7 +359,7 @@ def edit_week_event(request):
     time_zone = request.validated_data.get("time_zone")
 
     if not user:
-        return EVENT_NOT_FOUND_ERROR
+        return event_not_found_error()
 
     try:
         # Do everything inside a transaction to ensure atomicity
@@ -405,7 +405,7 @@ def edit_week_event(request):
             EventWeekdayTimeslot.objects.bulk_create(to_add)
 
     except UserEvent.DoesNotExist:
-        return EVENT_NOT_FOUND_ERROR
+        return event_not_found_error()
 
     notify_live_update(
         LiveUpdateEvent(
@@ -447,7 +447,7 @@ def delete_event(request):
         event.delete()
 
     except UserEvent.DoesNotExist:
-        return EVENT_NOT_FOUND_ERROR
+        return event_not_found_error()
 
     return Response({"message": ["Event deleted successfully."]}, status=200)
 
@@ -480,7 +480,7 @@ def get_event_details(request):
                 ]
 
     except UserEvent.DoesNotExist:
-        return EVENT_NOT_FOUND_ERROR
+        return event_not_found_error()
 
     return Response(
         {
