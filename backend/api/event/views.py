@@ -69,11 +69,6 @@ EVENT_NOT_FOUND_ERROR = Response(
     {"error": {"general": ["Event not found."]}}, status=404
 )
 
-INVALID_TIMESLOT_TIME_ERROR = Response(
-    {"error": {"timeslots": ["Timeslots must be on 15-minute intervals."]}},
-    status=400,
-)
-
 
 @api_endpoint("POST")
 @require_captcha
