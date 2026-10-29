@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 
+import { parseISO } from "date-fns";
 import { format } from "date-fns-tz";
 import { BroomIcon } from "lucide-react";
 
@@ -26,7 +27,7 @@ export default function DateRangePresets({
 
   const next4Days = useMemo(() => {
     const days: string[] = [];
-    const today = new Date(dateNow);
+    const today = parseISO(dateNow);
     for (let i = 1; i <= 4; i++) {
       const nextDate = new Date(today);
       nextDate.setDate(today.getDate() + i);
@@ -40,8 +41,8 @@ export default function DateRangePresets({
 
   const nextWeek = useMemo(() => {
     const weekDates: string[] = [];
-    for (let i = 0; weekDates.length < 5; i++) {
-      const today = new Date(dateNow);
+    for (let i = 1; weekDates.length < 5; i++) {
+      const today = parseISO(dateNow);
       const nextDate = new Date(today);
       nextDate.setDate(today.getDate() + i);
       if (weekDates.length === 0 && nextDate.getDay() !== 1) {
