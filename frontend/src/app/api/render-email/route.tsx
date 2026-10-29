@@ -14,7 +14,17 @@ export async function POST(req: Request) {
     return new Response("Forbidden", { status: 403 });
   }
 
-  const { template_key: templateKey, context } = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return new Response("Invalid JSON body", { status: 400 });
+  }
+
+  const { template_key: templateKey, context = {} } = body ?? {};
+  if (typeof context !== "object" || context === null) {
+    return new Response("Context must be an object", { status: 400 });
+  }
 
   let data: EmailRenderResponse;
 
