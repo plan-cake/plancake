@@ -121,9 +121,9 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     const modifiers = {
       group_start: (date: Date) => {
         const prevDate = new Date(
-          date.getUTCFullYear(),
-          date.getUTCMonth(),
-          date.getUTCDate(),
+          date.getFullYear(),
+          date.getMonth(),
+          date.getDate(),
         );
         prevDate.setDate(prevDate.getDate() - 1);
         return (
@@ -135,9 +135,9 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
       },
       group_end: (date: Date) => {
         const nextDate = new Date(
-          date.getUTCFullYear(),
-          date.getUTCMonth(),
-          date.getUTCDate(),
+          date.getFullYear(),
+          date.getMonth(),
+          date.getDate(),
         );
         nextDate.setDate(nextDate.getDate() + 1);
         return (
