@@ -1,0 +1,115 @@
+/* HERO SCROLL ANIMATIONS */
+
+@supports (animation-timeline: view()) {
+  /* Progress is 0 when the track's top reaches the top of the viewport and 1 when its
+  bottom reaches the bottom */
+  .hero-track {
+    view-timeline: --hero block;
+  }
+
+  .hero-circle-outer {
+    animation: hero-circle-outer linear both;
+  }
+  .hero-circle-inner {
+    animation: hero-circle-inner linear both;
+  }
+  .hero-rest {
+    animation: hero-rest linear both;
+  }
+  .hero-image {
+    animation: hero-image linear both;
+  }
+  .hero-arrow {
+    animation: hero-arrow linear both;
+  }
+
+  /* Must come after the animation shorthands above, which reset these */
+  :is(
+    .hero-circle-outer,
+    .hero-circle-inner,
+    .hero-rest,
+    .hero-image,
+    .hero-arrow
+  ) {
+    animation-timeline: --hero;
+    animation-range: contain 0% contain 100%;
+  }
+}
+
+/* Browsers without scroll-driven animations get a static hero in its
+finished state, without the extra scroll length or the scroll prompt */
+@supports not (animation-timeline: view()) {
+  .hero-track {
+    height: 100vh;
+  }
+  .hero-circle-outer {
+    scale: var(--hero-outer-scale-end);
+  }
+  .hero-circle-inner {
+    scale: var(--hero-inner-scale-end);
+  }
+  .hero-image {
+    translate: 0 90%;
+  }
+  .hero-arrow {
+    display: none;
+  }
+}
+
+/* The end scales are set as CSS variables by HeroContent, since they depend on the
+circle's measured size and the viewport */
+@keyframes hero-circle-outer {
+  0% {
+    scale: 1;
+  }
+  100% {
+    scale: var(--hero-outer-scale-end);
+  }
+}
+
+@keyframes hero-circle-inner {
+  0% {
+    scale: 1;
+  }
+  100% {
+    scale: var(--hero-inner-scale-end);
+  }
+}
+
+@keyframes hero-rest {
+  0% {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  40% {
+    opacity: 0;
+  }
+  50% {
+    translate: 0 24px;
+  }
+  80%,
+  100% {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes hero-image {
+  0%,
+  20% {
+    translate: 0 110%;
+  }
+  100% {
+    translate: 0 90%;
+  }
+}
+
+@keyframes hero-arrow {
+  0% {
+    opacity: 1;
+  }
+  5%,
+  100% {
+    opacity: 0;
+  }
+}

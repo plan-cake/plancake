@@ -141,7 +141,6 @@ export default function BaseDrawer({
       <Drawer.Portal>
         {showOverlay && (
           <Drawer.Overlay
-            onClick={(e) => e.stopPropagation()}
             className={cn(
               "fixed inset-0",
               frostedGlass ? "bg-black/1" : "bg-black/30",
@@ -152,7 +151,6 @@ export default function BaseDrawer({
 
         <Drawer.Content
           ref={contentRef}
-          onClick={(e) => e.stopPropagation()}
           className={cn(
             "fixed bottom-0 left-0 right-0 flex outline-none",
             _type !== "floating" && "h-[100dvh]",
@@ -294,6 +292,9 @@ export default function BaseDrawer({
                       : "pb-4",
                   )}
                   data-vaul-no-drag
+                  // Vaul captures the pointer on press, which stops pointerenter events
+                  // from reaching the body (e.g. drag-painting a grid with a mouse)
+                  onPointerDown={(e) => e.stopPropagation()}
                 >
                   {/* Wrap in an extra div to manage the opacity transition separately */}
                   <div
