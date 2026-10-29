@@ -153,7 +153,11 @@ GENERIC_ERR_RESPONSE = Response(
 )
 
 # Email settings
-if DEBUG:
+SEND_EMAILS = env.bool("SEND_EMAILS", default=False)
+if not SEND_EMAILS:
+    # Nothing should try to send, but if it does, print it to the console
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+elif DEBUG:
     # For use with something like Mailpit
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = env("SMTP_HOST")
@@ -172,7 +176,6 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 EMAIL_BRIDGE_SECRET = env("EMAIL_BRIDGE_SECRET")
 EMAIL_TIMEOUT = 10  # seconds
 ADMIN_EMAILS = env.list("ADMIN_EMAILS", default=[])
-SEND_EMAILS = env.bool("SEND_EMAILS", default=False)
 CRITICAL_EMAIL_INTERVAL_SECONDS = 1800  # 30 minutes
 
 # Automated tasks
