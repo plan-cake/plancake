@@ -113,6 +113,12 @@ def delete_session_cookie(response, key):
     response.delete_cookie(key, domain=COOKIE_DOMAIN)
 
 
+def generic_error_response():
+    return Response(
+        {"error": {"general": ["An unknown error has occurred."]}}, status=500
+    )
+
+
 class MessageOutputSerializer(serializers.Serializer):
     message = serializers.ListField(child=serializers.CharField())
 

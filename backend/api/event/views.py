@@ -45,7 +45,6 @@ from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEve
 from api.redis_pools import async_pool
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
-    GENERIC_ERR_RESPONSE,
     GUEST_COOKIE_NAME,
     LIVE_UPDATES_HEARTBEAT_SECONDS,
     MAX_LIVE_CONNECTIONS_EVENT,
@@ -59,6 +58,7 @@ from api.utils import (
     check_rate_limit,
     event_lookup,
     format_event_info,
+    generic_error_response,
     get_session,
     notify_live_update,
 )
@@ -115,7 +115,7 @@ def create_date_event(request):
             url_code = generate_code()
         except Exception:
             logger.critical("Failed to generate a unique URL code.")
-            return GENERIC_ERR_RESPONSE
+            return generic_error_response()
 
     check_rate_limit(request, ThrottleScopes.EVENT_CREATION)
 
@@ -179,7 +179,7 @@ def create_week_event(request):
             url_code = generate_code()
         except Exception:
             logger.critical("Failed to generate a unique URL code.")
-            return GENERIC_ERR_RESPONSE
+            return generic_error_response()
 
     check_rate_limit(request, ThrottleScopes.EVENT_CREATION)
 
@@ -293,7 +293,7 @@ def edit_date_event(request):
                 logger.critical(
                     f"Event {event.id} has no timeslots when editing date event."
                 )
-                return GENERIC_ERR_RESPONSE
+                return generic_error_response()
             # Convert it to local date for comparison
             existing_start_date = existing_start_date.astimezone(
                 ZoneInfo(event.time_zone)

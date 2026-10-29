@@ -29,7 +29,6 @@ from api.models import AuthedPasswordResetCode, UserSession
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
     AUTHED_PWD_RESET_EXP_SECONDS,
-    GENERIC_ERR_RESPONSE,
     LONG_SESS_EXP_SECONDS,
     SEND_EMAILS,
     SESS_EXP_SECONDS,
@@ -39,6 +38,7 @@ from api.utils import (
     MessageOutputSerializer,
     check_rate_limit,
     delete_session_cookie,
+    generic_error_response,
     prune_account_sessions,
 )
 
@@ -140,7 +140,7 @@ def get_active_sessions(request):
         logger.error(
             f"No session matching session token for user, despite being authenticated: {user.id}."
         )
-        return GENERIC_ERR_RESPONSE
+        return generic_error_response()
 
     return Response(
         {"current_session": current_session, "other_sessions": other_sessions},

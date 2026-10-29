@@ -8,7 +8,6 @@ from urllib.parse import urlparse
 import environ
 from celery.schedules import crontab
 from django.core.mail import send_mail
-from rest_framework.response import Response
 
 from api.logging import FancyFormatter
 
@@ -148,9 +147,6 @@ URL_CODE_EXP_SECONDS = 1209600  # 14 days
 ACCOUNT_COOKIE_NAME = "account_sess_token"
 GUEST_COOKIE_NAME = "guest_sess_token"
 
-GENERIC_ERR_RESPONSE = Response(
-    {"error": {"general": ["An unknown error has occurred."]}}, status=500
-)
 
 # AWS SES Credentials
 EMAIL_BACKEND = "django_ses.SESBackend"
