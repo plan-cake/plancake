@@ -11,6 +11,7 @@ import {
   HeroImageTheme,
   HeroImageView,
 } from "@/features/landing-page/hero/config";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 const SHOW_VIEW_TOGGLE = false;
 
@@ -22,11 +23,15 @@ export default function HeroImage({ theme }: HeroImageProps) {
   const [heroImageView, setHeroImageView] =
     useState<HeroImageView>("specific-dates");
 
+  const isMobile = useCheckMobile();
   const desktopImage = HERO_IMAGES[heroImageView].desktop[theme];
   const mobileImage = HERO_IMAGES[heroImageView].mobile[theme];
 
   return (
-    <div className="hero-image pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto w-full max-w-[1296px] will-change-[translate] md:w-[80vw]">
+    <div
+      key={String(isMobile)}
+      className="hero-image pointer-events-none absolute inset-x-0 bottom-0 z-20 mx-auto w-full max-w-[1296px] will-change-[translate] md:w-[80vw]"
+    >
       {SHOW_VIEW_TOGGLE && (
         <div className="pointer-events-auto relative z-10 mx-auto mb-2 w-64">
           <SegmentedControl
