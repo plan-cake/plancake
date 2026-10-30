@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 
+import { parseISO } from "date-fns";
 import { format } from "date-fns-tz";
 import { BroomIcon } from "lucide-react";
 
@@ -8,10 +9,10 @@ import ActionButton from "@/features/button/components/action";
 
 export default function DateRangePresets({
   dates,
-  setDates,
+  applyPreset,
 }: {
   dates: Set<string>;
-  setDates: (dates: Set<string>) => void;
+  applyPreset: (days: string[]) => void;
 }) {
   const { state } = useEventContext();
   const dateOnly = state.eventRange?.type === "calendar";
@@ -30,7 +31,7 @@ export default function DateRangePresets({
 
   const next4Days = useMemo(() => {
     const days: string[] = [];
-    const today = new Date(dateNow);
+    const today = parseISO(dateNow);
     for (let i = 1; i <= 4; i++) {
       const nextDate = new Date(today);
       nextDate.setDate(today.getDate() + i);
@@ -44,8 +45,8 @@ export default function DateRangePresets({
 
   const nextWeek = useMemo(() => {
     const weekDates: string[] = [];
-    for (let i = 0; weekDates.length < 5; i++) {
-      const today = new Date(dateNow);
+    for (let i = 1; weekDates.length < 5; i++) {
+      const today = parseISO(dateNow);
       const nextDate = new Date(today);
       nextDate.setDate(today.getDate() + i);
       if (weekDates.length === 0 && nextDate.getDay() !== 1) {
@@ -98,7 +99,7 @@ export default function DateRangePresets({
       <ActionButton
         buttonStyle="semi-transparent"
         icon={<BroomIcon />}
-        onClick={() => setDates(new Set())}
+        onClick={() => applyPreset([])}
         disabled={dates.size === 0}
         tooltip="Clear Selection"
       />
@@ -109,7 +110,7 @@ export default function DateRangePresets({
               isNext4Days ? "bordered semi-transparent" : "semi-transparent"
             }
             label="Next 4 Days"
-            onClick={() => setDates(new Set(next4Days))}
+            onClick={() => applyPreset(next4Days)}
             fullWidth
             className="justify-center"
           />
@@ -118,7 +119,7 @@ export default function DateRangePresets({
               isNextWeek ? "bordered semi-transparent" : "semi-transparent"
             }
             label="Next Week"
-            onClick={() => setDates(new Set(nextWeek))}
+            onClick={() => applyPreset(nextWeek)}
             fullWidth
             className="justify-center"
           />
@@ -131,7 +132,7 @@ export default function DateRangePresets({
               isNext2Weeks ? "bordered semi-transparent" : "semi-transparent"
             }
             label="Next 2 Weeks"
-            onClick={() => setDates(new Set(next2Weeks))}
+            onClick={() => applyPreset(next2Weeks)}
             fullWidth
             className="justify-center"
           />
@@ -140,7 +141,7 @@ export default function DateRangePresets({
               isNext4Weeks ? "bordered semi-transparent" : "semi-transparent"
             }
             label="Next 4 Weeks"
-            onClick={() => setDates(new Set(next4Weeks))}
+            onClick={() => applyPreset(next4Weeks)}
             fullWidth
             className="justify-center"
           />

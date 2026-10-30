@@ -83,7 +83,7 @@ function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
   if (checkUnselectedRange(range)) return [];
 
   // Validate Duration
-  if (checkDateRange(new Set(range.dates))) {
+  if (checkDateRange(new Set(range.dates), range.type)) {
     return [];
   }
 

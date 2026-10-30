@@ -5,6 +5,8 @@ from datetime import date, datetime, time, timedelta
 from enum import Enum
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+import requests
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
 from ipware import get_client_ip
 from redis import Redis
@@ -17,10 +19,13 @@ from api.models import UserAccount, UserEvent, UserSession
 from api.redis_pools import sync_pool
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
+    BASE_URL,
     COOKIE_DOMAIN,
     DEBUG,
+    EMAIL_BRIDGE_SECRET,
     GUEST_COOKIE_NAME,
     LONG_SESS_EXP_SECONDS,
+    SEND_EMAILS,
     SESS_EXP_SECONDS,
     TEST_ENVIRONMENT,
     ThrottleScope,
@@ -191,7 +196,6 @@ def get_event_range(event: UserEvent) -> EventRange:
         raise ValueError("Event has no timeslots.")
 
     if event.date_type == UserEvent.EventType.CALENDAR:
-        # Don't do any conversions for calendar events, time zones don't affect them
         return EventRange(
             dates=list(dates),
             start_time=time(hour=0, minute=0, second=0),
@@ -201,27 +205,14 @@ def get_event_range(event: UserEvent) -> EventRange:
         start_time = min(times)
         end_time = max(times)
         # End time is 15 minutes after the last timeslot
-        end_time = (
-            datetime.combine(datetime.today(), end_time) + timedelta(minutes=15)
-        ).time()
+        end_time = (datetime.combine(date.min, end_time) + timedelta(minutes=15)).time()
 
-        # datetime.combine has no time zone info, so we include the event's time zone to
-        # make sure it doesn't convert twice
-        start_time_converted = datetime.combine(datetime.today(), start_time).replace(
-            tzinfo=event_time_zone
-        )
-        end_time_converted = datetime.combine(datetime.today(), end_time).replace(
-            tzinfo=event_time_zone
-        )
-        if event.date_type == UserEvent.EventType.SPECIFIC:
-            # Convert to UTC for date events, not week events since those stay in local time
-            start_time_converted = start_time_converted.astimezone(ZoneInfo("UTC"))
-            end_time_converted = end_time_converted.astimezone(ZoneInfo("UTC"))
-
+        # Dates and times are left in the event's time zone, and the frontend handles the
+        # conversion
         return EventRange(
             dates=list(dates),
-            start_time=start_time_converted.time(),
-            end_time=end_time_converted.time(),
+            start_time=start_time,
+            end_time=end_time,
         )
 
 
@@ -496,3 +487,72 @@ def to_datetime(date):
     if isinstance(date, datetime):
         return date
     return datetime(date.year, date.month, date.day)
+
+
+class EmailTemplateKey(str, Enum):
+    EMAIL_IN_USE = "email_in_use"
+    EMAIL_VERIFICATION = "email_verification"
+    PASSWORD_RESET = "password_reset"
+    PASSWORD_RESET_CODE = "password_reset_code"
+
+
+def send_templated_email(to_email, template_key: EmailTemplateKey, context) -> bool:
+    """
+    Fetches rendered HTML from Next.js and sends it as an email.
+
+    Returns True if the email was sent successfully, False otherwise.
+
+    This function will check the SEND_EMAILS environment variable, and if set to False
+    then the email will not be sent and True will be returned every time.
+    """
+    if not SEND_EMAILS:
+        return True
+
+    url = BASE_URL
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {EMAIL_BRIDGE_SECRET}",
+    }
+    payload = {
+        "template_key": template_key,
+        "context": context,
+    }
+
+    html_content = None
+    text_fallback = None
+    msg_subject = None
+    success = False
+
+    try:
+        response = requests.post(
+            url + "/api/render-email/", json=payload, headers=headers, timeout=5
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            html_content = data.get("html")
+            text_fallback = data.get("text")
+            msg_subject = data.get("subject")
+            success = True
+            logger.info(f"Successfully rendered email for template '{template_key}'")
+        else:
+            logger.error(
+                f"Failed to render email for template '{template_key}'. "
+                f"Status code: {response.status_code}, Response: {response.text}"
+            )
+    except requests.RequestException as e:
+        logger.error(f"Error rendering email for template '{template_key}': {e}")
+
+    try:
+        if html_content:
+            EmailMultiAlternatives(
+                subject=msg_subject,
+                body=text_fallback,
+                alternatives=[(html_content, "text/html")],
+                to=[to_email],
+            ).send()
+    except Exception as e:
+        logger.error(f"Error sending email: {e}")
+        success = False
+
+    return success

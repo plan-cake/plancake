@@ -62,35 +62,42 @@ export default function DashboardEvent({
   // Memoized local date details
   const dateDetails = useMemo(() => {
     // Extract the dates from the start time on each day
+    // Dates and times are in the event's timezone
     const weekdays = new Set<number>();
-    let startDate = null;
-    let endDate = null;
+    let eventStartDate = null;
+    let localStartDate = null;
+    let localEndDate = null;
     for (const singleDate of dateTimeProps.dates) {
+      if (!eventStartDate || singleDate < eventStartDate)
+        eventStartDate = singleDate;
+
+      // Convert the single date to the local timezone from the event timezone
       const { date, weekday } = getTimezoneDetails({
         time: dateTimeProps.startTime,
         date: singleDate,
-        fromTZ: type === "weekday" ? timezone : undefined,
+        fromTZ: timezone,
         toTZ: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
       weekdays.add(weekday);
-      if (!startDate || singleDate < startDate) startDate = date;
-      if (!endDate || singleDate > endDate) endDate = date;
+      if (!localStartDate || date < localStartDate) localStartDate = date;
+      if (!localEndDate || date > localEndDate) localEndDate = date;
     }
 
+    // Convert the times using the first date in the event's timezone
     const startTime = getTimezoneDetails({
       time: dateTimeProps.startTime,
-      date: startDate!,
-      fromTZ: type === "weekday" ? timezone : undefined,
+      date: eventStartDate!,
+      fromTZ: timezone,
     }).time;
     const endTime = getTimezoneDetails({
       time: dateTimeProps.endTime,
-      date: startDate!,
-      fromTZ: type === "weekday" ? timezone : undefined,
+      date: eventStartDate!,
+      fromTZ: timezone,
     }).time;
 
     return {
-      startDate: startDate!,
-      endDate: endDate!,
+      startDate: localStartDate!,
+      endDate: localEndDate!,
       startTime,
       endTime,
       weekdays,
@@ -100,7 +107,6 @@ export default function DashboardEvent({
     dateTimeProps.startTime,
     dateTimeProps.endTime,
     timezone,
-    type,
   ]);
 
   // Dynamic participant icon count based on event width

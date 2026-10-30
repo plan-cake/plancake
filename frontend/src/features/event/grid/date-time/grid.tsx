@@ -40,11 +40,13 @@ const variants = {
 };
 
 export default function DateTimeGrid({
+  mode = "preview",
+  eventType,
   timeslots,
   timezone,
   pageDays,
-  mode = "preview",
-  eventType,
+  viewTransitionName = "grid",
+  staticHeader = false,
   unselectedRange = false,
   setGridDisplayed = () => {},
   availabilities = {},
@@ -133,7 +135,7 @@ export default function DateTimeGrid({
         "relative grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]",
         mode === "preview" ? "bg-background md:bg-panel" : "bg-background",
       )}
-      style={{ viewTransitionName: "grid" }}
+      style={{ viewTransitionName }}
       id={GRID_ID}
     >
       <DateHeader
@@ -144,6 +146,7 @@ export default function DateTimeGrid({
         dateBlockGaps={dateBlockGaps}
         scrollbarPresent={scrollbarPresent}
         isWeekdayEvent={eventType === "weekday"}
+        isStatic={staticHeader}
         onPrevPage={() => paginate(-1)}
         onNextPage={() => paginate(1)}
         direction={direction}

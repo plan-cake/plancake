@@ -8,7 +8,13 @@ import {
   useState,
 } from "react";
 
-import { format, parseISO } from "date-fns";
+import {
+  addMonths,
+  endOfMonth,
+  format,
+  parseISO,
+  startOfMonth,
+} from "date-fns";
 import {
   DayButton,
   DayButtonProps,
@@ -28,7 +34,7 @@ type CalendarProps = {
 };
 
 export type CalendarHandle = {
-  scrollToSelected: () => void;
+  applyPreset: (days: string[]) => void;
 };
 
 export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
@@ -63,25 +69,20 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
 
     /**
      * Instead of giving the parent the full DOM of this component, we give it the
-     * helper function. the parent will receive this function when it attaches a ref
-     * to this component, and can call it to scroll the calendar to the selected date.
+     * helper function. The parent will receive this function when it attaches a ref
+     * to this component, and can call it to paginate the calendar.
      */
     const containerRef = useRef<HTMLDivElement>(null);
     useImperativeHandle(ref, () => ({
-      scrollToSelected: () => {
-        if (!containerRef.current || !firstSelectedDate) return;
+      applyPreset: (days: string[]) => {
+        // Selects the given days and paginates to the first one if it isn't visible
+        setDates(new Set(days));
+        if (!days.length) return;
 
-        const selectedEl = containerRef.current.querySelector(
-          ".rdp-selected:not(.rdp-outside)",
-        );
-
-        if (selectedEl) {
-          const monthEl = selectedEl.closest(".rdp-month");
-          if (monthEl) {
-            monthEl.scrollIntoView({ behavior: "auto", block: "start" });
-          } else {
-            selectedEl.scrollIntoView({ behavior: "auto", block: "center" });
-          }
+        const firstDay = parseISO(days[0]);
+        const lastVisibleDay = endOfMonth(addMonths(month, numberOfMonths - 1));
+        if (firstDay < startOfMonth(month) || firstDay > lastVisibleDay) {
+          setMonth(startOfMonth(firstDay));
         }
       },
     }));
@@ -121,9 +122,9 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
     const modifiers = {
       group_start: (date: Date) => {
         const prevDate = new Date(
-          date.getUTCFullYear(),
-          date.getUTCMonth(),
-          date.getUTCDate(),
+          date.getFullYear(),
+          date.getMonth(),
+          date.getDate(),
         );
         prevDate.setDate(prevDate.getDate() - 1);
         return (
@@ -135,9 +136,9 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
       },
       group_end: (date: Date) => {
         const nextDate = new Date(
-          date.getUTCFullYear(),
-          date.getUTCMonth(),
-          date.getUTCDate(),
+          date.getFullYear(),
+          date.getMonth(),
+          date.getDate(),
         );
         nextDate.setDate(nextDate.getDate() + 1);
         return (

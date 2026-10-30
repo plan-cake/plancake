@@ -6,11 +6,14 @@ import { EventRange } from "@/core/event/types";
 
 export interface GridProps {
   mode: "paint" | "view" | "preview";
+  viewTransitionName?: string | "none";
+
   timeslots: Date[];
   timezone: string;
   pageDays: number;
   eventType: EventRange["type"];
   backgroundColor: string;
+  staticHeader?: boolean;
 
   unselectedRange?: boolean;
   setGridDisplayed?: (displayed: boolean) => void;
