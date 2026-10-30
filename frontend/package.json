@@ -40,8 +40,10 @@
     "react-day-picker": "^9.6.7",
     "react-dom": "^19.0.0",
     "react-email": "^6.9.0",
+    "react-markdown": "^10.1.0",
     "react-select": "^5.10.2",
     "react-timezone-select": "^3.2.8",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.2.0",
     "use-debounce": "^10.0.6",
     "vaul": "^1.1.2"
