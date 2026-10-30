@@ -28,13 +28,13 @@ export default function BaseMonthBlock({
       parseInt(month.month.split("-")[1]) - 1,
       1,
     );
-    const firstDayOfMonthWeekday = firstDayOfMonth.getUTCDay();
+    const firstDayOfMonthWeekday = firstDayOfMonth.getDay();
     const lastDayOfMonth = new Date(
       parseInt(month.month.split("-")[0]),
       parseInt(month.month.split("-")[1]),
       0,
     );
-    const lastDayOfMonthWeekday = lastDayOfMonth.getUTCDay();
+    const lastDayOfMonthWeekday = lastDayOfMonth.getDay();
 
     const weeks = [];
     let currentWeek: {
@@ -55,7 +55,7 @@ export default function BaseMonthBlock({
     }
 
     // Fill in the days of the month
-    for (let day = 1; day <= lastDayOfMonth.getUTCDate(); day++) {
+    for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
       const dayString = `${month.month}-${day.toString().padStart(2, "0")}`;
       currentWeek.days.push({
         dayString,
