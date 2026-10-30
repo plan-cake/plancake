@@ -31,10 +31,14 @@ interface ScheduleGridProps {
 
   timeslots: Date[];
   timezone: string;
+  pageDays: number;
   isWeekdayEvent?: boolean;
   disableSelect?: boolean;
   staticHeader?: boolean;
+
+  // for "preview" mode
   unselectedRange?: boolean;
+  setGridDisplayed?: (displayed: boolean) => void;
 
   // for "view" mode
   availabilities?: ResultsAvailabilityMap;
@@ -72,9 +76,11 @@ export default function ScheduleGrid({
   viewTransitionName = "grid",
   timeslots,
   timezone,
+  pageDays,
   isWeekdayEvent = false,
   staticHeader = false,
   unselectedRange = false,
+  setGridDisplayed = () => {},
   availabilities = {},
   numParticipants = 0,
   hoveredSlot,
@@ -94,17 +100,23 @@ export default function ScheduleGrid({
     direction,
     paginate,
     error,
-  } = useGridinfo(timeslots, timezone, isMobile ? 4 : 7, onPageUpdate);
+  } = useGridinfo(timeslots, timezone, isWeekdayEvent, pageDays, onPageUpdate);
 
   // Initial onPageUpdate callback to report pagination info to parent
   // Also triggers if the user changes between mobile and desktop layouts
   const reportedTotalPages = useRef<number | null>(null);
   useEffect(() => {
+    let effectiveCurrentPage = currentPage;
+    if (currentPage >= totalPages) {
+      // If out of bounds, go to the last page
+      effectiveCurrentPage = totalPages - 1;
+      paginate(totalPages - 1 - currentPage);
+    }
     if (reportedTotalPages.current !== totalPages) {
-      onPageUpdate(currentPage, totalPages);
+      onPageUpdate(effectiveCurrentPage, totalPages);
       reportedTotalPages.current = totalPages;
     }
-  }, [onPageUpdate, currentPage, totalPages]);
+  }, [onPageUpdate, currentPage, totalPages, paginate]);
 
   const hasPrevPage = currentPage > 0;
   const hasNextPage = currentPage < totalPages - 1;
@@ -129,6 +141,11 @@ export default function ScheduleGrid({
   // Dateblocks logic
   const numQuarterHours =
     dateBlocks[0]?.timeBlocks?.map((block) => block.numQuarterHours) || [];
+
+  const isGridDisplayed = !unselectedRange && !error;
+  useEffect(() => {
+    setGridDisplayed(isGridDisplayed);
+  }, [isGridDisplayed, setGridDisplayed]);
 
   if (unselectedRange)
     return (

@@ -10,6 +10,7 @@ export const MESSAGES = {
   ERROR_GENERIC: "An error occurred. Please try again.",
   ERROR_RATE_LIMIT: "Too many requests. Please try again later.",
   ERROR_CAPTCHA_FAILED: "CAPTCHA verification failed. Please try again.",
+  ERROR_CAPTCHA_BLOCKED: "CAPTCHA blocked.",
 
   // auth errors
   ERROR_EMAIL_MISSING: "Missing email.",
@@ -75,4 +76,8 @@ export const MESSAGES = {
   INFO_NO_IDEAL_TIMES:
     "There are no times that work for everyone. Times with an indicator are the best options.",
   INFO_DRAG_DATES: "Drag to select multiple days",
+
+  // form error messages
+  FORM_NOT_FILLED: "Please fill out all fields.",
+  FORM_HAS_ERRORS: "Please fix the displayed errors.",
 };
