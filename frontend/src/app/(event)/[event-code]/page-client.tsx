@@ -180,7 +180,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
               <p>Days per page</p>
             </div>
             <GridPageDaysSelector
-              id="grid-page-days-selector"
+              id={"grid-page-days-selector-" + (desktop ? "desktop" : "mobile")}
               value={gridPageDays}
               options={gridPageDaysOptions}
               onChange={setGridPageDays}
