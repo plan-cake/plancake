@@ -34,7 +34,6 @@ type CalendarProps = {
 };
 
 export type CalendarHandle = {
-  scrollToSelected: () => void;
   applyPreset: (days: string[]) => void;
 };
 
@@ -70,29 +69,13 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
 
     /**
      * Instead of giving the parent the full DOM of this component, we give it the
-     * helper function. the parent will receive this function when it attaches a ref
-     * to this component, and can call it to scroll the calendar to the selected date.
+     * helper function. The parent will receive this function when it attaches a ref
+     * to this component, and can call it to paginate the calendar.
      */
     const containerRef = useRef<HTMLDivElement>(null);
     useImperativeHandle(ref, () => ({
-      scrollToSelected: () => {
-        if (!containerRef.current || !firstSelectedDate) return;
-
-        const selectedEl = containerRef.current.querySelector(
-          ".rdp-selected:not(.rdp-outside)",
-        );
-
-        if (selectedEl) {
-          const monthEl = selectedEl.closest(".rdp-month");
-          if (monthEl) {
-            monthEl.scrollIntoView({ behavior: "auto", block: "start" });
-          } else {
-            selectedEl.scrollIntoView({ behavior: "auto", block: "center" });
-          }
-        }
-      },
-      // Selects the given days and paginates to the first one if it isn't visible
       applyPreset: (days: string[]) => {
+        // Selects the given days and paginates to the first one if it isn't visible
         setDates(new Set(days));
         if (!days.length) return;
 

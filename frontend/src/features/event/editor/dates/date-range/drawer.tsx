@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { TriangleAlertIcon } from "lucide-react";
 
@@ -24,17 +24,6 @@ export default function DateRangeDrawer({
 
   const [open, setOpen] = useState(false);
   const calendarRef = useRef<CalendarHandle>(null);
-
-  // Scroll to the selected date when the drawer opens
-  useEffect(() => {
-    if (open) {
-      // Small timeout to wait for the Dialog animation/rendering to settle
-      const timer = setTimeout(() => {
-        calendarRef.current?.scrollToSelected();
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [open]);
 
   const dateDisplay = useMemo(() => formatDateSet(dates), [dates]);
 
