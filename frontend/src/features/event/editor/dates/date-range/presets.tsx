@@ -8,10 +8,10 @@ import ActionButton from "@/features/button/components/action";
 
 export default function DateRangePresets({
   dates,
-  setDates,
+  applyPreset,
 }: {
   dates: Set<string>;
-  setDates: (dates: Set<string>) => void;
+  applyPreset: (days: string[]) => void;
 }) {
   const checkDatesSelected = useCallback(
     (days: Set<string>) => {
@@ -61,7 +61,7 @@ export default function DateRangePresets({
       <ActionButton
         buttonStyle="semi-transparent"
         icon={<BroomIcon />}
-        onClick={() => setDates(new Set())}
+        onClick={() => applyPreset([])}
         disabled={dates.size === 0}
         tooltip="Clear Selection"
       />
@@ -70,7 +70,7 @@ export default function DateRangePresets({
           isNext4Days ? "bordered semi-transparent" : "semi-transparent"
         }
         label="Next 4 Days"
-        onClick={() => setDates(new Set(next4Days))}
+        onClick={() => applyPreset(next4Days)}
         fullWidth
         className="justify-center"
       />
@@ -79,7 +79,7 @@ export default function DateRangePresets({
           isNextWeek ? "bordered semi-transparent" : "semi-transparent"
         }
         label="Next Week"
-        onClick={() => setDates(new Set(nextWeek))}
+        onClick={() => applyPreset(nextWeek)}
         fullWidth
         className="justify-center"
       />

@@ -42,7 +42,12 @@ export default function DateRangeDrawer({
     <FloatingDrawer
       open={open}
       onOpenChange={setOpen}
-      footerContent={<DateRangePresets dates={dates} setDates={setDates} />}
+      footerContent={
+        <DateRangePresets
+          dates={dates}
+          applyPreset={(days) => calendarRef.current?.applyPreset(days)}
+        />
+      }
       title="Select Date Range"
       description="Select dates using the calendar below"
       trigger={

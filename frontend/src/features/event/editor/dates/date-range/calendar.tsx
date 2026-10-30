@@ -8,7 +8,13 @@ import {
   useState,
 } from "react";
 
-import { format, parseISO } from "date-fns";
+import {
+  addMonths,
+  endOfMonth,
+  format,
+  parseISO,
+  startOfMonth,
+} from "date-fns";
 import {
   DayButton,
   DayButtonProps,
@@ -29,6 +35,7 @@ type CalendarProps = {
 
 export type CalendarHandle = {
   scrollToSelected: () => void;
+  applyPreset: (days: string[]) => void;
 };
 
 export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
@@ -82,6 +89,17 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
           } else {
             selectedEl.scrollIntoView({ behavior: "auto", block: "center" });
           }
+        }
+      },
+      // Selects the given days and paginates to the first one if it isn't visible
+      applyPreset: (days: string[]) => {
+        setDates(new Set(days));
+        if (!days.length) return;
+
+        const firstDay = parseISO(days[0]);
+        const lastVisibleDay = endOfMonth(addMonths(month, numberOfMonths - 1));
+        if (firstDay < startOfMonth(month) || firstDay > lastVisibleDay) {
+          setMonth(startOfMonth(firstDay));
         }
       },
     }));
