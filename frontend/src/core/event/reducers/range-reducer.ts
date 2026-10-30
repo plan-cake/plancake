@@ -176,8 +176,10 @@ export function EventRangeReducer(
     case "RESET": {
       if (state.type === "specific") {
         return DEFAULT_RANGE_SPECIFIC;
-      } else {
+      } else if (state.type === "weekday") {
         return DEFAULT_RANGE_WEEKDAY;
+      } else {
+        return DEFAULT_RANGE_CALENDAR;
       }
     }
 
