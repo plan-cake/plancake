@@ -59,7 +59,9 @@ export function getTimezoneDetails({
 // Returns an ISO string representation of the timeslot. If this is
 // specific date event, it returns the standard ISO string. If it's a
 // weekday event, then the ISO string will be formatted in the
-// event's timezone.
+// event's timezone. If it's a calendar event, the timeslot is a local
+// midnight with no meaningful time, so it's formatted as-is without
+// any timezone conversion.
 export function timeslotToISOString(
   timeslot: Date,
   timezone: string,
@@ -67,6 +69,8 @@ export function timeslotToISOString(
 ): string {
   if (eventType === "specific") {
     return timeslot.toISOString();
+  } else if (eventType === "calendar") {
+    return format(timeslot, "yyyy-MM-dd'T'HH:mm:ss");
   } else {
     return formatInTimeZone(timeslot, timezone, "yyyy-MM-dd'T'HH:mm:ss");
   }
