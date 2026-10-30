@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { createEmptyUserAvailability } from "@/core/availability/utils";
 import useCalendarGridInfo from "@/features/event/grid/calendar/lib/use-grid";
@@ -30,6 +30,10 @@ export default function CalendarGrid({
   const isMobile = useCheckMobile();
 
   const { monthBlocks, error } = useCalendarGridInfo(timeslots);
+  const highestMatchCount = useMemo(
+    () => getHighestMatchCount(availabilities),
+    [availabilities],
+  );
 
   // The calendar grid is a single scrolling page, so report that once to the parent
   const pageReported = useRef(false);
@@ -105,7 +109,7 @@ export default function CalendarGrid({
                 hoveredDay={hoveredSlot}
                 availabilities={availabilities}
                 numParticipants={numParticipants}
-                highestMatchCount={getHighestMatchCount(availabilities)}
+                highestMatchCount={highestMatchCount}
                 onHoverDay={setHoveredSlot}
               />
             );
