@@ -9,7 +9,7 @@ import {
   TIME_LABEL_WIDTH,
 } from "@/features/event/grid/constants";
 import DateHeader from "@/features/event/grid/date-time/date-header";
-import useDateTimeGridinfo from "@/features/event/grid/date-time/lib/use-grid";
+import useDateTimeGridInfo from "@/features/event/grid/date-time/lib/use-grid";
 import GridPageIndicator from "@/features/event/grid/date-time/page-indicator";
 import TimeColumn from "@/features/event/grid/date-time/time-column";
 import InteractiveTimeBlock from "@/features/event/grid/date-time/timeblocks/interactive";
@@ -68,7 +68,13 @@ export default function DateTimeGrid({
     direction,
     paginate,
     error,
-  } = useDateTimeGridinfo(timeslots, timezone, pageDays, onPageUpdate);
+  } = useDateTimeGridInfo(
+    timeslots,
+    timezone,
+    eventType === "weekday",
+    pageDays,
+    onPageUpdate,
+  );
 
   // Initial onPageUpdate callback to report pagination info to parent
   // Also triggers if the user changes between mobile and desktop layouts
@@ -106,14 +112,14 @@ export default function DateTimeGrid({
     return () => resizeObserver.disconnect();
   });
 
+  // Dateblocks logic
+  const numQuarterHours =
+    dateBlocks[0]?.timeBlocks?.map((block) => block.numQuarterHours) || [];
+
   const isGridDisplayed = !unselectedRange && !error;
   useEffect(() => {
     setGridDisplayed(isGridDisplayed);
   }, [isGridDisplayed, setGridDisplayed]);
-
-  // Dateblocks logic
-  const numQuarterHours =
-    dateBlocks[0]?.timeBlocks?.map((block) => block.numQuarterHours) || [];
 
   if (unselectedRange)
     return (

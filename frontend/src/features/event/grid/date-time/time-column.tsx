@@ -17,7 +17,7 @@ export default function TimeColumn({
     return Array.from({ length: numQuarterHours + 1 }, (_, i) => {
       const hour24 = startHour + Math.floor(i / 4);
       const hour12 = hour24 % 12 || 12;
-      const period = hour24 < 12 ? "AM" : "PM";
+      const period = hour24 < 12 || hour24 === 24 ? "AM" : "PM";
       return `${hour12} ${period}`;
     });
   }, [startHour, numQuarterHours]);

@@ -1,7 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
