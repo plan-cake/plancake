@@ -62,8 +62,8 @@ export default function DateRangePresets({
 
   const next2Weeks = useMemo(() => {
     const weekDates: string[] = [];
-    for (let i = 0; weekDates.length < 14; i++) {
-      const today = new Date(dateNow);
+    for (let i = 1; weekDates.length < 14; i++) {
+      const today = parseISO(dateNow);
       const nextDate = new Date(today);
       nextDate.setDate(today.getDate() + i);
       if (weekDates.length === 0 && nextDate.getDay() !== 0) {
@@ -79,8 +79,8 @@ export default function DateRangePresets({
 
   const next4Weeks = useMemo(() => {
     const weekDates: string[] = [];
-    for (let i = 0; weekDates.length < 28; i++) {
-      const today = new Date(dateNow);
+    for (let i = 1; weekDates.length < 28; i++) {
+      const today = parseISO(dateNow);
       const nextDate = new Date(today);
       nextDate.setDate(today.getDate() + i);
       if (weekDates.length === 0 && nextDate.getDay() !== 0) {
