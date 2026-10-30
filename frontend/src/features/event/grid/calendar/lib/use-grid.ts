@@ -15,13 +15,15 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
         error: MESSAGES.ERROR_EVENT_RANGE_INVALID,
       };
 
-    const sortedDates = timeslots.sort((a, b) => a.getTime() - b.getTime());
+    const sortedDates = [...timeslots].sort(
+      (a, b) => a.getTime() - b.getTime(),
+    );
 
     const months = {} as Record<string, CalendarGridMonth>;
     const firstDate = sortedDates[0];
     const lastDate = sortedDates[sortedDates.length - 1];
 
-    for (let currentDate = firstDate; currentDate <= lastDate;) {
+    for (let currentDate = firstDate; currentDate <= lastDate; ) {
       const monthString = format(currentDate, "yyyy-MM");
       if (!months[monthString]) {
         months[monthString] = {
