@@ -61,6 +61,18 @@ export default function DashboardEvent({
 
   // Memoized local date details
   const dateDetails = useMemo(() => {
+    // Calendar event dates aren't converted
+    if (type === "calendar") {
+      const sortedDates = [...dateTimeProps.dates].sort();
+      return {
+        startDate: sortedDates[0],
+        endDate: sortedDates[sortedDates.length - 1],
+        startTime: "",
+        endTime: "",
+        weekdays: new Set<number>(),
+      };
+    }
+
     // Extract the dates from the start time on each day
     // Dates and times are in the event's timezone
     const weekdays = new Set<number>();
@@ -103,6 +115,7 @@ export default function DashboardEvent({
       weekdays,
     };
   }, [
+    type,
     dateTimeProps.dates,
     dateTimeProps.startTime,
     dateTimeProps.endTime,
