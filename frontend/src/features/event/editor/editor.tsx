@@ -91,42 +91,38 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       return MESSAGES.ERROR_CAPTCHA_BLOCKED;
     }
 
+    const sameSet = <T,>(a: Set<T>, b: Set<T>) =>
+      a.size === b.size && [...a].every((item) => b.has(item));
+
     let eventNotEdited = false;
     if (type === "edit" && initialData && initialData.originalEventRange) {
+      const original = initialData.originalEventRange;
       const sameTitle = title.trim() === initialData.title.trim();
-      const sameType = eventRange.type === initialData.originalEventRange.type;
       const sameTimeRange =
-        eventRange.timeRange.from ===
-          initialData.originalEventRange.timeRange.from &&
-        eventRange.timeRange.to ===
-          initialData.originalEventRange.timeRange.to &&
-        eventRange.timezone === initialData.originalEventRange.timezone;
+        eventRange.timeRange.from === original.timeRange.from &&
+        eventRange.timeRange.to === original.timeRange.to &&
+        eventRange.timezone === original.timezone;
 
-      const sameDate =
-        eventRange.type === "specific" &&
-        initialData.originalEventRange.type === "specific" &&
-        eventRange.dateRange.from ===
-          initialData.originalEventRange.dateRange.from &&
-        eventRange.dateRange.to === initialData.originalEventRange.dateRange.to;
+      const sameDays =
+        eventRange.type === "weekday" && original.type === "weekday"
+          ? sameSet(eventRange.weekdays, original.weekdays)
+          : eventRange.type !== "weekday" &&
+            original.type !== "weekday" &&
+            eventRange.type === original.type &&
+            sameSet(eventRange.dates, original.dates);
 
-      const sameWeekdays =
-        eventRange.type === "weekday" &&
-        initialData.originalEventRange.type === "weekday" &&
-        JSON.stringify(eventRange.weekdays) ===
-          JSON.stringify(initialData.originalEventRange.weekdays);
-
-      eventNotEdited =
-        sameTitle && sameType && sameTimeRange && (sameDate || sameWeekdays);
+      eventNotEdited = sameTitle && sameTimeRange && sameDays;
     }
 
-    return !title ||
-      !title.trim() ||
-      (eventRange.type === "specific" &&
-        (!eventRange.dateRange.from || !eventRange.dateRange.to)) ||
-      (eventRange.type === "weekday" &&
-        (!eventRange.weekdays || eventRange.weekdays.length === 0)) ||
-      !eventRange.timeRange.from ||
-      !eventRange.timeRange.to
+    const missingDays =
+      eventRange.type === "weekday"
+        ? eventRange.weekdays.size === 0
+        : eventRange.dates.size === 0;
+    const missingTimes =
+      eventRange.type !== "calendar" &&
+      (!eventRange.timeRange.from || !eventRange.timeRange.to);
+
+    return !title || !title.trim() || missingDays || missingTimes
       ? MESSAGES.FORM_NOT_FILLED
       : eventNotEdited
         ? "Please make changes to update the event."
