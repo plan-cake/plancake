@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { createEmptyUserAvailability } from "@/core/availability/utils";
 import useCalendarGridInfo from "@/features/event/grid/calendar/lib/use-grid";
@@ -25,10 +25,19 @@ export default function CalendarGrid({
   setHoveredSlot = () => {},
   userAvailability = createEmptyUserAvailability(),
   onToggleSlot = () => {},
+  onPageUpdate = () => {},
 }: GridProps) {
   const isMobile = useCheckMobile();
 
   const { monthBlocks, error } = useCalendarGridInfo(timeslots);
+
+  // The calendar grid is a single scrolling page, so report that once to the parent
+  const pageReported = useRef(false);
+  useEffect(() => {
+    if (pageReported.current) return;
+    pageReported.current = true;
+    onPageUpdate(0, 1);
+  }, [onPageUpdate]);
 
   const isGridDisplayed = !unselectedRange && !error;
   useEffect(() => {
