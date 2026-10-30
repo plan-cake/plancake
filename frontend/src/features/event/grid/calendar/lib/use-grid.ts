@@ -1,19 +1,10 @@
 import { useMemo } from "react";
 
+import { addDays } from "date-fns";
 import { format } from "date-fns-tz";
 
 import { CalendarGridMonth } from "@/features/event/grid/calendar/types";
 import { MESSAGES } from "@/lib/messages";
-
-function getShiftedDate(date: Date, daysToShift: number): Date {
-  const shiftedDate = new Date(
-    date.getUTCFullYear(),
-    date.getUTCMonth(),
-    date.getUTCDate(),
-  );
-  shiftedDate.setDate(shiftedDate.getDate() + daysToShift);
-  return shiftedDate;
-}
 
 export default function useCalendarGridInfo(timeslots: Date[]) {
   // Organize into weekblocks
@@ -38,7 +29,7 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
           activeDays: new Set<string>(),
         };
       }
-      currentDate = getShiftedDate(currentDate, 1);
+      currentDate = addDays(currentDate, 1);
     }
 
     for (const date of sortedDates) {
