@@ -1,17 +1,17 @@
-import { SpecificDateRange, WeekdayRange } from "@/core/event/types";
+import { SpecificDateRange, Weekday, WeekdayRange } from "@/core/event/types";
 
 const emptyRange = { from: null, to: null };
 
 export const DEFAULT_RANGE_SPECIFIC: SpecificDateRange = {
   type: "specific" as const,
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  dateRange: emptyRange,
+  dates: new Set<string>(),
   timeRange: emptyRange,
 };
 
 export const DEFAULT_RANGE_WEEKDAY: WeekdayRange = {
   type: "weekday" as const,
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  weekdays: [],
+  weekdays: new Set<Weekday>(),
   timeRange: emptyRange,
 };

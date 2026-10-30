@@ -41,7 +41,8 @@ class EventDetailSerializer(EventInfoSerializer):
     event_type = serializers.ChoiceField(
         required=True, choices=["Date", "Week", "Calendar"]
     )
-    start_date = serializers.DateField(required=True)
-    end_date = serializers.DateField(required=True)
+    dates = serializers.ListField(
+        child=serializers.DateField(), required=True, allow_empty=False
+    )
     start_time = serializers.TimeField(required=True)
     end_time = serializers.TimeField(required=True)

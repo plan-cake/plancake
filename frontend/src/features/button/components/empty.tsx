@@ -15,6 +15,7 @@ const EmptyButton = forwardRef<Ref, EmptyButtonProps>(
       tooltip,
       loading = false,
       disabled = false,
+      fullWidth = false,
       className,
       ...props
     },
@@ -30,6 +31,7 @@ const EmptyButton = forwardRef<Ref, EmptyButtonProps>(
         tooltip={tooltip}
         loading={loading}
         disabled={disabled}
+        fullWidth={fullWidth}
         className={className}
         ref={ref}
         {...props}

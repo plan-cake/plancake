@@ -36,15 +36,12 @@ export const ALL_WEEKDAYS: Weekday[] = [
 
 export type SpecificDateRange = BaseEventRange & {
   type: "specific";
-  dateRange: {
-    from: string | null;
-    to: string | null;
-  };
+  dates: Set<string>;
 };
 
 export type WeekdayRange = BaseEventRange & {
   type: "weekday";
-  weekdays: Weekday[];
+  weekdays: Set<Weekday>;
 };
 
 /* SLOTS TYPES FOR UI */
