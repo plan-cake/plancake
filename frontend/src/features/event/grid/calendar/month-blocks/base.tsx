@@ -136,7 +136,7 @@ export default function BaseMonthBlock({
           backgroundImage: NONEXISTENT_SLOT_PATTERN,
         }}
         className="[--week-height:60px] md:[--week-height:80px]"
-        onPointerLeave={clearHoveredSlot}
+        onMouseLeave={clearHoveredSlot}
       >
         <div
           className="grid"

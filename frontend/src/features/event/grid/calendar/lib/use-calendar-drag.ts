@@ -18,6 +18,7 @@ export default function useCalendarDrag(
   timeslots: Date[],
 ) {
   const [hoveredDay, setHoveredDay] = useState<string | null>(null);
+  const [draggedDays, setDraggedDays] = useState<Set<string>>(new Set());
   const dragState = useRef<DragState>({
     isDragging: false,
     startDay: null,
@@ -69,6 +70,7 @@ export default function useCalendarDrag(
         }
       }
       dragState.current.draggedDays = newDraggedDays;
+      setDraggedDays(newDraggedDays);
     },
     [dayStringSet],
   );
@@ -81,6 +83,7 @@ export default function useCalendarDrag(
       draggedDays: new Set<string>(),
       togglingOn: null,
     };
+    setDraggedDays((prev) => (prev.size ? new Set() : prev));
     setHoveredDay(null);
   }
 
@@ -143,7 +146,7 @@ export default function useCalendarDrag(
   );
 
   return {
-    draggedDays: dragState.current.draggedDays,
+    draggedDays,
     hoveredDay,
     togglingOn: dragState.current.togglingOn,
     handlePointerDown,
