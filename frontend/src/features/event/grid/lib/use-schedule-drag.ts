@@ -122,6 +122,9 @@ export default function useScheduleDrag(
   // handle stopping drag on mouseup/touchend anywhere
   useEffect(() => {
     const stopDragging = () => {
+      // Only stop dragging if we started, stops conflicts with multiple grids on one page
+      if (!dragState.current.startSlot) return;
+
       for (const slotIso of draggedSlots) {
         if (timeslotIsoSet.has(slotIso)) {
           onToggleRef.current(slotIso, dragState.current.togglingOn!);

@@ -27,10 +27,13 @@ import { cn } from "@/lib/utils/classname";
 
 interface ScheduleGridProps {
   mode: "paint" | "view" | "preview";
+  viewTransitionName?: string | "none";
+
   timeslots: Date[];
   timezone: string;
   isWeekdayEvent?: boolean;
-
+  disableSelect?: boolean;
+  staticHeader?: boolean;
   unselectedRange?: boolean;
 
   // for "view" mode
@@ -65,10 +68,12 @@ const variants = {
 };
 
 export default function ScheduleGrid({
+  mode = "preview",
+  viewTransitionName = "grid",
   timeslots,
   timezone,
-  mode = "preview",
   isWeekdayEvent = false,
+  staticHeader = false,
   unselectedRange = false,
   availabilities = {},
   numParticipants = 0,
@@ -145,7 +150,7 @@ export default function ScheduleGrid({
         "relative grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]",
         mode === "preview" ? "bg-background md:bg-panel" : "bg-background",
       )}
-      style={{ viewTransitionName: "grid" }}
+      style={{ viewTransitionName }}
       id={GRID_ID}
     >
       <ScheduleHeader
@@ -155,6 +160,7 @@ export default function ScheduleGrid({
         totalPages={totalPages}
         dateBlockGaps={dateBlockGaps}
         scrollbarPresent={scrollbarPresent}
+        isStatic={staticHeader}
         isWeekdayEvent={isWeekdayEvent}
         onPrevPage={() => paginate(-1)}
         onNextPage={() => paginate(1)}

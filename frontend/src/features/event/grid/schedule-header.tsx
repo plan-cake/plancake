@@ -23,6 +23,7 @@ interface ScheduleHeaderProps {
     middleGaps: Set<number>;
   };
   scrollbarPresent?: boolean;
+  isStatic?: boolean;
   isWeekdayEvent?: boolean;
   onPrevPage: () => void;
   onNextPage: () => void;
@@ -51,6 +52,7 @@ export default function ScheduleHeader({
   totalPages,
   dateBlockGaps,
   scrollbarPresent = false,
+  isStatic = false,
   isWeekdayEvent = false,
   onPrevPage,
   onNextPage,
@@ -61,7 +63,7 @@ export default function ScheduleHeader({
       className={cn(
         preview ? "bg-background md:bg-panel" : "bg-background",
         scrollbarPresent && "pr-4",
-        "sticky top-[var(--header-height)] md:top-0",
+        !isStatic && "sticky top-[var(--header-height)] md:top-0",
         "z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
       )}
       style={{
