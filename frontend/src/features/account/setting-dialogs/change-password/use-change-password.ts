@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
 import PasswordValidation from "@/features/auth/components/password-validation";
 import { useToast } from "@/features/system-feedback";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
@@ -16,6 +18,7 @@ export type ChangePasswordStepProps = {
 
 export function useChangePasswordFlow() {
   const { addToast } = useToast();
+  const router = useRouter();
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
   const [open, setOpen] = useState(false);
@@ -154,6 +157,7 @@ export function useChangePasswordFlow() {
       });
       handleOpenChange(false);
       addToast("success", MESSAGES.SUCCESS_PASSWORD_CHANGED);
+      router.refresh();
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -192,6 +196,7 @@ export function useChangePasswordFlow() {
       });
       handleOpenChange(false);
       addToast("success", MESSAGES.SUCCESS_PASSWORD_CHANGED);
+      router.refresh();
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
