@@ -59,14 +59,9 @@ export default function PanelHeader({
   const formatHoveredSlot = () => {
     const date = new Date(hoveredSlot!);
 
-    return eventType === "weekday"
-      ? date.toLocaleString(undefined, {
-          weekday: "long",
-          hour: "numeric",
-          minute: "numeric",
-          timeZone: timezone,
-        })
-      : date.toLocaleString(undefined, {
+    switch (eventType) {
+      case "specific":
+        return date.toLocaleString(undefined, {
           weekday: "short",
           month: "short",
           day: "numeric",
@@ -74,6 +69,21 @@ export default function PanelHeader({
           minute: "numeric",
           timeZone: timezone,
         });
+      case "weekday":
+        return date.toLocaleString(undefined, {
+          weekday: "long",
+          hour: "numeric",
+          minute: "numeric",
+          timeZone: timezone,
+        });
+      case "calendar":
+        return date.toLocaleDateString(undefined, {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          timeZone: "UTC",
+        });
+    }
   };
 
   const headerContent = () => {

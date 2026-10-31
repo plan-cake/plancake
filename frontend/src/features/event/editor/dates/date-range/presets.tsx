@@ -4,6 +4,7 @@ import { parseISO } from "date-fns";
 import { format } from "date-fns-tz";
 import { BroomIcon } from "lucide-react";
 
+import { useEventContext } from "@/core/event/context";
 import ActionButton from "@/features/button/components/action";
 
 export default function DateRangePresets({
@@ -13,6 +14,9 @@ export default function DateRangePresets({
   dates: Set<string>;
   applyPreset: (days: string[]) => void;
 }) {
+  const { state } = useEventContext();
+  const dateOnly = state.eventRange?.type === "calendar";
+
   const checkDatesSelected = useCallback(
     (days: Set<string>) => {
       return (
@@ -56,6 +60,40 @@ export default function DateRangePresets({
     return checkDatesSelected(new Set(nextWeek));
   }, [checkDatesSelected, nextWeek]);
 
+  const next2Weeks = useMemo(() => {
+    const weekDates: string[] = [];
+    for (let i = 1; weekDates.length < 14; i++) {
+      const today = parseISO(dateNow);
+      const nextDate = new Date(today);
+      nextDate.setDate(today.getDate() + i);
+      if (weekDates.length === 0 && nextDate.getDay() !== 0) {
+        continue;
+      }
+      weekDates.push(format(nextDate, "yyyy-MM-dd"));
+    }
+    return weekDates;
+  }, [dateNow]);
+  const isNext2Weeks = useMemo(() => {
+    return checkDatesSelected(new Set(next2Weeks));
+  }, [checkDatesSelected, next2Weeks]);
+
+  const next4Weeks = useMemo(() => {
+    const weekDates: string[] = [];
+    for (let i = 1; weekDates.length < 28; i++) {
+      const today = parseISO(dateNow);
+      const nextDate = new Date(today);
+      nextDate.setDate(today.getDate() + i);
+      if (weekDates.length === 0 && nextDate.getDay() !== 0) {
+        continue;
+      }
+      weekDates.push(format(nextDate, "yyyy-MM-dd"));
+    }
+    return weekDates;
+  }, [dateNow]);
+  const isNext4Weeks = useMemo(() => {
+    return checkDatesSelected(new Set(next4Weeks));
+  }, [checkDatesSelected, next4Weeks]);
+
   return (
     <div className="flex w-full gap-2">
       <ActionButton
@@ -65,24 +103,50 @@ export default function DateRangePresets({
         disabled={dates.size === 0}
         tooltip="Clear Selection"
       />
-      <ActionButton
-        buttonStyle={
-          isNext4Days ? "bordered semi-transparent" : "semi-transparent"
-        }
-        label="Next 4 Days"
-        onClick={() => applyPreset(next4Days)}
-        fullWidth
-        className="justify-center"
-      />
-      <ActionButton
-        buttonStyle={
-          isNextWeek ? "bordered semi-transparent" : "semi-transparent"
-        }
-        label="Next Week"
-        onClick={() => applyPreset(nextWeek)}
-        fullWidth
-        className="justify-center"
-      />
+      {!dateOnly && (
+        <>
+          <ActionButton
+            buttonStyle={
+              isNext4Days ? "bordered semi-transparent" : "semi-transparent"
+            }
+            label="Next 4 Days"
+            onClick={() => applyPreset(next4Days)}
+            fullWidth
+            className="justify-center"
+          />
+          <ActionButton
+            buttonStyle={
+              isNextWeek ? "bordered semi-transparent" : "semi-transparent"
+            }
+            label="Next Week"
+            onClick={() => applyPreset(nextWeek)}
+            fullWidth
+            className="justify-center"
+          />
+        </>
+      )}
+      {dateOnly && (
+        <>
+          <ActionButton
+            buttonStyle={
+              isNext2Weeks ? "bordered semi-transparent" : "semi-transparent"
+            }
+            label="Next 2 Weeks"
+            onClick={() => applyPreset(next2Weeks)}
+            fullWidth
+            className="justify-center"
+          />
+          <ActionButton
+            buttonStyle={
+              isNext4Weeks ? "bordered semi-transparent" : "semi-transparent"
+            }
+            label="Next 4 Weeks"
+            onClick={() => applyPreset(next4Weeks)}
+            fullWidth
+            className="justify-center"
+          />
+        </>
+      )}
     </div>
   );
 }

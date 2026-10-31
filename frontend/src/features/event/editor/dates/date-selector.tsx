@@ -6,7 +6,12 @@ import {
 } from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
-import { SpecificDateRange, Weekday } from "@/core/event/types";
+import {
+  CalendarRange,
+  SpecificDateRange,
+  Weekday,
+  WeekdayRange,
+} from "@/core/event/types";
 import { DateRangeProps } from "@/features/event/editor/dates/date-range/date-range-props";
 import DateRangeDrawer from "@/features/event/editor/dates/date-range/drawer";
 import DateRangePopover from "@/features/event/editor/dates/date-range/popover";
@@ -36,7 +41,7 @@ export default function DateRangeSelection({
         </label>
         <EventTypeSelect id="event-type-select" disabled={editing} />
       </div>
-      <div className="flex w-fit flex-col justify-center gap-1">
+      <div className="flex w-fit flex-col gap-1">
         <div
           className={cn(
             "flex items-center gap-2 font-bold",
@@ -44,20 +49,20 @@ export default function DateRangeSelection({
           )}
         >
           <CalendarRangeIcon className="h-4 w-4" strokeWidth={2} />
-          {rangeType === "specific" ? "Possible Dates" : "Possible Days"}
+          {rangeType === "weekday" ? "Possible Days" : "Possible Dates"}
           {(errors.dateRange || errors.weekdayRange) && (
-            <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
+            <TriangleAlertIcon className="text-error h-4 w-4" />
           )}
         </div>
 
-        {eventRange?.type === "specific" ? (
+        {eventRange?.type === "weekday" ? (
+          <WeekdayPicker weekdays={(eventRange as WeekdayRange).weekdays} />
+        ) : (
           <DatePicker
             eventRange={eventRange}
             editing={editing}
             originalEventRange={originalEventRange as SpecificDateRange}
           />
-        ) : (
-          <WeekdayPicker weekdays={eventRange.weekdays} />
         )}
       </div>
     </div>
@@ -69,7 +74,7 @@ function DatePicker({
   editing = false,
   originalEventRange,
 }: {
-  eventRange: SpecificDateRange;
+  eventRange: SpecificDateRange | CalendarRange;
   editing?: boolean;
   originalEventRange?: SpecificDateRange;
 }) {

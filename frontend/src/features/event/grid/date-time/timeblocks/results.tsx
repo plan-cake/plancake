@@ -1,8 +1,8 @@
 import { CircleSmallIcon, ThumbsUpIcon } from "lucide-react";
 
-import TimeSlot from "@/features/event/grid/time-slot";
-import BaseTimeBlock from "@/features/event/grid/timeblocks/base";
-import { ResultsTimeBlockProps } from "@/features/event/grid/timeblocks/props";
+import TimeSlot from "@/features/event/grid/date-time/time-slot";
+import BaseTimeBlock from "@/features/event/grid/date-time/timeblocks/base";
+import { ResultsTimeBlockProps } from "@/features/event/grid/date-time/timeblocks/props";
 
 export default function ResultsTimeBlock({
   numQuarterHours,
@@ -18,7 +18,6 @@ export default function ResultsTimeBlock({
     <BaseTimeBlock
       numQuarterHours={numQuarterHours}
       visibleDaysCount={numVisibleDays}
-      onMouseLeave={() => onHoverSlot?.(null)}
     >
       {timeslots.map(({ iso, coords, cellClasses: baseClasses }) => {
         const { row: gridRow, column: gridColumn } = coords;

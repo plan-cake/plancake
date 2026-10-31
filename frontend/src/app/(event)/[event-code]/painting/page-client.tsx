@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
-import { GlobeIcon } from "lucide-react";
+import { Columns3Icon, GlobeIcon } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
 import Captcha from "@/components/captcha";
@@ -17,9 +17,10 @@ import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
 import GridPageDaysSelector from "@/features/event/components/selectors/grid-page-days";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
-import { ScheduleGrid } from "@/features/event/grid";
-import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
-import useGridPageDays from "@/features/event/grid/lib/use-page-days";
+import CalendarGrid from "@/features/event/grid/calendar/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/constants";
+import DateTimeGrid from "@/features/event/grid/date-time/grid";
+import useGridPageDays from "@/features/event/grid/date-time/lib/use-page-days";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,
@@ -33,6 +34,7 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { SelfAvailability } from "@/lib/utils/api/types";
+import { cn } from "@/lib/utils/classname";
 import {
   getDatesFromTimeslots,
   timeslotToISOString,
@@ -54,6 +56,8 @@ export default function ClientPage({
   timeslots: Date[];
   initialData: SelfAvailability | null;
 }) {
+  const Grid = eventRange.type === "calendar" ? CalendarGrid : DateTimeGrid;
+
   const doViewTransition = useViewTransition();
 
   // AVAILABILITY STATE
@@ -237,6 +241,9 @@ export default function ClientPage({
     console.log(userAvailability);
 
     const payload_availability = Array.from(userAvailability).map((iso) => {
+      if (eventRange.type === "calendar") {
+        return iso;
+      }
       const date = parseISO(iso);
       if (eventRange.type === "weekday") {
         return timeslotToISOString(date, eventRange.timezone, eventRange.type);
@@ -299,32 +306,41 @@ export default function ClientPage({
     />
   );
 
-  const displaySettings = (
-    <div className="bg-panel flex flex-col gap-2 rounded-3xl p-6 text-sm">
-      {showGridPageDaysSelector && (
+  const displaySettings = (desktop: boolean) =>
+    eventRange.type !== "calendar" && (
+      <div
+        className={cn(
+          "bg-panel flex-col gap-2 rounded-3xl p-6 text-sm",
+          desktop ? "hidden md:flex" : "flex md:hidden",
+        )}
+      >
+        {showGridPageDaysSelector && (
+          <div>
+            <div className="flex items-center gap-1">
+              <Columns3Icon className="h-3.5 w-3.5" />
+              <p>Days per page</p>
+            </div>
+            <GridPageDaysSelector
+              id={"grid-page-days-selector-" + (desktop ? "desktop" : "mobile")}
+              value={gridPageDays}
+              options={gridPageDaysOptions}
+              onChange={setGridPageDays}
+            />
+          </div>
+        )}
         <div>
-          <p>Days per page</p>
-          <GridPageDaysSelector
-            id="grid-page-days-selector"
-            value={gridPageDays}
-            options={gridPageDaysOptions}
-            onChange={setGridPageDays}
+          <div className="flex items-center gap-1">
+            <GlobeIcon className="h-3.5 w-3.5" />
+            Displaying event in
+          </div>
+          <TimeZoneSelector
+            id={"timezone-select-" + (desktop ? "desktop" : "mobile")}
+            value={timeZone}
+            onChange={setTimeZone}
           />
         </div>
-      )}
-      <div className="text-sm">
-        <div className="flex items-center gap-1">
-          <GlobeIcon className="h-3.5 w-3.5" />
-          Displaying event in
-        </div>
-        <TimeZoneSelector
-          id="timezone-select"
-          value={timeZone}
-          onChange={setTimeZone}
-        />
       </div>
-    </div>
-  );
+    );
 
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
@@ -365,14 +381,15 @@ export default function ClientPage({
             setSaveDefaultName={setSaveDefaultName}
           />
 
-          {displaySettings}
+          {displaySettings(true)}
         </div>
 
         {/* Right Panel */}
-        <ScheduleGrid
+        <Grid
           mode="paint"
-          isWeekdayEvent={eventRange.type === "weekday"}
+          eventType={eventRange.type}
           timezone={timeZone}
+          backgroundColor="background"
           onToggleSlot={toggleSlot}
           userAvailability={userAvailability}
           timeslots={timeslots}
@@ -384,7 +401,7 @@ export default function ClientPage({
           pageDays={gridPageDays}
         />
 
-        <div className="md:hidden">{displaySettings}</div>
+        {displaySettings(false)}
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}

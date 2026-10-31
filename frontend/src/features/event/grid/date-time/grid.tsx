@@ -1,58 +1,26 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { TriangleAlertIcon } from "lucide-react";
 
-import {
-  AvailabilitySet,
-  ResultsAvailabilityMap,
-} from "@/core/availability/types";
 import { createEmptyUserAvailability } from "@/core/availability/utils";
 import {
   GRID_ID,
   SIDE_WIDTH,
   TIME_LABEL_WIDTH,
-} from "@/features/event/grid/lib/constants";
-import useGridinfo from "@/features/event/grid/lib/use-grid";
-import GridPageIndicator from "@/features/event/grid/page-indicator";
-import ScheduleHeader from "@/features/event/grid/schedule-header";
-import TimeColumn from "@/features/event/grid/time-column";
-import InteractiveTimeBlock from "@/features/event/grid/timeblocks/interactive";
-import PreviewTimeBlock from "@/features/event/grid/timeblocks/preview";
-import ResultsTimeBlock from "@/features/event/grid/timeblocks/results";
+} from "@/features/event/grid/constants";
+import DateHeader from "@/features/event/grid/date-time/date-header";
+import useDateTimeGridInfo from "@/features/event/grid/date-time/lib/use-grid";
+import GridPageIndicator from "@/features/event/grid/date-time/page-indicator";
+import TimeColumn from "@/features/event/grid/date-time/time-column";
+import InteractiveTimeBlock from "@/features/event/grid/date-time/timeblocks/interactive";
+import PreviewTimeBlock from "@/features/event/grid/date-time/timeblocks/preview";
+import ResultsTimeBlock from "@/features/event/grid/date-time/timeblocks/results";
+import GridMessage from "@/features/event/grid/grid-message";
+import { GridProps } from "@/features/event/grid/grid-props";
 import { getHighestMatchCount } from "@/features/event/results/lib/utils";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
-
-interface ScheduleGridProps {
-  mode: "paint" | "view" | "preview";
-  viewTransitionName?: string | "none";
-
-  timeslots: Date[];
-  timezone: string;
-  pageDays: number;
-  isWeekdayEvent?: boolean;
-  disableSelect?: boolean;
-  staticHeader?: boolean;
-
-  // for "preview" mode
-  unselectedRange?: boolean;
-  setGridDisplayed?: (displayed: boolean) => void;
-
-  // for "view" mode
-  availabilities?: ResultsAvailabilityMap;
-  numParticipants?: number;
-  hoveredSlot?: string | null;
-  setHoveredSlot?: (slotIso: string | null) => void;
-
-  // for "paint" mode
-  userAvailability?: AvailabilitySet;
-  onToggleSlot?: (slotIso: string, togglingOn: boolean) => void;
-
-  // for pagination
-  onPageUpdate?: (index: number, pages: number) => void;
-}
 
 const variants = {
   enter: (direction: number) => ({
@@ -71,13 +39,13 @@ const variants = {
   }),
 };
 
-export default function ScheduleGrid({
+export default function DateTimeGrid({
   mode = "preview",
-  viewTransitionName = "grid",
+  eventType,
   timeslots,
   timezone,
   pageDays,
-  isWeekdayEvent = false,
+  viewTransitionName = "grid",
   staticHeader = false,
   unselectedRange = false,
   setGridDisplayed = () => {},
@@ -88,7 +56,7 @@ export default function ScheduleGrid({
   userAvailability = createEmptyUserAvailability(),
   onToggleSlot = () => {},
   onPageUpdate = () => {},
-}: ScheduleGridProps) {
+}: GridProps) {
   const isMobile = useCheckMobile();
 
   const {
@@ -100,7 +68,13 @@ export default function ScheduleGrid({
     direction,
     paginate,
     error,
-  } = useGridinfo(timeslots, timezone, isWeekdayEvent, pageDays, onPageUpdate);
+  } = useDateTimeGridInfo(
+    timeslots,
+    timezone,
+    eventType === "weekday",
+    pageDays,
+    onPageUpdate,
+  );
 
   // Initial onPageUpdate callback to report pagination info to parent
   // Also triggers if the user changes between mobile and desktop layouts
@@ -152,9 +126,9 @@ export default function ScheduleGrid({
       <GridMessage
         error={false}
         message={
-          isWeekdayEvent
+          eventType === "weekday"
             ? MESSAGES.INFO_UNSELECTED_WEEK_RANGE
-            : MESSAGES.INFO_UNSELECTED_DATE_RANGE
+            : MESSAGES.INFO_UNSELECTED_DATE_TIME_RANGE
         }
       />
     );
@@ -170,15 +144,15 @@ export default function ScheduleGrid({
       style={{ viewTransitionName }}
       id={GRID_ID}
     >
-      <ScheduleHeader
+      <DateHeader
         preview={mode === "preview"}
         visibleDays={visibleDays}
         currentPage={currentPage}
         totalPages={totalPages}
         dateBlockGaps={dateBlockGaps}
         scrollbarPresent={scrollbarPresent}
+        isWeekdayEvent={eventType === "weekday"}
         isStatic={staticHeader}
-        isWeekdayEvent={isWeekdayEvent}
         onPrevPage={() => paginate(-1)}
         onNextPage={() => paginate(1)}
         direction={direction}
@@ -188,6 +162,7 @@ export default function ScheduleGrid({
         ref={scrollRef}
         className={cn(
           "relative flex-grow select-none overflow-x-hidden pt-2",
+          scrollbarPresent && "pr-1.5",
           !isMobile ? "overflow-y-auto" : "overflow-y-hidden",
           mode === "preview" ? "pb-1" : "pb-6",
         )}
@@ -214,6 +189,11 @@ export default function ScheduleGrid({
               exit="exit"
               transition={{ type: "tween", ease: "easeInOut" }}
               className="flex"
+              onMouseLeave={() => {
+                if (mode === "view") {
+                  setHoveredSlot(null);
+                }
+              }}
             >
               <div
                 className={cn(
@@ -232,61 +212,70 @@ export default function ScheduleGrid({
 
               {dateBlockGaps.startGap && <div className="w-2" />}
 
-              {dateBlocks.map((dBlock, dIndex) => {
-                const isLastDateBlock = dIndex === dateBlocks.length - 1;
+              <div
+                className="contents"
+                onMouseLeave={() => {
+                  if (mode === "view") {
+                    setHoveredSlot(null);
+                  }
+                }}
+              >
+                {dateBlocks.map((dBlock, dIndex) => {
+                  const isLastDateBlock = dIndex === dateBlocks.length - 1;
 
-                return (
-                  <Fragment key={`date-block-fragment-${dIndex}`}>
-                    <div
-                      className="flex flex-col gap-2"
-                      style={{
-                        flex: dBlock.numDays,
-                      }}
-                    >
-                      {dBlock.timeBlocks.map((tBlock, tIndex) => {
-                        const commonProps = {
-                          numQuarterHours: tBlock.numQuarterHours,
-                          numVisibleDays: dBlock.numDays,
-                          timeslots: tBlock.timeslots,
-                        };
+                  return (
+                    <Fragment key={`date-block-fragment-${dIndex}`}>
+                      <div
+                        className="flex flex-col gap-2"
+                        style={{
+                          flex: dBlock.numDays,
+                        }}
+                      >
+                        {dBlock.timeBlocks.map((tBlock, tIndex) => {
+                          const commonProps = {
+                            numQuarterHours: tBlock.numQuarterHours,
+                            numVisibleDays: dBlock.numDays,
+                            timeslots: tBlock.timeslots,
+                          };
 
-                        if (mode === "preview") {
-                          return (
-                            <PreviewTimeBlock
-                              key={`preview-${dIndex}-${tIndex}`}
-                              {...commonProps}
-                            />
-                          );
-                        } else if (mode === "paint") {
-                          return (
-                            <InteractiveTimeBlock
-                              key={`interactive-${dIndex}-${tIndex}`}
-                              {...commonProps}
-                              availability={userAvailability}
-                              onToggle={onToggleSlot}
-                            />
-                          );
-                        } else if (mode === "view") {
-                          return (
-                            <ResultsTimeBlock
-                              key={`results-${dIndex}-${tIndex}`}
-                              {...commonProps}
-                              hoveredSlot={hoveredSlot}
-                              availabilities={availabilities}
-                              numParticipants={numParticipants}
-                              highestMatchCount={getHighestMatchCount(
-                                availabilities,
-                              )}
-                              onHoverSlot={setHoveredSlot}
-                            />
-                          );
-                        }
-                      })}
-                    </div>
-                    {!isLastDateBlock && <div className="w-2" />}
-                  </Fragment>
-                );
-              })}
+                          if (mode === "preview") {
+                            return (
+                              <PreviewTimeBlock
+                                key={`preview-${dIndex}-${tIndex}`}
+                                {...commonProps}
+                              />
+                            );
+                          } else if (mode === "paint") {
+                            return (
+                              <InteractiveTimeBlock
+                                key={`interactive-${dIndex}-${tIndex}`}
+                                {...commonProps}
+                                availability={userAvailability}
+                                onToggle={onToggleSlot}
+                              />
+                            );
+                          } else if (mode === "view") {
+                            return (
+                              <ResultsTimeBlock
+                                key={`results-${dIndex}-${tIndex}`}
+                                {...commonProps}
+                                hoveredSlot={hoveredSlot}
+                                availabilities={availabilities}
+                                numParticipants={numParticipants}
+                                highestMatchCount={getHighestMatchCount(
+                                  availabilities,
+                                )}
+                                onHoverSlot={setHoveredSlot}
+                              />
+                            );
+                          }
+                        })}
+                      </div>
+                      {!isLastDateBlock && <div className="w-2" />}
+                    </Fragment>
+                  );
+                })}
+              </div>
 
               {dateBlockGaps.endGap && <div className="w-2" />}
 
@@ -306,21 +295,3 @@ export default function ScheduleGrid({
     </div>
   );
 }
-
-const GridMessage = ({
-  error,
-  message,
-}: {
-  error: boolean;
-  message: string;
-}) => (
-  <div
-    className={cn(
-      "flex h-full w-full items-center justify-center gap-2 text-center text-sm",
-      !error && "opacity-75",
-    )}
-  >
-    {error && <TriangleAlertIcon className="text-error h-5 w-5" />}
-    {message}
-  </div>
-);

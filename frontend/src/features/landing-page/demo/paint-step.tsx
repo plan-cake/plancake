@@ -1,7 +1,7 @@
 "use client";
 
 import ActionButton from "@/features/button/components/action";
-import ScheduleGrid from "@/features/event/grid/grid";
+import DateTimeGrid from "@/features/event/grid/date-time/grid";
 import { TIMESLOTS } from "@/features/landing-page/demo/lib/utils";
 
 interface PaintAvailabilityStepProps {
@@ -19,12 +19,15 @@ export default function PaintAvailabilityStep({
 }: PaintAvailabilityStepProps) {
   return (
     <div className="bg-background text-foreground rounded-2xl p-4">
-      <ScheduleGrid
+      <DateTimeGrid
         mode="paint"
         viewTransitionName="none"
         staticHeader
         timeslots={TIMESLOTS}
         timezone="America/New_York"
+        pageDays={4}
+        eventType="specific"
+        backgroundColor="panel"
         userAvailability={userAvailability}
         onToggleSlot={onToggleSlot}
       />

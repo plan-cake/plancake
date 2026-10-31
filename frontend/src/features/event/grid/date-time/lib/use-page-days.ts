@@ -7,7 +7,7 @@ import {
   GRID_PAGE_DAYS_DESKTOP_OPTIONS,
   GRID_PAGE_DAYS_MOBILE_KEY,
   GRID_PAGE_DAYS_MOBILE_OPTIONS,
-} from "@/features/event/grid/lib/constants";
+} from "@/features/event/grid/constants";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 
 export default function useGridPageDays() {

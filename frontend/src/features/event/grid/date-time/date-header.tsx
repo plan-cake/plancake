@@ -6,14 +6,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
-import {
-  SIDE_WIDTH,
-  TIME_LABEL_WIDTH,
-} from "@/features/event/grid/lib/constants";
+import { SIDE_WIDTH, TIME_LABEL_WIDTH } from "@/features/event/grid/constants";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
-interface ScheduleHeaderProps {
+interface DateHeaderProps {
   preview?: boolean;
   visibleDays: { dayKey: string; dayDisplay: string }[];
   currentPage: number;
@@ -67,7 +64,7 @@ const condenseWeekday = (weekday: string) => {
   return weekday === "Thu" ? "R" : weekday === "Sun" ? "U" : weekday[0];
 };
 
-export default function ScheduleHeader({
+export default function DateHeader({
   preview = false,
   visibleDays,
   currentPage,
@@ -79,17 +76,18 @@ export default function ScheduleHeader({
   onPrevPage,
   onNextPage,
   direction = 0,
-}: ScheduleHeaderProps) {
+}: DateHeaderProps) {
   const isMobile = useCheckMobile();
   const compact = useMemo(
     () => (isMobile ? visibleDays.length > 4 : visibleDays.length > 7),
     [isMobile, visibleDays.length],
   );
+
   return (
     <div
       className={cn(
         preview ? "bg-background md:bg-panel" : "bg-background",
-        scrollbarPresent && "pr-4",
+        scrollbarPresent && "pr-4.5",
         !isStatic && "sticky top-[var(--header-height)] md:top-0",
         "z-10 col-span-2 grid h-[50px] w-full items-center justify-center",
       )}
@@ -142,7 +140,7 @@ export default function ScheduleHeader({
                         {condenseWeekday(weekday)}
                       </span>
                       <span className={compact ? "hidden lg:block" : ""}>
-                        {isWeekdayEvent ? weekday.toUpperCase() : weekday}
+                        {weekday}
                       </span>
                     </div>
                     {!isWeekdayEvent && (
