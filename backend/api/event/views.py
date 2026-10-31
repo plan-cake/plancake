@@ -105,7 +105,9 @@ def create_date_event(request):
     custom_code = request.validated_data.get("custom_code")
 
     user_date_local = datetime.now(ZoneInfo(time_zone)).date()
-    errors = validate_date_timeslots(timeslots, user_date_local, time_zone)
+    errors = validate_date_timeslots(
+        timeslots, user_date_local, user_date_local, time_zone
+    )
     if errors.keys():
         return Response({"error": errors}, status=400)
 
@@ -240,7 +242,7 @@ def create_calendar_event(request):
     custom_code = request.validated_data.get("custom_code")
 
     user_date_local = datetime.now(ZoneInfo(time_zone)).date()
-    errors = validate_calendar_timeslots(timeslots, user_date_local)
+    errors = validate_calendar_timeslots(timeslots, user_date_local, user_date_local)
     if errors.keys():
         return Response({"error": errors}, status=400)
 
@@ -373,7 +375,7 @@ def edit_date_event(request):
             if existing_start_date < user_date_local:
                 earliest_date_local = existing_start_date
             errors = validate_date_timeslots(
-                timeslots, earliest_date_local, time_zone, True
+                timeslots, earliest_date_local, user_date_local, time_zone, True
             )
             if errors.keys():
                 return Response({"error": errors}, status=400)
@@ -541,7 +543,9 @@ def edit_calendar_event(request):
             earliest_date_local = user_date_local
             if existing_start_date < user_date_local:
                 earliest_date_local = existing_start_date
-            errors = validate_calendar_timeslots(timeslots, earliest_date_local, True)
+            errors = validate_calendar_timeslots(
+                timeslots, earliest_date_local, user_date_local, True
+            )
             if errors.keys():
                 return Response({"error": errors}, status=400)
 
