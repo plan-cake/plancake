@@ -39,7 +39,7 @@ export default function TimeColumn({
           >
             <span
               className={cn(
-                "bg-background absolute -top-2 rounded-full px-1 text-xs",
+                "bg-background absolute -top-2 whitespace-nowrap rounded-full px-1 text-xs",
                 isPreview && "md:bg-panel",
               )}
             >
