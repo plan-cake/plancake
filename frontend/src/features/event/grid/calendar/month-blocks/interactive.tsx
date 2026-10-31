@@ -1,4 +1,3 @@
-import useCalendarDrag from "@/features/event/grid/calendar/lib/use-calendar-drag";
 import BaseMonthBlock from "@/features/event/grid/calendar/month-blocks/base";
 import { InteractiveMonthBlockProps } from "@/features/event/grid/calendar/month-blocks/props";
 import { cn } from "@/lib/utils/classname";
@@ -7,9 +6,8 @@ import { dateToISOString } from "@/lib/utils/date-time-format";
 export default function InteractiveMonthBlock({
   month,
   backgroundColor,
-  timeslots,
   availability,
-  onToggle,
+  drag,
 }: InteractiveMonthBlockProps) {
   const {
     draggedDays,
@@ -19,7 +17,7 @@ export default function InteractiveMonthBlock({
     handlePointerEnter,
     handlePointerLeave,
     handleTouchMove,
-  } = useCalendarDrag(onToggle, timeslots);
+  } = drag;
 
   return (
     <BaseMonthBlock

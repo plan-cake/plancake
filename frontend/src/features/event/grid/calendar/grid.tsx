@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 
 import { createEmptyUserAvailability } from "@/core/availability/utils";
+import useCalendarDrag from "@/features/event/grid/calendar/lib/use-calendar-drag";
 import useCalendarGridInfo from "@/features/event/grid/calendar/lib/use-grid";
 import InteractiveMonthBlock from "@/features/event/grid/calendar/month-blocks/interactive";
 import PreviewMonthBlock from "@/features/event/grid/calendar/month-blocks/preview";
@@ -30,6 +31,7 @@ export default function CalendarGrid({
   const isMobile = useCheckMobile();
 
   const { monthBlocks, error } = useCalendarGridInfo(timeslots);
+  const drag = useCalendarDrag(onToggleSlot, timeslots);
   const highestMatchCount = useMemo(
     () => getHighestMatchCount(availabilities),
     [availabilities],
@@ -96,9 +98,8 @@ export default function CalendarGrid({
               <InteractiveMonthBlock
                 key={index}
                 {...commonProps}
-                timeslots={timeslots}
                 availability={userAvailability}
-                onToggle={onToggleSlot}
+                drag={drag}
               />
             );
           } else if (mode === "view") {

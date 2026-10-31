@@ -2,6 +2,7 @@ import {
   AvailabilitySet,
   ResultsAvailabilityMap,
 } from "@/core/availability/types";
+import useCalendarDrag from "@/features/event/grid/calendar/lib/use-calendar-drag";
 import { CalendarGridMonth } from "@/features/event/grid/calendar/types";
 
 type CommonBlockProps = {
@@ -12,9 +13,8 @@ type CommonBlockProps = {
 export type PreviewMonthBlockProps = CommonBlockProps;
 
 export type InteractiveMonthBlockProps = CommonBlockProps & {
-  timeslots: Date[];
   availability: AvailabilitySet;
-  onToggle: (dayString: string, togglingOn: boolean) => void;
+  drag: ReturnType<typeof useCalendarDrag>;
 };
 
 export type ResultsMonthBlockProps = CommonBlockProps & {
