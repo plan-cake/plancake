@@ -91,9 +91,16 @@ export function useEventInfo(initialData?: EventInformation) {
     dispatch({ type: "SET_RANGE_INFO", payload: info });
   }, []);
 
-  const setEventType = useCallback((type: EventType) => {
-    dispatch({ type: "SET_RANGE_TYPE", payload: type });
-  }, []);
+  const setEventType = useCallback(
+    (type: EventType) => {
+      // Clear errors for fields that the new event type doesn't use
+      if (type === "calendar") handleError("timeRange", "");
+      if (type !== "weekday") handleError("weekdayRange", "");
+
+      dispatch({ type: "SET_RANGE_TYPE", payload: type });
+    },
+    [handleError],
+  );
 
   const setTimezone = useCallback((tz: string) => {
     dispatch({ type: "SET_TIMEZONE", payload: tz });
