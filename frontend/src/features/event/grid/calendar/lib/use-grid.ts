@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 
-import { addDays } from "date-fns";
-import { format } from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz";
 
 import { CalendarGridMonth } from "@/features/event/grid/calendar/types";
 import { MESSAGES } from "@/lib/messages";
@@ -23,20 +22,23 @@ export default function useCalendarGridInfo(timeslots: Date[]) {
     const firstDate = sortedDates[0];
     const lastDate = sortedDates[sortedDates.length - 1];
 
+    // Calendar dates are represented as UTC midnight, so format and step in UTC
     for (let currentDate = firstDate; currentDate <= lastDate; ) {
-      const monthString = format(currentDate, "yyyy-MM");
+      const monthString = formatInTimeZone(currentDate, "UTC", "yyyy-MM");
       if (!months[monthString]) {
         months[monthString] = {
           month: monthString,
           activeDays: new Set<string>(),
         };
       }
-      currentDate = addDays(currentDate, 1);
+      currentDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
     }
 
     for (const date of sortedDates) {
-      const monthString = format(date, "yyyy-MM");
-      months[monthString].activeDays.add(format(date, "yyyy-MM-dd"));
+      const monthString = formatInTimeZone(date, "UTC", "yyyy-MM");
+      months[monthString].activeDays.add(
+        formatInTimeZone(date, "UTC", "yyyy-MM-dd"),
+      );
     }
 
     return { monthBlocks: Object.values(months), error: null };

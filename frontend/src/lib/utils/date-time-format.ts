@@ -70,7 +70,7 @@ export function timeslotToISOString(
   if (eventType === "specific") {
     return timeslot.toISOString();
   } else if (eventType === "calendar") {
-    return format(timeslot, "yyyy-MM-dd'T'HH:mm:ss");
+    return formatInTimeZone(timeslot, "UTC", "yyyy-MM-dd'T'HH:mm:ss");
   } else {
     return formatInTimeZone(timeslot, timezone, "yyyy-MM-dd'T'HH:mm:ss");
   }

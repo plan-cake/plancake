@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
-import { format } from "date-fns-tz";
+import { format, formatInTimeZone } from "date-fns-tz";
 
 import { dateToISOString } from "@/lib/utils/date-time-format";
 
@@ -27,7 +27,8 @@ export default function useCalendarDrag(
     togglingOn: null,
   });
   const dayStringSet = useMemo(
-    () => new Set(timeslots.map((d) => format(d, "yyyy-MM-dd"))),
+    () =>
+      new Set(timeslots.map((d) => formatInTimeZone(d, "UTC", "yyyy-MM-dd"))),
     [timeslots],
   );
 

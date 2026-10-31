@@ -1,5 +1,3 @@
-import { parse } from "date-fns";
-
 import { ALL_WEEKDAYS, EventRange, Weekday } from "@/core/event/types";
 import { EventDetails } from "@/lib/utils/api/types";
 import {
@@ -28,8 +26,10 @@ export function processEventData(eventData: EventDetails): {
     return {
       eventName: eventData.title,
       eventRange,
+      // Calendar dates are represented as UTC midnight so they stay the same date
+      // regardless of the time zone this runs in (server or browser)
       timeslots: eventData.timeslots.map((ts) =>
-        parse(ts, "yyyy-MM-dd'T'HH:mm:ss", new Date()),
+        parseIsoDateTime(ts, eventData.time_zone, "calendar"),
       ),
       isCreator: eventData.is_creator,
     };

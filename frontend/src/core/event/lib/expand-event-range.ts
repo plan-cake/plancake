@@ -6,7 +6,6 @@ import {
   format,
   getDay,
   isBefore,
-  parse,
   parseISO,
   startOfWeek,
 } from "date-fns";
@@ -159,7 +158,7 @@ function generateSlotsForCalendarRange(range: CalendarRange): Date[] {
 
   const slots: Date[] = [];
   for (const day of range.dates) {
-    slots.push(parse(day, "yyyy-MM-dd", new Date()));
+    slots.push(parseISO(`${day}T00:00:00Z`));
   }
   return slots;
 }
