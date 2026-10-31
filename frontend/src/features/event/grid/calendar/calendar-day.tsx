@@ -72,7 +72,10 @@ function CalendarDay({
 
   if (display === "disabled") {
     return (
-      <div className={borderClasses} onPointerEnter={clearHoveredSlot}>
+      <div
+        className={cn(borderClasses, "hover:cursor-not-allowed")}
+        onPointerEnter={clearHoveredSlot}
+      >
         <div className="p-2 leading-none opacity-50">{dayNum}</div>
       </div>
     );
