@@ -162,6 +162,7 @@ export default function DateTimeGrid({
         ref={scrollRef}
         className={cn(
           "relative flex-grow select-none overflow-x-hidden pt-2",
+          scrollbarPresent && "pr-1.5",
           !isMobile ? "overflow-y-auto" : "overflow-y-hidden",
           mode === "preview" ? "pb-1" : "pb-6",
         )}
