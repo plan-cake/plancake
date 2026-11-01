@@ -253,7 +253,7 @@ def create_calendar_event(request):
             url_code = generate_code()
         except Exception:
             logger.critical("Failed to generate a unique URL code.")
-            return GENERIC_ERR_RESPONSE
+            return generic_error_response()
 
     check_rate_limit(request, ThrottleScopes.EVENT_CREATION)
 
@@ -506,7 +506,7 @@ def edit_calendar_event(request):
     time_zone = request.validated_data.get("time_zone")
 
     if not user:
-        return EVENT_NOT_FOUND_ERROR
+        return event_not_found_error()
 
     user_date_local = datetime.now(ZoneInfo(time_zone)).date()
     try:
@@ -531,7 +531,7 @@ def edit_calendar_event(request):
                 logger.critical(
                     f"Event {event.user_event_id} has no timeslots when editing calendar event."
                 )
-                return GENERIC_ERR_RESPONSE
+                return generic_error_response()
 
             # If the start date is after today, it cannot be moved to a date earlier than today.
             # If the start date is before today, it cannot be moved earlier at all.
@@ -567,7 +567,7 @@ def edit_calendar_event(request):
             EventCalendarTimeslot.objects.bulk_create(to_add)
 
     except UserEvent.DoesNotExist:
-        return EVENT_NOT_FOUND_ERROR
+        return event_not_found_error()
 
     notify_live_update(
         LiveUpdateEvent(
