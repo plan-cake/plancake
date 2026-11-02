@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -85,9 +85,12 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   /* GRID PAGE DAYS */
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
-  const showGridPageDaysSelector =
-    getDatesFromTimeslots(timeslots, timezone).size >
-    Math.min(...gridPageDaysOptions);
+  const showGridPageDaysSelector = useMemo(
+    () =>
+      getDatesFromTimeslots(timeslots, timezone, eventData.eventRange.type)
+        .size > Math.min(...gridPageDaysOptions),
+    [timeslots, timezone, eventData.eventRange.type, gridPageDaysOptions],
+  );
 
   /* MOBILE DRAWER SPACING */
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);
