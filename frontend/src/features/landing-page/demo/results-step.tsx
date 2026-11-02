@@ -2,7 +2,7 @@
 
 import { AnimatePresence } from "framer-motion";
 
-import ScheduleGrid from "@/features/event/grid/grid";
+import DateTimeGrid from "@/features/event/grid/date-time/grid";
 import ParticipantChip from "@/features/event/results/attendees/participant-chip";
 import {
   PARTICIPANTS,
@@ -24,13 +24,16 @@ export default function ViewResultsStep({
 }: ViewResultsStepProps) {
   return (
     <div className="bg-background text-foreground rounded-2xl p-4">
-      <ScheduleGrid
+      <DateTimeGrid
         mode="view"
         viewTransitionName="none"
         staticHeader
         timeslots={TIMESLOTS}
         timezone="America/New_York"
         availabilities={availabilities}
+        pageDays={4}
+        eventType="specific"
+        backgroundColor="panel"
         numParticipants={4}
         hoveredSlot={hoveredSlot}
         setHoveredSlot={onHoverSlot}

@@ -14,6 +14,7 @@ import { fromZonedTime } from "date-fns-tz";
 import checkUnselectedRange from "@/core/event/lib/unselected-range";
 import {
   ALL_WEEKDAYS,
+  CalendarRange,
   EventRange,
   SpecificDateRange,
   WeekdayRange,
@@ -71,8 +72,10 @@ function getDailyBoundariesInUTC(
 export function expandEventRange(range: EventRange): Date[] {
   if (range.type === "specific") {
     return generateSlotsForSpecificRange(range);
-  } else {
+  } else if (range.type === "weekday") {
     return generateSlotsForWeekdayRange(range);
+  } else {
+    return generateSlotsForCalendarRange(range);
   }
 }
 
@@ -80,7 +83,7 @@ function generateSlotsForSpecificRange(range: SpecificDateRange): Date[] {
   if (checkUnselectedRange(range)) return [];
 
   // Validate Duration
-  if (checkDateRange(new Set(range.dates))) {
+  if (checkDateRange(new Set(range.dates), range.type)) {
     return [];
   }
 
@@ -142,5 +145,20 @@ function generateSlotsForWeekdayRange(range: WeekdayRange): Date[] {
     }
   }
 
+  return slots;
+}
+
+function generateSlotsForCalendarRange(range: CalendarRange): Date[] {
+  if (checkUnselectedRange(range)) return [];
+
+  // Validate Duration
+  if (checkDateRange(range.dates, range.type)) {
+    return [];
+  }
+
+  const slots: Date[] = [];
+  for (const day of range.dates) {
+    slots.push(parseISO(`${day}T00:00:00Z`));
+  }
   return slots;
 }

@@ -1,6 +1,6 @@
-import TimeSlot from "@/features/event/grid/time-slot";
-import BaseTimeBlock from "@/features/event/grid/timeblocks/base";
-import { PreviewTimeBlockProps } from "@/features/event/grid/timeblocks/props";
+import TimeSlot from "@/features/event/grid/date-time/time-slot";
+import BaseTimeBlock from "@/features/event/grid/date-time/timeblocks/base";
+import { PreviewTimeBlockProps } from "@/features/event/grid/date-time/timeblocks/props";
 
 export default function PreviewTimeBlock({
   numQuarterHours,

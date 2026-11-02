@@ -21,11 +21,13 @@ import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
 import DateRangeSelection from "@/features/event/editor/dates/date-selector";
 import { EventEditorType } from "@/features/event/editor/types";
 import { validateEventData } from "@/features/event/editor/validate-data";
-import { ScheduleGrid } from "@/features/event/grid";
-import useGridPageDays from "@/features/event/grid/lib/use-page-days";
+import CalendarGrid from "@/features/event/grid/calendar/grid";
+import DateTimeGrid from "@/features/event/grid/date-time/grid";
+import useGridPageDays from "@/features/event/grid/date-time/lib/use-page-days";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { RateLimitBanner } from "@/features/system-feedback";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { MESSAGES } from "@/lib/messages";
 import submitEvent from "@/lib/utils/api/submit-event";
 import { cn } from "@/lib/utils/classname";
@@ -38,7 +40,8 @@ type EventEditorProps = {
 
 type SegmentedControlOption = "details" | "preview";
 
-const MemoizedScheduleGrid = memo(ScheduleGrid);
+const MemoizedDateTimeGrid = memo(DateTimeGrid);
+const MemoizedCalendarGrid = memo(CalendarGrid);
 
 export default function EventEditor({ type, initialData }: EventEditorProps) {
   return (
@@ -64,10 +67,17 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
     useGridPageDays();
   const showGridPageDaysSelector =
+    state.eventRange.type !== "calendar" &&
     getDatesFromTimeslots(timeslots, eventRange.timezone).size >
-    Math.min(...gridPageDaysOptions);
+      Math.min(...gridPageDaysOptions);
   const [gridDisplayed, setGridDisplayed] = useState(false);
   const router = useRouter();
+  const isMobile = useCheckMobile();
+
+  const Grid =
+    state.eventRange.type === "calendar"
+      ? MemoizedCalendarGrid
+      : MemoizedDateTimeGrid;
 
   // CAPTCHA STATES
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -81,42 +91,38 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       return MESSAGES.ERROR_CAPTCHA_BLOCKED;
     }
 
+    const sameSet = <T,>(a: Set<T>, b: Set<T>) =>
+      a.size === b.size && [...a].every((item) => b.has(item));
+
     let eventNotEdited = false;
     if (type === "edit" && initialData && initialData.originalEventRange) {
+      const original = initialData.originalEventRange;
       const sameTitle = title.trim() === initialData.title.trim();
-      const sameType = eventRange.type === initialData.originalEventRange.type;
       const sameTimeRange =
-        eventRange.timeRange.from ===
-          initialData.originalEventRange.timeRange.from &&
-        eventRange.timeRange.to ===
-          initialData.originalEventRange.timeRange.to &&
-        eventRange.timezone === initialData.originalEventRange.timezone;
+        eventRange.timeRange.from === original.timeRange.from &&
+        eventRange.timeRange.to === original.timeRange.to &&
+        eventRange.timezone === original.timezone;
 
-      const sameDate =
-        eventRange.type === "specific" &&
-        initialData.originalEventRange.type === "specific" &&
-        eventRange.dateRange.from ===
-          initialData.originalEventRange.dateRange.from &&
-        eventRange.dateRange.to === initialData.originalEventRange.dateRange.to;
+      const sameDays =
+        eventRange.type === "weekday" && original.type === "weekday"
+          ? sameSet(eventRange.weekdays, original.weekdays)
+          : eventRange.type !== "weekday" &&
+            original.type !== "weekday" &&
+            eventRange.type === original.type &&
+            sameSet(eventRange.dates, original.dates);
 
-      const sameWeekdays =
-        eventRange.type === "weekday" &&
-        initialData.originalEventRange.type === "weekday" &&
-        JSON.stringify(eventRange.weekdays) ===
-          JSON.stringify(initialData.originalEventRange.weekdays);
-
-      eventNotEdited =
-        sameTitle && sameType && sameTimeRange && (sameDate || sameWeekdays);
+      eventNotEdited = sameTitle && sameTimeRange && sameDays;
     }
 
-    return !title ||
-      !title.trim() ||
-      (eventRange.type === "specific" &&
-        (!eventRange.dateRange.from || !eventRange.dateRange.to)) ||
-      (eventRange.type === "weekday" &&
-        (!eventRange.weekdays || eventRange.weekdays.length === 0)) ||
-      !eventRange.timeRange.from ||
-      !eventRange.timeRange.to
+    const missingDays =
+      eventRange.type === "weekday"
+        ? eventRange.weekdays.size === 0
+        : eventRange.dates.size === 0;
+    const missingTimes =
+      eventRange.type !== "calendar" &&
+      (!eventRange.timeRange.from || !eventRange.timeRange.to);
+
+    return !title || !title.trim() || missingDays || missingTimes
       ? MESSAGES.FORM_NOT_FILLED
       : eventNotEdited
         ? "Please make changes to update the event."
@@ -179,9 +185,10 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
     />
   );
   const grid = (
-    <MemoizedScheduleGrid
+    <Grid
       mode="preview"
-      isWeekdayEvent={eventRange.type === "weekday"}
+      eventType={eventRange.type}
+      backgroundColor={isMobile ? "background" : "panel"}
       unselectedRange={checkUnselectedRange(eventRange)}
       timezone={eventRange.timezone}
       timeslots={timeslots}
@@ -248,38 +255,40 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       >
         <DateRangeSelection editing={type === "edit"} />
 
-        <div className="flex flex-col gap-1">
-          <div
-            className={`flex items-center gap-2 font-bold md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
-          >
-            <ClockIcon className="h-4 w-4" strokeWidth={2} />
-            Possible Times
-            {errors.timeRange && (
-              <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
-            )}
-          </div>
-          <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
-            <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
-              <TimeSelector
-                id="from-time-dropdown"
-                value={eventRange.timeRange.from}
-                onChange={setStartTime}
-                placeholder="Start Time"
-                dialogTitle="Select Start Time"
-              />
-            </FormSelectorField>
+        {state.eventRange.type !== "calendar" && (
+          <div className="flex flex-col gap-1">
+            <div
+              className={`flex items-center gap-2 font-bold md:col-start-1 md:row-start-2 ${errors.timeRange ? "text-error" : ""}`}
+            >
+              <ClockIcon className="h-4 w-4" strokeWidth={2} />
+              Possible Times
+              {errors.timeRange && (
+                <TriangleAlertIcon className="h-4 w-4" strokeWidth={2} />
+              )}
+            </div>
+            <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
+              <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
+                <TimeSelector
+                  id="from-time-dropdown"
+                  value={eventRange.timeRange.from}
+                  onChange={setStartTime}
+                  placeholder="Start Time"
+                  dialogTitle="Select Start Time"
+                />
+              </FormSelectorField>
 
-            <FormSelectorField label="UNTIL" htmlFor="to-time-dropdown">
-              <TimeSelector
-                id="to-time-dropdown"
-                value={eventRange.timeRange.to}
-                onChange={setEndTime}
-                placeholder="End Time"
-                dialogTitle="Select End Time"
-              />
-            </FormSelectorField>
+              <FormSelectorField label="UNTIL" htmlFor="to-time-dropdown">
+                <TimeSelector
+                  id="to-time-dropdown"
+                  value={eventRange.timeRange.to}
+                  onChange={setEndTime}
+                  placeholder="End Time"
+                  dialogTitle="Select End Time"
+                />
+              </FormSelectorField>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="md:content md:col-start-1 md:row-start-10 md:flex md:max-w-[250px] md:items-end">
           <AdvancedOptions isEditing={type === "edit"} errors={errors} />
@@ -288,7 +297,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
         <div className="hidden flex-1 md:col-start-2 md:row-span-9 md:row-start-2 md:block">
           <div className="relative h-full w-full grow">
             <div className="bg-panel absolute inset-0 flex flex-col justify-between gap-2 rounded-3xl px-2 py-4">
-              <div className="min-h-0 flex-1 pr-2">{grid}</div>
+              <div className="min-h-0 flex-1 px-2">{grid}</div>
               {gridDisplayed && (
                 <div className="flex items-center justify-between pl-4 pr-2 text-sm">
                   {previewText}

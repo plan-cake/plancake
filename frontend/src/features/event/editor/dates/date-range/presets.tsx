@@ -1,10 +1,24 @@
-import { useCallback, useMemo } from "react";
-
-import { parseISO } from "date-fns";
-import { format } from "date-fns-tz";
+import {
+  addDays,
+  format,
+  nextMonday,
+  nextSunday,
+  startOfToday,
+} from "date-fns";
 import { BroomIcon } from "lucide-react";
 
+import { useEventContext } from "@/core/event/context";
 import ActionButton from "@/features/button/components/action";
+
+function consecutiveDays(start: Date, count: number): string[] {
+  return Array.from({ length: count }, (_, i) =>
+    format(addDays(start, i), "yyyy-MM-dd"),
+  );
+}
+
+function isSelected(days: string[], dates: Set<string>): boolean {
+  return days.length === dates.size && days.every((day) => dates.has(day));
+}
 
 export default function DateRangePresets({
   dates,
@@ -13,48 +27,25 @@ export default function DateRangePresets({
   dates: Set<string>;
   applyPreset: (days: string[]) => void;
 }) {
-  const checkDatesSelected = useCallback(
-    (days: Set<string>) => {
-      return (
-        days.size === dates.size &&
-        Array.from(days).every((day) => dates.has(day))
-      );
-    },
-    [dates],
-  );
+  const { state } = useEventContext();
+  const today = startOfToday();
 
-  const dateNow = format(new Date(), "yyyy-MM-dd");
-
-  const next4Days = useMemo(() => {
-    const days: string[] = [];
-    const today = parseISO(dateNow);
-    for (let i = 1; i <= 4; i++) {
-      const nextDate = new Date(today);
-      nextDate.setDate(today.getDate() + i);
-      days.push(format(nextDate, "yyyy-MM-dd"));
-    }
-    return days;
-  }, [dateNow]);
-  const isNext4Days = useMemo(() => {
-    return checkDatesSelected(new Set(next4Days));
-  }, [checkDatesSelected, next4Days]);
-
-  const nextWeek = useMemo(() => {
-    const weekDates: string[] = [];
-    for (let i = 1; weekDates.length < 5; i++) {
-      const today = parseISO(dateNow);
-      const nextDate = new Date(today);
-      nextDate.setDate(today.getDate() + i);
-      if (weekDates.length === 0 && nextDate.getDay() !== 1) {
-        continue;
-      }
-      weekDates.push(format(nextDate, "yyyy-MM-dd"));
-    }
-    return weekDates;
-  }, [dateNow]);
-  const isNextWeek = useMemo(() => {
-    return checkDatesSelected(new Set(nextWeek));
-  }, [checkDatesSelected, nextWeek]);
+  const presets =
+    state.eventRange?.type === "calendar"
+      ? [
+          {
+            label: "Next 2 Weeks",
+            days: consecutiveDays(nextSunday(today), 14),
+          },
+          {
+            label: "Next 4 Weeks",
+            days: consecutiveDays(nextSunday(today), 28),
+          },
+        ]
+      : [
+          { label: "Next 4 Days", days: consecutiveDays(addDays(today, 1), 4) },
+          { label: "Next Week", days: consecutiveDays(nextMonday(today), 5) },
+        ];
 
   return (
     <div className="flex w-full gap-2">
@@ -65,24 +56,20 @@ export default function DateRangePresets({
         disabled={dates.size === 0}
         tooltip="Clear Selection"
       />
-      <ActionButton
-        buttonStyle={
-          isNext4Days ? "bordered semi-transparent" : "semi-transparent"
-        }
-        label="Next 4 Days"
-        onClick={() => applyPreset(next4Days)}
-        fullWidth
-        className="justify-center"
-      />
-      <ActionButton
-        buttonStyle={
-          isNextWeek ? "bordered semi-transparent" : "semi-transparent"
-        }
-        label="Next Week"
-        onClick={() => applyPreset(nextWeek)}
-        fullWidth
-        className="justify-center"
-      />
+      {presets.map(({ label, days }) => (
+        <ActionButton
+          key={label}
+          buttonStyle={
+            isSelected(days, dates)
+              ? "bordered semi-transparent"
+              : "semi-transparent"
+          }
+          label={label}
+          onClick={() => applyPreset(days)}
+          fullWidth
+          className="justify-center"
+        />
+      ))}
     </div>
   );
 }

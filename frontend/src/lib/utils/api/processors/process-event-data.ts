@@ -11,9 +11,32 @@ export function processEventData(eventData: EventDetails): {
   timeslots: Date[];
   isCreator: boolean;
 } {
+  // If a calendar event, skip all the time zone processing
+  if (eventData.event_type === "Calendar") {
+    const dateSet = new Set<string>(eventData.dates);
+    const eventRange: EventRange = {
+      type: "calendar",
+      timezone: eventData.time_zone,
+      dates: dateSet,
+      timeRange: {
+        from: eventData.start_time,
+        to: eventData.end_time,
+      },
+    };
+    return {
+      eventName: eventData.title,
+      eventRange,
+      // Calendar dates are represented as UTC midnight so they stay the same date
+      // regardless of the time zone this runs in (server or browser)
+      timeslots: eventData.timeslots.map((ts) =>
+        parseIsoDateTime(ts, eventData.time_zone, "calendar"),
+      ),
+      isCreator: eventData.is_creator,
+    };
+  }
+
   const isWeekEvent = eventData.event_type !== "Date";
 
-  const eventName: string = eventData.title;
   const timeslots: Date[] = eventData.timeslots.map((ts) => {
     return parseIsoDateTime(
       ts,
@@ -81,5 +104,10 @@ export function processEventData(eventData: EventDetails): {
     };
   }
 
-  return { eventName, eventRange, timeslots, isCreator: eventData.is_creator };
+  return {
+    eventName: eventData.title,
+    eventRange,
+    timeslots,
+    isCreator: eventData.is_creator,
+  };
 }

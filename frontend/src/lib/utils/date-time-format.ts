@@ -59,7 +59,9 @@ export function getTimezoneDetails({
 // Returns an ISO string representation of the timeslot. If this is
 // specific date event, it returns the standard ISO string. If it's a
 // weekday event, then the ISO string will be formatted in the
-// event's timezone.
+// event's timezone. If it's a calendar event, the timeslot is a local
+// midnight with no meaningful time, so it's formatted as-is without
+// any timezone conversion.
 export function timeslotToISOString(
   timeslot: Date,
   timezone: string,
@@ -67,9 +69,21 @@ export function timeslotToISOString(
 ): string {
   if (eventType === "specific") {
     return timeslot.toISOString();
+  } else if (eventType === "calendar") {
+    return formatInTimeZone(timeslot, "UTC", "yyyy-MM-dd'T'HH:mm:ss");
   } else {
     return formatInTimeZone(timeslot, timezone, "yyyy-MM-dd'T'HH:mm:ss");
   }
+}
+
+/**
+ * Converts a date string in "YYYY-MM-DD" format to an ISO string at midnight UTC.
+ *
+ * @param dateString A date string in "YYYY-MM-DD" format
+ * @returns An ISO string representation of the date at midnight UTC.
+ */
+export function dateToISOString(dateString: string): string {
+  return new Date(dateString + "T00:00Z").toISOString();
 }
 
 /**
@@ -120,11 +134,11 @@ export function parseIsoDateTime(
   timezone: string,
   eventType: EventType,
 ): Date {
-  if (eventType === "specific") {
-    return parseISO(slotIso + "Z");
-  } else {
+  if (eventType === "weekday") {
     const localIso = slotIso;
     return fromZonedTime(localIso, timezone);
+  } else {
+    return parseISO(slotIso + "Z");
   }
 }
 
@@ -409,4 +423,27 @@ export function convert12To24(time12: string): string {
 
   const date = parse(time12, "hh:mm a", new Date());
   return format(date, "HH:mm");
+}
+
+/* TIME AGO UTILS */
+
+/**
+ * Formats a time difference in seconds into a simplified readable string.
+ * @param secondsAgo The number of seconds ago.
+ * @param largestUnit The largest time unit to display.
+ * @returns A string representing the time difference.
+ */
+export function formatTimeAgo(secondsAgo: number): string {
+  if (secondsAgo < 60) {
+    return "just now";
+  } else if (secondsAgo < 60 * 60) {
+    const minutes = Math.floor(secondsAgo / 60);
+    return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+  } else if (secondsAgo < 60 * 60 * 24) {
+    const hours = Math.floor(secondsAgo / (60 * 60));
+    return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+  } else {
+    const days = Math.floor(secondsAgo / (60 * 60 * 24));
+    return `${days} day${days !== 1 ? "s" : ""} ago`;
+  }
 }

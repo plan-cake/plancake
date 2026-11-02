@@ -61,6 +61,18 @@ export default function DashboardEvent({
 
   // Memoized local date details
   const dateDetails = useMemo(() => {
+    // Calendar event dates aren't converted
+    if (type === "calendar") {
+      const sortedDates = [...dateTimeProps.dates].sort();
+      return {
+        startDate: sortedDates[0],
+        endDate: sortedDates[sortedDates.length - 1],
+        startTime: "",
+        endTime: "",
+        weekdays: new Set<number>(),
+      };
+    }
+
     // Extract the dates from the start time on each day
     // Dates and times are in the event's timezone
     const weekdays = new Set<number>();
@@ -103,6 +115,7 @@ export default function DashboardEvent({
       weekdays,
     };
   }, [
+    type,
     dateTimeProps.dates,
     dateTimeProps.startTime,
     dateTimeProps.endTime,
@@ -205,27 +218,35 @@ export default function DashboardEvent({
     >
       {titleContent}
       <div className="text-sm opacity-50">{code}</div>
-      <div className="mb-2 mt-1 flex items-center gap-2">
-        <CalendarRangeIcon className="h-5 w-5" />
-        {type === "specific" && (
-          <DateRangeRow
-            startDate={dateDetails.startDate}
-            endDate={dateDetails.endDate}
-          />
-        )}
-        {type === "weekday" && <WeekdayRow weekdays={dateDetails.weekdays} />}
-      </div>
-      <div className="flex items-center gap-2">
-        <ClockIcon className="h-5 w-5" />
-        <span>
-          {timeRange.display}
-          {timeRange.pastMidnight && <sup className=""> +1</sup>}
-        </span>
-      </div>
-      <div className="mt-1.5 flex w-full items-center gap-2 bg-inherit">
-        <UsersIcon className="h-5 w-5 shrink-0" />
-        <div className="w-full bg-inherit" ref={participantRowRef}>
-          <ParticipantRow participants={participants} numIcons={numIcons} />
+      <div className="flex flex-col gap-2 bg-inherit">
+        <div className="mt-1 flex items-center gap-2">
+          <CalendarRangeIcon className="h-5 w-5" />
+          {(type === "specific" || type === "calendar") && (
+            <DateRangeRow
+              startDate={dateDetails.startDate}
+              endDate={dateDetails.endDate}
+            />
+          )}
+          {type === "weekday" && <WeekdayRow weekdays={dateDetails.weekdays} />}
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <ClockIcon className="h-5 w-5" />
+          {type === "calendar" ? (
+            <span className="opacity-50">—</span>
+          ) : (
+            <>
+              <span>
+                {timeRange.display}
+                {timeRange.pastMidnight && <sup className=""> +1</sup>}
+              </span>
+            </>
+          )}
+        </div>
+        <div className="flex w-full items-center gap-2 bg-inherit">
+          <UsersIcon className="h-5 w-5 shrink-0" />
+          <div className="w-full bg-inherit" ref={participantRowRef}>
+            <ParticipantRow participants={participants} numIcons={numIcons} />
+          </div>
         </div>
       </div>
       <div data-actions className="mt-2.5 flex items-center gap-2">

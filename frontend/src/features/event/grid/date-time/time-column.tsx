@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { TIME_LABEL_WIDTH } from "@/features/event/grid/lib/constants";
+import { TIME_LABEL_WIDTH } from "@/features/event/grid/constants";
 import { cn } from "@/lib/utils/classname";
 
 export default function TimeColumn({
@@ -39,7 +39,7 @@ export default function TimeColumn({
           >
             <span
               className={cn(
-                "bg-background absolute -top-2 rounded-full px-1 text-xs",
+                "bg-background absolute -top-2 whitespace-nowrap rounded-full px-1 text-xs",
                 isPreview && "md:bg-panel",
               )}
             >

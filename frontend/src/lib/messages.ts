@@ -1,7 +1,8 @@
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import {
-  MAX_DURATION,
+  MAX_DATE_TIME_DURATION,
+  MAX_CALENDAR_DURATION,
   MAX_TITLE_LENGTH,
 } from "@/features/event/editor/constants";
 
@@ -36,7 +37,8 @@ export const MESSAGES = {
   ERROR_EVENT_TIMES_MISSING: "Please select possible times for this event.",
   ERROR_EVENT_RANGE_INVALID: "Please select a valid date/time range.",
   ERROR_EVENT_TIMES_INVALID: "Please select a valid time range.",
-  ERROR_EVENT_RANGE_TOO_LONG: `Too many days selected. Max is ${MAX_DURATION}.`,
+  ERROR_DATE_TIME_EVENT_RANGE_TOO_LONG: `Too many days selected. Max is ${MAX_DATE_TIME_DURATION}.`,
+  ERROR_CALENDAR_EVENT_RANGE_TOO_LONG: `Too many days selected. Max is ${MAX_CALENDAR_DURATION}.`,
 
   // default name errors
   ERROR_DEFAULT_NAME_LENGTH: `Max ${MAX_DEFAULT_NAME_LENGTH} characters.`,
@@ -51,6 +53,8 @@ export const MESSAGES = {
   SUCCESS_DEFAULT_NAME_SAVED: "Nickname saved successfully.",
   SUCCESS_DEFAULT_NAME_REMOVED: "Nickname removed successfully.",
   SUCCESS_EVENT_DELETE: "Event deleted successfully.",
+  SUCCESS_SESSION_REMOVE: "Session removed successfully.",
+  SUCCESS_SESSION_PRUNE: "All other sessions removed successfully.",
   SUCCESS_ACCOUNT_DELETE: "Account deleted successfully. Have a nice day!",
 
   // copy link messages
@@ -67,10 +71,12 @@ export const MESSAGES = {
   INFO_ADD_AVAILABILITY_MOBILE:
     "Add your availability by clicking the button below.",
   INFO_COPY_SHARE_LINK: "Copy and share the link so others can join!",
-  INFO_UNSELECTED_DATE_RANGE:
+  INFO_UNSELECTED_DATE_TIME_RANGE:
     "Select dates and times to see a preview of the event grid.",
   INFO_UNSELECTED_WEEK_RANGE:
     "Select days and times to see a preview of the event grid.",
+  INFO_UNSELECTED_CALENDAR_RANGE:
+    "Select dates to see a preview of the event grid.",
   INFO_NO_OVERLAP:
     "Literally no one is free at the same time. This is NOT making it out of the group chat...",
   INFO_NO_IDEAL_TIMES:
