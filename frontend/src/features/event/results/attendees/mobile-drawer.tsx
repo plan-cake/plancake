@@ -5,7 +5,7 @@ import { ShareIcon, SlidersHorizontalIcon, SquarePenIcon } from "lucide-react";
 import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import { FloatingDrawer, MorphingDrawer } from "@/features/drawer";
-import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/constants";
 import PanelHeader from "@/features/event/results/attendees/panel-header";
 import ParticipantList from "@/features/event/results/attendees/participant-list";
 import {
@@ -96,6 +96,7 @@ export default function AttendeesDrawer({
           aria-label="View Options"
         />
       }
+      nested={isCollapsed}
     >
       <AvailabilityFilters />
     </FloatingDrawer>
@@ -112,7 +113,7 @@ export default function AttendeesDrawer({
       }
       eventTitle={eventTitle}
       eventCode={eventCode}
-      isNested
+      isNested={isCollapsed}
     />
   );
 

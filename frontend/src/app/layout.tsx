@@ -32,11 +32,7 @@ export function generateMetadata(): Metadata {
 
   return {
     title: "Plancake - Stacking up perfect plans",
-
-    // text that appears below your link in search engines
     description: description,
-
-    // keywords for SEO optimization
     keywords: [
       "Plancake",
       "scheduling",
@@ -51,12 +47,9 @@ export function generateMetadata(): Metadata {
       "Doodle",
       "mobile friendly scheduler",
     ],
-
     appleWebApp: {
       title: "Plancake",
     },
-
-    // for link previews on social media
     openGraph: {
       title: "Plancake - Stacking up perfect plans",
       description: description,
@@ -80,22 +73,24 @@ export default async function RootLayout({
       className={`${modak.variable} ${nunito.variable}`}
     >
       <body className="font-sans antialiased">
-        <div className="mx-auto flex min-h-dvh max-w-[1440px] flex-col">
-          <SkipToContentButton />
-          <Providers>
-            <CookieGuard>
-              <Suspense fallback={null}>
-                <ToastListener />
-              </Suspense>
-              <Header />
-              {/* The main content is wrapped to allow skip to content functionality. */}
-              <div id="main-content" className="outline-hidden">
-                {children}
-              </div>
-            </CookieGuard>
-          </Providers>
-          <Analytics />
-          <SpeedInsights />
+        <div className="relative w-full overflow-x-clip">
+          <div className="mx-auto flex min-h-dvh w-full max-w-[1440px] flex-col">
+            <SkipToContentButton />
+            <Providers>
+              <CookieGuard>
+                <Suspense fallback={null}>
+                  <ToastListener />
+                </Suspense>
+                <Header />
+                {/* The main content is wrapped to allow skip to content functionality. */}
+                <div id="main-content" className="outline-hidden">
+                  {children}
+                </div>
+              </CookieGuard>
+            </Providers>
+            <Analytics />
+            <SpeedInsights />
+          </div>
         </div>
       </body>
     </html>

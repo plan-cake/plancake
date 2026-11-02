@@ -302,6 +302,26 @@ export const VERSION_DATA: VersionHistoryData = [
       },
     ],
   },
+  {
+    version: "v1.0",
+    releaseDate: { year: 2026, month: 11, day: 1 },
+    tag: "Full Release",
+    added: [
+      "The landing page was completely redesigned",
+      "Date-only events were added",
+      "Events are no longer restricted to a single consecutive range of days",
+      "Emails are now formatted to match the site",
+      "Active sessions can now be managed from account settings",
+      "Date selectors now have presets",
+    ],
+    changed: [
+      "The scrollbar gutter is now persistent to avoid layout shifts",
+      "Drawer, dropdown, and popover styling was slightly adjusted",
+      "Event types were renamed to be more descriptive",
+    ],
+    fixed: [],
+    minorVersions: [],
+  },
 ] as const;
 
 export function getCurrentVersion(threeDigit = true): string {

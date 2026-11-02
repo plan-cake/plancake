@@ -24,13 +24,15 @@ class ActiveSessionSerializer(serializers.Serializer):
     client_version = serializers.CharField(
         required=False, allow_null=True, default=None
     )
+    created_at = serializers.DateTimeField(required=True)
     last_used = serializers.DateTimeField(required=True)
     is_current = serializers.BooleanField(required=True)
 
 
 class ActiveSessionListSerializer(serializers.Serializer):
-    sessions = serializers.ListField(
-        child=ActiveSessionSerializer(), required=True, allow_empty=False
+    current_session = ActiveSessionSerializer(required=True)
+    other_sessions = serializers.ListField(
+        child=ActiveSessionSerializer(), required=True, allow_empty=True
     )
 
 

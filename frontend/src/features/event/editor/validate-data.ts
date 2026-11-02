@@ -1,7 +1,7 @@
-import { EventInformation, WeekdayRange } from "@/core/event/types";
-import { findRangeFromWeekdayArray } from "@/core/event/weekday-utils";
+import { EventInformation } from "@/core/event/types";
 import {
-  MAX_DURATION_MS,
+  MAX_CALENDAR_DAYS,
+  MAX_DATE_TIME_DAYS,
   MAX_TITLE_LENGTH,
 } from "@/features/event/editor/constants";
 import { EventEditorType } from "@/features/event/editor/types";
@@ -22,49 +22,55 @@ export async function validateEventData(
   }
 
   // Validate event range
-  if (eventRange.type === "specific") {
-    if (!eventRange.dateRange?.from || !eventRange.dateRange?.to) {
+  if (eventRange.type === "specific" || eventRange.type === "calendar") {
+    if (!eventRange.dates.size) {
       errors.dateRange = MESSAGES.ERROR_EVENT_DATES_MISSING;
     } else {
-      // check if the date range is more than 64 days
-      const fromDate = new Date(eventRange.dateRange.from);
-      const toDate = new Date(eventRange.dateRange.to);
-      if (checkDateRange(fromDate, toDate)) {
-        errors.dateRange = MESSAGES.ERROR_EVENT_RANGE_TOO_LONG;
+      if (eventRange.type === "specific") {
+        if (eventRange.dates.size > MAX_DATE_TIME_DAYS) {
+          errors.dateRange = MESSAGES.ERROR_DATE_TIME_EVENT_RANGE_TOO_LONG;
+        }
+      } else {
+        if (eventRange.dates.size > MAX_CALENDAR_DAYS) {
+          errors.dateRange = MESSAGES.ERROR_CALENDAR_EVENT_RANGE_TOO_LONG;
+        }
       }
     }
   }
 
   if (eventRange.type === "weekday") {
-    const weekdayRange = findRangeFromWeekdayArray(
-      (data.eventRange as WeekdayRange).weekdays,
-    );
-    if (weekdayRange.startDay === null || weekdayRange.endDay === null) {
+    if (!eventRange.weekdays.size) {
       errors.weekdayRange = MESSAGES.ERROR_EVENT_WEEKDAYS_MISSING;
     }
   }
 
-  // Validate time range
-  if (!eventRange.timeRange.from || !eventRange.timeRange.to) {
-    errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_MISSING;
-  } else if (
-    !checkTimeRange(eventRange.timeRange.from, eventRange.timeRange.to)
-  ) {
-    errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_INVALID;
+  if (eventRange.type === "specific" || eventRange.type === "weekday") {
+    // Validate time range
+    if (!eventRange.timeRange.from || !eventRange.timeRange.to) {
+      errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_MISSING;
+    } else if (
+      !checkTimeRange(eventRange.timeRange.from, eventRange.timeRange.to)
+    ) {
+      errors.timeRange = MESSAGES.ERROR_EVENT_TIMES_INVALID;
+    }
   }
 
   return errors;
 }
 
 export function checkDateRange(
-  start: Date | undefined,
-  end: Date | undefined,
-): boolean {
-  if (start && end) {
-    const diffTime = end.getTime() - start.getTime();
-    return diffTime > MAX_DURATION_MS;
+  dates: Set<string>,
+  eventType: "specific" | "calendar",
+): string {
+  if (eventType === "specific") {
+    return dates.size > MAX_DATE_TIME_DAYS
+      ? MESSAGES.ERROR_DATE_TIME_EVENT_RANGE_TOO_LONG
+      : "";
+  } else {
+    return dates.size > MAX_CALENDAR_DAYS
+      ? MESSAGES.ERROR_CALENDAR_EVENT_RANGE_TOO_LONG
+      : "";
   }
-  return false;
 }
 
 export function checkTimeRange(startTime: string, endTime: string): boolean {
