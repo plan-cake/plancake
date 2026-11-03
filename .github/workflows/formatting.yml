@@ -53,3 +53,8 @@ jobs:
         with:
           sarif_file: frontend/eslint-results.sarif
           category: frontend-eslint
+
+      - name: Run Prettier
+        # Should run either on success or failure of ESLint
+        if: success() || failure()
+        run: npm run check-format
