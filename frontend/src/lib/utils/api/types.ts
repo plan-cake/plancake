@@ -1,71 +1,71 @@
 export type MessageResponse = {
   message: string[];
-}
+};
 
 export type RegisterData = {
   email: string;
   password: string;
-}
+};
 
 export type Email = {
   email: string;
-}
+};
 
 export type VerificationCode = {
   verification_code: string;
-}
+};
 
 export type AccountData = {
   email: string;
   default_display_name: string | null;
-}
+};
 
 export type LoginData = {
   email: string;
   password: string;
   remember_me?: boolean;
-}
+};
 
 export type PasswordResetData = {
   reset_token: string;
   new_password: string;
-}
+};
 
 export type PasswordChangeData = {
   password: string;
   new_password: string;
   prune_sessions?: boolean;
-}
+};
 
 export type Password = {
   password: string;
-}
+};
 
 export type EventCode = {
   event_code: string;
-}
+};
 
 export type NewEventData = {
   title: string;
   timeslots: string[];
   time_zone: string;
   custom_code?: string;
-}
+};
 
 export type CustomCode = {
   custom_code: string;
-}
+};
 
 export type TrueCode = {
   true_code: string;
-}
+};
 
 export type EventEditData = {
   title: string;
   timeslots: string[];
   time_zone: string;
   event_code: string;
-}
+};
 
 export type ApiEventType = "Date" | "Week" | "Calendar";
 
@@ -78,25 +78,25 @@ export type EventDetails = {
   dates: string[];
   start_time: string;
   end_time: string;
-}
+};
 
 export type AvailabilityAddData = {
   event_code: string;
   display_name: string;
   availability: string[];
   time_zone: string;
-}
+};
 
 export type EventDisplayNameData = {
   event_code: string;
   display_name: string;
-}
+};
 
 export type SelfAvailability = {
   display_name: string;
   available_dates: string[];
   time_zone: string;
-}
+};
 
 export type AllAvailability = {
   user_display_name: string | null;
@@ -109,8 +109,8 @@ export type AllAvailability = {
   }[];
   availability: {
     [timeslot: string]: string[];
-  }
-}
+  };
+};
 
 export type DashboardEvent = {
   title: string;
@@ -121,16 +121,16 @@ export type DashboardEvent = {
   time_zone: string;
   participants: string[];
   event_code: string;
-}
+};
 
 export type DashboardData = {
   created_events: DashboardEvent[];
   participated_events: DashboardEvent[];
-}
+};
 
 export type DisplayName = {
   display_name: string;
-}
+};
 
 export type ActiveSession = {
   public_id: string;
@@ -158,37 +158,37 @@ export type ActiveSession = {
   created_at: string;
   last_used: string;
   is_current: boolean;
-}
+};
 
 export type ActiveSessionList = {
   current_session: ActiveSession;
   other_sessions: ActiveSession[];
-}
+};
 
 export type SessionId = {
   session_id: string;
-}
+};
 
 export type AuthedPasswordResetCode = {
   reset_code: string;
-}
+};
 
 export type AuthedPasswordResetData = {
   reset_code: string;
   new_password: string;
   prune_sessions?: boolean;
-}
+};
 
 export type GuestDataSummary = {
   created_events: number;
   participated_events: number;
-}
+};
 
 type GuestCreatedEvent = {
   url_code: string | null;
   public_id: string;
   title: string;
-}
+};
 
 type GuestParticipatedEvent = {
   url_code: string | null;
@@ -196,15 +196,15 @@ type GuestParticipatedEvent = {
   title: string;
   guest_display_name: string;
   account_display_name: string | null;
-}
+};
 
 export type GuestData = {
   created_events: GuestCreatedEvent[];
   participated_events: GuestParticipatedEvent[];
-}
+};
 
 export type GuestImportData = {
   availability_choices: {
     [public_id: string]: "guest" | "account";
   };
-}
+};
