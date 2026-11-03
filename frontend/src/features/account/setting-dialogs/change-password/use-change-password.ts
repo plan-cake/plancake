@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useSettingsAccount } from "@/features/account/settings/context";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import { useToast } from "@/features/system-feedback";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
@@ -20,11 +21,12 @@ export function useChangePasswordFlow() {
   const { addToast } = useToast();
   const router = useRouter();
   const { errors, handleError, clearAllErrors } = useFormErrors();
+  const { email } = useSettingsAccount();
 
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<AuthedChangePasswordStep>("CHANGE");
 
-  // 1. CONSOLIDATED FORM STATE
+  // CONSOLIDATED FORM STATE
   const [form, setForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -49,9 +51,23 @@ export function useChangePasswordFlow() {
 
   const passwordIsStrong = Object.values(criteria).every(Boolean);
 
+  // CAPTCHA STATES
+  // Only the forgot password flow needs a token, since it sends an email
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
+  // Tokens are single-use, so changing the key remounts the widget for a fresh one
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const refreshCaptcha = () => {
+    setCaptchaToken(null);
+    setCaptchaKey((key) => key + 1);
+  };
+
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
+      // The widget unmounts with the dialog, so its token and errors go with it
+      setCaptchaToken(null);
+      setCaptchaInitError(false);
       setForm({
         currentPassword: "",
         newPassword: "",
@@ -103,14 +119,38 @@ export function useChangePasswordFlow() {
   }, [step, form, passwordIsStrong, errors]);
 
   // --- API FUNCTIONS ---
-  const handleForgotPassword = async () => {
+  const handleForgotPassword = async (resend: boolean) => {
+    if (captchaInitError) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_BLOCKED);
+      return false;
+    }
+    if (!captchaToken) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      return false;
+    }
     clearAllErrors();
+
     try {
-      await clientPost(ROUTES.account.startAuthedPasswordReset);
+      await clientPost(ROUTES.auth.startPasswordReset, {
+        email,
+        captcha_token: captchaToken,
+      });
+      refreshCaptcha();
       setStep("OTP");
-      addToast("success", "Password reset code sent to your email.");
+      if (resend) {
+        addToast("success", "Email resent.");
+      }
+      return true;
     } catch (e) {
-      handleError("toast", (e as ApiErrorResponse).formattedMessage);
+      const error = e as ApiErrorResponse;
+      if (error.captchaFailed) {
+        // The widget opens its own challenge dialog, which provides a new token
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      } else {
+        refreshCaptcha();
+        handleError("toast", error.formattedMessage);
+      }
+      return false;
     }
   };
 
@@ -118,18 +158,28 @@ export function useChangePasswordFlow() {
     clearAllErrors();
     const codeToVerify = code ?? form.resetCode;
 
-    if (!form.resetCode) {
+    if (!codeToVerify) {
       handleError("resetCode", "Please enter the code.");
       return false;
     }
     try {
-      await clientPost(ROUTES.account.checkAuthedPasswordResetCode, {
+      await clientPost(ROUTES.auth.checkPasswordResetCode, {
+        email,
         reset_code: codeToVerify,
       });
       setStep("RESET");
       return false;
-    } catch {
-      handleError("resetCode", "Invalid code. Try Again.");
+    } catch (e) {
+      const error = e as ApiErrorResponse;
+      if (error.rateLimited) {
+        handleError("rate_limit", error.formattedMessage);
+      } else {
+        handleError(
+          "resetCode",
+          error.formattedMessage.split("Reset Code: ")[1] ||
+            error.formattedMessage,
+        );
+      }
       return false;
     }
   };
@@ -150,7 +200,8 @@ export function useChangePasswordFlow() {
       );
 
     try {
-      await clientPost(ROUTES.account.authedPasswordReset, {
+      await clientPost(ROUTES.auth.resetPassword, {
+        email,
         reset_code: form.resetCode,
         new_password: form.newPassword,
         prune_sessions: form.pruneSessions,
@@ -170,23 +221,22 @@ export function useChangePasswordFlow() {
 
   const handleChangePassword = async () => {
     clearAllErrors();
-    if (!form.currentPassword)
-      return (
-        handleError("currentPassword", MESSAGES.ERROR_PASSWORD_MISSING),
-        false
-      );
-    if (!form.newPassword)
-      return (
-        handleError("newPassword", MESSAGES.ERROR_PASSWORD_MISSING),
-        false
-      );
-    if (!passwordIsStrong)
-      return (handleError("newPassword", MESSAGES.ERROR_PASSWORD_WEAK), false);
-    if (form.newPassword !== form.confirmPassword)
-      return (
-        handleError("confirmPassword", MESSAGES.ERROR_PASSWORD_MISMATCH),
-        false
-      );
+    if (!form.currentPassword) {
+      handleError("currentPassword", MESSAGES.ERROR_PASSWORD_MISSING);
+      return false;
+    }
+    if (!form.newPassword) {
+      handleError("newPassword", MESSAGES.ERROR_PASSWORD_MISSING);
+      return false;
+    }
+    if (!passwordIsStrong) {
+      handleError("newPassword", MESSAGES.ERROR_PASSWORD_WEAK);
+      return false;
+    }
+    if (form.newPassword !== form.confirmPassword) {
+      handleError("confirmPassword", MESSAGES.ERROR_PASSWORD_MISMATCH);
+      return false;
+    }
 
     try {
       await clientPost(ROUTES.account.changePassword, {
@@ -201,7 +251,7 @@ export function useChangePasswordFlow() {
     } catch (e) {
       const error = e as ApiErrorResponse;
       if (error.status === 404)
-        handleError("api", MESSAGES.ERROR_RESET_TOKEN_INVALID);
+        handleError("api", MESSAGES.ERROR_RESET_CODE_INVALID);
       else if (error.data?.error?.["password"])
         handleError("currentPassword", MESSAGES.ERROR_PASSWORD_WRONG);
       else if (error.data?.error?.["new_password"])
@@ -214,11 +264,15 @@ export function useChangePasswordFlow() {
   return {
     open,
     step,
-    setStep,
     form,
     updateForm,
     invalidForm,
     errors,
+    handleError,
+    captchaKey,
+    captchaInitError,
+    setCaptchaToken,
+    setCaptchaInitError,
     criteria,
     showCriteria,
     setShowCriteria,

@@ -48,12 +48,13 @@ export default function FormDialog({
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+      if (submitDisabled) return;
       const success = await onSubmit();
       if (success) {
         handleOpenChange(false);
       }
     },
-    [onSubmit, handleOpenChange],
+    [submitDisabled, onSubmit, handleOpenChange],
   );
 
   return (
@@ -72,7 +73,7 @@ export default function FormDialog({
     >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center gap-6"
+        className="flex flex-col items-center gap-4"
       >
         {children}
 

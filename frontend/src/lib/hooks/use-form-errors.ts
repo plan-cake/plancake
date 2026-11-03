@@ -22,7 +22,7 @@ export function useFormErrors() {
       }
 
       // show toast for api and toast errors
-      if (field === "api" || field === "toast") {
+      if (field === "api" || field === "toast" || field === "captcha") {
         addToast("error", message);
       } else if (field === "rate_limit" && !message) {
         message = MESSAGES.ERROR_RATE_LIMIT;

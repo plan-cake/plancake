@@ -1,3 +1,7 @@
+import random
+import string
+
+
 def validate_password(password):
     MIN_LENGTH = 8
     SPECIAL_CHARACTERS = """!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"""
@@ -37,3 +41,10 @@ def validate_password(password):
 
 def list_failed_criteria(criteria):
     return [f"Password must {crit}." for crit, passed in criteria.items() if not passed]
+
+
+def generate_auth_code():
+    """
+    Generates a random 6-digit code.
+    """
+    return "".join(random.SystemRandom().choices(string.digits, k=6))

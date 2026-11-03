@@ -116,23 +116,23 @@ export default function ClientPage({
 
   // FORM VALIDATION
   const invalidForm = useMemo(() => {
-    if (captchaInitError) {
-      return MESSAGES.ERROR_CAPTCHA_BLOCKED;
-    }
-
     const hasName = displayName && displayName.trim();
     const hasAvailability = userAvailability && userAvailability.size > 0;
 
-    return !hasName
-      ? !hasAvailability
-        ? "Please fill out your name and availability."
-        : "Please fill out your name."
-      : Object.keys(errors).length
-        ? MESSAGES.FORM_HAS_ERRORS
-        : !hasAvailability
-          ? "Please select your availability on the grid."
-          : undefined;
-  }, [captchaInitError, displayName, userAvailability, errors]);
+    return captchaInitError
+      ? MESSAGES.ERROR_CAPTCHA_BLOCKED
+      : !captchaToken
+        ? MESSAGES.ERROR_CAPTCHA_FAILED
+        : !hasName
+          ? !hasAvailability
+            ? "Please fill out your name and availability."
+            : "Please fill out your name."
+          : Object.keys(errors).length
+            ? MESSAGES.FORM_HAS_ERRORS
+            : !hasAvailability
+              ? "Please select your availability on the grid."
+              : undefined;
+  }, [captchaInitError, displayName, userAvailability, errors, captchaToken]);
 
   const checkNameAvailability = useDebouncedCallback(async (displayName) => {
     try {

@@ -15,7 +15,7 @@ export default function MessagePage({
 }: MessagePageProps) {
   return (
     <div className="flex flex-col gap-4 text-center">
-      <h2 className="text-4xl font-bold">{title}</h2>
+      <h2 className="-mb-2 text-3xl font-bold">{title}</h2>
       {description && <p>{description}</p>}
       {children}
       <div className="flex justify-center gap-4">

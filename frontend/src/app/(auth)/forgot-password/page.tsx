@@ -1,7 +1,5 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
 import Link from "next/link";
 
 import Captcha from "@/components/captcha";
@@ -9,97 +7,30 @@ import AuthPageLayout from "@/components/layout/auth-page";
 import MessagePage from "@/components/layout/message-page";
 import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
-import InboxLinks from "@/features/auth/components/inbox-links";
+import { useResetPasswordFlow } from "@/features/auth/hooks/use-reset-password";
 import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
+import OTPModule from "@/features/otp/otp-module";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
-import { useFormErrors } from "@/lib/hooks/use-form-errors";
-import { MESSAGES } from "@/lib/messages";
-import { clientPost } from "@/lib/utils/api/client-fetch";
-import { ROUTES } from "@/lib/utils/api/endpoints";
-import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function Page() {
-  const [email, setEmail] = useState("");
-  const [emailSent, setEmailSent] = useState(false);
   const isMobile = useCheckMobile();
+  const flow = useResetPasswordFlow();
 
-  // CAPTCHA STATES
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaInitError, setCaptchaInitError] = useState(false);
+  // Both the submit and resend steps send an email, so both need a token
+  const captcha = (
+    <Captcha
+      key={flow.captchaKey}
+      backendVerificationFailed={!!flow.errors.captcha}
+      onTokenChange={flow.setCaptchaToken}
+      onClearBackendError={() => flow.handleError("captcha", "")}
+      onInitError={() => flow.setCaptchaInitError(true)}
+    />
+  );
 
-  // TOASTS AND ERROR STATES
-  const { errors, handleError, clearAllErrors } = useFormErrors();
-
-  // CHECK FIELDS
-  const invalidForm = useMemo(() => {
-    return captchaInitError
-      ? MESSAGES.ERROR_CAPTCHA_BLOCKED
-      : !email || !email.trim()
-        ? "Please enter an email address."
-        : Object.keys(errors).length
-          ? MESSAGES.FORM_HAS_ERRORS
-          : undefined;
-  }, [captchaInitError, email, errors]);
-
-  const handleEmailChange = (value: string) => {
-    handleError("email", "");
-    handleError("api", "");
-    setEmail(value);
-  };
-
-  const handleSubmit = async () => {
-    clearAllErrors();
-
-    if (!email) {
-      handleError("email", MESSAGES.ERROR_EMAIL_MISSING);
-      return false;
-    }
-    if (!captchaToken) {
-      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
-      return false;
-    }
-
-    try {
-      await clientPost(ROUTES.auth.startPasswordReset, {
-        email,
-        captcha_token: captchaToken,
-      });
-      setEmailSent(true);
-      return true;
-    } catch (e) {
-      const error = e as ApiErrorResponse;
-      if (error.rateLimited) {
-        handleError("rate_limit", error.formattedMessage);
-      } else if (error.captchaFailed) {
-        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
-      } else if (error.formattedMessage.includes("Email:")) {
-        handleError("email", error.formattedMessage.split("Email:")[1].trim());
-      } else {
-        handleError("api", error.formattedMessage);
-      }
-      return false;
-    }
-  };
-
-  return (
-    <div className="flex h-screen flex-col items-center justify-center gap-4">
-      {emailSent ? (
-        <MessagePage
-          title="Check your email"
-          description={`A password reset link was sent to ${email}.`}
-          buttons={[
-            <LinkButton
-              key="0"
-              buttonStyle="primary"
-              label="Back to Login"
-              href="/login"
-            />,
-          ]}
-        >
-          <InboxLinks email={email} />
-        </MessagePage>
-      ) : (
+  switch (flow.step) {
+    case "EMAIL":
+      return (
         <AuthPageLayout
           title="forgot password"
           fields={[
@@ -108,29 +39,25 @@ export default function Page() {
               id="email"
               type="email"
               label="Email*"
-              value={email}
-              onChange={handleEmailChange}
+              value={flow.form.email}
+              onChange={(value) => flow.updateForm("email", value)}
               style="outlined"
-              error={errors.email || errors.api}
+              error={flow.errors.email || flow.errors.api}
             />,
           ]}
-          rateLimitError={errors.rate_limit}
+          rateLimitError={flow.errors.rate_limit}
         >
           <div className="space-y-4">
-            <Captcha
-              backendVerificationFailed={!!errors.captcha}
-              onTokenChange={setCaptchaToken}
-              onClearBackendError={() => handleError("captcha", "")}
-              onInitError={() => setCaptchaInitError(true)}
-            />
+            {captcha}
             <div className="flex justify-end">
               <ActionButton
                 buttonStyle="primary"
-                label="Send Link"
-                tooltip={invalidForm}
-                onClick={handleSubmit}
-                disabled={(!isMobile && !!invalidForm) || captchaInitError}
-                loadOnSuccess
+                label="Submit"
+                tooltip={flow.invalidForm}
+                disabled={
+                  (!isMobile && !!flow.invalidForm) || flow.captchaInitError
+                }
+                onClick={() => flow.handleEmailSubmit(false)}
               />
             </div>
           </div>
@@ -146,7 +73,119 @@ export default function Page() {
             </div>
           </div>
         </AuthPageLayout>
-      )}
-    </div>
-  );
+      );
+    case "OTP":
+      return (
+        <div className="flex h-screen items-center justify-center">
+          <MessagePage
+            title="Verify It's You"
+            buttons={[
+              <LinkButton
+                key="0"
+                buttonStyle="transparent"
+                label="Back to Login"
+                href="/login"
+              />,
+              <ActionButton
+                key="1"
+                buttonStyle="primary"
+                label="Verify Code"
+                onClick={() => flow.handleVerifyOTP()}
+              />,
+            ]}
+          >
+            {captcha}
+            <OTPModule
+              value={flow.form.resetCode}
+              onValueChange={(val) => flow.updateForm("resetCode", val)}
+              email={flow.form.email}
+              relevantError={
+                flow.errors.resetCode ||
+                flow.errors.api ||
+                flow.errors.rate_limit
+              }
+              onVerify={flow.handleVerifyOTP}
+              onResend={() => flow.handleEmailSubmit(true)}
+            />
+          </MessagePage>
+        </div>
+      );
+    case "RESET":
+      return (
+        <AuthPageLayout
+          title="reset password"
+          fields={[
+            // New Password
+            <TextInputField
+              key="newPassword"
+              id="newPassword"
+              type="password"
+              label="New Password*"
+              value={flow.form.newPassword}
+              onChange={(value) => {
+                flow.updateForm("newPassword", value);
+              }}
+              onFocus={() => flow.setShowCriteria(true)}
+              onBlur={() => {
+                if (!flow.form.newPassword || flow.passwordIsStrong) {
+                  flow.setShowCriteria(false);
+                }
+              }}
+              style="outlined"
+              error={flow.errors.newPassword || flow.errors.api}
+              showPasswordCriteria={flow.showCriteria}
+              passwordCriteria={flow.criteria}
+            />,
+
+            // Retype Password
+            <TextInputField
+              key="confirmPassword"
+              id="confirmPassword"
+              type="password"
+              label="Retype Password*"
+              value={flow.form.confirmPassword}
+              onChange={(value) => {
+                flow.updateForm("confirmPassword", value);
+              }}
+              style="outlined"
+              error={flow.errors.confirmPassword || flow.errors.api}
+            />,
+          ]}
+          rateLimitError={flow.errors.rate_limit}
+        >
+          <div className="flex flex-col items-center gap-4">
+            <div className="text-sm opacity-75">
+              This will sign out your account on all devices.
+            </div>
+            <div className="flex w-full justify-end">
+              <ActionButton
+                buttonStyle="primary"
+                label="Change Password"
+                tooltip={flow.invalidForm}
+                onClick={flow.handleResetPassword}
+                disabled={!isMobile && !!flow.invalidForm}
+              />
+            </div>
+          </div>
+        </AuthPageLayout>
+      );
+    case "SUCCESS":
+      return (
+        <div className="flex h-screen items-center justify-center">
+          <MessagePage
+            title="Password Reset Successful"
+            buttons={[
+              <LinkButton
+                key="0"
+                buttonStyle="primary"
+                label="Back to Login"
+                href="/login"
+              />,
+            ]}
+          />
+        </div>
+      );
+    default:
+      return null;
+  }
 }
