@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import Captcha from "@/components/captcha";
 import ChangeStep from "@/features/account/setting-dialogs/change-password/steps/change";
 import OtpStep from "@/features/account/setting-dialogs/change-password/steps/otp";
 import ResetStep from "@/features/account/setting-dialogs/change-password/steps/reset";
@@ -67,6 +68,13 @@ export default function ChangePasswordDialog() {
       submitDisabled={!isMobile && !!flow.invalidForm}
     >
       {dialogContent}
+      <Captcha
+        key={flow.captchaKey}
+        backendVerificationFailed={!!flow.errors.captcha}
+        onTokenChange={flow.setCaptchaToken}
+        onClearBackendError={() => flow.handleError("captcha", "")}
+        onInitError={() => flow.setCaptchaInitError(true)}
+      />
     </FormDialog>
   );
 }

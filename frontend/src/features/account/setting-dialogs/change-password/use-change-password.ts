@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
 import { useSettingsAccount } from "@/features/account/settings/context";
 import PasswordValidation from "@/features/auth/components/password-validation";
 import { useToast } from "@/features/system-feedback";
@@ -17,13 +19,14 @@ export type ChangePasswordStepProps = {
 
 export function useChangePasswordFlow() {
   const { addToast } = useToast();
+  const router = useRouter();
   const { errors, handleError, clearAllErrors } = useFormErrors();
   const { email } = useSettingsAccount();
 
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<AuthedChangePasswordStep>("CHANGE");
 
-  // 1. CONSOLIDATED FORM STATE
+  // CONSOLIDATED FORM STATE
   const [form, setForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -48,9 +51,23 @@ export function useChangePasswordFlow() {
 
   const passwordIsStrong = Object.values(criteria).every(Boolean);
 
+  // CAPTCHA STATES
+  // Only the forgot password flow needs a token, since it sends an email
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
+  // Tokens are single-use, so changing the key remounts the widget for a fresh one
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const refreshCaptcha = () => {
+    setCaptchaToken(null);
+    setCaptchaKey((key) => key + 1);
+  };
+
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
+      // The widget unmounts with the dialog, so its token and errors go with it
+      setCaptchaToken(null);
+      setCaptchaInitError(false);
       setForm({
         currentPassword: "",
         newPassword: "",
@@ -79,11 +96,15 @@ export function useChangePasswordFlow() {
                 : undefined;
     }
     if (step === "OTP") {
-      return !form.resetCode
-        ? "Please enter the reset code."
-        : Object.keys(errors).length
-          ? MESSAGES.FORM_HAS_ERRORS
-          : undefined;
+      return captchaInitError
+        ? MESSAGES.ERROR_CAPTCHA_BLOCKED
+        : !captchaToken
+          ? MESSAGES.ERROR_CAPTCHA_FAILED
+          : !form.resetCode
+            ? "Please enter the reset code."
+            : Object.keys(errors).length
+              ? MESSAGES.FORM_HAS_ERRORS
+              : undefined;
     }
     if (step === "RESET") {
       return !form.newPassword
@@ -99,20 +120,40 @@ export function useChangePasswordFlow() {
                 : undefined;
     }
     return undefined;
-  }, [step, form, passwordIsStrong, errors]);
+  }, [step, form, passwordIsStrong, errors, captchaInitError, captchaToken]);
 
   // --- API FUNCTIONS ---
   const handleForgotPassword = async (resend: boolean) => {
+    if (captchaInitError) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_BLOCKED);
+      return false;
+    }
+    if (!captchaToken) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      return false;
+    }
     clearAllErrors();
+
     try {
-      await clientPost(ROUTES.auth.startPasswordReset, { email });
+      await clientPost(ROUTES.auth.startPasswordReset, {
+        email,
+        captcha_token: captchaToken,
+      });
+      refreshCaptcha();
       setStep("OTP");
       if (resend) {
         addToast("success", "Email resent.");
       }
       return true;
     } catch (e) {
-      handleError("toast", (e as ApiErrorResponse).formattedMessage);
+      const error = e as ApiErrorResponse;
+      if (error.captchaFailed) {
+        // The widget opens its own challenge dialog, which provides a new token
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      } else {
+        refreshCaptcha();
+        handleError("toast", error.formattedMessage);
+      }
       return false;
     }
   };
@@ -171,6 +212,7 @@ export function useChangePasswordFlow() {
       });
       handleOpenChange(false);
       addToast("success", MESSAGES.SUCCESS_PASSWORD_CHANGED);
+      router.refresh();
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -208,6 +250,7 @@ export function useChangePasswordFlow() {
       });
       handleOpenChange(false);
       addToast("success", MESSAGES.SUCCESS_PASSWORD_CHANGED);
+      router.refresh();
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -229,6 +272,11 @@ export function useChangePasswordFlow() {
     updateForm,
     invalidForm,
     errors,
+    handleError,
+    captchaKey,
+    captchaInitError,
+    setCaptchaToken,
+    setCaptchaInitError,
     criteria,
     showCriteria,
     setShowCriteria,

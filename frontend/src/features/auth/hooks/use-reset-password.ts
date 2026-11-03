@@ -38,14 +38,26 @@ export function useResetPasswordFlow() {
 
   const passwordIsStrong = Object.values(criteria).every(Boolean);
 
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
+  // Tokens are single-use, so changing the key remounts the widget for a fresh one
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const refreshCaptcha = () => {
+    setCaptchaToken(null);
+    setCaptchaKey((key) => key + 1);
+  };
+
   const invalidForm = useMemo(() => {
     switch (step) {
       case "EMAIL":
-        return !form.email || !form.email.trim()
-          ? "Please enter an email address."
-          : Object.keys(errors).length
-            ? MESSAGES.FORM_HAS_ERRORS
-            : undefined;
+        return captchaInitError
+          ? MESSAGES.ERROR_CAPTCHA_BLOCKED
+          : !form.email || !form.email.trim()
+            ? "Please enter an email address."
+            : Object.keys(errors).length
+              ? MESSAGES.FORM_HAS_ERRORS
+              : undefined;
       case "OTP":
         return !form.resetCode || !form.resetCode.trim()
           ? "Please enter the reset code."
@@ -67,7 +79,7 @@ export function useResetPasswordFlow() {
       default:
         return undefined;
     }
-  }, [step, form, passwordIsStrong, errors]);
+  }, [step, form, passwordIsStrong, errors, captchaInitError]);
 
   // API FUNCTIONS
   const handleEmailSubmit = async (resend: boolean) => {
@@ -77,9 +89,21 @@ export function useResetPasswordFlow() {
       handleError("email", MESSAGES.ERROR_EMAIL_MISSING);
       return false;
     }
+    if (captchaInitError) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_BLOCKED);
+      return false;
+    }
+    if (!captchaToken) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      return false;
+    }
 
     try {
-      await clientPost(ROUTES.auth.startPasswordReset, { email: form.email });
+      await clientPost(ROUTES.auth.startPasswordReset, {
+        email: form.email,
+        captcha_token: captchaToken,
+      });
+      refreshCaptcha();
       setStep("OTP");
       if (resend) {
         addToast("success", "Email resent.");
@@ -87,6 +111,12 @@ export function useResetPasswordFlow() {
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
+      if (error.captchaFailed) {
+        // The widget opens its own challenge dialog, which provides a new token
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+        return false;
+      }
+      refreshCaptcha();
       if (error.rateLimited) {
         handleError("rate_limit", error.formattedMessage);
       } else {
@@ -165,6 +195,11 @@ export function useResetPasswordFlow() {
     updateForm,
     invalidForm,
     errors,
+    handleError,
+    captchaKey,
+    captchaInitError,
+    setCaptchaToken,
+    setCaptchaInitError,
     criteria,
     showCriteria,
     setShowCriteria,

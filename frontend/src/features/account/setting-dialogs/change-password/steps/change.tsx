@@ -69,9 +69,10 @@ export default function ChangeStep({ flow }: ChangePasswordStepProps) {
         <button
           type="button"
           onClick={() => flow.handleForgotPassword(false)}
-          className="cursor-pointer border-none bg-transparent p-0"
+          disabled={flow.captchaInitError}
+          className="cursor-pointer border-none bg-transparent p-0 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <LinkText>Forgot password?</LinkText>
+          <LinkText disabled={flow.captchaInitError}>Forgot password?</LinkText>
         </button>
       </div>
     </div>

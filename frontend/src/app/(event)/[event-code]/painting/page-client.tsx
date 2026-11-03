@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { parseISO } from "date-fns";
+import { Columns3Icon, GlobeIcon } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
+import Captcha from "@/components/captcha";
 import Checkbox from "@/components/checkbox";
 import MobileFooterIsland from "@/components/mobile-footer-island";
 import TextInputField from "@/components/text-input-field";
@@ -13,9 +15,12 @@ import { EventRange } from "@/core/event/types";
 import ActionButton from "@/features/button/components/action";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import { validateAvailabilityData } from "@/features/event/availability/validate-data";
+import GridPageDaysSelector from "@/features/event/components/selectors/grid-page-days";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
-import { ScheduleGrid } from "@/features/event/grid";
-import { GRID_ID_SELECTOR } from "@/features/event/grid/lib/constants";
+import CalendarGrid from "@/features/event/grid/calendar/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/constants";
+import DateTimeGrid from "@/features/event/grid/date-time/grid";
+import useGridPageDays from "@/features/event/grid/date-time/lib/use-page-days";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import {
   ConfirmationDialog,
@@ -29,7 +34,11 @@ import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { SelfAvailability } from "@/lib/utils/api/types";
-import { timeslotToISOString } from "@/lib/utils/date-time-format";
+import { cn } from "@/lib/utils/classname";
+import {
+  getDatesFromTimeslots,
+  timeslotToISOString,
+} from "@/lib/utils/date-time-format";
 import type { Session } from "@/lib/utils/get-session";
 
 export default function ClientPage({
@@ -47,23 +56,38 @@ export default function ClientPage({
   timeslots: Date[];
   initialData: SelfAvailability | null;
 }) {
+  const Grid = eventRange.type === "calendar" ? CalendarGrid : DateTimeGrid;
+
   const doViewTransition = useViewTransition();
 
   // AVAILABILITY STATE
   const { state, setDisplayName, setTimeZone, toggleSlot } = useAvailability(
     initialData,
     eventRange.type,
+    eventRange.timezone,
   );
   const { displayName, timeZone, userAvailability } = state;
+
+  // GRID PAGE DAYS
+  const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
+    useGridPageDays();
+  const showGridPageDaysSelector = useMemo(
+    () =>
+      getDatesFromTimeslots(timeslots, timeZone, eventRange.type).size >
+      Math.min(...gridPageDaysOptions),
+    [timeslots, timeZone, eventRange.type, gridPageDaysOptions],
+  );
+
+  // CAPTCHA STATES
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
   // VISITED LAST PAGE STATE
-  const [maxVisitedPage, setMaxVisitedPage] = useState(0);
-  const [numPages, setNumPages] = useState(1);
-  const visitedLastPage = maxVisitedPage >= numPages - 1;
+  const [visitedLastPage, setVisitedLastPage] = useState(false);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const dialogResolver = useRef<((confirmed: boolean) => void) | null>(null);
 
@@ -95,16 +119,20 @@ export default function ClientPage({
     const hasName = displayName && displayName.trim();
     const hasAvailability = userAvailability && userAvailability.size > 0;
 
-    return !hasName
-      ? !hasAvailability
-        ? "Please fill out your name and availability."
-        : "Please fill out your name."
-      : Object.keys(errors).length
-        ? MESSAGES.FORM_HAS_ERRORS
-        : !hasAvailability
-          ? "Please select your availability on the grid."
-          : undefined;
-  }, [displayName, userAvailability, errors]);
+    return captchaInitError
+      ? MESSAGES.ERROR_CAPTCHA_BLOCKED
+      : !captchaToken
+        ? MESSAGES.ERROR_CAPTCHA_FAILED
+        : !hasName
+          ? !hasAvailability
+            ? "Please fill out your name and availability."
+            : "Please fill out your name."
+          : Object.keys(errors).length
+            ? MESSAGES.FORM_HAS_ERRORS
+            : !hasAvailability
+              ? "Please select your availability on the grid."
+              : undefined;
+  }, [captchaInitError, displayName, userAvailability, errors, captchaToken]);
 
   const checkNameAvailability = useDebouncedCallback(async (displayName) => {
     try {
@@ -189,6 +217,11 @@ export default function ClientPage({
       }
     }
 
+    if (!captchaToken) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      return false;
+    }
+
     // Save the default name if checkbox checked
     if (saveDefaultName) {
       if (session.isLoggedIn) {
@@ -208,16 +241,28 @@ export default function ClientPage({
       }
     }
 
+    console.log(userAvailability);
+
     const payload_availability = Array.from(userAvailability).map((iso) => {
+      if (eventRange.type === "calendar") {
+        return iso;
+      }
       const date = parseISO(iso);
-      return timeslotToISOString(date, timeZone, eventRange.type);
+      if (eventRange.type === "weekday") {
+        return timeslotToISOString(date, eventRange.timezone, eventRange.type);
+      } else {
+        return timeslotToISOString(date, timeZone, eventRange.type);
+      }
     });
+
+    console.log(payload_availability);
 
     const payload = {
       event_code: eventCode,
       display_name: displayName,
       availability: payload_availability,
       time_zone: timeZone,
+      captcha_token: captchaToken,
     };
 
     try {
@@ -231,6 +276,8 @@ export default function ClientPage({
           "rate_limit",
           error.formattedMessage || MESSAGES.ERROR_RATE_LIMIT,
         );
+      } else if (error.captchaFailed) {
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       } else {
         addToast("error", error.formattedMessage);
       }
@@ -257,10 +304,46 @@ export default function ClientPage({
       }
       tooltip={desktop && invalidForm ? invalidForm : undefined}
       onClick={handleSubmitAvailability}
-      disabled={desktop && !!invalidForm}
+      disabled={(desktop && !!invalidForm) || captchaInitError}
       loadOnSuccess
     />
   );
+
+  const displaySettings = (desktop: boolean) =>
+    eventRange.type !== "calendar" && (
+      <div
+        className={cn(
+          "bg-panel flex-col gap-2 rounded-3xl p-6 text-sm",
+          desktop ? "hidden md:flex" : "flex md:hidden",
+        )}
+      >
+        {showGridPageDaysSelector && (
+          <div>
+            <div className="flex items-center gap-1">
+              <Columns3Icon className="h-3.5 w-3.5" />
+              <p>Days per page</p>
+            </div>
+            <GridPageDaysSelector
+              id={"grid-page-days-selector-" + (desktop ? "desktop" : "mobile")}
+              value={gridPageDays}
+              options={gridPageDaysOptions}
+              onChange={setGridPageDays}
+            />
+          </div>
+        )}
+        <div>
+          <div className="flex items-center gap-1">
+            <GlobeIcon className="h-3.5 w-3.5" />
+            Displaying event in
+          </div>
+          <TimeZoneSelector
+            id={"timezone-select-" + (desktop ? "desktop" : "mobile")}
+            value={timeZone}
+            onChange={setTimeZone}
+          />
+        </div>
+      </div>
+    );
 
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
@@ -270,6 +353,14 @@ export default function ClientPage({
       {errors.rate_limit && (
         <RateLimitBanner>{errors.rate_limit}</RateLimitBanner>
       )}
+
+      {/* CAPTCHA + Error */}
+      <Captcha
+        backendVerificationFailed={!!errors.captcha}
+        onTokenChange={setCaptchaToken}
+        onClearBackendError={() => handleError("captcha", "")}
+        onInitError={() => setCaptchaInitError(true)}
+      />
 
       {/* Header and Button Row */}
       <div className="flex w-full flex-wrap justify-between md:flex-row">
@@ -293,40 +384,27 @@ export default function ClientPage({
             setSaveDefaultName={setSaveDefaultName}
           />
 
-          <div className="bg-panel rounded-3xl p-6 text-sm">
-            Displaying event in
-            <TimeZoneSelector
-              id="timezone-select"
-              value={timeZone}
-              onChange={setTimeZone}
-            />
-          </div>
+          {displaySettings(true)}
         </div>
 
         {/* Right Panel */}
-        <ScheduleGrid
+        <Grid
           mode="paint"
-          isWeekdayEvent={eventRange.type === "weekday"}
+          eventType={eventRange.type}
           timezone={timeZone}
+          backgroundColor="background"
           onToggleSlot={toggleSlot}
           userAvailability={userAvailability}
           timeslots={timeslots}
           onPageUpdate={(index, pages) => {
-            setNumPages(pages);
-            if (index > maxVisitedPage) {
-              setMaxVisitedPage(index);
+            if (index >= pages - 1) {
+              setVisitedLastPage(true);
             }
           }}
+          pageDays={gridPageDays}
         />
 
-        <div className="bg-panel rounded-3xl p-6 text-sm md:hidden">
-          Displaying event in
-          <TimeZoneSelector
-            id="timezone-select"
-            value={timeZone}
-            onChange={setTimeZone}
-          />
-        </div>
+        {displaySettings(false)}
       </div>
 
       {/* This z-index is necessary to avoid the time column overlapping */}

@@ -1,8 +1,8 @@
-import { cloneElement, useEffect, useRef, useState } from "react";
+import { cloneElement, ReactElement, useEffect, useRef, useState } from "react";
 
 import { ChevronDownIcon } from "lucide-react";
 
-import { FloatingDrawer, StandardDrawer } from "@/features/drawer";
+import { FloatingDrawer } from "@/features/drawer";
 import { DrawerProps } from "@/features/selector/types";
 import { cn } from "@/lib/utils/classname";
 
@@ -38,7 +38,9 @@ export default function SelectorDrawer<TValue extends string | number | null>({
 
   /* SELECTED ITEM SCROLLING LOGIC */
   const selectedItemRef = useRef<HTMLButtonElement>(null);
-  const selectLabel = options.find((opt) => opt.value === value)?.label || "";
+  const selectedItem = options.find((opt) => opt.value === value);
+  const selectLabel = selectedItem?.label;
+  const selectIcon = selectedItem?.icon;
 
   useEffect(() => {
     if (open) {
@@ -53,16 +55,19 @@ export default function SelectorDrawer<TValue extends string | number | null>({
     }
   }, [open]);
 
-  const DrawerComponent = drawerNesting ? FloatingDrawer : StandardDrawer;
+  const sizedIcon = (icon: React.ReactNode) =>
+    cloneElement(icon as ReactElement<{ className: string }>, {
+      className: "h-4.5 w-4.5",
+    });
 
   return (
-    <DrawerComponent
+    <FloatingDrawer
       nested={drawerNesting}
       open={open}
       onOpenChange={handleOpenChange}
       title={dialogTitle}
       description={dialogDescription || "Select an option from the list below"}
-      contentClassName="h-1/2"
+      contentClassName="h-2/3"
       trigger={
         trigger ? (
           // Apply accessibility attributes to the trigger element
@@ -94,8 +99,12 @@ export default function SelectorDrawer<TValue extends string | number | null>({
             )}
           >
             <span
-              className={cn("text-wrap", !selectLabel && "text-foreground/60")}
+              className={cn(
+                "flex items-center gap-1.5 text-wrap",
+                !selectLabel && "text-foreground/60",
+              )}
             >
+              {selectIcon && sizedIcon(selectIcon)}
               {selectLabel || placeholder}
             </span>
             <ChevronDownIcon className="h-4 w-4 flex-shrink-0" />
@@ -125,17 +134,19 @@ export default function SelectorDrawer<TValue extends string | number | null>({
                 }
               }}
               className={cn(
+                "flex items-center justify-center gap-1.5",
                 "shrink-0 cursor-pointer rounded-2xl px-3 py-1 text-center",
                 "bg-background active:bg-accent/20",
                 isSelected && "bg-accent text-white",
-                textStart && "text-start",
+                textStart && "justify-start",
               )}
             >
+              {option.icon && sizedIcon(option.icon)}
               {option.label}
             </button>
           );
         })}
       </div>
-    </DrawerComponent>
+    </FloatingDrawer>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import Captcha from "@/components/captcha";
 import AuthPageLayout from "@/components/layout/auth-page";
 import MessagePage from "@/components/layout/message-page";
 import LinkText from "@/components/link-text";
@@ -15,6 +16,17 @@ import useCheckMobile from "@/lib/hooks/use-check-mobile";
 export default function Page() {
   const isMobile = useCheckMobile();
   const flow = useResetPasswordFlow();
+
+  // Both the submit and resend steps send an email, so both need a token
+  const captcha = (
+    <Captcha
+      key={flow.captchaKey}
+      backendVerificationFailed={!!flow.errors.captcha}
+      onTokenChange={flow.setCaptchaToken}
+      onClearBackendError={() => flow.handleError("captcha", "")}
+      onInitError={() => flow.setCaptchaInitError(true)}
+    />
+  );
 
   switch (flow.step) {
     case "EMAIL":
@@ -35,14 +47,19 @@ export default function Page() {
           ]}
           rateLimitError={flow.errors.rate_limit}
         >
-          <div className="flex justify-end">
-            <ActionButton
-              buttonStyle="primary"
-              label="Submit"
-              tooltip={flow.invalidForm}
-              disabled={!isMobile && !!flow.invalidForm}
-              onClick={() => flow.handleEmailSubmit(false)}
-            />
+          <div className="space-y-4">
+            {captcha}
+            <div className="flex justify-end">
+              <ActionButton
+                buttonStyle="primary"
+                label="Submit"
+                tooltip={flow.invalidForm}
+                disabled={
+                  (!isMobile && !!flow.invalidForm) || flow.captchaInitError
+                }
+                onClick={() => flow.handleEmailSubmit(false)}
+              />
+            </div>
           </div>
           <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
             <Link href="/login">
@@ -77,6 +94,7 @@ export default function Page() {
               />,
             ]}
           >
+            {captcha}
             <OTPModule
               value={flow.form.resetCode}
               onValueChange={(val) => flow.updateForm("resetCode", val)}

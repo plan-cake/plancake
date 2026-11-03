@@ -1,0 +1,33 @@
+import { useEventContext } from "@/core/event/context";
+import { EventType } from "@/core/event/types";
+import Selector from "@/features/selector/components/selector";
+
+type EventTypeSelectProps = {
+  id: string;
+  disabled?: boolean;
+};
+
+export default function EventTypeSelect({
+  id,
+  disabled = false,
+}: EventTypeSelectProps) {
+  const { state, setEventType } = useEventContext();
+  const rangeType = state.eventRange?.type || "specific";
+
+  return (
+    <Selector
+      id={id}
+      options={[
+        { label: "Dates & Times", value: "specific" },
+        { label: "Weekdays & Times", value: "weekday" },
+        { label: "Dates Only", value: "calendar" },
+      ]}
+      dialogTitle="Select Event Type"
+      dialogDescription="Select a type from the list"
+      value={rangeType}
+      disabled={disabled}
+      onChange={(value: EventType) => setEventType(value)}
+      className="w-fit min-w-[100px] border-none"
+    />
+  );
+}

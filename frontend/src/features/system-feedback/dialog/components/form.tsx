@@ -88,8 +88,8 @@ export default function FormDialog({
             type="submit"
             buttonStyle={config.buttonStyle}
             label={submitLabel}
-            tooltip={submitTooltip}
             disabled={submitDisabled}
+            tooltip={submitTooltip}
           />
         </div>
       </form>

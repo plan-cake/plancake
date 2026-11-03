@@ -14,6 +14,11 @@ export function useRegisterFlow() {
   const { addToast } = useToast();
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
+  // CAPTCHA STATES
+  // Only the forgot password flow needs a token, since it sends an email
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaInitError, setCaptchaInitError] = useState(false);
+
   const [step, setStep] = useState<RegisterStep>("REGISTRATION");
 
   const [form, setForm] = useState({
@@ -41,17 +46,21 @@ export function useRegisterFlow() {
   const invalidForm = useMemo(() => {
     switch (step) {
       case "REGISTRATION":
-        return !form.email || !form.email.trim() || !form.password
-          ? MESSAGES.FORM_NOT_FILLED
-          : !passwordIsStrong
-            ? MESSAGES.ERROR_PASSWORD_WEAK
-            : !form.confirmPassword
+        return captchaInitError
+          ? MESSAGES.ERROR_CAPTCHA_BLOCKED
+          : !captchaToken
+            ? MESSAGES.ERROR_CAPTCHA_FAILED
+            : !form.email || !form.email.trim() || !form.password
               ? MESSAGES.FORM_NOT_FILLED
-              : form.password !== form.confirmPassword
-                ? MESSAGES.ERROR_PASSWORD_MISMATCH
-                : Object.keys(errors).length
-                  ? MESSAGES.FORM_HAS_ERRORS
-                  : undefined;
+              : !passwordIsStrong
+                ? MESSAGES.ERROR_PASSWORD_WEAK
+                : !form.confirmPassword
+                  ? MESSAGES.FORM_NOT_FILLED
+                  : form.password !== form.confirmPassword
+                    ? MESSAGES.ERROR_PASSWORD_MISMATCH
+                    : Object.keys(errors).length
+                      ? MESSAGES.FORM_HAS_ERRORS
+                      : undefined;
       case "OTP":
         return !form.verificationCode || !form.verificationCode.trim()
           ? "Please enter the verification code."
@@ -61,11 +70,20 @@ export function useRegisterFlow() {
       default:
         return undefined;
     }
-  }, [step, form, passwordIsStrong, errors]);
+  }, [step, form, passwordIsStrong, errors, captchaInitError, captchaToken]);
 
   // API FUNCTIONS
   const handleRegister = async () => {
     clearAllErrors();
+
+    if (captchaInitError) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_BLOCKED);
+      return false;
+    }
+    if (!captchaToken) {
+      handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+      return false;
+    }
 
     if (!form.email || !form.email.trim()) {
       handleError("email", MESSAGES.ERROR_EMAIL_MISSING);
@@ -88,6 +106,7 @@ export function useRegisterFlow() {
       await clientPost(ROUTES.auth.register, {
         email: form.email,
         password: form.password,
+        captcha_token: captchaToken,
       });
       setStep("OTP");
       return true;
@@ -95,6 +114,8 @@ export function useRegisterFlow() {
       const error = e as ApiErrorResponse;
       if (error.rateLimited) {
         handleError("rate_limit", error.formattedMessage);
+      } else if (error.captchaFailed) {
+        handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       } else {
         handleError("toast", error.formattedMessage);
       }
@@ -150,6 +171,10 @@ export function useRegisterFlow() {
     updateForm,
     invalidForm,
     errors,
+    handleError,
+    captchaInitError,
+    setCaptchaToken,
+    setCaptchaInitError,
     criteria,
     showCriteria,
     setShowCriteria,

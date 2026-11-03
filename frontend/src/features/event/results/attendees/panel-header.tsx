@@ -1,7 +1,13 @@
 import { Key, useRef } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckIcon, DoorOpenIcon, EraserIcon, Undo2Icon } from "lucide-react";
+import {
+  CheckIcon,
+  DoorOpenIcon,
+  EraserIcon,
+  Undo2Icon,
+  UsersIcon,
+} from "lucide-react";
 
 import ActionButton from "@/features/button/components/action";
 import { useResultsContext } from "@/features/event/results/context";
@@ -53,14 +59,9 @@ export default function PanelHeader({
   const formatHoveredSlot = () => {
     const date = new Date(hoveredSlot!);
 
-    return eventType === "weekday"
-      ? date.toLocaleString(undefined, {
-          weekday: "long",
-          hour: "numeric",
-          minute: "numeric",
-          timeZone: timezone,
-        })
-      : date.toLocaleString(undefined, {
+    switch (eventType) {
+      case "specific":
+        return date.toLocaleString(undefined, {
           weekday: "short",
           month: "short",
           day: "numeric",
@@ -68,51 +69,69 @@ export default function PanelHeader({
           minute: "numeric",
           timeZone: timezone,
         });
+      case "weekday":
+        return date.toLocaleString(undefined, {
+          weekday: "long",
+          hour: "numeric",
+          minute: "numeric",
+          timeZone: timezone,
+        });
+      case "calendar":
+        return date.toLocaleDateString(undefined, {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          timeZone: "UTC",
+        });
+    }
   };
 
   const headerContent = () => {
     return (
-      <TransitioningText motionStateKey={String(totalParticipants === 0)}>
-        {totalParticipants === 0 ? (
-          "No Attendees Yet"
-        ) : isRemoving ? (
-          "Removing attendees"
-        ) : activeCount === null ? (
-          hasSelection ? (
-            <span>
-              <TransitioningText motionStateKey={totalParticipants}>
-                {selectedParticipants.length}
-              </TransitioningText>
-              <span className="whitespace-pre"> Attendee</span>
-              <TransitioningText motionStateKey={totalParticipants}>
-                {selectedParticipants.length !== 1 ? "s" : ""}
-              </TransitioningText>
-              <span className="whitespace-pre"> Selected</span>
-            </span>
+      <div className="flex items-center gap-1.5">
+        {!isRemoving && <UsersIcon className="h-4 w-4" strokeWidth={2} />}
+        <TransitioningText motionStateKey={String(totalParticipants === 0)}>
+          {totalParticipants === 0 ? (
+            "No Attendees Yet"
+          ) : isRemoving ? (
+            "Removing attendees"
+          ) : activeCount === null ? (
+            hasSelection ? (
+              <span>
+                <TransitioningText motionStateKey={totalParticipants}>
+                  {selectedParticipants.length}
+                </TransitioningText>
+                <span className="whitespace-pre"> Attendee</span>
+                <TransitioningText motionStateKey={totalParticipants}>
+                  {selectedParticipants.length !== 1 ? "s" : ""}
+                </TransitioningText>
+                <span className="whitespace-pre"> Selected</span>
+              </span>
+            ) : (
+              <span>
+                <TransitioningText motionStateKey={totalParticipants}>
+                  {totalParticipants}
+                </TransitioningText>
+                <span className="whitespace-pre"> Attendee</span>
+                <TransitioningText motionStateKey={totalParticipants}>
+                  {totalParticipants !== 1 ? "s" : ""}
+                </TransitioningText>
+              </span>
+            )
           ) : (
             <span>
               <TransitioningText motionStateKey={totalParticipants}>
-                {totalParticipants}
+                {activeCount}
               </TransitioningText>
-              <span className="whitespace-pre"> Attendee</span>
+              <span>/</span>
               <TransitioningText motionStateKey={totalParticipants}>
-                {totalParticipants !== 1 ? "s" : ""}
+                {gridNumParticipants}
               </TransitioningText>
+              <span className="whitespace-pre"> Available</span>
             </span>
-          )
-        ) : (
-          <span>
-            <TransitioningText motionStateKey={totalParticipants}>
-              {activeCount}
-            </TransitioningText>
-            <span>/</span>
-            <TransitioningText motionStateKey={totalParticipants}>
-              {gridNumParticipants}
-            </TransitioningText>
-            <span className="whitespace-pre"> Available</span>
-          </span>
-        )}
-      </TransitioningText>
+          )}
+        </TransitioningText>
+      </div>
     );
   };
 

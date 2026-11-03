@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import Captcha from "@/components/captcha";
 import AuthPageLayout from "@/components/layout/auth-page";
 import MessagePage from "@/components/layout/message-page";
 import LinkText from "@/components/link-text";
@@ -70,24 +71,34 @@ export default function Page() {
             />,
           ]}
         >
-          <div className="flex w-full justify-end">
-            <ActionButton
-              buttonStyle="primary"
-              label="Register"
-              tooltip={flow.invalidForm}
-              onClick={flow.handleRegister}
-              disabled={!isMobile && !!flow.invalidForm}
+          <div className="flex flex-col gap-4">
+            <Captcha
+              backendVerificationFailed={!!flow.errors.captcha}
+              onTokenChange={flow.setCaptchaToken}
+              onClearBackendError={() => flow.handleError("captcha", "")}
+              onInitError={() => flow.setCaptchaInitError(true)}
             />
-          </div>
-          <div className="border-foreground/50 mt-4 flex justify-between border-t pt-2 text-xs">
-            <Link href="/forgot-password">
-              <LinkText>Forgot password?</LinkText>
-            </Link>
-            <div>
-              Already have an account?{" "}
-              <Link href="/login">
-                <LinkText>Login!</LinkText>
+            <div className="flex w-full justify-end">
+              <ActionButton
+                buttonStyle="primary"
+                label="Register"
+                tooltip={flow.invalidForm}
+                onClick={flow.handleRegister}
+                disabled={
+                  (!isMobile && !!flow.invalidForm) || flow.captchaInitError
+                }
+              />
+            </div>
+            <div className="border-foreground/50 flex justify-between border-t pt-2 text-xs">
+              <Link href="/forgot-password">
+                <LinkText>Forgot password?</LinkText>
               </Link>
+              <div>
+                Already have an account?{" "}
+                <Link href="/login">
+                  <LinkText>Login!</LinkText>
+                </Link>
+              </div>
             </div>
           </div>
         </AuthPageLayout>

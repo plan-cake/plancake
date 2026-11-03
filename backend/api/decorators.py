@@ -2,6 +2,7 @@ import functools
 import logging
 import uuid
 
+import requests
 from django.db import DatabaseError, transaction
 from rest_framework import serializers
 from rest_framework.decorators import api_view
@@ -11,7 +12,8 @@ from rest_framework.response import Response
 from api.models import UserAccount, UserSession
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
-    GENERIC_ERR_RESPONSE,
+    CF_TURNSTILE_SECRET_KEY,
+    CF_TURNSTILE_VERIFY_URL,
     GUEST_COOKIE_NAME,
     ThrottleScopes,
 )
@@ -19,6 +21,8 @@ from api.utils import (
     RateLimitError,
     check_rate_limit,
     delete_session_cookie,
+    generic_error_response,
+    get_client_ip_address,
     get_metadata,
     get_session,
     set_session_cookie,
@@ -47,10 +51,10 @@ def api_endpoint(method):
                 return e.response
             except DatabaseError as e:
                 logger.db_error(e)
-                return GENERIC_ERR_RESPONSE
+                return generic_error_response()
             except Exception as e:
                 logger.error(e)
-                return GENERIC_ERR_RESPONSE
+                return generic_error_response()
 
         drf_view = api_view([method])(wrapper)
         metadata = get_metadata(func)
@@ -487,7 +491,7 @@ def validate_output(serializer_class):
                         return response
                     else:
                         logger.error("Output validation failed: %s", serializer.errors)
-                        return GENERIC_ERR_RESPONSE
+                        return generic_error_response()
                 else:
                     validate_error_format(
                         response.data, get_metadata(wrapper).input_serializer_class
@@ -497,7 +501,7 @@ def validate_output(serializer_class):
                     return response
             else:
                 logger.critical("Response is not a valid Response object.")
-                return GENERIC_ERR_RESPONSE
+                return generic_error_response()
 
         get_metadata(wrapper).output_serializer_class = serializer_class
         return wrapper
@@ -517,3 +521,49 @@ def sse_endpoint(method):
         return func
 
     return decorator
+
+
+def require_captcha(func):
+    """
+    A decorator to check if the request has a valid Cloudflare Turnstile token.
+
+    If the token is invalid, an error response will be returned.
+    """
+
+    @functools.wraps(func)
+    def wrapper(request, *args, **kwargs):
+        client_token = (
+            request.data.get("captcha_token")
+            if isinstance(request.data, dict)
+            else None
+        )
+        if not client_token:
+            return Response(
+                {"error": {"general": ["CAPTCHA token is required."]}}, status=400
+            )
+
+        # Assemble payload, including client IP if possible for extra security
+        payload = {
+            "secret": CF_TURNSTILE_SECRET_KEY,
+            "response": client_token,
+        }
+        if client_ip := get_client_ip_address(request):
+            payload["remoteip"] = client_ip
+
+        try:
+            # Verify the token with Cloudflare Turnstile
+            response = requests.post(CF_TURNSTILE_VERIFY_URL, data=payload, timeout=5)
+            response.raise_for_status()
+            result = response.json()
+            if not result.get("success"):
+                return Response(
+                    {"error": {"general": ["CAPTCHA verification failed."]}}, status=400
+                )
+        except Exception as e:
+            logger.warning("CAPTCHA verification had a problem: %s", e)
+            return generic_error_response()
+
+        return func(request, *args, **kwargs)
+
+    get_metadata(wrapper).captcha_required = True
+    return wrapper
