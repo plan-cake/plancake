@@ -96,15 +96,11 @@ export function useChangePasswordFlow() {
                 : undefined;
     }
     if (step === "OTP") {
-      return captchaInitError
-        ? MESSAGES.ERROR_CAPTCHA_BLOCKED
-        : !captchaToken
-          ? MESSAGES.ERROR_CAPTCHA_FAILED
-          : !form.resetCode
-            ? "Please enter the reset code."
-            : Object.keys(errors).length
-              ? MESSAGES.FORM_HAS_ERRORS
-              : undefined;
+      return !form.resetCode
+        ? "Please enter the reset code."
+        : Object.keys(errors).length
+          ? MESSAGES.FORM_HAS_ERRORS
+          : undefined;
     }
     if (step === "RESET") {
       return !form.newPassword
@@ -120,7 +116,7 @@ export function useChangePasswordFlow() {
                 : undefined;
     }
     return undefined;
-  }, [step, form, passwordIsStrong, errors, captchaInitError, captchaToken]);
+  }, [step, form, passwordIsStrong, errors]);
 
   // --- API FUNCTIONS ---
   const handleForgotPassword = async (resend: boolean) => {
