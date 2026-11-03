@@ -67,7 +67,7 @@ export type EventEditData = {
   event_code: string;
 }
 
-type ApiEventType = "Date" | "Week";
+export type ApiEventType = "Date" | "Week" | "Calendar";
 
 export type EventDetails = {
   title: string;
@@ -75,8 +75,7 @@ export type EventDetails = {
   time_zone: string;
   is_creator: boolean;
   event_type: ApiEventType;
-  start_date: string;
-  end_date: string;
+  dates: string[];
   start_time: string;
   end_time: string;
 }
@@ -116,8 +115,7 @@ export type AllAvailability = {
 export type DashboardEvent = {
   title: string;
   event_type: ApiEventType;
-  start_date: string;
-  end_date: string;
+  dates: string[];
   start_time: string;
   end_time: string;
   time_zone: string;
@@ -136,17 +134,35 @@ export type DisplayName = {
 
 export type ActiveSession = {
   public_id: string;
-  device_type: string | null;
+  device_type:
+    | "desktop"
+    | "smartphone"
+    | "tablet"
+    | "feature phone"
+    | "console"
+    | "tv"
+    | "car browser"
+    | "smart display"
+    | "camera"
+    | "portable media player"
+    | "phablet"
+    | "smart speaker"
+    | "wearable"
+    | "peripheral"
+    | ""
+    | null;
   os_name: string | null;
   os_version: string | null;
   client_name: string | null;
   client_version: string | null;
+  created_at: string;
   last_used: string;
   is_current: boolean;
 }
 
 export type ActiveSessionList = {
-  sessions: ActiveSession[];
+  current_session: ActiveSession;
+  other_sessions: ActiveSession[];
 }
 
 export type SessionId = {

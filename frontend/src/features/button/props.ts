@@ -134,6 +134,10 @@ export type BaseButtonProps = {
    */
   hotkey?: HotkeyOptions;
   /**
+   * If `true`, the button will expand to fill the width of its container.
+   */
+  fullWidth?: boolean;
+  /**
    * Additional className to apply to the button, for further customization.
    */
   className?: string;
@@ -158,6 +162,8 @@ type CommonButtonProps = {
   disabled?: boolean;
   /** @inheritdoc BaseButtonProps */
   hotkey?: HotkeyOptions;
+  /** @inheritdoc BaseButtonProps */
+  fullWidth?: boolean;
   /** @inheritdoc BaseButtonProps */
   className?: string;
 };

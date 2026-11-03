@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,6 +11,7 @@ import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
 import ActionButton from "@/features/button/components/action";
 import { DONT_SHOW_AGAIN_KEY } from "@/features/guest-import/constants";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -23,12 +24,22 @@ export default function Page() {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
+  const isMobile = useCheckMobile();
 
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
 
   // TOASTS AND ERROR STATES
   const { errors, handleError, clearAllErrors } = useFormErrors();
+
+  // CHECK FIELDS
+  const invalidForm = useMemo(() => {
+    return !email || !email.trim() || !password
+      ? MESSAGES.FORM_NOT_FILLED
+      : Object.keys(errors).length
+        ? MESSAGES.FORM_HAS_ERRORS
+        : undefined;
+  }, [email, password, errors]);
 
   const handleEmailChange = (value: string) => {
     handleError("email", "");
@@ -133,7 +144,9 @@ export default function Page() {
         <ActionButton
           buttonStyle="primary"
           label="Login"
+          tooltip={invalidForm}
           onClick={handleSubmit}
+          disabled={!isMobile && !!invalidForm}
           loadOnSuccess
         />
       </div>

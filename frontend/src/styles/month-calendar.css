@@ -3,6 +3,17 @@
 .rdp-root {
   --rdp-accent-color: var(--calendar-accent);
   --rdp-accent-background-color: var(--calendar-accent-background);
+  --rdp-enabling-color: color-mix(
+    in srgb,
+    var(--calendar-accent) 30%,
+    transparent
+  );
+  --rdp-disabling-color: color-mix(
+    in srgb,
+    var(--calendar-accent) 40%,
+    transparent
+  );
+  --rdp-disabled-opacity: 0.4;
 }
 
 .rdp-months {
@@ -14,23 +25,17 @@
   padding-left: 12px;
 }
 
-/* DAY MODIFIERS */
-.rdp-day {
-  padding: 0 !important;
-  width: var(--rdp-day-width, 44px);
-  height: var(--rdp-day-height, 44px);
-}
-
 /* expands the hitbox of the day buttons to the entire cell and
  * lets pseudoelement (::before) handle the styling on top of the button
  */
 .rdp-day_button {
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: 0 !important;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
   border: none !important;
-  background: transparent !important;
+  background: transparent;
   position: relative;
+  opacity: 0.75;
   z-index: 0;
 }
 
@@ -45,52 +50,37 @@
   border: 1px solid transparent;
 }
 
-.rdp-focused > .rdp-day_button::before,
 .rdp-selected > .rdp-day_button::before {
-  border-color: var(--rdp-accent-color);
-  border: 2px solid var(--rdp-accent-color);
-}
-
-.rdp-range_middle > .rdp-day_button::before {
-  border: 1px solid transparent;
-}
-
-.rdp-range_start > .rdp-day_button::before,
-.rdp-range_end > .rdp-day_button::before {
-  background-color: var(--rdp-accent-color);
-}
-
-.rdp-disabled > .rdp-day_button::before {
-  border: none !important;
-}
-
-/* RANGE PREVIEW MODIFIERS */
-
-.rdp-range_preview_start,
-.rdp-range_preview_middle,
-.rdp-range_preview_end {
+  border-radius: 0;
   background-color: var(--rdp-accent-background-color);
 }
 
-.rdp-range_preview_start {
+.rdp-drag_enabling > .rdp-day_button::before {
+  border-radius: 0;
+  background-color: var(--rdp-enabling-color);
+}
+
+.rdp-drag_disabling > .rdp-day_button::before {
+  border-radius: 0;
+  background-color: var(--rdp-disabling-color);
+}
+
+.rdp-selected > .rdp-day_button {
+  opacity: 1;
+}
+
+.rdp-group_start > .rdp-day_button::before {
   border-top-left-radius: 50%;
   border-bottom-left-radius: 50%;
 }
 
-.rdp-range_preview_end {
+.rdp-group_end > .rdp-day_button::before {
   border-top-right-radius: 50%;
   border-bottom-right-radius: 50%;
 }
 
-.rdp-range_preview_start.rdp-range_preview_end {
-  border-radius: 50%;
-}
-
-.rdp-range_preview_start > .rdp-day_button::before,
-.rdp-range_preview_end > .rdp-day_button::before {
-  background-color: transparent;
-  border: 2px solid var(--rdp-accent-color);
-  border-radius: 100%;
+.rdp-disabled {
+  pointer-events: none;
 }
 
 /**
@@ -99,13 +89,11 @@
  * wrap it inside this query
  */
 @media (hover: hover) {
-  .rdp-day:hover > .rdp-day_button::before {
-    border-color: var(--rdp-accent-color);
+  .rdp-hovered:hover > .rdp-day_button::before {
+    background-color: var(--rdp-enabling-color);
   }
 
-  .rdp-button_previous:hover,
-  .rdp-button_next:hover {
-    background-color: var(--calendar-accent-background) !important;
-    border-radius: 100% !important;
+  .rdp-hovered.rdp-selected:hover > .rdp-day_button::before {
+    background-color: var(--rdp-disabling-color);
   }
 }

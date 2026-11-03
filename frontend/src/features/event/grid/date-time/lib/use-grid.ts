@@ -1,0 +1,353 @@
+import { useCallback, useMemo, useState } from "react";
+
+import { format, toZonedTime } from "date-fns-tz";
+
+import { MESSAGES } from "@/lib/messages";
+import { normalizeWeekdayTimeslot } from "@/lib/utils/date-time-format";
+
+/**
+ * This hook manages the state and logic for displaying the grid view. It
+ * processes the provided timeslots into structured timeblocks, handles
+ * pagination, and prepares the data needed for rendering the grid.
+ *
+ * For more details about each part of the data processing and returned data,
+ * please refer to the helper function below.
+ *
+ * @param timeslots - Pregenerated array of Date objects representing timeslots
+ * @param timezone - The timezone string to convert timeslots into
+ * @param daysPerPage - Number of days to display per page in the grid
+ *
+ * @returns:
+ * - direction: Direction of pagination (-1 for back, 1 for forward)
+ * - paginate: Function to change pages
+ * - error: Error message if applicable
+ * - FOR THE GRID VIEW FORMAT:
+ *    - timeBlocks: Array of processed timeblocks for the visible days
+ *    - visibleDays: Array of days to be displayed on the current page
+ *    - totalPages: Total number of pages based on daysPerPage
+ *    - currentPage: Current active page index
+ */
+export default function useDateTimeGridInfo(
+  timeslots: Date[],
+  timezone: string,
+  isWeekdayEvent: boolean,
+  daysPerPage: number,
+  onPaginate: (index: number, pages: number) => void,
+) {
+  const [[currentPage, direction], setCurrentPage] = useState([0, 0]);
+
+  const data = useMemo(
+    () => processTimeslots(timeslots, timezone, isWeekdayEvent),
+    [timeslots, timezone, isWeekdayEvent],
+  );
+
+  const view = useMemo(
+    () => organizeGridView(data, currentPage, daysPerPage),
+    [data, currentPage, daysPerPage],
+  );
+
+  const paginate = useCallback(
+    (newDirection: number) => {
+      if (
+        (newDirection < 0 && currentPage > 0) ||
+        (newDirection > 0 && currentPage < view.totalPages - 1)
+      ) {
+        setCurrentPage([currentPage + newDirection, newDirection]);
+        onPaginate(currentPage + newDirection, view.totalPages);
+      }
+    },
+    [currentPage, view.totalPages, onPaginate],
+  );
+
+  return { ...view, currentPage, direction, paginate };
+}
+
+/* HELPER FUNCTIONS */
+
+/**
+ * Processes a single timeslot into components for displaying in the grid.
+ *
+ * If the event is a weekday event, the timeslot is normalized to the reference week to
+ * ensure the grid only displays 7 days maximum.
+ *
+ * @param slot The timeslot Date object to process
+ * @param timezone The user's timezone to convert the timeslot into
+ * @param isWeekdayEvent If the event is a weekday event
+ * @returns An object containing the day key, display string, hour, and minute components
+ */
+function getSlotComponents(
+  slot: Date,
+  timezone: string,
+  isWeekdayEvent: boolean,
+) {
+  const slotInTZ = toZonedTime(slot, timezone);
+  const normalizedSlot = isWeekdayEvent
+    ? normalizeWeekdayTimeslot(slotInTZ)
+    : slotInTZ;
+
+  const [dayKey, dayDisplay, hour, minute] = format(
+    normalizedSlot,
+    "yyyy-MM-dd:EEE MMM dd:HH:mm",
+  ).split(":");
+
+  return { dayKey, dayDisplay, hour, minute };
+}
+
+/**
+ * Processes the given timeslots into structured timeblocks and converts
+ * them to the display timezone, grouped by day for easier reference from
+ * grid components.
+ *
+ * @returns:
+ * - dateBlocks: Array of dateblocks for the visible date ranges
+ * - timeblocks: Array of timeblocks with start and end hours
+ * - days: Array of unique days the timeslots span
+ * - slotsByDay: Map of day string to array of timeslots on that day
+ */
+function processTimeslots(
+  timeslots: Date[],
+  timezone: string,
+  isWeekdayEvent: boolean,
+) {
+  if (!timeslots || timeslots.length === 0) return null;
+
+  const slotsByDay = new Map<
+    string,
+    { iso: string; hour: number; minute: number }[]
+  >();
+  const days: { dayKey: string; dayDisplay: string }[] = [];
+  const seen = new Set<string>();
+
+  /* GROUP SLOTS BY DAY */
+  for (const slot of timeslots) {
+    const { dayKey, dayDisplay, hour, minute } = getSlotComponents(
+      slot,
+      timezone,
+      isWeekdayEvent,
+    );
+
+    if (!seen.has(dayKey)) {
+      seen.add(dayKey);
+      days.push({ dayKey, dayDisplay });
+      slotsByDay.set(dayKey, []);
+    }
+
+    slotsByDay.get(dayKey)?.push({
+      iso: slot.toISOString(),
+      hour: parseInt(hour, 10),
+      minute: parseInt(minute, 10),
+    });
+  }
+
+  days.sort((a, b) => (a.dayKey < b.dayKey ? -1 : 1));
+
+  /* RAW TIMEBLOCKS */
+  const start = toZonedTime(timeslots[0], timezone);
+  const end = toZonedTime(timeslots[timeslots.length - 1], timezone);
+  const startHour = start.getHours();
+  const endHour = end.getHours();
+
+  const timeBlocks = [];
+  if (endHour < startHour) {
+    timeBlocks.push({ startHour: 0, endHour: endHour });
+    timeBlocks.push({ startHour: startHour, endHour: 23 });
+  } else {
+    timeBlocks.push({ startHour: startHour, endHour: endHour });
+  }
+
+  /* DATEBLOCKS */
+  const dateBlocks = [];
+  days.sort((a, b) => (a.dayKey < b.dayKey ? -1 : 1));
+  let lastBlock: { start: number; end: number } | null = null;
+  for (let i = 0; i < days.length; i++) {
+    const day = days[i];
+    if (lastBlock) {
+      const lastDate = new Date(days[lastBlock.end].dayKey);
+      const currentDate = new Date(day.dayKey);
+      const diffDays =
+        (currentDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+
+      if (diffDays > 1) {
+        dateBlocks.push({
+          startDay: lastBlock.start,
+          endDay: lastBlock.end,
+        });
+        lastBlock = {
+          start: i,
+          end: i,
+        };
+      }
+    } else {
+      lastBlock = {
+        start: i,
+        end: i,
+      };
+    }
+
+    lastBlock.end = i;
+  }
+  if (lastBlock) {
+    dateBlocks.push({
+      startDay: lastBlock.start,
+      endDay: lastBlock.end,
+    });
+  }
+
+  return { dateBlocks, timeBlocks, days, slotsByDay };
+}
+
+/**
+ * Organizes the processed timeslot data into a view suitable for the grid,
+ * applying pagination and preparing dateblocks and timeblocks for the visible days.
+ *
+ * @returns:
+ * - dateBlocks: Array of processed dateblocks with timeblocks for the visible days
+ * - visibleDays: Array of days to be displayed on the current page
+ * - totalPages: Total number of pages based on daysPerPage
+ * - error: Error message if applicable
+ */
+function organizeGridView(
+  data: ReturnType<typeof processTimeslots>,
+  currentPage: number,
+  daysPerPage: number,
+) {
+  if (!data) {
+    return {
+      dateBlocks: [],
+      dateBlockGaps: {
+        startGap: false,
+        endGap: false,
+        middleGaps: new Set<number>(),
+      },
+      visibleDays: [],
+      totalPages: 1,
+      error: MESSAGES.ERROR_EVENT_RANGE_INVALID,
+    };
+  }
+
+  const { days, slotsByDay, dateBlocks, timeBlocks } = data;
+
+  /* PAGINATION LOGIC */
+  const totalPages = Math.max(1, Math.ceil(days.length / daysPerPage));
+  const safePage = Math.min(Math.max(0, currentPage), totalPages - 1);
+  const startIndex = safePage * daysPerPage;
+  const endIndex = startIndex + daysPerPage - 1;
+  const visibleDays = days.slice(startIndex, startIndex + daysPerPage);
+  const processedDateBlocks = [];
+  const dateBlockGaps = {
+    startGap: false,
+    endGap: false,
+    middleGaps: new Set<number>(),
+  };
+
+  const currentBlocks = dateBlocks.filter((block) => {
+    return block.startDay <= endIndex && block.endDay >= startIndex;
+  });
+
+  let runningDayCount = 0;
+  for (let i = 0; i < currentBlocks.length; i++) {
+    const block = currentBlocks[i];
+
+    const startDay = Math.max(block.startDay, startIndex);
+    const endDay = Math.min(block.endDay, endIndex);
+    const blockDays = days.slice(startDay, endDay + 1);
+    const isLastBlock = i === currentBlocks.length - 1;
+
+    /* PROCESS TIMEBLOCKS */
+    const processedTimeBlocks = timeBlocks.map((timeBlock) =>
+      processTimeblock(timeBlock, blockDays, slotsByDay),
+    );
+
+    if (!isLastBlock) {
+      runningDayCount += blockDays.length;
+      dateBlockGaps.middleGaps.add(runningDayCount - 1);
+    }
+    if (i === 0 && block.startDay === startDay && safePage > 0) {
+      dateBlockGaps.startGap = true;
+    }
+    if (isLastBlock && block.endDay === endDay && safePage < totalPages - 1) {
+      dateBlockGaps.endGap = true;
+    }
+
+    processedDateBlocks.push({
+      numDays: blockDays.length,
+      timeBlocks: processedTimeBlocks,
+    });
+  }
+
+  return {
+    dateBlocks: processedDateBlocks,
+    dateBlockGaps,
+    visibleDays,
+    totalPages,
+    error: null,
+  };
+}
+
+/**
+ * Generates the metadata for each timeslot and filters a list of timeslots
+ * that fall within the given timeblock for the specified visible days. Each
+ * timeslot is formatted to include its ISO string, grid coordinates, and base
+ * CSS classes for easier reference in the grid.
+ *
+ * @returns:
+ * - startHour: Block start hour
+ * - endHour: Block end hour
+ * - numQuarterHours: Total number of 15-minute intervals in the block
+ * - timeslots: Array of formatted timeslots within the block
+ */
+function processTimeblock(
+  block: { startHour: number; endHour: number },
+  visibleDays: { dayKey: string; dayDisplay: string }[],
+  slotsByDay: Map<string, { iso: string; hour: number; minute: number }[]>,
+) {
+  const numQuarterHours = (block.endHour - block.startHour + 1) * 4;
+  const blockSlots = visibleDays.flatMap((day, dayIndex) => {
+    const dayKey = day.dayKey;
+    const daySlots = slotsByDay.get(dayKey) || [];
+
+    return daySlots
+      .filter((slot) => {
+        const h = slot.hour;
+        return h >= block.startHour && h <= block.endHour;
+      })
+      .map((slot) => {
+        const h = slot.hour;
+        const m = slot.minute;
+        const row = (h - block.startHour) * 4 + Math.floor(m / 15) + 1;
+
+        return {
+          iso: slot.iso,
+          coords: { row, column: dayIndex + 1 },
+          cellClasses: getBaseCellClasses(row, numQuarterHours),
+        };
+      });
+  });
+
+  return {
+    ...block,
+    numQuarterHours,
+    timeslots: blockSlots,
+  };
+}
+
+/**
+ * Determines the base CSS classes for a timeslot cell based on its grid
+ * row and total number of quarter hours.
+ */
+function getBaseCellClasses(
+  gridRow: number,
+  numQuarterHours: number,
+): string[] {
+  const cellClasses: string[] = [];
+  if (gridRow < numQuarterHours) {
+    cellClasses.push("border-b");
+
+    if (gridRow % 4 === 0) {
+      cellClasses.push("border-solid border-foreground/75");
+    } else {
+      cellClasses.push("border-dashed border-foreground/75");
+    }
+  }
+  return cellClasses;
+}
