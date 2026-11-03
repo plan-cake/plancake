@@ -259,6 +259,11 @@ function DraggableDayButton({
       onTouchMove={(e) => {
         handleTouchMove(e);
       }}
+      onClick={(e) => {
+        // Pointer clicks are handled by the drag handlers on pointerup, so only trigger
+        // on keyboard activation
+        if (e.detail === 0) buttonProps.onClick?.(e);
+      }}
     />
   );
 }
