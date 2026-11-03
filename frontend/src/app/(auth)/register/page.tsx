@@ -73,6 +73,7 @@ export default function Page() {
         >
           <div className="flex flex-col gap-4">
             <Captcha
+              key={flow.captchaKey}
               backendVerificationFailed={!!flow.errors.captcha}
               onTokenChange={flow.setCaptchaToken}
               onClearBackendError={() => flow.handleError("captcha", "")}

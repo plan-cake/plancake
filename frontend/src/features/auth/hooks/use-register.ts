@@ -18,6 +18,12 @@ export function useRegisterFlow() {
   // Only the forgot password flow needs a token, since it sends an email
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [captchaInitError, setCaptchaInitError] = useState(false);
+  // Tokens are single-use, so changing the key remounts the widget for a fresh one
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const refreshCaptcha = () => {
+    setCaptchaToken(null);
+    setCaptchaKey((key) => key + 1);
+  };
 
   const [step, setStep] = useState<RegisterStep>("REGISTRATION");
 
@@ -108,15 +114,18 @@ export function useRegisterFlow() {
         password: form.password,
         captcha_token: captchaToken,
       });
+      refreshCaptcha();
       setStep("OTP");
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
       if (error.rateLimited) {
+        refreshCaptcha();
         handleError("rate_limit", error.formattedMessage);
       } else if (error.captchaFailed) {
         handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       } else {
+        refreshCaptcha();
         handleError("toast", error.formattedMessage);
       }
       return false;
@@ -172,6 +181,7 @@ export function useRegisterFlow() {
     invalidForm,
     errors,
     handleError,
+    captchaKey,
     captchaInitError,
     setCaptchaToken,
     setCaptchaInitError,
