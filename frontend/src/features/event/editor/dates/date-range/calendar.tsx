@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  createContext,
   forwardRef,
+  useContext,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -36,6 +38,19 @@ type CalendarProps = {
 export type CalendarHandle = {
   applyPreset: (days: string[]) => void;
 };
+
+type DragHandlers = {
+  handlePointerDown: (date: Date) => void;
+  handlePointerEnter: (date: Date) => void;
+  handlePointerLeave: () => void;
+  handleTouchMove: (event: React.TouchEvent<HTMLButtonElement>) => void;
+};
+
+/**
+ * Handlers are passed through context so DraggableDayButton can be a stable component, as
+ * opposed to remounting on every render where the event handlers get lost.
+ */
+const DragHandlersContext = createContext<DragHandlers | null>(null);
 
 export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
   function Calendar({ earliestDate, className, selectedDates, setDates }, ref) {
@@ -175,43 +190,42 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
 
     return (
       <div ref={containerRef} className={cn("flex flex-col gap-2", className)}>
-        <DayPicker
-          mode="multiple"
-          numberOfMonths={numberOfMonths}
-          animate
-          month={month}
-          onMonthChange={setMonth}
-          selected={selectedDatesArray}
-          onSelect={handleSelect}
-          disabled={{ before: startDate }}
-          startMonth={startDate}
-          endMonth={
-            new Date(new Date().getFullYear() + 1, new Date().getMonth())
-          }
-          // modifiers + styles
-          modifiers={modifiers}
-          modifiersClassNames={{
-            group_start: "rdp-group_start",
-            group_end: "rdp-group_end",
-            drag_enabling: "rdp-drag_enabling",
-            drag_disabling: "rdp-drag_disabling",
-            hovered: "rdp-hovered",
+        <DragHandlersContext.Provider
+          value={{
+            handlePointerDown,
+            handlePointerEnter,
+            handlePointerLeave,
+            handleTouchMove,
           }}
-          components={{
-            DayButton: (props) => (
-              <DraggableDayButton
-                {...props}
-                handlePointerDown={handlePointerDown}
-                handlePointerEnter={handlePointerEnter}
-                handlePointerLeave={handlePointerLeave}
-                handleTouchMove={handleTouchMove}
-              />
-            ),
-          }}
-          classNames={{
-            root: `${defaultClassNames.root} flex justify-center items-center select-none`,
-          }}
-        />
+        >
+          <DayPicker
+            mode="multiple"
+            numberOfMonths={numberOfMonths}
+            animate
+            month={month}
+            onMonthChange={setMonth}
+            selected={selectedDatesArray}
+            onSelect={handleSelect}
+            disabled={{ before: startDate }}
+            startMonth={startDate}
+            endMonth={
+              new Date(new Date().getFullYear() + 1, new Date().getMonth())
+            }
+            // modifiers + styles
+            modifiers={modifiers}
+            modifiersClassNames={{
+              group_start: "rdp-group_start",
+              group_end: "rdp-group_end",
+              drag_enabling: "rdp-drag_enabling",
+              drag_disabling: "rdp-drag_disabling",
+              hovered: "rdp-hovered",
+            }}
+            components={{ DayButton: DraggableDayButton }}
+            classNames={{
+              root: `${defaultClassNames.root} flex justify-center items-center select-none`,
+            }}
+          />
+        </DragHandlersContext.Provider>
       </div>
     );
   },
@@ -220,17 +234,15 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
 function DraggableDayButton({
   day,
   modifiers,
-  handlePointerDown,
-  handlePointerEnter,
-  handlePointerLeave,
-  handleTouchMove,
   ...buttonProps
-}: DayButtonProps & {
-  handlePointerDown: (date: Date) => void;
-  handlePointerEnter: (date: Date) => void;
-  handlePointerLeave: () => void;
-  handleTouchMove: (event: React.TouchEvent<HTMLButtonElement>) => void;
-}) {
+}: DayButtonProps) {
+  const {
+    handlePointerDown,
+    handlePointerEnter,
+    handlePointerLeave,
+    handleTouchMove,
+  } = useContext(DragHandlersContext)!;
+
   return (
     <DayButton
       {...buttonProps}
