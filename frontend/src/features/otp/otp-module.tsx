@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 
 import LinkText from "@/components/link-text";
 import InboxLinks from "@/features/auth/components/inbox-links";
@@ -39,6 +39,7 @@ const OTPModule = forwardRef<HTMLDivElement, OTPModuleProps>(
       EMAIL_RESEND_COOLDOWN_SEC,
     );
 
+    const isResending = useRef(false);
     useEffect(() => {
       if (resendCooldown <= 0) return;
       const timer = setTimeout(() => setResendCooldown((s) => s - 1), 1000);
@@ -82,10 +83,15 @@ const OTPModule = forwardRef<HTMLDivElement, OTPModuleProps>(
           <button
             type="button"
             onClick={async () => {
-              if (resendCooldown > 0) return;
+              if (resendCooldown > 0 || isResending.current) return;
 
-              if (await onResend()) {
-                setResendCooldown(EMAIL_RESEND_COOLDOWN_SEC);
+              isResending.current = true;
+              try {
+                if (await onResend()) {
+                  setResendCooldown(EMAIL_RESEND_COOLDOWN_SEC);
+                }
+              } finally {
+                isResending.current = false;
               }
             }}
             disabled={resendCooldown > 0}
