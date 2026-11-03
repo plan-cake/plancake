@@ -1,5 +1,5 @@
 import { differenceInCalendarMonths, format, parse, parseISO } from "date-fns";
-import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
+import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
 
 import { ALL_WEEKDAYS, EventType, Weekday } from "@/core/event/types";
 
@@ -276,9 +276,32 @@ export function formatDateSet(dates: Set<string>): string | null {
 export function getDatesFromTimeslots(
   timeslots: Date[],
   timezone: string,
+  eventType: EventType,
 ): Set<string> {
   return new Set(
-    timeslots.map((slot) => formatInTimeZone(slot, timezone, "yyyy-MM-dd")),
+    timeslots.map((slot) => {
+      const slotInTZ = toZonedTime(slot, timezone);
+      const normalizedSlot =
+        eventType === "weekday" ? normalizeWeekdayTimeslot(slotInTZ) : slotInTZ;
+      return format(normalizedSlot, "yyyy-MM-dd");
+    }),
+  );
+}
+
+/**
+ * Normalizes a timeslot to a reference week for weekday events.
+ *
+ * @param localTimeslot The timeslot to normalize, already in the user's local time zone.
+ * @returns The timeslot normalized to the week of 2012-01-01.
+ */
+export function normalizeWeekdayTimeslot(localTimeslot: Date): Date {
+  // Normalize to the reference week dates (2012-01-01 - 2012-01-07)
+  return new Date(
+    2012,
+    0,
+    localTimeslot.getDay() + 1,
+    localTimeslot.getHours(),
+    localTimeslot.getMinutes(),
   );
 }
 
