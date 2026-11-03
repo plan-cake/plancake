@@ -167,7 +167,7 @@ export function useRegisterFlow() {
       } else {
         handleError(
           "verificationCode",
-          error.data?.error.verificationCode?.[0] || error.formattedMessage,
+          error.data?.error.verification_code?.[0] || error.formattedMessage,
         );
       }
       return false;
