@@ -39,8 +39,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Runs before ESLint so the SARIF output file isn't checked
+      - name: Run Prettier
+        run: npm run check-format
+
       - name: Run ESLint
         id: eslint
+        if: success() || failure()
         run: |
           npm run lint -- \
             --format node_modules/@microsoft/eslint-formatter-sarif/sarif.js \

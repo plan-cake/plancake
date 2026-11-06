@@ -74,8 +74,13 @@ export default function HowItWorksSection() {
             messy back-and-forth.
           </p>
           <p className="text-foreground mt-2 text-sm font-semibold md:text-lg">
-            Try it out by {usesDrawer ? pointerType === "coarse" ? "tapping" : "clicking" : "hovering over"} the steps
-            below!
+            Try it out by{" "}
+            {usesDrawer
+              ? pointerType === "coarse"
+                ? "tapping"
+                : "clicking"
+              : "hovering over"}{" "}
+            the steps below!
           </p>
         </div>
       </div>
