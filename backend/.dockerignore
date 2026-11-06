@@ -1,0 +1,56 @@
+# Python Bytecode
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*$py.class
+*.so
+
+# Documentation
+*.md
+docs/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+.env/
+
+# Git and OS files
+.git/
+.DS_Store
+Thumbs.db
+
+# Environment variables (only commit template files)
+.env
+.env*.local
+.env.development
+.env.test
+.env.production
+.env.production.local
+
+# Docker configuration files (not needed inside build context)
+Dockerfile*
+.dockerignore
+compose.yaml
+compose.yml
+docker-compose*.yaml
+docker-compose*.yml
+
+# Logs and Databases
+*.db
+*.log
+db.sqlite3
+db.sqlite3-journal
+
+# Testing and Coverage
+.pytest_cache/
+.tox/
+coverage/
+htmlcov/
+.coverage
+.coverage.*
+
+# Developer Tools
+.vscode/
+.idea/
