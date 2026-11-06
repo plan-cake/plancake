@@ -9,9 +9,15 @@ import {
 } from "react";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useHotkeys } from "react-hotkeys-hook";
 
 import LoadingSpinner from "@/components/loading-spinner";
 import { BaseButtonProps, ButtonStyle } from "@/features/button/props";
+import HotkeyBadge from "@/features/system-feedback/hotkeys/components/hotkey-badge";
+import ShortcutTooltip from "@/features/system-feedback/hotkeys/components/shortcut-tooltip";
+import { SHORTCUT_MODE_SCOPE } from "@/features/system-feedback/hotkeys/constants";
+import { useShortcuts } from "@/features/system-feedback/hotkeys/context";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import { cn } from "@/lib/utils/classname";
 
@@ -36,6 +42,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       target,
       onClick,
       loadOnSuccess = false,
+      hotkey,
       fullWidth = false,
       className,
       ...props // for forwardRef
@@ -52,6 +59,8 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       throw new Error("Link Button must specify href");
     if (_buttontype === "action" && !onClick)
       throw new Error("Action Button must specify onClick");
+
+    const [tooltipOpen, setTooltipOpen] = useState(false);
 
     const [isLoading, setIsLoading] = useState(loading);
     useEffect(() => {
@@ -73,6 +82,37 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       }
     };
 
+    // Hotkey handling
+    const router = useRouter();
+    const { endShortcutMode } = useShortcuts();
+    const hotkeyHandler = () => {
+      if (hotkey?.type === "shortcut") {
+        endShortcutMode(false);
+      }
+
+      switch (_buttontype) {
+        case "action":
+        case "empty":
+          // Don't let the mouse event be passed as undefined
+          onClickHandler({} as React.MouseEvent<HTMLButtonElement>);
+          break;
+        case "link":
+          if (href) {
+            router.push(href);
+          }
+          break;
+      }
+    };
+    useHotkeys(hotkey?.keys ?? "", hotkeyHandler, {
+      preventDefault: true,
+      eventListenerOptions: { capture: true },
+      enableOnContentEditable: true,
+      enableOnFormTags: true,
+      ...hotkey?.options,
+      enabled: !!hotkey && !disabled && !isLoading,
+      scopes: hotkey?.type === "shortcut" ? [SHORTCUT_MODE_SCOPE] : undefined,
+    });
+
     const baseClasses = cn(
       "text-nowrap rounded-full font-medium flex flex-row items-center gap-1 relative",
     );
@@ -87,13 +127,14 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         ? "cursor-not-allowed"
         : "cursor-pointer";
     const buttonState = isLoading ? "loading" : disabled ? "disabled" : "rest";
-    const [styleClasses, spinnerClasses] = getStyleClasses(
-      buttonStyle,
-      !!icon,
-      !!label,
-      buttonState,
-      shrinkOnMobile,
-    );
+    const [styleClasses, spinnerClasses, [hotkeyClasses, litHotkeyClasses]] =
+      getStyleClasses(
+        buttonStyle,
+        !!icon,
+        !!label,
+        buttonState,
+        shrinkOnMobile,
+      );
     const labelClass = shrinkOnMobile ? "hidden md:block" : "";
 
     // pretty ugly, but it allows the icon to be specified without a className for DRY
@@ -103,6 +144,27 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       cloneElement(icon as ReactElement<{ className: string }>, {
         className: cn("h-6 w-6 p-0.5", loadingHideClass),
       });
+
+    const { badgeDisplay = "button", type: hotkeyType = "normal" } =
+      hotkey ?? {};
+    const hotkeyBadge = hotkey &&
+      hotkeyType === "normal" &&
+      badgeDisplay === "button" && (
+        <div className={cn("ml-1 hidden md:block", loadingHideClass)}>
+          <HotkeyBadge
+            hotkey={hotkey.keys}
+            disabled={disabled}
+            keyClassName={cn(hotkeyClasses, hotkey.baseClassName)}
+            litKeyClassName={cn(litHotkeyClasses, hotkey.litClassName)}
+          />
+        </div>
+      );
+    const shortcutTooltip =
+      hotkey && hotkeyType === "shortcut" ? (
+        <ShortcutTooltip hotkey={hotkey.keys} disabled={tooltipOpen}>
+          <div className="pointer-events-none absolute inset-0" />
+        </ShortcutTooltip>
+      ) : null;
 
     const buttonContent = (
       <div
@@ -118,11 +180,13 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         {label && (
           <span className={cn(labelClass, loadingHideClass)}>{label}</span>
         )}
+        {hotkeyBadge}
         {isLoading && (
           <LoadingSpinner
             className={cn("centered-absolute h-5 w-5", spinnerClasses)}
           />
         )}
+        {shortcutTooltip}
       </div>
     );
 
@@ -169,8 +233,30 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       );
     }
 
-    if (tooltip != null) {
-      buttonComponent = <Tooltip content={tooltip}>{buttonComponent}</Tooltip>;
+    if (tooltip != null || (hotkey && badgeDisplay === "tooltip")) {
+      let tooltipContent: React.ReactNode = tooltip;
+      if (hotkey && hotkeyType === "normal" && badgeDisplay === "tooltip") {
+        tooltipContent = (
+          <div className="flex flex-col items-center">
+            {tooltip}
+            <HotkeyBadge
+              hotkey={hotkey!.keys}
+              keyClassName="text-background border-background"
+              litKeyClassName="text-background/50 border-background/50"
+            />
+          </div>
+        );
+      }
+      buttonComponent = (
+        <Tooltip
+          content={tooltipContent}
+          onOpenChange={(open) => {
+            setTooltipOpen(open);
+          }}
+        >
+          {buttonComponent}
+        </Tooltip>
+      );
     }
 
     return buttonComponent;
@@ -190,6 +276,8 @@ function getStyleClasses(
   let paddingShrink = 0;
   let styleClasses;
   let spinnerClasses = "border-white";
+  let hotkeyClasses = "text-white border-white";
+  let litHotkeyClasses = "text-white/50 border-white/50";
   switch (style) {
     case "primary":
       switch (state) {
@@ -226,6 +314,8 @@ function getStyleClasses(
       }
       paddingShrink = 0.5;
       spinnerClasses = "border-foreground";
+      hotkeyClasses = "text-foreground border-foreground";
+      litHotkeyClasses = "text-foreground/50 border-foreground/50";
       break;
     case "frosted glass":
       switch (state) {
@@ -241,6 +331,8 @@ function getStyleClasses(
       }
       paddingShrink = 0.25;
       spinnerClasses = "border-foreground";
+      hotkeyClasses = "text-foreground border-foreground";
+      litHotkeyClasses = "text-foreground/50 border-foreground/50";
       break;
     case "frosted glass inset":
       switch (state) {
@@ -257,6 +349,8 @@ function getStyleClasses(
           break;
       }
       spinnerClasses = "border-foreground";
+      hotkeyClasses = "text-foreground border-foreground";
+      litHotkeyClasses = "text-foreground/50 border-foreground/50";
       break;
     case "bordered semi-transparent":
       switch (state) {
@@ -275,6 +369,8 @@ function getStyleClasses(
           break;
       }
       spinnerClasses = "border-accent-text";
+      hotkeyClasses = "text-accent-text border-accent-text";
+      litHotkeyClasses = "text-accent-text/50 border-accent-text/50";
       break;
     case "semi-transparent":
       switch (state) {
@@ -291,6 +387,8 @@ function getStyleClasses(
           break;
       }
       spinnerClasses = "border-accent-text";
+      hotkeyClasses = "text-accent-text border-accent-text";
+      litHotkeyClasses = "text-accent-text/50 border-accent-text/50";
       break;
     case "transparent":
       switch (state) {
@@ -306,6 +404,8 @@ function getStyleClasses(
           break;
       }
       spinnerClasses = "border-accent";
+      hotkeyClasses = "text-accent border-accent";
+      litHotkeyClasses = "text-accent/50 border-accent/50";
       break;
     case "danger":
       switch (state) {
@@ -327,6 +427,8 @@ function getStyleClasses(
             "bg-gray-200 text-[#ffffff] dark:bg-gray-300/25 dark:text-gray-300 font-bold";
           break;
       }
+      hotkeyClasses = "text-error border-error";
+      litHotkeyClasses = "text-error/50 border-error/50";
       break;
   }
   const paddingClasses = getPaddingClasses(
@@ -335,7 +437,11 @@ function getStyleClasses(
     shrinkOnMobile,
     paddingShrink,
   );
-  return [cn(styleClasses, paddingClasses), spinnerClasses];
+  return [
+    cn(styleClasses, paddingClasses),
+    spinnerClasses,
+    [hotkeyClasses, litHotkeyClasses],
+  ];
 }
 
 // I know this looks bad, but tailwind needs the full class names to be defined

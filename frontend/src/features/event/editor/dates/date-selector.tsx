@@ -18,6 +18,7 @@ import DateRangePopover from "@/features/event/editor/dates/date-range/popover";
 import WeekdayRangeDrawer from "@/features/event/editor/dates/weekday-range/drawer";
 import WeekdayRangePopover from "@/features/event/editor/dates/weekday-range/popover";
 import EventTypeSelect from "@/features/event/editor/event-type-select";
+import ShortcutTrigger from "@/features/system-feedback/hotkeys/components/shortcut-trigger";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
@@ -39,7 +40,14 @@ export default function DateRangeSelection({
           <CalendarsIcon className="h-4 w-4" strokeWidth={2} />
           Event Type
         </label>
-        <EventTypeSelect id="event-type-select" disabled={editing} />
+        <ShortcutTrigger
+          hotkey="t"
+          selector="#event-type-select"
+          tooltipSide="right"
+          disabled={editing}
+        >
+          <EventTypeSelect id="event-type-select" disabled={editing} />
+        </ShortcutTrigger>
       </div>
       <div className="flex w-fit flex-col gap-1">
         <div
@@ -55,15 +63,17 @@ export default function DateRangeSelection({
           )}
         </div>
 
-        {eventRange?.type === "weekday" ? (
-          <WeekdayPicker weekdays={(eventRange as WeekdayRange).weekdays} />
-        ) : (
-          <DatePicker
-            eventRange={eventRange}
-            editing={editing}
-            originalEventRange={originalEventRange as SpecificDateRange}
-          />
-        )}
+        <ShortcutTrigger hotkey="d" tooltipSide="right">
+          {eventRange?.type === "weekday" ? (
+            <WeekdayPicker weekdays={(eventRange as WeekdayRange).weekdays} />
+          ) : (
+            <DatePicker
+              eventRange={eventRange}
+              editing={editing}
+              originalEventRange={originalEventRange as SpecificDateRange}
+            />
+          )}
+        </ShortcutTrigger>
       </div>
     </div>
   );
