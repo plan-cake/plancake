@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import * as Toast from "@radix-ui/react-toast";
 import { XIcon } from "lucide-react";
 
 import ProgressBar from "@/features/system-feedback/toast/progress-bar";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 type BaseToastProps = {
@@ -17,6 +18,7 @@ type BaseToastProps = {
   duration?: number;
   isPersistent?: boolean;
   isPaused: boolean;
+  stackIndex: number;
 };
 
 export default function BaseToast({
@@ -30,6 +32,7 @@ export default function BaseToast({
   duration = 5000,
   isPersistent = false,
   isPaused,
+  stackIndex,
 }: BaseToastProps) {
   // Whenever the viewport hover state changes, the toast provider rerenders
   // all toasts, which means that all toast durations will get reset. In order
@@ -37,6 +40,19 @@ export default function BaseToast({
   const remainingTime = useRef(duration);
   const startTime = useRef<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // ON MOBILE ONLY, when the toast is moved to any position but the top of the stack, the
+  // duration is reset to give each toast, when in the top position, its full duration
+  const isMobile = useCheckMobile();
+  const [prevStackIndex, setPrevStackIndex] = useState(stackIndex);
+  const [resetCount, setResetCount] = useState(0);
+  useEffect(() => {
+    if (isMobile && stackIndex !== prevStackIndex) {
+      setPrevStackIndex(stackIndex);
+      remainingTime.current = duration;
+      setResetCount((prev) => prev + 1);
+    }
+  }, [isMobile, stackIndex, prevStackIndex, duration]);
 
   useEffect(() => {
     if (isPersistent || !open) return;
@@ -64,12 +80,34 @@ export default function BaseToast({
   return (
     <Toast.Root
       className={cn(
-        "rounded-4xl group relative grid max-w-sm grid-cols-[auto_1fr_auto] items-center gap-x-4 overflow-hidden px-4 py-3 shadow-xl",
-        "data-[state=closed]:animate-slideOut data-[state=open]:animate-slideIn data-[swipe=end]:animate-swipeOut data-[swipe=cancel]:translate-x-0 data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=cancel]:transition-[transform_200ms_ease-out]",
+        "rounded-4xl group overflow-hidden px-4 py-3",
+        isMobile
+          ? cn(
+              "absolute w-[calc(100%-2*var(--viewport-padding))]",
+              "transition-[transform,background-color,scale] duration-200 ease-out",
+              "origin-[center_-100%]",
+              stackIndex < 3 && "shadow-xl",
+              "data-[state=closed]:animate-toastSlideOutUp data-[state=open]:animate-toastSlideInDown",
+              "data-[swipe=end]:animate-toastSwipeOutUp data-[swipe=move]:translate-y-[var(--radix-toast-swipe-move-y)]",
+              "data-[swipe=cancel]:translate-y-0 data-[swipe=cancel]:transition-[transform_200ms_ease-out]",
+            )
+          : cn(
+              "relative shadow-xl",
+              "data-[state=closed]:animate-toastSlideOutRight data-[state=open]:animate-toastSlideInLeft",
+              "data-[swipe=end]:animate-toastSwipeOutRight data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]",
+              "data-[swipe=cancel]:translate-x-0 data-[swipe=cancel]:transition-[transform_200ms_ease-out]",
+            ),
       )}
       style={{
         backgroundColor: `var(--color-${backgroundColor})`,
         color: `var(--color-${textColor})`,
+        ...(isMobile
+          ? {
+              zIndex: 2147483647 - stackIndex,
+              scale: Math.max(0, 1 - stackIndex * 0.1),
+              backgroundColor: `color-mix(in oklab, var(--color-${backgroundColor}), var(--color-background) ${Math.min(100, stackIndex * 40)}%)`,
+            }
+          : {}),
       }}
       open={open}
       onOpenChange={onOpenChange}
@@ -77,46 +115,57 @@ export default function BaseToast({
     >
       {!isPersistent && (
         <ProgressBar
+          key={resetCount} // Resets the progress bar when the duration is reset
           duration={duration}
           backgroundColor={backgroundColor}
           isPaused={isPaused}
         />
       )}
 
-      <div className="z-10 flex items-center justify-center">{icon}</div>
+      <div
+        className={cn(
+          "flex items-center justify-between gap-4",
+          isMobile && stackIndex > 1 && "opacity-0",
+        )}
+        aria-hidden={isMobile && stackIndex > 0}
+      >
+        <div className="flex items-center gap-4">
+          <div className="z-10 flex items-center justify-center">{icon}</div>
 
-      <div className="z-10 flex flex-col gap-1">
-        <Toast.Title className="text-sm font-semibold leading-none">
-          {title}
-        </Toast.Title>
-        <Toast.Description className="text-sm leading-snug opacity-90">
-          {message}
-        </Toast.Description>
+          <div className="z-10 flex flex-col gap-1">
+            <Toast.Title className="text-sm font-semibold leading-none">
+              {title}
+            </Toast.Title>
+            <Toast.Description className="text-sm leading-snug opacity-90">
+              {message}
+            </Toast.Description>
+          </div>
+        </div>
+
+        <Toast.Close asChild>
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={() => {
+              if (
+                document.activeElement &&
+                document.activeElement instanceof HTMLElement
+              ) {
+                document.activeElement.blur();
+              }
+            }}
+            className={cn(
+              "z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full",
+              "hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-white/50",
+              !isPersistent &&
+                "opacity-0 focus-visible:opacity-100 group-hover:opacity-100",
+            )}
+            tabIndex={isMobile && stackIndex > 0 ? -1 : undefined}
+          >
+            <XIcon className="h-4 w-4" />
+          </button>
+        </Toast.Close>
       </div>
-
-      <Toast.Close asChild>
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={() => {
-            if (
-              document.activeElement &&
-              document.activeElement instanceof HTMLElement
-            ) {
-              document.activeElement.blur();
-            }
-          }}
-          className={cn(
-            "z-10 col-start-3 row-span-2 flex h-6 w-6",
-            "cursor-pointer items-center justify-center rounded-full",
-            "hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-white/50",
-            !isPersistent &&
-              "opacity-0 focus-visible:opacity-100 group-hover:opacity-100",
-          )}
-        >
-          <XIcon className="h-4 w-4" />
-        </button>
-      </Toast.Close>
     </Toast.Root>
   );
 }

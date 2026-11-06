@@ -56,7 +56,6 @@ export default function ChangePasswordDialog() {
   return (
     <FormDialog
       type="info"
-      asNestedDrawer={isMobile}
       title={dialogTitle}
       description={dialogDescriptionText}
       submitLabel={submitLabel}
@@ -64,6 +63,8 @@ export default function ChangePasswordDialog() {
       open={flow.open}
       onOpenChange={flow.handleOpenChange}
       onSubmit={onConfirmHandler}
+      submitTooltip={flow.invalidForm}
+      submitDisabled={!isMobile && !!flow.invalidForm}
     >
       {dialogContent}
     </FormDialog>

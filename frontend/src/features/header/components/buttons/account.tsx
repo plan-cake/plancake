@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOutIcon, UserIcon } from "lucide-react";
+import { LogOutIcon, SettingsIcon, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import KebabMenu from "@/components/kebab-menu";
@@ -9,7 +9,7 @@ import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import ShrinkingHeaderButton from "@/features/header/components/buttons/shrinking-header";
-import { useHeaderSize } from "@/features/header/context";
+import { useHeader } from "@/features/header/context";
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
@@ -21,7 +21,7 @@ export default function AccountButton({
 }: {
   accountDetails: AccountDetails;
 }) {
-  const { activeMenu, setActiveMenu } = useHeaderSize();
+  const { activeMenu, setActiveMenu } = useHeader();
   const router = useRouter();
   const { addToast } = useToast();
 
@@ -54,6 +54,7 @@ export default function AccountButton({
   const accountSettingsButton = (
     <LinkButton
       buttonStyle="frosted glass inset"
+      icon={<SettingsIcon />}
       label="Account Settings"
       href="/settings"
     />
@@ -73,7 +74,7 @@ export default function AccountButton({
             className="relative z-10"
             buttonStyle="frosted glass inset"
             icon={<UserIcon />}
-            aria-label="Account"
+            aria-label="Account Menu"
             tooltip="Account"
           />
         }

@@ -2,13 +2,25 @@ import logging
 import random
 import re
 import string
-from datetime import datetime
+from calendar import monthrange
+from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 from django.db.models import Prefetch
 
-from api.models import EventDateTimeslot, EventWeekdayTimeslot, UrlCode, UserEvent
-from api.settings import MAX_EVENT_DAYS, RAND_URL_CODE_ATTEMPTS, RAND_URL_CODE_LENGTH
+from api.models import (
+    EventCalendarTimeslot,
+    EventDateTimeslot,
+    EventWeekdayTimeslot,
+    UrlCode,
+    UserEvent,
+)
+from api.settings import (
+    MAX_CALENDAR_EVENT_DAYS,
+    MAX_DATE_TIME_EVENT_DAYS,
+    RAND_URL_CODE_ATTEMPTS,
+    RAND_URL_CODE_LENGTH,
+)
 
 logger = logging.getLogger("api")
 
@@ -33,6 +45,8 @@ def check_custom_code(code):
         "api",
         "dashboard",
         "forgot-password",
+        "guest-import",
+        "legal",
         "login",
         "new-event",
         "settings",
@@ -78,9 +92,20 @@ def check_timeslot_times(timeslots):
     return True
 
 
+def get_latest_date_local(today_local: date) -> date:
+    """
+    Returns the latest date an event can include, which is the end of the same month
+    next year. This matches the range shown by the frontend date picker.
+    """
+    latest_year = today_local.year + 1
+    latest_day = monthrange(latest_year, today_local.month)[1]
+    return date(latest_year, today_local.month, latest_day)
+
+
 def validate_date_timeslots(
     timeslots: list[datetime],
-    earliest_date_local: datetime.date,
+    earliest_date_local: date,
+    today_local: date,
     user_time_zone: str,
     editing: bool = False,
 ):
@@ -92,10 +117,19 @@ def validate_date_timeslots(
     if not timeslots:
         return {"timeslots": ["At least one timeslot is required."]}
 
-    start_date = min(ts.date() for ts in timeslots)
-    end_date = max(ts.date() for ts in timeslots)
-
-    start_date_local = min(timeslots).astimezone(ZoneInfo(user_time_zone)).date()
+    user_tz = ZoneInfo(user_time_zone)
+    dates = set()
+    start_date = None
+    end_date = None
+    min_timeslot = None
+    for ts in timeslots:
+        dates.add(ts.astimezone(user_tz).date())
+        if start_date is None or ts.astimezone(user_tz).date() < start_date:
+            start_date = ts.astimezone(user_tz).date()
+        if end_date is None or ts.astimezone(user_tz).date() > end_date:
+            end_date = ts.astimezone(user_tz).date()
+        if min_timeslot is None or ts < min_timeslot:
+            min_timeslot = ts
 
     errors = {}
 
@@ -106,15 +140,17 @@ def validate_date_timeslots(
 
     # The earliest date allowed is "today" in the user's local time zone, which is why
     # this uses a time zone conversion instead of UTC
-    if start_date_local < earliest_date_local:
+    if start_date < earliest_date_local:
         if editing:
             add_error(
                 "Event cannot start earlier than today, or be moved earlier if already before today."
             )
         else:
             add_error("Event must start today or in the future.")
-    if (end_date - start_date).days > MAX_EVENT_DAYS:
-        add_error(f"Max event length is {MAX_EVENT_DAYS} days.")
+    if len(dates) > MAX_DATE_TIME_EVENT_DAYS:
+        add_error(f"Max event length is {MAX_DATE_TIME_EVENT_DAYS} days.")
+    if end_date > get_latest_date_local(today_local):
+        add_error("Event cannot end later than the end of this month next year.")
 
     if not check_timeslot_times(timeslots):
         add_error("Timeslots must be on 15-minute intervals.")
@@ -131,6 +167,49 @@ def validate_weekday_timeslots(timeslots):
     return {}
 
 
+def validate_calendar_timeslots(
+    timeslots: list[datetime],
+    earliest_date_local: date,
+    today_local: date,
+    editing: bool = False,
+):
+    if not timeslots:
+        return {"timeslots": ["At least one timeslot is required."]}
+
+    dates = set()
+    start_date = None
+    end_date = None
+    for ts in timeslots:
+        dates.add(ts.date())
+        if start_date is None or ts.date() < start_date:
+            start_date = ts.date()
+        if end_date is None or ts.date() > end_date:
+            end_date = ts.date()
+
+    errors = {}
+
+    def add_error(message):
+        if "timeslots" not in errors:
+            errors["timeslots"] = []
+        errors["timeslots"].append(message)
+
+    # The earliest date allowed is "today" in the user's local time zone, which is why
+    # this uses a time zone conversion instead of UTC
+    if start_date < earliest_date_local:
+        if editing:
+            add_error(
+                "Event cannot start earlier than today, or be moved earlier if already before today."
+            )
+        else:
+            add_error("Event must start today or in the future.")
+    if len(dates) > MAX_CALENDAR_EVENT_DAYS:
+        add_error(f"Max event length is {MAX_CALENDAR_EVENT_DAYS} days.")
+    if end_date > get_latest_date_local(today_local):
+        add_error("Event cannot end later than the end of this month next year.")
+
+    return errors
+
+
 def event_lookup_prefetch(event_code: str):
     """
     Looks up an event by its URL code.
@@ -145,6 +224,10 @@ def event_lookup_prefetch(event_code: str):
         Prefetch(
             "weekday_timeslots",
             queryset=EventWeekdayTimeslot.objects.order_by("weekday", "local_timeslot"),
+        ),
+        Prefetch(
+            "calendar_timeslots",
+            queryset=EventCalendarTimeslot.objects.order_by("date"),
         ),
     ).get(url_code__url_code__iexact=event_code)
 

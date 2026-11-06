@@ -1,13 +1,19 @@
 import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
-import { ClockIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import {
+  CalendarRangeIcon,
+  ClockIcon,
+  PencilIcon,
+  Trash2Icon,
+  UsersIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { EventType } from "@/core/event/types";
-import DashboardCopyButton from "@/features/dashboard/components/copy-button";
 import DateRangeRow from "@/features/dashboard/components/date-range-row";
 import ParticipantRow from "@/features/dashboard/components/participant-row";
+import DashboardShareButton from "@/features/dashboard/components/share-button";
 import WeekdayRow from "@/features/dashboard/components/weekday-row";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
@@ -25,8 +31,7 @@ export type DashboardEventProps = {
   participants: string[];
   startTime: string;
   endTime: string;
-  startDate: string;
-  endDate: string;
+  dates: string[];
   timezone: string;
   onDelete?: () => void;
 };
@@ -54,25 +59,68 @@ export default function DashboardEvent({
     router.push(`/${code}/edit`);
   }
 
-  // Memoized local start and end details
-  const start = useMemo(
-    () =>
-      getTimezoneDetails({
+  // Memoized local date details
+  const dateDetails = useMemo(() => {
+    // Calendar event dates aren't converted
+    if (type === "calendar") {
+      const sortedDates = [...dateTimeProps.dates].sort();
+      return {
+        startDate: sortedDates[0],
+        endDate: sortedDates[sortedDates.length - 1],
+        startTime: "",
+        endTime: "",
+        weekdays: new Set<number>(),
+      };
+    }
+
+    // Extract the dates from the start time on each day
+    // Dates and times are in the event's timezone
+    const weekdays = new Set<number>();
+    let eventStartDate = null;
+    let localStartDate = null;
+    let localEndDate = null;
+    for (const singleDate of dateTimeProps.dates) {
+      if (!eventStartDate || singleDate < eventStartDate)
+        eventStartDate = singleDate;
+
+      // Convert the single date to the local timezone from the event timezone
+      const { date, weekday } = getTimezoneDetails({
         time: dateTimeProps.startTime,
-        date: dateTimeProps.startDate,
-        fromTZ: type === "weekday" ? timezone : undefined,
-      }),
-    [dateTimeProps.startTime, dateTimeProps.startDate, timezone, type],
-  );
-  const end = useMemo(
-    () =>
-      getTimezoneDetails({
-        time: dateTimeProps.endTime,
-        date: dateTimeProps.endDate,
-        fromTZ: type === "weekday" ? timezone : undefined,
-      }),
-    [dateTimeProps.endTime, dateTimeProps.endDate, timezone, type],
-  );
+        date: singleDate,
+        fromTZ: timezone,
+        toTZ: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+      weekdays.add(weekday);
+      if (!localStartDate || date < localStartDate) localStartDate = date;
+      if (!localEndDate || date > localEndDate) localEndDate = date;
+    }
+
+    // Convert the times using the first date in the event's timezone
+    const startTime = getTimezoneDetails({
+      time: dateTimeProps.startTime,
+      date: eventStartDate!,
+      fromTZ: timezone,
+    }).time;
+    const endTime = getTimezoneDetails({
+      time: dateTimeProps.endTime,
+      date: eventStartDate!,
+      fromTZ: timezone,
+    }).time;
+
+    return {
+      startDate: localStartDate!,
+      endDate: localEndDate!,
+      startTime,
+      endTime,
+      weekdays,
+    };
+  }, [
+    type,
+    dateTimeProps.dates,
+    dateTimeProps.startTime,
+    dateTimeProps.endTime,
+    timezone,
+  ]);
 
   // Dynamic participant icon count based on event width
   const participantRowRef = useRef<HTMLDivElement>(null);
@@ -157,6 +205,8 @@ export default function DashboardEvent({
     );
   }
 
+  const timeRange = formatTimeRange(dateDetails.startTime, dateDetails.endTime);
+
   return (
     <Link
       href={`/${code}`}
@@ -168,23 +218,39 @@ export default function DashboardEvent({
     >
       {titleContent}
       <div className="text-sm opacity-50">{code}</div>
-      <div className="mb-2 mt-1">
-        {type === "specific" && (
-          <DateRangeRow startDate={start.date} endDate={end.date} />
-        )}
-        {type === "weekday" && (
-          <WeekdayRow startWeekday={start.weekday} endWeekday={end.weekday} />
-        )}
-      </div>
-      <div className="flex items-center gap-2">
-        <ClockIcon className="h-5 w-5" />
-        {formatTimeRange(start.time, end.time)}
-      </div>
-      <div className="mt-1.5 bg-inherit" ref={participantRowRef}>
-        <ParticipantRow participants={participants} numIcons={numIcons} />
+      <div className="flex flex-col gap-2 bg-inherit">
+        <div className="mt-1 flex items-center gap-2">
+          <CalendarRangeIcon className="h-5 w-5" />
+          {(type === "specific" || type === "calendar") && (
+            <DateRangeRow
+              startDate={dateDetails.startDate}
+              endDate={dateDetails.endDate}
+            />
+          )}
+          {type === "weekday" && <WeekdayRow weekdays={dateDetails.weekdays} />}
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <ClockIcon className="h-5 w-5" />
+          {type === "calendar" ? (
+            <span className="opacity-50">—</span>
+          ) : (
+            <>
+              <span>
+                {timeRange.display}
+                {timeRange.pastMidnight && <sup className=""> +1</sup>}
+              </span>
+            </>
+          )}
+        </div>
+        <div className="flex w-full items-center gap-2 bg-inherit">
+          <UsersIcon className="h-5 w-5 shrink-0" />
+          <div className="w-full bg-inherit" ref={participantRowRef}>
+            <ParticipantRow participants={participants} numIcons={numIcons} />
+          </div>
+        </div>
       </div>
       <div data-actions className="mt-2.5 flex items-center gap-2">
-        <DashboardCopyButton code={code} />
+        <DashboardShareButton title={title} code={code} />
         {myEvent && (
           <>
             <Tooltip content="Edit Event">

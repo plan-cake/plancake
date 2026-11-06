@@ -33,8 +33,10 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
       loading = false,
       disabled = false,
       href,
+      target,
       onClick,
       loadOnSuccess = false,
+      fullWidth = false,
       className,
       ...props // for forwardRef
     },
@@ -133,6 +135,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
           type={type}
           ref={ref as React.Ref<HTMLButtonElement>}
           {...props}
+          className={fullWidth ? "w-full" : undefined}
         >
           {buttonContent}
         </button>
@@ -142,8 +145,12 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         <Link
           ref={ref as React.Ref<HTMLAnchorElement>}
           {...props}
-          className={"group focus:outline-none"}
+          className={cn(
+            "group focus:outline-none",
+            fullWidth && "block w-full",
+          )}
           href={href!}
+          target={target ?? undefined}
         >
           {buttonContent}
         </Link>
@@ -154,7 +161,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
           type={type}
           ref={ref as React.Ref<HTMLButtonElement>}
           {...props}
-          className={"group focus:outline-none"}
+          className={cn("group focus:outline-none", fullWidth && "w-full")}
           onClick={onClickHandler}
         >
           {buttonContent}

@@ -1,27 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-import { PencilIcon, ShareIcon, SquarePenIcon } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Columns3Icon,
+  GlobeIcon,
+  PencilIcon,
+  ShareIcon,
+  SquarePenIcon,
+} from "lucide-react";
 
 import KebabMenu from "@/components/kebab-menu";
 import { EventInformation } from "@/core/event/types";
+import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
-import ScheduleGrid from "@/features/event/grid/grid";
+import GridPageDaysSelector from "@/features/event/components/selectors/grid-page-days";
+import TimeZoneSelector from "@/features/event/components/selectors/timezone";
+import CalendarGrid from "@/features/event/grid/calendar/grid";
+import { GRID_ID_SELECTOR } from "@/features/event/grid/constants";
+import DateTimeGrid from "@/features/event/grid/date-time/grid";
+import useGridPageDays from "@/features/event/grid/date-time/lib/use-page-days";
 import AttendeesPanel from "@/features/event/results/attendees/desktop-panel";
 import AttendeesDrawer from "@/features/event/results/attendees/mobile-drawer";
 import { getResultBanner } from "@/features/event/results/banner";
-import DisplaySettings from "@/features/event/results/components/display-settings";
+import AvailabilityFilters from "@/features/event/results/components/availability-filters";
 import {
   ResultsProvider,
   useResultsContext,
 } from "@/features/event/results/context";
 import { ResultsInformation } from "@/features/event/results/lib/types";
-import ShareMenu from "@/features/event/results/share-menu";
 import HeaderSpacer from "@/features/header/components/header-spacer";
-import BaseDialog from "@/features/system-feedback/dialog/components/base";
+import ShareMenu from "@/features/share-menu/menu";
+import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { cn } from "@/lib/utils/classname";
+import { getDatesFromTimeslots } from "@/lib/utils/date-time-format";
 
 export default function ClientPage({
   eventData,
@@ -40,6 +54,9 @@ export default function ClientPage({
 type HeaderButtonStyle = "frosted glass inset" | "secondary";
 
 function EventResults({ eventData }: { eventData: EventInformation }) {
+  const Grid =
+    eventData.eventRange.type === "calendar" ? CalendarGrid : DateTimeGrid;
+
   const {
     hoveredSlot,
     participants,
@@ -65,6 +82,16 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     setTimezone(newTZ.toString());
   };
 
+  /* GRID PAGE DAYS */
+  const { gridPageDays, gridPageDaysOptions, setGridPageDays } =
+    useGridPageDays();
+  const showGridPageDaysSelector = useMemo(
+    () =>
+      getDatesFromTimeslots(timeslots, timezone, eventData.eventRange.type)
+        .size > Math.min(...gridPageDaysOptions),
+    [timeslots, timezone, eventData.eventRange.type, gridPageDaysOptions],
+  );
+
   /* MOBILE DRAWER SPACING */
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);
   const getSpacerHeight = () => {
@@ -85,15 +112,36 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
     timeslots,
     eventRange.type === "weekday",
     currentUser !== null,
+    isCreator,
   );
+
+  const availabilityFilters = (
+    <motion.div
+      key="availability-filters"
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ type: "tween", ease: "easeInOut", duration: 0.3 }}
+      className="shrink-0 overflow-hidden"
+    >
+      <div className="bg-panel rounded-3xl p-6 text-sm">
+        <AvailabilityFilters />
+      </div>
+    </motion.div>
+  );
+
+  const doViewTransition = useViewTransition();
 
   /* BUTTONS */
   const paintingButton = (
-    <LinkButton
+    <ActionButton
       buttonStyle="primary"
       icon={<SquarePenIcon />}
       label={(currentUser ? "Edit" : "Add") + " Availability"}
-      href={`/${eventCode}/painting`}
+      onClick={() => {
+        doViewTransition(`/${eventCode}/painting`, GRID_ID_SELECTOR);
+      }}
+      loadOnSuccess
     />
   );
 
@@ -107,9 +155,9 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   );
 
   const shareButton = (
-    <BaseDialog
-      title="Share Event"
-      description="Share this event with others"
+    <ShareMenu
+      eventTitle={eventTitle}
+      eventCode={eventCode}
       trigger={
         <EmptyButton
           buttonStyle="secondary"
@@ -117,11 +165,44 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           label="Share Event"
         />
       }
-      showCloseButton
-    >
-      <ShareMenu eventTitle={eventTitle} eventCode={eventCode} />
-    </BaseDialog>
+    />
   );
+
+  const displaySettings = (desktop: boolean) =>
+    eventData.eventRange.type !== "calendar" && (
+      <div
+        className={cn(
+          "bg-panel flex-col gap-2 rounded-3xl p-6 text-sm",
+          desktop ? "hidden md:flex" : "flex md:hidden",
+        )}
+      >
+        {showGridPageDaysSelector && (
+          <div>
+            <div className="flex items-center gap-1">
+              <Columns3Icon className="h-3.5 w-3.5" />
+              <p>Days per page</p>
+            </div>
+            <GridPageDaysSelector
+              id={"grid-page-days-selector-" + (desktop ? "desktop" : "mobile")}
+              value={gridPageDays}
+              options={gridPageDaysOptions}
+              onChange={setGridPageDays}
+            />
+          </div>
+        )}
+        <div>
+          <div className="flex items-center gap-1">
+            <GlobeIcon className="h-3.5 w-3.5" />
+            Displaying event in
+          </div>
+          <TimeZoneSelector
+            id={"timezone-select-" + (desktop ? "desktop" : "mobile")}
+            value={timezone}
+            onChange={handleTZChange}
+          />
+        </div>
+      </div>
+    );
 
   return (
     <div className="flex flex-col space-y-4 pl-6 pr-6 md:h-screen">
@@ -147,23 +228,20 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       <div className="-mb-2 md:hidden">{bannerElement}</div>
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-4">
-        <ScheduleGrid
+        <Grid
           mode="view"
-          isWeekdayEvent={eventRange.type === "weekday"}
+          eventType={eventRange.type}
           timezone={timezone}
+          backgroundColor="background"
           hoveredSlot={hoveredSlot}
           setHoveredSlot={setHoveredSlot}
           availabilities={filteredAvailabilities}
           numParticipants={gridNumParticipants}
           timeslots={timeslots}
+          pageDays={gridPageDays}
         />
 
-        <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm md:hidden">
-          <DisplaySettings
-            timezone={timezone}
-            onTimezoneChange={handleTZChange}
-          />
-        </div>
+        {displaySettings(false)}
 
         {/* Mobile Spacer & Drawer */}
         <div
@@ -175,6 +253,14 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             onSnapChange={setDrawerSnap}
             eventTitle={eventTitle}
             eventCode={eventCode}
+            numParticipants={participants.length}
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed left-0 right-0 top-[100vh] w-[100vw]"
+            style={{
+              viewTransitionName: "painting-island",
+            }}
           />
         </div>
 
@@ -189,12 +275,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           {bannerElement}
           <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-y-4">
             <AttendeesPanel />
-            <div className="bg-panel shrink-0 rounded-3xl p-6 text-sm">
-              <DisplaySettings
-                timezone={timezone}
-                onTimezoneChange={handleTZChange}
-              />
-            </div>
+            <AnimatePresence initial={false}>
+              {participants.length > 1 && availabilityFilters}
+            </AnimatePresence>
+            {displaySettings(true)}
           </div>
         </div>
       </div>

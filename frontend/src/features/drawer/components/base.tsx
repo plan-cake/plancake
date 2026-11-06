@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 
 import { XIcon } from "lucide-react";
@@ -11,7 +13,7 @@ import useKeyboardHeight from "@/lib/hooks/use-keyboard-height";
 import { cn } from "@/lib/utils/classname";
 
 export default function BaseDrawer({
-  _type = "standard",
+  _type,
   open,
   onOpenChange,
   trigger,
@@ -28,6 +30,7 @@ export default function BaseDrawer({
   showOverlay = !frostedGlass && modal,
   nested = false,
   hideCloseButton = false,
+  viewTransitionName,
   ...rest
 }: DrawerProps) {
   useDrawerResize();
@@ -138,7 +141,6 @@ export default function BaseDrawer({
       <Drawer.Portal>
         {showOverlay && (
           <Drawer.Overlay
-            onClick={() => onOpenChange?.(false)}
             className={cn(
               "fixed inset-0",
               frostedGlass ? "bg-black/1" : "bg-black/30",
@@ -154,7 +156,12 @@ export default function BaseDrawer({
             _type !== "floating" && "h-[100dvh]",
             contentClassName,
           )}
-          style={{ zIndex: contentZIndex }}
+          style={{
+            zIndex: contentZIndex,
+            viewTransitionName: viewTransitionName
+              ? viewTransitionName
+              : undefined,
+          }}
         >
           <div
             className="flex w-full flex-col"
@@ -183,15 +190,21 @@ export default function BaseDrawer({
               className={cn(
                 "mx-auto flex w-full flex-col transition-[max-width,border-radius,margin,padding] duration-300",
                 isPill
-                  ? "border-foreground/10 rounded-4xl mb-4 max-h-[calc(100svh-2rem)] max-w-[calc(100%-1rem)] overflow-hidden border"
-                  : "border-foreground/10 max-w-full overflow-hidden rounded-t-[32px] border",
+                  ? "rounded-4xl max-h-[calc(100svh-2rem)] max-w-[calc(100%-1rem)] overflow-hidden"
+                  : "max-w-full overflow-hidden rounded-t-[32px]",
                 frostedGlass ? "frosted-glass" : "bg-panel",
                 (_type === "floating" || !isPill) &&
                   "max-h-full min-h-0 flex-1",
+                !showOverlay && "shadow-lg",
               )}
               style={{
                 paddingBottom:
                   keyboardOffset > 0 ? `${keyboardOffset}px` : "0px",
+                marginBottom: isPill
+                  ? _type === "morphing"
+                    ? "1rem"
+                    : nestingLevel * 8 + 8
+                  : "0px",
               }}
             >
               <div
@@ -279,6 +292,9 @@ export default function BaseDrawer({
                       : "pb-4",
                   )}
                   data-vaul-no-drag
+                  // Vaul captures the pointer on press, which stops pointerenter events
+                  // from reaching the body (e.g. drag-painting a grid with a mouse)
+                  onPointerDown={(e) => e.stopPropagation()}
                 >
                   {/* Wrap in an extra div to manage the opacity transition separately */}
                   <div
@@ -297,7 +313,7 @@ export default function BaseDrawer({
                   <div
                     onClick={(e) => e.stopPropagation()}
                     className={cn(
-                      "shrink-0 px-4 pt-2",
+                      "shrink-0 px-4 py-2",
                       isPill && _type === "morphing" && "px-3 pb-3 pt-0",
                       !frostedGlass && "bg-panel",
                     )}

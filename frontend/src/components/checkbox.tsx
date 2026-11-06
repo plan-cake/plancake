@@ -40,7 +40,7 @@ export default function Checkbox(props: CheckboxProps) {
         htmlFor={"checkbox-" + id}
         className={cn(
           "cursor-pointer select-none",
-          textSize === "sm" ? "text-sm" : "text-md",
+          textSize === "sm" ? "text-sm" : "text-base",
           checked && "text-accent",
         )}
       >

@@ -2,6 +2,7 @@
 // import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
 import {
+  DEFAULT_RANGE_CALENDAR,
   DEFAULT_RANGE_SPECIFIC,
   DEFAULT_RANGE_WEEKDAY,
 } from "@/core/event/lib/default-range";
@@ -12,11 +13,11 @@ export type EventRangeAction =
   | { type: "SET_RANGE_TYPE"; payload: EventType }
   | {
       type: "SET_DATE_RANGE";
-      payload: { from: string | null; to: string | null };
+      payload: Set<string>;
     }
   | { type: "SET_START_TIME"; payload: string | null }
   | { type: "SET_END_TIME"; payload: string | null }
-  | { type: "SET_WEEKDAYS"; payload: Weekday[] }
+  | { type: "SET_WEEKDAYS"; payload: Set<Weekday> }
   | { type: "SET_TIMEZONE"; payload: string }
   | { type: "RESET" };
 
@@ -41,32 +42,37 @@ export function EventRangeReducer(
         timeRange: state.timeRange,
       };
 
-      if (action.payload === "specific") {
-        return {
-          ...baseEvent,
-          type: "specific",
-          dateRange: DEFAULT_RANGE_SPECIFIC.dateRange,
-        };
-      } else {
-        return {
-          ...baseEvent,
-          type: "weekday",
-          weekdays: DEFAULT_RANGE_WEEKDAY.weekdays,
-        };
+      switch (action.payload) {
+        case "specific":
+          return {
+            ...baseEvent,
+            type: "specific",
+            dates: DEFAULT_RANGE_SPECIFIC.dates,
+          };
+        case "weekday":
+          return {
+            ...baseEvent,
+            type: "weekday",
+            weekdays: DEFAULT_RANGE_WEEKDAY.weekdays,
+          };
+        case "calendar":
+          return {
+            ...baseEvent,
+            type: "calendar",
+            dates: DEFAULT_RANGE_CALENDAR.dates,
+            timeRange: DEFAULT_RANGE_CALENDAR.timeRange,
+          };
       }
     }
 
     case "SET_DATE_RANGE": {
-      if (state.type !== "specific") {
+      if (state.type === "weekday") {
         return state;
       }
 
       return {
         ...state,
-        dateRange: {
-          from: action.payload.from,
-          to: action.payload.to,
-        },
+        dates: action.payload,
       };
     }
 
@@ -164,8 +170,10 @@ export function EventRangeReducer(
     case "RESET": {
       if (state.type === "specific") {
         return DEFAULT_RANGE_SPECIFIC;
-      } else {
+      } else if (state.type === "weekday") {
         return DEFAULT_RANGE_WEEKDAY;
+      } else {
+        return DEFAULT_RANGE_CALENDAR;
       }
     }
 

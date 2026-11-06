@@ -6,9 +6,9 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import environ
+import requests
 from celery.schedules import crontab
 from django.core.mail import send_mail
-from rest_framework.response import Response
 
 from api.logging import FancyFormatter
 
@@ -118,9 +118,9 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [],
     "DEFAULT_THROTTLE_RATES": {
         ThrottleScopes.GLOBAL.key: "300/min",
-        ThrottleScopes.USER_ACCOUNT_CREATION.key: "10/hour",
+        ThrottleScopes.USER_ACCOUNT_CREATION.key: "100/min",
         ThrottleScopes.RESEND_EMAIL.key: "20/hour",
-        ThrottleScopes.GUEST_ACCOUNT_CREATION.key: "10/min",
+        ThrottleScopes.GUEST_ACCOUNT_CREATION.key: "100/min",
         ThrottleScopes.LOGIN.key: "30/hour",
         ThrottleScopes.PASSWORD_RESET.key: "10/hour",
         ThrottleScopes.EVENT_CREATION.key: "25/hour",
@@ -128,6 +128,10 @@ REST_FRAMEWORK = {
         ThrottleScopes.CODE_CHECK.key: "10/min",
     },
 }
+
+# Cloudflare Turnstile secret key
+CF_TURNSTILE_SECRET_KEY = env("CF_TURNSTILE_SECRET_KEY")
+CF_TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 
 SESS_EXP_SECONDS = 3600  # 1 hour
 
@@ -144,20 +148,34 @@ URL_CODE_EXP_SECONDS = 1209600  # 14 days
 ACCOUNT_COOKIE_NAME = "account_sess_token"
 GUEST_COOKIE_NAME = "guest_sess_token"
 
-GENERIC_ERR_RESPONSE = Response(
-    {"error": {"general": ["An unknown error has occurred."]}}, status=500
-)
 
-# AWS SES Credentials
-EMAIL_BACKEND = "django_ses.SESBackend"
-AWS_SES_ACCESS_KEY_ID = env("AWS_SES_ACCESS_KEY_ID")
-AWS_SES_SECRET_ACCESS_KEY = env("AWS_SES_SECRET_ACCESS_KEY")
-AWS_SES_REGION_NAME = env("AWS_SES_REGION_NAME")
-AWS_SES_REGION_ENDPOINT = env("AWS_SES_REGION_ENDPOINT")
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
-ADMIN_EMAILS = env.list("ADMIN_EMAILS", default=[])
+# Email settings
 SEND_EMAILS = env.bool("SEND_EMAILS", default=False)
-CRITICAL_EMAIL_INTERVAL_SECONDS = 1800  # 30 minutes
+if not SEND_EMAILS:
+    # Nothing should try to send, but if it does, print it to the console
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+elif DEBUG:
+    # For use with something like Mailpit
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = env("SMTP_HOST")
+    EMAIL_PORT = env.int("SMTP_PORT")
+    EMAIL_USE_TLS = False
+    EMAIL_HOST_USER = env("SMTP_HOST_USER")
+    EMAIL_HOST_PASSWORD = env("SMTP_HOST_PASSWORD")
+else:
+    # For production, uses AWS SES
+    EMAIL_BACKEND = "django_ses.SESBackend"
+    AWS_SES_ACCESS_KEY_ID = env("AWS_SES_ACCESS_KEY_ID")
+    AWS_SES_SECRET_ACCESS_KEY = env("AWS_SES_SECRET_ACCESS_KEY")
+    AWS_SES_REGION_NAME = env("AWS_SES_REGION_NAME")
+    AWS_SES_REGION_ENDPOINT = env("AWS_SES_REGION_ENDPOINT")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+EMAIL_BRIDGE_SECRET = env("EMAIL_BRIDGE_SECRET")
+EMAIL_TIMEOUT = 10  # seconds
+
+# Discord Webhook URL
+# Errors will only be sent if this is set.
+DISCORD_WEBHOOK_URL = env("DISCORD_WEBHOOK_URL", default=None)
 
 # Automated tasks
 CELERY_BEAT_SCHEDULE = {
@@ -234,30 +252,43 @@ LOGGING = {
 # Custom logger just to add some of my own custom logging functions
 # We love DRY!!!
 class PlancakeLogger(logging.Logger):
-    _last_email_time = 0
+    def execute_webhook(self, msg, color):
+        if DISCORD_WEBHOOK_URL:
+            try:
+                requests.post(
+                    DISCORD_WEBHOOK_URL,
+                    json={
+                        "embeds": [
+                            {
+                                "title": "Error",
+                                "description": msg,
+                                "color": color,
+                                "timestamp": time.strftime(
+                                    "%Y-%m-%dT%H:%M:%SZ", time.gmtime()
+                                ),
+                            }
+                        ]
+                    },
+                    timeout=5,
+                )
+            except Exception as e:
+                self.warning(
+                    "Failed to execute Discord Webhook for error logging: %s\nIf you don't have Webhooks set up, leave the environment variable empty.",
+                    e,
+                )
 
     def db_error(self, msg, *args, **kwargs):
         self.error("Database error: %s", msg, *args, **kwargs)
 
+    def error(self, msg, *args, **kwargs):
+        super().error(msg, *args, **kwargs)
+        formatted_msg = str(msg) % args if args else str(msg)
+        self.execute_webhook(formatted_msg, 0xFF0000)
+
     def critical(self, msg, *args, **kwargs):
         super().critical(msg, *args, **kwargs)
-
-        # Send an email to admins
-        if SEND_EMAILS:
-            now = time.time()
-            if now - self._last_email_time > CRITICAL_EMAIL_INTERVAL_SECONDS:
-                stack_trace = "".join(traceback.format_stack())
-                try:
-                    send_mail(
-                        subject=f"Plancake - Critical Error",
-                        message=f"A critical error occurred in the application: {msg}\n\nStack Trace:\n{stack_trace}",
-                        from_email=DEFAULT_FROM_EMAIL,
-                        recipient_list=ADMIN_EMAILS,
-                        fail_silently=False,
-                    )
-                    self._last_email_time = now
-                except Exception as e:
-                    self.error("Failed to send critical error email: %s", e)
+        formatted_msg = str(msg) % args if args else str(msg)
+        self.execute_webhook(formatted_msg, 0xFF00FF)
 
 
 # Now any logger in the project will have access to this class
@@ -267,4 +298,5 @@ RAND_URL_CODE_LENGTH = 8
 
 RAND_URL_CODE_ATTEMPTS = 4
 
-MAX_EVENT_DAYS = 64
+MAX_DATE_TIME_EVENT_DAYS = 64
+MAX_CALENDAR_EVENT_DAYS = 128

@@ -46,6 +46,8 @@ def get_readable_field_name(field_name):
             return "string"
         case "RegexField":
             return "string"
+        case "UUIDField":
+            return "string"
         case _:
             return "object"
 

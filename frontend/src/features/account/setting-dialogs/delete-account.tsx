@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
 import TextInputField from "@/components/text-input-field";
 import EmptyButton from "@/features/button/components/empty";
-import { useToast, FormDialog } from "@/features/system-feedback";
+import { FormDialog, useToast } from "@/features/system-feedback";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useFormErrors } from "@/lib/hooks/use-form-errors";
 import { MESSAGES } from "@/lib/messages";
@@ -15,8 +15,8 @@ import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 
 export default function DeleteAccountDialog() {
-  const router = useRouter();
   const isMobile = useCheckMobile();
+  const router = useRouter();
 
   // TOASTS AND ERROR STATES
   const { addToast } = useToast();
@@ -26,6 +26,15 @@ export default function DeleteAccountDialog() {
   const [currentPassword, setCurrentPassword] = useState("");
 
   const [confirmationOpen, setConfirmationOpen] = useState(false);
+
+  // CHECK FIELDS
+  const invalidForm = useMemo(() => {
+    return !currentPassword
+      ? MESSAGES.FORM_NOT_FILLED
+      : Object.keys(errors).length
+        ? MESSAGES.FORM_HAS_ERRORS
+        : undefined;
+  }, [currentPassword, errors]);
 
   const handleOpenChange = (open: boolean) => {
     setConfirmationOpen(open);
@@ -64,7 +73,6 @@ export default function DeleteAccountDialog() {
   return (
     <FormDialog
       type="error"
-      asNestedDrawer={isMobile}
       title="WARNING: DELETING ACCOUNT"
       description={"Delete Account Confirmation"}
       trigger={
@@ -78,6 +86,8 @@ export default function DeleteAccountDialog() {
       onOpenChange={handleOpenChange}
       onSubmit={handleDeleteAccount}
       submitLabel="Delete Account"
+      submitDisabled={!isMobile && !!invalidForm}
+      submitTooltip={invalidForm}
     >
       <div className="text-center">
         <p>
@@ -97,6 +107,7 @@ export default function DeleteAccountDialog() {
         value={currentPassword}
         onChange={(value) => {
           setCurrentPassword(value);
+          handleError("currentPassword", "");
         }}
         style="outlined"
         error={errors.currentPassword || errors.api}

@@ -15,7 +15,14 @@ export function getResultBanner(
   timeslots: Date[],
   isWeekEvent: boolean,
   participated: boolean,
+  isCreator: boolean,
 ): React.ReactNode {
+  const shareLinkBanner = (
+    <Banner type="info" subtitle="Waiting for responses..." showPing>
+      <p>{MESSAGES.INFO_COPY_SHARE_LINK}</p>
+    </Banner>
+  );
+
   const bannerData = () => {
     if (
       !isWeekEvent &&
@@ -27,6 +34,11 @@ export function getResultBanner(
           <Banner type="info" subtitle={MESSAGES.INFO_EVENT_PASSED} showPing />
         ),
         id: "event-passed",
+      };
+    } else if (isCreator && participants.length === 0) {
+      return {
+        element: shareLinkBanner,
+        id: "share-link",
       };
     } else if (participants.length === 0) {
       return {
@@ -47,28 +59,24 @@ export function getResultBanner(
         return {
           element: (
             <Banner type="info" subtitle="Yikes..." showPing>
-              <p>{MESSAGES.INFO_NO_MUTUAL_AVAILABILITY}</p>
+              <p>{MESSAGES.INFO_NO_OVERLAP}</p>
             </Banner>
           ),
-          id: "no-mutual-availability",
+          id: "no-overlap",
         };
       }
       return {
         element: (
           <Banner type="info" subtitle="Oh dear :(" showPing>
-            <p>{MESSAGES.INFO_NO_IDEAL_TIMES_BANNER}</p>
+            <p>{MESSAGES.INFO_NO_IDEAL_TIMES}</p>
           </Banner>
         ),
         id: "no-ideal-times",
       };
     } else if (participated && participants.length === 1) {
       return {
-        element: (
-          <Banner type="info" subtitle="Waiting for others..." showPing>
-            <p>{MESSAGES.INFO_COPY_SHARE_LINK}</p>
-          </Banner>
-        ),
-        id: "share-link",
+        element: shareLinkBanner,
+        id: "share-link-participated",
       };
     } else if (!participated) {
       return {

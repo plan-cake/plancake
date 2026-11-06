@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 import bcrypt
 from device_detector import DeviceDetector
-from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Q
 from rest_framework.response import Response
@@ -30,15 +29,17 @@ from api.settings import (
     ACCOUNT_COOKIE_NAME,
     AUTHED_PWD_RESET_EXP_SECONDS,
     LONG_SESS_EXP_SECONDS,
-    SEND_EMAILS,
     SESS_EXP_SECONDS,
     ThrottleScopes,
 )
 from api.utils import (
+    EmailTemplateKey,
     MessageOutputSerializer,
     check_rate_limit,
     delete_session_cookie,
+    generic_error_response,
     prune_account_sessions,
+    send_templated_email,
 )
 
 logger = logging.getLogger("api")
@@ -107,11 +108,13 @@ def get_active_sessions(request):
         user_account=user,
     ).order_by("-last_used")
 
-    active_sessions = []
+    current_session = None
+    other_sessions = []
 
     for session in sessions:
         session_data = {
             "public_id": session.public_id,
+            "created_at": session.created_at,
             "last_used": session.last_used,
             "is_current": session.session_token
             == request.COOKIES.get(ACCOUNT_COOKIE_NAME),
@@ -123,9 +126,26 @@ def get_active_sessions(request):
             session_data["os_version"] = device.os_version() or None
             session_data["client_name"] = device.client_name() or None
             session_data["client_version"] = device.client_version() or None
-        active_sessions.append(session_data)
 
-    return Response({"sessions": active_sessions}, status=200)
+        if session_data["is_current"]:
+            if current_session is not None:
+                logger.error(
+                    f"Multiple sessions matching session token for user: {user.id}."
+                )
+            current_session = session_data
+        else:
+            other_sessions.append(session_data)
+
+    if current_session is None:
+        logger.error(
+            f"No session matching session token for user, despite being authenticated: {user.id}."
+        )
+        return generic_error_response()
+
+    return Response(
+        {"current_session": current_session, "other_sessions": other_sessions},
+        status=200,
+    )
 
 
 @api_endpoint("POST")
@@ -244,14 +264,11 @@ def start_authed_password_reset(request):
     )
     logger.debug("Authed password reset code for %s: %s", user.email, reset_code)
 
-    if SEND_EMAILS:
-        send_mail(
-            subject="Plancake - Password Reset Code",
-            message=f"Your password reset code is: {reset_code}.\n\nNot you? You should change your password immediately to protect your account.",
-            from_email=None,  # Use the default from settings
-            recipient_list=[user.email],
-            fail_silently=False,
-        )
+    send_templated_email(
+        to_email=user.email,
+        template_key=EmailTemplateKey.PASSWORD_RESET_CODE,
+        context={"code": reset_code},
+    )
 
     return Response(
         {"message": ["An email has been sent to your address with the reset code."]},

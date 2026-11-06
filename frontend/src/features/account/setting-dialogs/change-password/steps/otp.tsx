@@ -1,17 +1,24 @@
 import LinkText from "@/components/link-text";
 import OTPField from "@/components/otp-field";
 import { ChangePasswordStepProps } from "@/features/account/setting-dialogs/change-password/use-change-password";
+import { useSettingsAccount } from "@/features/account/settings/context";
+import InboxLinks from "@/features/auth/components/inbox-links";
 import { cn } from "@/lib/utils/classname";
 
 export default function OtpStep({ flow }: ChangePasswordStepProps) {
+  const { email } = useSettingsAccount();
+
   return (
-    <div className="w-full text-center">
-      <p>Check your email for the password reset code!</p>
-      <div className="mb-6 flex flex-col items-center justify-center gap-2">
+    <div className="flex w-full flex-col gap-4 text-center">
+      <div className="flex flex-col gap-2">
+        <p>Check your email for the password reset code!</p>
+        <InboxLinks email={email} />
+      </div>
+      <div className="flex flex-col items-center justify-center gap-2">
         <p
           className={cn(
-            "text-error flex h-fit min-h-5 items-end justify-center text-center text-sm",
-            !flow.errors.resetCode && "invisible",
+            "text-error -mt-2 text-sm",
+            !flow.errors.resetCode && "hidden",
           )}
         >
           {flow.errors.resetCode}
@@ -34,7 +41,7 @@ export default function OtpStep({ flow }: ChangePasswordStepProps) {
           }}
         />
       </div>
-      <div className="mt-2 flex justify-between text-sm">
+      <div className="flex justify-between text-sm">
         <button
           type="button"
           onClick={() => flow.setStep("CHANGE")}
