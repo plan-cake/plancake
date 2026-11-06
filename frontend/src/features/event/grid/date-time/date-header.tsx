@@ -98,7 +98,7 @@ export default function DateHeader({
       <div>
         {currentPage > 0 && (
           <ActionButton
-            buttonStyle="semi-transparent"
+            buttonStyle="primary"
             icon={<ChevronLeftIcon />}
             onClick={onPrevPage}
             className="ml-3 p-1.5"
@@ -173,7 +173,7 @@ export default function DateHeader({
       <div>
         {currentPage < totalPages - 1 && (
           <ActionButton
-            buttonStyle="semi-transparent"
+            buttonStyle="primary"
             icon={<ChevronRightIcon />}
             onClick={onNextPage}
             className="p-1.5"
