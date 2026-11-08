@@ -12,7 +12,7 @@ import ThemePicker from "@/features/header/components/theme-picker";
 import { useHeader } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
-export default function ShrinkingHeader({
+export default function ClientHeader({
   children: accountButton,
 }: {
   children: React.ReactNode;

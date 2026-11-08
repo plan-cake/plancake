@@ -1,18 +1,18 @@
 import AccountButton from "@/features/header/components/buttons/account";
 import LoginButton from "@/features/header/components/buttons/login";
-import ShrinkingHeader from "@/features/header/components/shrinking-header";
+import ClientHeader from "@/features/header/components/header-client";
 import { getSession } from "@/lib/utils/get-session";
 
 export default async function Header() {
   const session = await getSession();
 
   return (
-    <ShrinkingHeader>
+    <ClientHeader>
       {session.isLoggedIn ? (
         <AccountButton accountDetails={session.user} />
       ) : (
         <LoginButton />
       )}
-    </ShrinkingHeader>
+    </ClientHeader>
   );
 }
