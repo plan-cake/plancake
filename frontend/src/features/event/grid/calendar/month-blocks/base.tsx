@@ -93,12 +93,7 @@ export default function BaseMonthBlock({
 
   return (
     <div>
-      <div
-        className={cn(
-          "top-(--header-height) sticky z-10 md:top-0",
-          `bg-${backgroundColor}`,
-        )}
-      >
+      <div className={cn("sticky top-0 z-10 pt-1", `bg-${backgroundColor}`)}>
         <div className="text-lg font-bold">{monthDisplay}</div>
         <div className="h-6.25 flex w-full">
           {ALL_WEEKDAYS.map((day, index) => {

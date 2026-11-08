@@ -10,9 +10,8 @@ export default function HeaderSpacer({
   return (
     <div
       className={cn(
-        "h-[var(--header-height)]",
-        "bg-background z-20 w-full",
-        scrollable ? "" : "sticky top-0",
+        "h-(--header-height) bg-background z-20 w-full",
+        scrollable ? "" : "md:sticky md:top-0",
       )}
     />
   );

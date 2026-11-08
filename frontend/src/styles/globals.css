@@ -5,7 +5,7 @@
 @import "./text.css";
 @import "./frosted-glass.css";
 @import "./month-calendar.css";
-@import "./centered-absolute.css";
+@import "./utils.css";
 @import "./radix.css";
 @import "./scrollbar.css";
 @import "./view-transition.css";

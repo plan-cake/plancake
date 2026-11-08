@@ -2,18 +2,10 @@
 
 import { createContext, useContext } from "react";
 
-import { MotionValue } from "framer-motion";
-
 export const HeaderContext = createContext<{
-  isFullSize: boolean;
-  shrinkAmount: MotionValue;
-  expand: () => void;
   activeMenu: string | null;
   setActiveMenu: (menu: string | null) => void;
 }>({
-  isFullSize: true,
-  shrinkAmount: new MotionValue(0),
-  expand: () => {},
   activeMenu: null,
   setActiveMenu: () => {},
 });
