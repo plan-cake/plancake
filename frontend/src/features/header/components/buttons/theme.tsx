@@ -8,7 +8,7 @@ import EmptyButton from "@/features/button/components/empty";
 import { useHeader } from "@/features/header/context";
 import { useThemeToggle } from "@/lib/hooks/use-theme-toggle";
 
-export default function ThemePicker() {
+export default function ThemeButton() {
   const { activeMenu, setActiveMenu } = useHeader();
   const { theme = "system", toggleTheme } = useThemeToggle();
 

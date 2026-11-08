@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 
 import { LayoutGroup, motion } from "framer-motion";
+import { LayoutDashboardIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-import DashboardButton from "@/features/header/components/buttons/dashboard";
+import LinkButton from "@/features/button/components/link";
 import NewEventButton from "@/features/header/components/buttons/new-event";
+import ThemeButton from "@/features/header/components/buttons/theme";
 import LogoArea from "@/features/header/components/logo-area";
-import ThemePicker from "@/features/header/components/theme-picker";
 import { useHeader } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
@@ -45,8 +46,13 @@ export default function ClientHeader({
               aria-hidden="true"
             />
             <NewEventButton />
-            <ThemePicker />
-            <DashboardButton />
+            <ThemeButton />
+            <LinkButton
+              buttonStyle="frosted glass inset"
+              icon={<LayoutDashboardIcon className="h-5 w-5" />}
+              href="/dashboard"
+              tooltip="Dashboard"
+            />
             {accountButton}
             <div
               className={cn(
