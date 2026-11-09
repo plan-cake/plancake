@@ -52,6 +52,7 @@ export default function ClientHeader({
               icon={<LayoutDashboardIcon className="h-5 w-5" />}
               href="/dashboard"
               tooltip="Dashboard"
+              aria-label="Dashboard"
             />
             {accountButton}
             <div
