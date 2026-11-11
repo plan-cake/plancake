@@ -99,6 +99,7 @@ export default function PageDots({
                 "relative flex h-4 items-center justify-center",
                 !isActive && "cursor-pointer",
               )}
+              disabled={isActive}
             >
               <motion.div
                 layout
