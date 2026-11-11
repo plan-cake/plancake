@@ -23,7 +23,10 @@ export default function PageDots({
             onClick={() => onSelect(index)}
             aria-label={`Go to ${itemLabel} ${index + 1}`}
             aria-current={isActive ? "page" : undefined}
-            className="relative flex h-4 items-center justify-center"
+            className={cn(
+              "relative flex h-4 items-center justify-center",
+              !isActive && "cursor-pointer",
+            )}
           >
             <motion.div
               layout
