@@ -107,7 +107,7 @@ export default function DateHeader({
             disabled={currentPage === 0}
           />
 
-          <div className="flex flex-col items-center">
+          <div className="flex min-w-0 flex-col items-center">
             <div className="font-semibold">
               Page {currentPage + 1}/{totalPages}
             </div>

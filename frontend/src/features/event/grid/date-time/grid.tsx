@@ -138,7 +138,7 @@ export default function DateTimeGrid({
   return (
     <div
       className={cn(
-        "relative grid h-full w-full grid-cols-[1fr] grid-rows-[auto_1fr]",
+        "relative grid h-full w-full grid-cols-[minmax(0,1fr)] grid-rows-[auto_1fr]",
         mode === "preview" ? "bg-background md:bg-panel" : "bg-background",
       )}
       style={{ viewTransitionName }}
