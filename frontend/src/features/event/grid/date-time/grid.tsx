@@ -153,8 +153,7 @@ export default function DateTimeGrid({
         scrollbarPresent={scrollbarPresent}
         isWeekdayEvent={eventType === "weekday"}
         isStatic={staticHeader}
-        onPrevPage={() => paginate(-1)}
-        onNextPage={() => paginate(1)}
+        paginate={paginate}
         direction={direction}
       />
 
