@@ -10,6 +10,7 @@ import ActionButton from "@/features/button/components/action";
 import { SIDE_WIDTH, TIME_LABEL_WIDTH } from "@/features/event/grid/constants";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
+import { formatDateRange } from "@/lib/utils/date-time-format";
 
 interface DateHeaderProps {
   preview?: boolean;
@@ -88,6 +89,15 @@ export default function DateHeader({
     return pageIndicatorWidth + scrollbarWidth;
   }, [currentPage, totalPages, scrollbarPresent]);
 
+  const rangeDisplay = useMemo(
+    () =>
+      formatDateRange(
+        visibleDays[0].dayKey,
+        visibleDays[visibleDays.length - 1].dayKey,
+      ),
+    [visibleDays],
+  );
+
   return (
     <div
       className={cn(
@@ -110,7 +120,7 @@ export default function DateHeader({
 
           <div className="flex min-w-0 flex-col items-center md:min-w-48">
             <div className="text-sm font-semibold" role="status">
-              Page {currentPage + 1}/{totalPages}
+              {rangeDisplay}
             </div>
             <PageDots
               count={totalPages}
