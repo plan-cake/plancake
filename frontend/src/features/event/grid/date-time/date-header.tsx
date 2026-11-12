@@ -89,14 +89,21 @@ export default function DateHeader({
     return pageIndicatorWidth + scrollbarWidth;
   }, [currentPage, totalPages, scrollbarPresent]);
 
-  const rangeDisplay = useMemo(
-    () =>
-      formatDateRange(
+  const rangeDisplay = useMemo(() => {
+    if (isWeekdayEvent) {
+      const startWeekday = visibleDays[0].dayDisplay.split(" ")[0];
+      const endWeekday =
+        visibleDays[visibleDays.length - 1].dayDisplay.split(" ")[0];
+      return startWeekday === endWeekday
+        ? startWeekday
+        : `${startWeekday} - ${endWeekday}`;
+    } else {
+      return formatDateRange(
         visibleDays[0].dayKey,
         visibleDays[visibleDays.length - 1].dayKey,
-      ),
-    [visibleDays],
-  );
+      );
+    }
+  }, [visibleDays, isWeekdayEvent]);
 
   return (
     <div
