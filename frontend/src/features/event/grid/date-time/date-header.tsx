@@ -108,7 +108,7 @@ export default function DateHeader({
           />
 
           <div className="flex min-w-0 flex-col items-center">
-            <div className="font-semibold">
+            <div className="font-semibold" role="status">
               Page {currentPage + 1}/{totalPages}
             </div>
             <PageDots
