@@ -105,10 +105,11 @@ export default function DateHeader({
             aria-label="Previous Page"
             tooltip="Previous Page"
             disabled={currentPage === 0}
+            className="p-1"
           />
 
           <div className="flex min-w-0 flex-col items-center">
-            <div className="font-semibold" role="status">
+            <div className="text-sm font-semibold" role="status">
               Page {currentPage + 1}/{totalPages}
             </div>
             <PageDots
@@ -130,6 +131,7 @@ export default function DateHeader({
             aria-label="Next Page"
             tooltip="Next Page"
             disabled={currentPage === totalPages - 1}
+            className="p-1"
           />
         </div>
       )}
