@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { usePathname } from "next/navigation";
+
 import { HeaderContext } from "@/features/header/context";
 
 export default function HeaderProvider({
@@ -10,6 +12,13 @@ export default function HeaderProvider({
   children: React.ReactNode;
 }) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+
+  const pathname = usePathname();
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setActiveMenu(null);
+  }
 
   useEffect(() => {
     if (!activeMenu) return;
