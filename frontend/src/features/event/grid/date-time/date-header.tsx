@@ -91,7 +91,7 @@ export default function DateHeader({
   return (
     <div
       className={cn(
-        "z-10 w-full",
+        "z-10 flex w-full flex-col gap-2",
         preview ? "bg-background md:bg-panel" : "bg-background",
         !isStatic && "sticky top-0",
       )}
@@ -108,7 +108,7 @@ export default function DateHeader({
             className="p-1"
           />
 
-          <div className="flex min-w-0 flex-col items-center">
+          <div className="flex min-w-0 flex-col items-center md:min-w-48">
             <div className="text-sm font-semibold" role="status">
               Page {currentPage + 1}/{totalPages}
             </div>
