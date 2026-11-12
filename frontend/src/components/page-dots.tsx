@@ -18,7 +18,7 @@ export default function PageDots({
   count: number;
   activeIndex: number;
   onSelect: (index: number) => void;
-  itemLabel?: string;
+  itemLabel?: "page" | "step";
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -94,7 +94,7 @@ export default function PageDots({
               key={index}
               onClick={() => onSelect(index)}
               aria-label={`Go to ${itemLabel} ${index + 1}`}
-              aria-current={isActive ? "page" : undefined}
+              aria-current={isActive ? itemLabel : undefined}
               className={cn(
                 "relative flex h-4 items-center justify-center",
                 !isActive && "cursor-pointer",
