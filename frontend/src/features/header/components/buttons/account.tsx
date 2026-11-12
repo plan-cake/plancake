@@ -8,7 +8,6 @@ import { AccountDetails } from "@/features/account/type";
 import ActionButton from "@/features/button/components/action";
 import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
-import ShrinkingHeaderButton from "@/features/header/components/buttons/shrinking-header";
 import { useHeader } from "@/features/header/context";
 import { useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
@@ -61,30 +60,25 @@ export default function AccountButton({
   );
 
   return (
-    <ShrinkingHeaderButton
-      buttonStyle="frosted glass inset"
-      icon={<UserIcon />}
+    <KebabMenu
+      nested
+      open={isMenuOpen}
+      onOpenChange={(isOpen) => setActiveMenu(isOpen ? "account" : null)}
+      trigger={
+        <EmptyButton
+          className="relative z-10"
+          buttonStyle="frosted glass inset"
+          icon={<UserIcon />}
+          aria-label="Account Menu"
+          tooltip="Account"
+        />
+      }
     >
-      <KebabMenu
-        nested
-        open={isMenuOpen}
-        onOpenChange={(isOpen) => setActiveMenu(isOpen ? "account" : null)}
-        trigger={
-          <EmptyButton
-            className="relative z-10"
-            buttonStyle="frosted glass inset"
-            icon={<UserIcon />}
-            aria-label="Account Menu"
-            tooltip="Account"
-          />
-        }
-      >
-        <h2 className="text-foreground text-center font-bold">
-          {accountDetails?.email}
-        </h2>
-        {accountSettingsButton}
-        {signOutButton}
-      </KebabMenu>
-    </ShrinkingHeaderButton>
+      <h2 className="text-foreground text-center font-bold">
+        {accountDetails?.email}
+      </h2>
+      {accountSettingsButton}
+      {signOutButton}
+    </KebabMenu>
   );
 }

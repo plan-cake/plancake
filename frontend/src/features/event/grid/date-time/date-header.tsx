@@ -89,7 +89,7 @@ export default function DateHeader({
         "z-10 col-span-2 grid h-[50px] w-full items-center justify-center pr-2",
         preview ? "bg-background md:bg-panel" : "bg-background",
         scrollbarPresent && "pr-5",
-        !isStatic && "sticky top-[var(--header-height)] md:top-0",
+        !isStatic && "sticky top-0",
       )}
       style={{
         gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 0}px`,
