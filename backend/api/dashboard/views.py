@@ -1,6 +1,6 @@
 import logging
 
-from django.db.models import Exists, OuterRef, Prefetch, Q
+from django.db.models import Exists, OuterRef, Prefetch, Q, prefetch_related_objects
 from rest_framework import serializers
 from rest_framework.response import Response
 
@@ -80,25 +80,31 @@ def get_dashboard(request):
         .select_related("url_code")
         .prefetch_related(
             Prefetch(
-                "date_timeslots",
-                queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
-            ),
-            Prefetch(
-                "weekday_timeslots",
-                queryset=EventWeekdayTimeslot.objects.order_by(
-                    "weekday", "local_timeslot"
-                ),
-            ),
-            Prefetch(
-                "calendar_timeslots",
-                queryset=EventCalendarTimeslot.objects.order_by("date"),
-            ),
-            Prefetch(
                 "participants",
                 queryset=EventParticipant.objects.order_by("created_at"),
             ),
         )
     )
+
+    # Only prefetch the relevant timeslots for each event
+    events = list(events)
+    timeslot_prefetches = {
+        UserEvent.EventType.SPECIFIC: Prefetch(
+            "date_timeslots",
+            queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
+        ),
+        UserEvent.EventType.GENERIC: Prefetch(
+            "weekday_timeslots",
+            queryset=EventWeekdayTimeslot.objects.order_by("weekday", "local_timeslot"),
+        ),
+        UserEvent.EventType.CALENDAR: Prefetch(
+            "calendar_timeslots",
+            queryset=EventCalendarTimeslot.objects.order_by("date"),
+        ),
+    }
+    for event_type, prefetch in timeslot_prefetches.items():
+        events_of_type = [event for event in events if event.date_type == event_type]
+        prefetch_related_objects(events_of_type, prefetch)
 
     # Events that the user both created and participated in only count as created
     my_events = []
