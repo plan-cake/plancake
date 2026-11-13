@@ -378,137 +378,100 @@ def get_all_availability(request):
             for slot in timeslots:
                 availability_dict[to_datetime(slot.date).isoformat()] = []
 
-        if not len(participants):
-            return Response(
-                {
-                    "user_display_name": user_display_name,
-                    "participants": [],
-                    "availability": availability_dict,
-                },
-                status=200,
-            )
-
-        # Check if the user is a participant to get their display name
-        if user:
-            participant = next(
-                (p for p in participants if p.user_account_id == user.user_account_id),
-                None,
-            )
-            user_display_name = participant.display_name if participant else None
-
-        if event.date_type == UserEvent.EventType.SPECIFIC:
-            availabilities = (
-                EventDateAvailability.objects.filter(event_participant__in=participants)
-                .select_related("event_date_timeslot", "event_participant")
-                .order_by(
-                    "event_date_timeslot__utc_timeslot",
-                    "event_participant__display_name",
-                )
-            )
-            for t in availabilities:
-                timeslot = t.event_date_timeslot.utc_timeslot.isoformat()
-                if timeslot not in availability_dict:
-                    logger.error(
-                        f"Timeslot {timeslot} not found in availability dict for event {event_code}"
-                    )
-                    continue
-                availability_dict[timeslot].append(t.event_participant.display_name)
-
-            return Response(
-                {
-                    "user_display_name": user_display_name,
-                    "participants": [
-                        {
-                            "public_id": str(p.public_id),
-                            "display_name": p.display_name,
-                            "joined_at": p.created_at.isoformat(),
-                            "updated_at": p.updated_at.isoformat(),
-                            "time_zone": p.time_zone,
-                        }
+        if participants:
+            # Check if the user is a participant to get their display name
+            if user:
+                participant = next(
+                    (
+                        p
                         for p in participants
-                    ],
-                    "availability": availability_dict,
-                },
-                status=200,
-            )
-        elif event.date_type == UserEvent.EventType.GENERIC:
-            availabilities = (
-                EventWeekdayAvailability.objects.filter(
-                    event_participant__in=participants
+                        if p.user_account_id == user.user_account_id
+                    ),
+                    None,
                 )
-                .select_related("event_weekday_timeslot", "event_participant")
-                .order_by(
-                    "event_weekday_timeslot__weekday",
-                    "event_weekday_timeslot__local_timeslot",
-                    "event_participant__display_name",
-                )
-            )
-            for t in availabilities:
-                timeslot = get_weekday_date(
-                    t.event_weekday_timeslot.weekday,
-                    t.event_weekday_timeslot.local_timeslot,
-                ).isoformat()
-                if timeslot not in availability_dict:
-                    logger.error(
-                        f"Timeslot {timeslot} not found in availability dict for event {event_code}"
-                    )
-                    continue
-                availability_dict[timeslot].append(t.event_participant.display_name)
+                user_display_name = participant.display_name if participant else None
 
-            return Response(
-                {
-                    "user_display_name": user_display_name,
-                    "participants": [
-                        {
-                            "public_id": str(p.public_id),
-                            "display_name": p.display_name,
-                            "joined_at": p.created_at.isoformat(),
-                            "updated_at": p.updated_at.isoformat(),
-                            "time_zone": p.time_zone,
-                        }
-                        for p in participants
-                    ],
-                    "availability": availability_dict,
-                },
-                status=200,
-            )
-        elif event.date_type == UserEvent.EventType.CALENDAR:
-            availabilities = (
-                EventCalendarAvailability.objects.filter(
-                    event_participant__in=participants
-                )
-                .select_related("event_calendar_timeslot", "event_participant")
-                .order_by(
-                    "event_calendar_timeslot__date",
-                    "event_participant__display_name",
-                )
-            )
-            for t in availabilities:
-                timeslot = to_datetime(t.event_calendar_timeslot.date).isoformat()
-                if timeslot not in availability_dict:
-                    logger.error(
-                        f"Timeslot {timeslot} not found in availability dict for event {event_code}"
+            if event.date_type == UserEvent.EventType.SPECIFIC:
+                availabilities = (
+                    EventDateAvailability.objects.filter(
+                        event_participant__in=participants
                     )
-                    continue
-                availability_dict[timeslot].append(t.event_participant.display_name)
+                    .select_related("event_date_timeslot", "event_participant")
+                    .order_by(
+                        "event_date_timeslot__utc_timeslot",
+                        "event_participant__display_name",
+                    )
+                )
+                for t in availabilities:
+                    timeslot = t.event_date_timeslot.utc_timeslot.isoformat()
+                    if timeslot not in availability_dict:
+                        logger.error(
+                            f"Timeslot {timeslot} not found in availability dict for event {event_code}"
+                        )
+                        continue
+                    availability_dict[timeslot].append(t.event_participant.display_name)
 
-            return Response(
-                {
-                    "user_display_name": user_display_name,
-                    "participants": [
-                        {
-                            "public_id": str(p.public_id),
-                            "display_name": p.display_name,
-                            "joined_at": p.created_at.isoformat(),
-                            "updated_at": p.updated_at.isoformat(),
-                            "time_zone": p.time_zone,
-                        }
-                        for p in participants
-                    ],
-                    "availability": availability_dict,
-                },
-                status=200,
-            )
+            elif event.date_type == UserEvent.EventType.GENERIC:
+                availabilities = (
+                    EventWeekdayAvailability.objects.filter(
+                        event_participant__in=participants
+                    )
+                    .select_related("event_weekday_timeslot", "event_participant")
+                    .order_by(
+                        "event_weekday_timeslot__weekday",
+                        "event_weekday_timeslot__local_timeslot",
+                        "event_participant__display_name",
+                    )
+                )
+                for t in availabilities:
+                    timeslot = get_weekday_date(
+                        t.event_weekday_timeslot.weekday,
+                        t.event_weekday_timeslot.local_timeslot,
+                    ).isoformat()
+                    if timeslot not in availability_dict:
+                        logger.error(
+                            f"Timeslot {timeslot} not found in availability dict for event {event_code}"
+                        )
+                        continue
+                    availability_dict[timeslot].append(t.event_participant.display_name)
+
+            elif event.date_type == UserEvent.EventType.CALENDAR:
+                availabilities = (
+                    EventCalendarAvailability.objects.filter(
+                        event_participant__in=participants
+                    )
+                    .select_related("event_calendar_timeslot", "event_participant")
+                    .order_by(
+                        "event_calendar_timeslot__date",
+                        "event_participant__display_name",
+                    )
+                )
+                for t in availabilities:
+                    timeslot = to_datetime(t.event_calendar_timeslot.date).isoformat()
+                    if timeslot not in availability_dict:
+                        logger.error(
+                            f"Timeslot {timeslot} not found in availability dict for event {event_code}"
+                        )
+                        continue
+                    availability_dict[timeslot].append(t.event_participant.display_name)
+
+        return Response(
+            {
+                "user_display_name": user_display_name,
+                "participants": [
+                    {
+                        "public_id": str(p.public_id),
+                        "display_name": p.display_name,
+                        "joined_at": p.created_at.isoformat(),
+                        "updated_at": p.updated_at.isoformat(),
+                        "time_zone": p.time_zone,
+                    }
+                    for p in participants
+                ],
+                "availability": availability_dict,
+            },
+            status=200,
+        )
 
     except UserEvent.DoesNotExist:
         return Response(
