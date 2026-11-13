@@ -627,7 +627,7 @@ def get_event_details(request):
 
     try:
         event = event_lookup_prefetch(event_code)
-        touch_url_code(event_code)
+        touch_url_code(event.url_code)
         data = format_event_info(event)
         match event.date_type:
             case UserEvent.EventType.SPECIFIC:

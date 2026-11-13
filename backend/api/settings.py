@@ -150,11 +150,6 @@ SESS_EXP_SECONDS = 3600  # 1 hour
 
 LONG_SESS_EXP_SECONDS = 31536000  # 1 year
 
-# The minimum time between writes of a session's last used time, to avoid an extra
-# database write on every request. Sessions may expire up to this much earlier than the
-# actual intended time from the last time the user was active.
-SESS_TOUCH_INTERVAL_SECONDS = 60
-
 EMAIL_CODE_EXP_SECONDS = 600  # 10 minutes
 
 PWD_RESET_EXP_SECONDS = 600  # 10 minutes
@@ -162,6 +157,12 @@ PWD_RESET_EXP_SECONDS = 600  # 10 minutes
 AUTHED_PWD_RESET_EXP_SECONDS = 600  # 10 minutes
 
 URL_CODE_EXP_SECONDS = 1209600  # 14 days
+
+# Touch intervals, which are the minimum time between writes of the last used time. This
+# could result in these objects expiring slightly earlier than intended, but it avoids a
+# database write on every request.
+SESS_TOUCH_INTERVAL_SECONDS = 60
+URL_CODE_TOUCH_INTERVAL_SECONDS = 3600
 
 ACCOUNT_COOKIE_NAME = "account_sess_token"
 GUEST_COOKIE_NAME = "guest_sess_token"

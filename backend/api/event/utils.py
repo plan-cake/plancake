@@ -1,9 +1,8 @@
-import logging
 import random
 import re
 import string
 from calendar import monthrange
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from django.db.models import Prefetch
@@ -20,9 +19,8 @@ from api.settings import (
     MAX_DATE_TIME_EVENT_DAYS,
     RAND_URL_CODE_ATTEMPTS,
     RAND_URL_CODE_LENGTH,
+    URL_CODE_TOUCH_INTERVAL_SECONDS,
 )
-
-logger = logging.getLogger("api")
 
 
 def check_code_available(code):
@@ -239,11 +237,15 @@ def js_weekday(weekday: int) -> int:
     return (weekday + 1) % 7
 
 
-def touch_url_code(url_code: str):
+def touch_url_code(url_code: UrlCode):
     """
     Updates the last_used timestamp for a URL code.
+
+    The write is skipped if the code was last used within
+    `URL_CODE_TOUCH_INTERVAL_SECONDS`.
     """
-    try:
-        UrlCode.objects.get(url_code__iexact=url_code).save()
-    except UrlCode.DoesNotExist:
-        logger.error(f"URL code {url_code} not found when attempting to touch.")
+    touch_due = url_code.last_used < datetime.now() - timedelta(
+        seconds=URL_CODE_TOUCH_INTERVAL_SECONDS
+    )
+    if touch_due:
+        url_code.save(update_fields=["last_used"])
