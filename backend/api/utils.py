@@ -27,6 +27,7 @@ from api.settings import (
     LONG_SESS_EXP_SECONDS,
     SEND_EMAILS,
     SESS_EXP_SECONDS,
+    SESS_TOUCH_INTERVAL_SECONDS,
     TEST_ENVIRONMENT,
     ThrottleScope,
 )
@@ -63,7 +64,8 @@ def get_metadata(func):
 
 def get_session(token):
     """
-    Retrieves a session by its token, ensuring it is still valid.
+    Retrieves a session (and the associated user account) by its token, ensuring it is
+    still valid.
     """
     return (
         UserSession.objects.filter(session_token=token)
@@ -80,6 +82,7 @@ def get_session(token):
                 & Q(last_used__gte=datetime.now() - timedelta(seconds=SESS_EXP_SECONDS))
             )
         )
+        .select_related("user_account")
         .first()
     )
 
@@ -356,13 +359,24 @@ def update_session_metadata(request, session: UserSession):
     """
     Updates the session's metadata (IP address, user agent, and last used time) based on
     the incoming request.
+
+    The write is skipped if the metadata is unchanged and the session was last used
+    within `SESS_TOUCH_INTERVAL_SECONDS`.
     """
-    # Since the session is being updated anyway, we don't have to check if the metadata
-    # has changed before updating it
-    session.ip_address = get_client_ip_address(request)
-    session.user_agent_raw = get_client_user_agent(request)
-    # Auto-updates last_used
-    session.save()
+    ip_address = get_client_ip_address(request)
+    user_agent_raw = get_client_user_agent(request)
+    touch_due = session.last_used < datetime.now() - timedelta(
+        seconds=SESS_TOUCH_INTERVAL_SECONDS
+    )
+
+    if (
+        touch_due
+        or session.ip_address != ip_address
+        or session.user_agent_raw != user_agent_raw
+    ):
+        session.ip_address = ip_address
+        session.user_agent_raw = user_agent_raw
+        session.save(update_fields=["ip_address", "user_agent_raw", "last_used"])
 
 
 class LiveUpdateAction(str, Enum):

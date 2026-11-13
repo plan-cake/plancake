@@ -91,13 +91,11 @@ def check_auth(func):
         if acct_token:
             logger.debug("Account session token: %s", acct_token)
             try:
-                with transaction.atomic():
-                    session = get_session(acct_token)
-                    if not session:
-                        # To break out of the rest of the logic
-                        raise UserSession.DoesNotExist
-
-                    update_session_metadata(request, session)
+                session = get_session(acct_token)
+                if not session:
+                    # To break out of the rest of the logic
+                    raise UserSession.DoesNotExist
+                update_session_metadata(request, session)
 
                 # At this point the account is authenticated
                 request.user = session.user_account
@@ -122,12 +120,10 @@ def check_auth(func):
             logger.debug("Guest session token: %s", guest_token)
             # Make sure the guest session token exists (it should)
             try:
-                with transaction.atomic():
-                    session = get_session(guest_token)
-                    if not session:
-                        raise UserSession.DoesNotExist
-
-                    update_session_metadata(request, session)
+                session = get_session(guest_token)
+                if not session:
+                    raise UserSession.DoesNotExist
+                update_session_metadata(request, session)
 
                 request.user = session.user_account
                 # Run the function
@@ -181,13 +177,11 @@ def require_auth(func):
         if acct_token:
             logger.debug("Account session token: %s", acct_token)
             try:
-                with transaction.atomic():
-                    session = get_session(acct_token)
-                    if not session:
-                        # To break out of the rest of the logic
-                        raise UserSession.DoesNotExist
-
-                    update_session_metadata(request, session)
+                session = get_session(acct_token)
+                if not session:
+                    # To break out of the rest of the logic
+                    raise UserSession.DoesNotExist
+                update_session_metadata(request, session)
 
                 # At this point the account is authenticated
                 request.user = session.user_account
@@ -212,12 +206,10 @@ def require_auth(func):
             logger.debug("Guest session token: %s", guest_token)
             # Make sure the guest session token exists (it should)
             try:
-                with transaction.atomic():
-                    session = get_session(guest_token)
-                    if not session:
-                        raise UserSession.DoesNotExist
-
-                    update_session_metadata(request, session)
+                session = get_session(guest_token)
+                if not session:
+                    raise UserSession.DoesNotExist
+                update_session_metadata(request, session)
 
                 request.user = session.user_account
                 # Run the function
@@ -308,12 +300,10 @@ def require_account_auth(func):
 
         if acct_token:
             try:
-                with transaction.atomic():
-                    session = get_session(acct_token)
-                    if not session:
-                        raise UserSession.DoesNotExist
-
-                    update_session_metadata(request, session)
+                session = get_session(acct_token)
+                if not session:
+                    raise UserSession.DoesNotExist
+                update_session_metadata(request, session)
 
                 # At this point the account is authenticated
                 request.user = session.user_account

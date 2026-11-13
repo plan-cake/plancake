@@ -150,6 +150,11 @@ SESS_EXP_SECONDS = 3600  # 1 hour
 
 LONG_SESS_EXP_SECONDS = 31536000  # 1 year
 
+# The minimum time between writes of a session's last used time, to avoid an extra
+# database write on every request. Sessions may expire up to this much earlier than the
+# actual intended time from the last time the user was active.
+SESS_TOUCH_INTERVAL_SECONDS = 60
+
 EMAIL_CODE_EXP_SECONDS = 600  # 10 minutes
 
 PWD_RESET_EXP_SECONDS = 600  # 10 minutes
