@@ -385,9 +385,11 @@ def get_all_availability(request):
             )
 
         # Check if the user is a participant to get their display name
-        # This checks after the empty participants check to avoid unnecessary queries
         if user:
-            participant = participants.filter(user_account=user).first()
+            participant = next(
+                (p for p in participants if p.user_account_id == user.user_account_id),
+                None,
+            )
             user_display_name = participant.display_name if participant else None
 
         if event.date_type == UserEvent.EventType.SPECIFIC:
