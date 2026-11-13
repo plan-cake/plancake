@@ -281,8 +281,11 @@ def get_self_availability(request):
         return not_participated_error()
 
     try:
-        event = event_lookup(event_code)
-        participant = EventParticipant.objects.get(user_event=event, user_account=user)
+        # Look up the participant and their event in one query
+        participant = EventParticipant.objects.select_related("user_event").get(
+            user_event__url_code__url_code__iexact=event_code, user_account=user
+        )
+        event = participant.user_event
 
         if event.date_type == UserEvent.EventType.SPECIFIC:
             availabilities = (
@@ -325,12 +328,13 @@ def get_self_availability(request):
             status=200,
         )
 
-    except UserEvent.DoesNotExist:
-        return Response(
-            {"error": {"event_code": ["Event not found."]}},
-            status=404,
-        )
     except EventParticipant.DoesNotExist:
+        # Only check whether the event exists when needed, to return the right error
+        if not UserEvent.objects.filter(url_code__url_code__iexact=event_code).exists():
+            return Response(
+                {"error": {"event_code": ["Event not found."]}},
+                status=404,
+            )
         return not_participated_error()
 
 
