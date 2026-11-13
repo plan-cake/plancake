@@ -73,7 +73,18 @@ DATABASES = {
         "PASSWORD": env("DB_PASSWORD"),
         "HOST": env("DB_HOST"),
         "PORT": env("DB_PORT"),
-        "CONN_MAX_AGE": 0 if DEBUG else 600,  # Don't persist connections in development
+        # Under ASGI each request runs in its own thread, so Django's per-thread
+        # persistent connections (CONN_MAX_AGE > 0) never get reused. Instead, each
+        # worker process keeps a shared psycopg pool, which requires CONN_MAX_AGE = 0.
+        "CONN_MAX_AGE": 0,
+        "OPTIONS": {
+            "pool": {
+                "min_size": 1,
+                "max_size": 4,
+                "timeout": 10,  # Seconds to wait for a free connection
+                "max_idle": 300,  # Close extra connections idle for 5 minutes
+            },
+        },
     }
 }
 
