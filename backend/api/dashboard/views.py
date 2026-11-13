@@ -48,6 +48,8 @@ def get_dashboard(request):
     The events are sorted by their creation date descending, meaning the most recent
     events appear first.
 
+    Each event's dates are sorted in ascending order.
+
     Events that no longer have a URL code from inactivity will not be included.
     """
     user = request.user

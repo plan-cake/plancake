@@ -217,7 +217,7 @@ def get_event_range(event: UserEvent) -> EventRange:
 
     if event.date_type == UserEvent.EventType.CALENDAR:
         return EventRange(
-            dates=list(dates),
+            dates=sorted(dates),
             start_time=time(hour=0, minute=0, second=0),
             end_time=time(hour=0, minute=0, second=0),
         )
@@ -230,7 +230,7 @@ def get_event_range(event: UserEvent) -> EventRange:
         # Dates and times are left in the event's time zone, and the frontend handles the
         # conversion
         return EventRange(
-            dates=list(dates),
+            dates=sorted(dates),
             start_time=start_time,
             end_time=end_time,
         )
