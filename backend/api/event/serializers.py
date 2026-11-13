@@ -37,6 +37,7 @@ class EventEditSerializer(EventInfoSerializer, EventCodeSerializer):
 
 
 class EventDetailSerializer(EventInfoSerializer):
+    event_code = serializers.CharField(required=True, max_length=255)
     is_creator = serializers.BooleanField(required=True)
     event_type = serializers.ChoiceField(
         required=True, choices=["Date", "Week", "Calendar"]
