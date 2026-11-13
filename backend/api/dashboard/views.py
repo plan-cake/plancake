@@ -1,6 +1,6 @@
 import logging
 
-from django.db.models import Prefetch, Q
+from django.db.models import Exists, OuterRef, Prefetch, Q
 from rest_framework import serializers
 from rest_framework.response import Response
 
@@ -67,8 +67,15 @@ def get_dashboard(request):
             status=200,
         )
 
-    created_events = (
-        UserEvent.objects.filter(user_account=user, url_code__isnull=False)
+    # Create a queryset to be used as a subquery
+    is_participant = EventParticipant.objects.filter(
+        user_event=OuterRef("pk"), user_account=user
+    )
+    events = (
+        UserEvent.objects.filter(
+            Q(user_account=user) | Q(Exists(is_participant)),
+            url_code__isnull=False,
+        )
         .order_by("-created_at")
         .select_related("url_code")
         .prefetch_related(
@@ -92,45 +99,16 @@ def get_dashboard(request):
             ),
         )
     )
-    # Don't include events that the user both created and participated in
-    participations = (
-        EventParticipant.objects.filter(
-            ~Q(user_event__user_account=user),
-            user_account=user,
-            user_event__url_code__isnull=False,
-        )
-        .order_by("-user_event__created_at")
-        .select_related("user_event__url_code")
-        .prefetch_related(
-            Prefetch(
-                "user_event__date_timeslots",
-                queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
-            ),
-            Prefetch(
-                "user_event__weekday_timeslots",
-                queryset=EventWeekdayTimeslot.objects.order_by(
-                    "weekday", "local_timeslot"
-                ),
-            ),
-            Prefetch(
-                "user_event__calendar_timeslots",
-                queryset=EventCalendarTimeslot.objects.order_by("date"),
-            ),
-            Prefetch(
-                "user_event__participants",
-                queryset=EventParticipant.objects.order_by("created_at"),
-            ),
-        )
-    )
 
+    # Events that the user both created and participated in only count as created
     my_events = []
-    for event in created_events:
-        my_events.append(format_event_info(event, include_participants=True))
     their_events = []
-    for event in participations:
-        their_events.append(
-            format_event_info(event.user_event, include_participants=True)
-        )
+    for event in events:
+        event_info = format_event_info(event, include_participants=True)
+        if event.user_account_id == user.user_account_id:
+            my_events.append(event_info)
+        else:
+            their_events.append(event_info)
 
     return Response(
         {"created_events": my_events, "participated_events": their_events}, status=200
