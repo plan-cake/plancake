@@ -1,33 +1,26 @@
 import functools
 import logging
-import uuid
-from dataclasses import dataclass
 
 import requests
-from django.db import DatabaseError, transaction
+from django.db import DatabaseError
 from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 
-from api.models import UserAccount, UserSession
 from api.settings import (
-    ACCOUNT_COOKIE_NAME,
     CF_TURNSTILE_SECRET_KEY,
     CF_TURNSTILE_VERIFY_URL,
     GUEST_COOKIE_NAME,
-    ThrottleScopes,
 )
 from api.utils import (
     RateLimitError,
-    check_rate_limit,
-    delete_session_cookie,
+    authenticate,
+    create_guest_session,
+    finalize_auth_response,
     generic_error_response,
     get_client_ip_address,
     get_metadata,
-    get_session,
-    set_session_cookie,
-    update_session_metadata,
 )
 
 logger = logging.getLogger("api")
@@ -70,97 +63,6 @@ def api_endpoint(method):
         return drf_view
 
     return decorator
-
-
-@dataclass
-class AuthResult:
-    """
-    The outcome of checking a request's session cookies.
-    """
-
-    session: UserSession | None = None
-    # The name of the cookie that holds the session's token, to refresh it later
-    cookie_name: str | None = None
-    # Whether an account session token was sent but is no longer valid
-    account_expired: bool = False
-
-
-def _touch_session(request, token):
-    """
-    Returns the valid session for a token, updating its metadata, or `None` if the session
-    doesn't exist or has expired.
-    """
-    session = get_session(token)
-    if session:
-        update_session_metadata(request, session)
-    return session
-
-
-def authenticate(request, allow_guest=True):
-    """
-    Finds the session for a request from its cookies, checking the account session first
-    and falling back to the guest session if `allow_guest` is true.
-
-    This does NOT create a guest account, or make the user available on the request.
-    """
-    acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-    if acct_token:
-        logger.debug("Account session token: %s", acct_token)
-        session = _touch_session(request, acct_token)
-        if session:
-            return AuthResult(session, ACCOUNT_COOKIE_NAME)
-        logger.info("Account session expired.")
-
-    # At this point the account session either expired or did not exist
-    result = AuthResult(account_expired=bool(acct_token))
-    if not allow_guest:
-        return result
-
-    guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
-    if guest_token:
-        logger.debug("Guest session token: %s", guest_token)
-        session = _touch_session(request, guest_token)
-        if session:
-            result.session = session
-            result.cookie_name = GUEST_COOKIE_NAME
-        else:
-            logger.info("Guest session expired.")
-    return result
-
-
-def create_guest_session(request):
-    """
-    Creates a new guest account with an extended session, subject to the guest account
-    creation rate limit.
-    """
-    check_rate_limit(request, ThrottleScopes.GUEST_ACCOUNT_CREATION)
-    with transaction.atomic():
-        guest_account = UserAccount.objects.create(is_guest=True)
-        guest_session = UserSession.objects.create(
-            session_token=str(uuid.uuid4()),
-            user_account=guest_account,
-            is_extended=True,
-        )
-    logger.debug("New guest session token: %s", guest_session.session_token)
-    return guest_session
-
-
-def finalize_auth_response(response, auth: AuthResult):
-    """
-    Refreshes the session token cookie on the response, and if the account session
-    expired, deletes its cookie and adds a message saying so.
-    """
-    if auth.session:
-        set_session_cookie(
-            response,
-            auth.cookie_name,
-            auth.session.session_token,
-            auth.session.is_extended,
-        )
-    if auth.account_expired:
-        response.data.setdefault("message", []).append("Account session expired.")
-        delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
-    return response
 
 
 def check_auth(func):

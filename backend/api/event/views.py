@@ -49,8 +49,6 @@ from api.models import (
 )
 from api.redis_pools import async_pool
 from api.settings import (
-    ACCOUNT_COOKIE_NAME,
-    GUEST_COOKIE_NAME,
     LIVE_UPDATES_HEARTBEAT_SECONDS,
     MAX_LIVE_CONNECTIONS_EVENT,
     MAX_LIVE_CONNECTIONS_GLOBAL,
@@ -60,11 +58,11 @@ from api.utils import (
     LiveUpdateEvent,
     LiveUpdateEventEditData,
     MessageOutputSerializer,
+    authenticate,
     check_rate_limit,
     event_lookup,
     format_event_info,
     generic_error_response,
-    get_session,
     notify_live_update,
     to_datetime,
 )
@@ -708,15 +706,8 @@ async def get_live_updates(request, event_code):
         )
 
     # Get current user ID from cookies
-    aget_session = sync_to_async(get_session)
-    session = None
-    user_id = -1
-    if ACCOUNT_COOKIE_NAME in request.COOKIES:
-        session = await aget_session(request.COOKIES[ACCOUNT_COOKIE_NAME])
-    if session is None and GUEST_COOKIE_NAME in request.COOKIES:
-        session = await aget_session(request.COOKIES[GUEST_COOKIE_NAME])
-    if session:
-        user_id = session.user_account_id
+    auth = await sync_to_async(authenticate)(request)
+    user_id = auth.session.user_account_id if auth.session else -1
 
     # Return the database connection to the pool now, otherwise it stays checked out until
     # the stream ends.

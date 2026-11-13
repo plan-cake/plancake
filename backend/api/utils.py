@@ -1,12 +1,15 @@
 import json
 import logging
+import uuid
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from enum import Enum
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import requests
 from django.core.mail import EmailMultiAlternatives
+from django.db import transaction
 from django.db.models import Q
 from ipware import get_client_ip
 from redis import Redis
@@ -30,6 +33,7 @@ from api.settings import (
     SESS_TOUCH_INTERVAL_SECONDS,
     TEST_ENVIRONMENT,
     ThrottleScope,
+    ThrottleScopes,
 )
 
 logger = logging.getLogger("api")
@@ -269,16 +273,9 @@ class PlancakeThrottle(SimpleRateThrottle):
         if isinstance(request.user, UserAccount):
             user = request.user
         else:
-            acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-            guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
-            if acct_token:
-                session = get_session(acct_token)
-                if session:
-                    user = session.user_account
-            if not user and guest_token:
-                session = get_session(guest_token)
-                if session:
-                    user = session.user_account
+            auth = authenticate(request, touch=False)
+            if auth.session:
+                user = auth.session.user_account
 
         # If the user is either logged in or using a guest account, use their ID
         if user:
@@ -377,6 +374,104 @@ def update_session_metadata(request, session: UserSession):
         session.ip_address = ip_address
         session.user_agent_raw = user_agent_raw
         session.save(update_fields=["ip_address", "user_agent_raw", "last_used"])
+
+
+@dataclass
+class AuthResult:
+    """
+    The outcome of checking a request's session cookies.
+    """
+
+    session: UserSession | None = None
+    # The name of the cookie that holds the session's token, to refresh it later
+    cookie_name: str | None = None
+    # Whether an account session token was sent but is no longer valid
+    account_expired: bool = False
+
+
+def touch_session(request, token):
+    """
+    Returns the valid session for a token, updating its metadata, or `None` if the session
+    doesn't exist or has expired.
+    """
+    session = get_session(token)
+    if session:
+        update_session_metadata(request, session)
+    return session
+
+
+def authenticate(request, allow_guest=True, touch=True):
+    """
+    Finds the session for a request from its cookies, checking the account session first
+    and falling back to the guest session if `allow_guest` is true.
+
+    If `touch` is true, the session's metadata is updated (see `update_session_metadata`).
+    Use `touch=False` for lookups that shouldn't count as session activity.
+
+    This does NOT create a guest account, or make the user available on the request.
+    """
+
+    def find(token):
+        return touch_session(request, token) if touch else get_session(token)
+
+    acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+    if acct_token:
+        logger.debug("Account session token: %s", acct_token)
+        session = find(acct_token)
+        if session:
+            return AuthResult(session, ACCOUNT_COOKIE_NAME)
+        logger.info("Account session expired.")
+
+    # At this point the account session either expired or did not exist
+    result = AuthResult(account_expired=bool(acct_token))
+    if not allow_guest:
+        return result
+
+    guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
+    if guest_token:
+        logger.debug("Guest session token: %s", guest_token)
+        session = find(guest_token)
+        if session:
+            result.session = session
+            result.cookie_name = GUEST_COOKIE_NAME
+        else:
+            logger.info("Guest session expired.")
+    return result
+
+
+def create_guest_session(request):
+    """
+    Creates a new guest account with an extended session, subject to the guest account
+    creation rate limit.
+    """
+    check_rate_limit(request, ThrottleScopes.GUEST_ACCOUNT_CREATION)
+    with transaction.atomic():
+        guest_account = UserAccount.objects.create(is_guest=True)
+        guest_session = UserSession.objects.create(
+            session_token=str(uuid.uuid4()),
+            user_account=guest_account,
+            is_extended=True,
+        )
+    logger.debug("New guest session token: %s", guest_session.session_token)
+    return guest_session
+
+
+def finalize_auth_response(response, auth: AuthResult):
+    """
+    Refreshes the session token cookie on the response, and if the account session
+    expired, deletes its cookie and adds a message saying so.
+    """
+    if auth.session:
+        set_session_cookie(
+            response,
+            auth.cookie_name,
+            auth.session.session_token,
+            auth.session.is_extended,
+        )
+    if auth.account_expired:
+        response.data.setdefault("message", []).append("Account session expired.")
+        delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
+    return response
 
 
 class LiveUpdateAction(str, Enum):
