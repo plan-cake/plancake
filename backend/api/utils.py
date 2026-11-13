@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import requests
 from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Prefetch, Q, prefetch_related_objects
 from ipware import get_client_ip
 from redis import Redis
 from rest_framework import serializers
@@ -18,7 +18,14 @@ from rest_framework.response import Response
 from rest_framework.throttling import SimpleRateThrottle
 
 from api.availability.utils import get_weekday_date
-from api.models import UserAccount, UserEvent, UserSession
+from api.models import (
+    EventCalendarTimeslot,
+    EventDateTimeslot,
+    EventWeekdayTimeslot,
+    UserAccount,
+    UserEvent,
+    UserSession,
+)
 from api.redis_pools import sync_pool
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
@@ -227,6 +234,31 @@ def get_event_range(event: UserEvent) -> EventRange:
             start_time=start_time,
             end_time=end_time,
         )
+
+
+def prefetch_timeslots(events: list[UserEvent]):
+    """
+    Prefetches the ordered timeslots for already-fetched events.
+
+    Only the tables that the events actually need are queried.
+    """
+    timeslot_prefetches = {
+        UserEvent.EventType.SPECIFIC: Prefetch(
+            "date_timeslots",
+            queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
+        ),
+        UserEvent.EventType.GENERIC: Prefetch(
+            "weekday_timeslots",
+            queryset=EventWeekdayTimeslot.objects.order_by("weekday", "local_timeslot"),
+        ),
+        UserEvent.EventType.CALENDAR: Prefetch(
+            "calendar_timeslots",
+            queryset=EventCalendarTimeslot.objects.order_by("date"),
+        ),
+    }
+    for event_type, prefetch in timeslot_prefetches.items():
+        events_of_type = [event for event in events if event.date_type == event_type]
+        prefetch_related_objects(events_of_type, prefetch)
 
 
 def format_event_info(event: UserEvent, include_participants: bool = False) -> dict:
