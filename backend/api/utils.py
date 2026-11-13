@@ -587,9 +587,19 @@ class LiveUpdateEvent:
         )
 
 
+def live_update_channel(event_code: str) -> str:
+    """
+    Returns the Redis channel for an event's live updates.
+
+    URL codes are case-insensitive, so the channel is lowercased to make every
+    capitalization of a code share it.
+    """
+    return f"event_{event_code.lower()}"
+
+
 def notify_live_update(event: LiveUpdateEvent):
     Redis(connection_pool=sync_pool).publish(
-        f"event_{event.event_code}",
+        live_update_channel(event.event_code),
         event.dumps(),
     )
 

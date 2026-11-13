@@ -63,6 +63,7 @@ from api.utils import (
     event_lookup,
     format_event_info,
     generic_error_response,
+    live_update_channel,
     notify_live_update,
     to_datetime,
 )
@@ -677,7 +678,7 @@ async def get_live_updates(request, event_code):
     client: Redis = Redis(connection_pool=async_pool)
 
     GLOBAL_COUNT = "live_updates_global_count"
-    EVENT_COUNT = f"live_updates_event_{event_code}_count"
+    EVENT_COUNT = f"live_updates_{live_update_channel(event_code)}_count"
 
     # Check global limit
     global_count = await client.incr(GLOBAL_COUNT)
@@ -716,7 +717,7 @@ async def get_live_updates(request, event_code):
 
     async def event_generator():
         pubsub = client.pubsub()
-        await pubsub.subscribe(f"event_{event_code}")
+        await pubsub.subscribe(live_update_channel(event_code))
 
         try:
             while True:
@@ -747,7 +748,7 @@ async def get_live_updates(request, event_code):
 
                 await asyncio.sleep(LIVE_UPDATES_HEARTBEAT_SECONDS)
         except Exception:
-            await pubsub.unsubscribe(f"event_{event_code}")
+            await pubsub.unsubscribe(live_update_channel(event_code))
         finally:
             await client.decr(GLOBAL_COUNT)
             await client.decr(EVENT_COUNT)
