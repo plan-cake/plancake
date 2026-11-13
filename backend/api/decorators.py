@@ -1,6 +1,7 @@
 import functools
 import logging
 import uuid
+from dataclasses import dataclass
 
 import requests
 from django.db import DatabaseError, transaction
@@ -71,6 +72,97 @@ def api_endpoint(method):
     return decorator
 
 
+@dataclass
+class AuthResult:
+    """
+    The outcome of checking a request's session cookies.
+    """
+
+    session: UserSession | None = None
+    # The name of the cookie that holds the session's token, to refresh it later
+    cookie_name: str | None = None
+    # Whether an account session token was sent but is no longer valid
+    account_expired: bool = False
+
+
+def _touch_session(request, token):
+    """
+    Returns the valid session for a token, updating its metadata, or `None` if the session
+    doesn't exist or has expired.
+    """
+    session = get_session(token)
+    if session:
+        update_session_metadata(request, session)
+    return session
+
+
+def authenticate(request, allow_guest=True):
+    """
+    Finds the session for a request from its cookies, checking the account session first
+    and falling back to the guest session if `allow_guest` is true.
+
+    This does NOT create a guest account, or make the user available on the request.
+    """
+    acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+    if acct_token:
+        logger.debug("Account session token: %s", acct_token)
+        session = _touch_session(request, acct_token)
+        if session:
+            return AuthResult(session, ACCOUNT_COOKIE_NAME)
+        logger.info("Account session expired.")
+
+    # At this point the account session either expired or did not exist
+    result = AuthResult(account_expired=bool(acct_token))
+    if not allow_guest:
+        return result
+
+    guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
+    if guest_token:
+        logger.debug("Guest session token: %s", guest_token)
+        session = _touch_session(request, guest_token)
+        if session:
+            result.session = session
+            result.cookie_name = GUEST_COOKIE_NAME
+        else:
+            logger.info("Guest session expired.")
+    return result
+
+
+def create_guest_session(request):
+    """
+    Creates a new guest account with an extended session, subject to the guest account
+    creation rate limit.
+    """
+    check_rate_limit(request, ThrottleScopes.GUEST_ACCOUNT_CREATION)
+    with transaction.atomic():
+        guest_account = UserAccount.objects.create(is_guest=True)
+        guest_session = UserSession.objects.create(
+            session_token=str(uuid.uuid4()),
+            user_account=guest_account,
+            is_extended=True,
+        )
+    logger.debug("New guest session token: %s", guest_session.session_token)
+    return guest_session
+
+
+def finalize_auth_response(response, auth: AuthResult):
+    """
+    Refreshes the session token cookie on the response, and if the account session
+    expired, deletes its cookie and adds a message saying so.
+    """
+    if auth.session:
+        set_session_cookie(
+            response,
+            auth.cookie_name,
+            auth.session.session_token,
+            auth.session.is_extended,
+        )
+    if auth.account_expired:
+        response.data.setdefault("message", []).append("Account session expired.")
+        delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
+    return response
+
+
 def check_auth(func):
     """
     A decorator to check if the user is authenticated based on their cookies.
@@ -85,73 +177,10 @@ def check_auth(func):
 
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
-        acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-
-        acct_sess_expired = False
-        if acct_token:
-            logger.debug("Account session token: %s", acct_token)
-            try:
-                session = get_session(acct_token)
-                if not session:
-                    # To break out of the rest of the logic
-                    raise UserSession.DoesNotExist
-                update_session_metadata(request, session)
-
-                # At this point the account is authenticated
-                request.user = session.user_account
-
-                response = func(request, *args, **kwargs)
-                # Intercept the response to refresh the session token cookie
-                set_session_cookie(
-                    response,
-                    ACCOUNT_COOKIE_NAME,
-                    session.session_token,
-                    session.is_extended,
-                )
-                return response
-            except UserSession.DoesNotExist:
-                logger.info("Account session expired.")
-                acct_sess_expired = True
-
-        # At this point the account session either expired or did not exist
-        guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
-
-        if guest_token:
-            logger.debug("Guest session token: %s", guest_token)
-            # Make sure the guest session token exists (it should)
-            try:
-                session = get_session(guest_token)
-                if not session:
-                    raise UserSession.DoesNotExist
-                update_session_metadata(request, session)
-
-                request.user = session.user_account
-                # Run the function
-                response = func(request, *args, **kwargs)
-                set_session_cookie(
-                    response, GUEST_COOKIE_NAME, session.session_token, True
-                )
-            except UserSession.DoesNotExist:
-                logger.info("Guest session expired.")
-                # Do NOT create a new guest account
-                request.user = None
-                # Run the function
-                response = func(request, *args, **kwargs)
-        else:
-            # Do NOT create a new guest account
-            request.user = None
-            # Run the function
-            response = func(request, *args, **kwargs)
-
-        # Make sure to return a message if the account session expired
-        if acct_sess_expired:
-            SESS_EXP_MSG = "Account session expired."
-            if "message" in response.data:
-                response.data["message"].append(SESS_EXP_MSG)
-            else:
-                response.data["message"] = [SESS_EXP_MSG]
-            delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
-        return response
+        auth = authenticate(request)
+        request.user = auth.session.user_account if auth.session else None
+        response = func(request, *args, **kwargs)
+        return finalize_auth_response(response, auth)
 
     return wrapper
 
@@ -171,107 +200,14 @@ def require_auth(func):
 
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
-        acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-
-        acct_sess_expired = False
-        if acct_token:
-            logger.debug("Account session token: %s", acct_token)
-            try:
-                session = get_session(acct_token)
-                if not session:
-                    # To break out of the rest of the logic
-                    raise UserSession.DoesNotExist
-                update_session_metadata(request, session)
-
-                # At this point the account is authenticated
-                request.user = session.user_account
-
-                response = func(request, *args, **kwargs)
-                # Intercept the response to refresh the session token cookie
-                set_session_cookie(
-                    response,
-                    ACCOUNT_COOKIE_NAME,
-                    session.session_token,
-                    session.is_extended,
-                )
-                return response
-            except UserSession.DoesNotExist:
-                logger.info("Account session expired.")
-                acct_sess_expired = True
-
-        # At this point the account session either expired or did not exist
-        guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
-
-        if guest_token:
-            logger.debug("Guest session token: %s", guest_token)
-            # Make sure the guest session token exists (it should)
-            try:
-                session = get_session(guest_token)
-                if not session:
-                    raise UserSession.DoesNotExist
-                update_session_metadata(request, session)
-
-                request.user = session.user_account
-                # Run the function
-                response = func(request, *args, **kwargs)
-                set_session_cookie(
-                    response, GUEST_COOKIE_NAME, session.session_token, True
-                )
-            except UserSession.DoesNotExist:
-                logger.info("Guest session expired. Creating a new guest account...")
-                check_rate_limit(request, ThrottleScopes.GUEST_ACCOUNT_CREATION)
-                # Create a new guest user
-                with transaction.atomic():
-                    guest_account = UserAccount.objects.create(is_guest=True)
-                    new_session_token = str(uuid.uuid4())
-                    guest_session = UserSession.objects.create(
-                        session_token=new_session_token,
-                        user_account=guest_account,
-                        is_extended=True,
-                    )
-                logger.debug("New guest session token: %s", guest_session.session_token)
-
-                request.user = guest_account
-                # Run the function
-                response = func(request, *args, **kwargs)
-                set_session_cookie(
-                    response,
-                    GUEST_COOKIE_NAME,
-                    guest_session.session_token,
-                    True,
-                )
-        else:
-            check_rate_limit(request, ThrottleScopes.GUEST_ACCOUNT_CREATION)
-            # Create a guest user with an extended session
-            with transaction.atomic():
-                guest_account = UserAccount.objects.create(is_guest=True)
-                new_session_token = str(uuid.uuid4())
-                guest_session = UserSession.objects.create(
-                    session_token=new_session_token,
-                    user_account=guest_account,
-                    is_extended=True,
-                )
-            logger.debug("New guest session token: %s", guest_session.session_token)
-
-            request.user = guest_account
-            # Run the function
-            response = func(request, *args, **kwargs)
-            set_session_cookie(
-                response,
-                GUEST_COOKIE_NAME,
-                guest_session.session_token,
-                True,
-            )
-
-        # Make sure to return a message if the account session expired
-        if acct_sess_expired:
-            SESS_EXP_MSG = "Account session expired."
-            if "message" in response.data:
-                response.data["message"].append(SESS_EXP_MSG)
-            else:
-                response.data["message"] = [SESS_EXP_MSG]
-            delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
-        return response
+        auth = authenticate(request)
+        if not auth.session:
+            logger.info("Creating a new guest account...")
+            auth.session = create_guest_session(request)
+            auth.cookie_name = GUEST_COOKIE_NAME
+        request.user = auth.session.user_account
+        response = func(request, *args, **kwargs)
+        return finalize_auth_response(response, auth)
 
     get_metadata(wrapper).min_auth_required = "Guest"
     return wrapper
@@ -291,37 +227,12 @@ def require_account_auth(func):
 
     @functools.wraps(func)
     def wrapper(request, *args, **kwargs):
-        acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-        logger.debug("Account session token: %s", acct_token)
-
-        BAD_AUTH_RESPONSE = Response(
-            {"error": {"general": ["Account required."]}}, status=401
-        )
-
-        if acct_token:
-            try:
-                session = get_session(acct_token)
-                if not session:
-                    raise UserSession.DoesNotExist
-                update_session_metadata(request, session)
-
-                # At this point the account is authenticated
-                request.user = session.user_account
-
-                response = func(request, *args, **kwargs)
-                # Intercept the response to refresh the session token cookie
-                set_session_cookie(
-                    response,
-                    ACCOUNT_COOKIE_NAME,
-                    session.session_token,
-                    session.is_extended,
-                )
-                return response
-            except UserSession.DoesNotExist:
-                logger.info("Account session expired.")
-                return BAD_AUTH_RESPONSE
-        else:
-            return BAD_AUTH_RESPONSE
+        auth = authenticate(request, allow_guest=False)
+        if not auth.session:
+            return Response({"error": {"general": ["Account required."]}}, status=401)
+        request.user = auth.session.user_account
+        response = func(request, *args, **kwargs)
+        return finalize_auth_response(response, auth)
 
     get_metadata(wrapper).min_auth_required = "User Account"
     return wrapper
