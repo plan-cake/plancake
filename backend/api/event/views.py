@@ -5,7 +5,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from asgiref.sync import sync_to_async
-from django.db import transaction
+from django.db import close_old_connections, transaction
 from django.db.models import Q
 from django.http import JsonResponse, StreamingHttpResponse
 from redis.asyncio import Redis
@@ -717,6 +717,10 @@ async def get_live_updates(request, event_code):
         session = await aget_session(request.COOKIES[GUEST_COOKIE_NAME])
     if session:
         user_id = session.user_account_id
+
+    # Return the database connection to the pool now, otherwise it stays checked out until
+    # the stream ends.
+    await sync_to_async(close_old_connections)()
 
     async def event_generator():
         pubsub = client.pubsub()
