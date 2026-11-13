@@ -1,18 +1,12 @@
 import logging
 
-from django.db.models import Exists, OuterRef, Prefetch, Q, prefetch_related_objects
+from django.db.models import Exists, OuterRef, Prefetch, Q
 from rest_framework import serializers
 from rest_framework.response import Response
 
 from api.decorators import api_endpoint, check_auth, validate_output
-from api.models import (
-    EventCalendarTimeslot,
-    EventDateTimeslot,
-    EventParticipant,
-    EventWeekdayTimeslot,
-    UserEvent,
-)
-from api.utils import TimeZoneField, format_event_info
+from api.models import EventParticipant, UserEvent
+from api.utils import TimeZoneField, format_event_info, prefetch_timeslots
 
 logger = logging.getLogger("api")
 
@@ -86,25 +80,8 @@ def get_dashboard(request):
         )
     )
 
-    # Only prefetch the relevant timeslots for each event
     events = list(events)
-    timeslot_prefetches = {
-        UserEvent.EventType.SPECIFIC: Prefetch(
-            "date_timeslots",
-            queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
-        ),
-        UserEvent.EventType.GENERIC: Prefetch(
-            "weekday_timeslots",
-            queryset=EventWeekdayTimeslot.objects.order_by("weekday", "local_timeslot"),
-        ),
-        UserEvent.EventType.CALENDAR: Prefetch(
-            "calendar_timeslots",
-            queryset=EventCalendarTimeslot.objects.order_by("date"),
-        ),
-    }
-    for event_type, prefetch in timeslot_prefetches.items():
-        events_of_type = [event for event in events if event.date_type == event_type]
-        prefetch_related_objects(events_of_type, prefetch)
+    prefetch_timeslots(events)
 
     # Events that the user both created and participated in only count as created
     my_events = []
