@@ -648,7 +648,8 @@ def get_event_details(request):
     return Response(
         {
             **data,
-            "is_creator": event.user_account == user,
+            "is_creator": user is not None
+            and event.user_account_id == user.user_account_id,
         },
         status=200,
     )
