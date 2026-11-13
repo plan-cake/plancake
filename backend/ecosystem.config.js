@@ -15,7 +15,7 @@ module.exports = {
             name: "celery-worker",
             cwd: __dirname,
             script: "./.venv/bin/python",
-            args: "-m celery -A api worker --loglevel=info --concurrency=1",
+            args: "-m celery -A api worker -B --loglevel=info --concurrency=1",
             env: {
                 DB_POOL_MIN_SIZE: "0",
                 DB_POOL_MAX_SIZE: "1",
@@ -23,19 +23,6 @@ module.exports = {
             instances: 1,
             autorestart: true,
             max_memory_restart: "150M",
-        },
-        {
-            name: "celery-beat",
-            cwd: __dirname,
-            script: "./.venv/bin/python",
-            args: "-m celery -A api beat --loglevel=info",
-            env: {
-                DB_POOL_MIN_SIZE: "0",
-                DB_POOL_MAX_SIZE: "1",
-            },
-            instances: 1,
-            autorestart: true,
-            max_memory_restart: "100M",
         },
     ]
 };
