@@ -212,22 +212,28 @@ def event_lookup_prefetch(event_code: str):
     """
     Looks up an event by its URL code.
 
-    Also prefetches related timeslot data for efficiency.
+    Also loads the URL code and prefetches related timeslot data for efficiency.
     """
-    return UserEvent.objects.prefetch_related(
-        Prefetch(
-            "date_timeslots",
-            queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
-        ),
-        Prefetch(
-            "weekday_timeslots",
-            queryset=EventWeekdayTimeslot.objects.order_by("weekday", "local_timeslot"),
-        ),
-        Prefetch(
-            "calendar_timeslots",
-            queryset=EventCalendarTimeslot.objects.order_by("date"),
-        ),
-    ).get(url_code__url_code__iexact=event_code)
+    return (
+        UserEvent.objects.select_related("url_code")
+        .prefetch_related(
+            Prefetch(
+                "date_timeslots",
+                queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
+            ),
+            Prefetch(
+                "weekday_timeslots",
+                queryset=EventWeekdayTimeslot.objects.order_by(
+                    "weekday", "local_timeslot"
+                ),
+            ),
+            Prefetch(
+                "calendar_timeslots",
+                queryset=EventCalendarTimeslot.objects.order_by("date"),
+            ),
+        )
+        .get(url_code__url_code__iexact=event_code)
+    )
 
 
 def js_weekday(weekday: int) -> int:
