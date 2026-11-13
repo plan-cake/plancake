@@ -11,7 +11,6 @@ from django.http import JsonResponse, StreamingHttpResponse
 from redis.asyncio import Redis
 from rest_framework.response import Response
 
-from api.availability.utils import get_weekday_date
 from api.decorators import (
     api_endpoint,
     check_auth,
@@ -62,6 +61,7 @@ from api.utils import (
     event_lookup,
     format_event_info,
     generic_error_response,
+    get_weekday_date,
     live_update_channel,
     notify_live_update,
     to_datetime,

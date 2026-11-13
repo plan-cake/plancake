@@ -10,11 +10,7 @@ from api.availability.serializers import (
     EventAvailabilitySerializer,
     EventCodeSerializer,
 )
-from api.availability.utils import (
-    check_name_available,
-    get_timeslots,
-    get_weekday_date,
-)
+from api.availability.utils import check_name_available, get_timeslots
 from api.decorators import (
     api_endpoint,
     check_auth,
@@ -41,6 +37,7 @@ from api.utils import (
     MessageOutputSerializer,
     check_rate_limit,
     event_lookup,
+    get_weekday_date,
     notify_live_update,
     to_datetime,
 )

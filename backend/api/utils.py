@@ -17,7 +17,6 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.throttling import SimpleRateThrottle
 
-from api.availability.utils import get_weekday_date
 from api.models import (
     EventCalendarTimeslot,
     EventDateTimeslot,
@@ -645,6 +644,14 @@ def to_datetime(date):
     if isinstance(date, datetime):
         return date
     return datetime(date.year, date.month, date.day)
+
+
+def get_weekday_date(weekday, timeslot):
+    """
+    Places a weekday (0 = Sunday) and time of day on a reference week, January 1-7, 2012,
+    which starts on a Sunday.
+    """
+    return datetime(2012, 1, weekday + 1, timeslot.hour, timeslot.minute)
 
 
 class EmailTemplateKey(str, Enum):
