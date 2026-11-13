@@ -420,7 +420,8 @@ def authenticate(request, allow_guest=True, touch=True):
         session = find(acct_token)
         if session:
             return AuthResult(session, ACCOUNT_COOKIE_NAME)
-        logger.info("Account session expired.")
+        if touch:
+            logger.info("Account session expired.")
 
     # At this point the account session either expired or did not exist
     result = AuthResult(account_expired=bool(acct_token))
