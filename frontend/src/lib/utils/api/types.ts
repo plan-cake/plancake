@@ -70,6 +70,7 @@ export type EventEditData = {
 export type ApiEventType = "Date" | "Week" | "Calendar";
 
 export type EventDetails = {
+  event_code: string;
   title: string;
   timeslots: string[];
   time_zone: string;

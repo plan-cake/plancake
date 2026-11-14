@@ -1,18 +1,12 @@
 import logging
 
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch
 from rest_framework import serializers
 from rest_framework.response import Response
 
 from api.decorators import api_endpoint, check_auth, validate_output
-from api.models import (
-    EventCalendarTimeslot,
-    EventDateTimeslot,
-    EventParticipant,
-    EventWeekdayTimeslot,
-    UserEvent,
-)
-from api.utils import TimeZoneField, format_event_info
+from api.models import EventParticipant, UserEvent
+from api.utils import TimeZoneField, format_event_info, prefetch_timeslots
 
 logger = logging.getLogger("api")
 
@@ -54,6 +48,8 @@ def get_dashboard(request):
     The events are sorted by their creation date descending, meaning the most recent
     events appear first.
 
+    Each event's dates are sorted in ascending order.
+
     Events that no longer have a URL code from inactivity will not be included.
     """
     user = request.user
@@ -67,70 +63,36 @@ def get_dashboard(request):
             status=200,
         )
 
-    created_events = (
-        UserEvent.objects.filter(user_account=user, url_code__isnull=False)
+    # A UNION instead of an OR, so that both halves can use their user_account index
+    event_ids = (
+        UserEvent.objects.filter(user_account=user)
+        .values("pk")
+        .union(EventParticipant.objects.filter(user_account=user).values("user_event"))
+    )
+    events = (
+        UserEvent.objects.filter(pk__in=event_ids, url_code__isnull=False)
         .order_by("-created_at")
         .select_related("url_code")
         .prefetch_related(
-            Prefetch(
-                "date_timeslots",
-                queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
-            ),
-            Prefetch(
-                "weekday_timeslots",
-                queryset=EventWeekdayTimeslot.objects.order_by(
-                    "weekday", "local_timeslot"
-                ),
-            ),
-            Prefetch(
-                "calendar_timeslots",
-                queryset=EventCalendarTimeslot.objects.order_by("date"),
-            ),
             Prefetch(
                 "participants",
                 queryset=EventParticipant.objects.order_by("created_at"),
             ),
         )
     )
-    # Don't include events that the user both created and participated in
-    participations = (
-        EventParticipant.objects.filter(
-            ~Q(user_event__user_account=user),
-            user_account=user,
-            user_event__url_code__isnull=False,
-        )
-        .order_by("-user_event__created_at")
-        .select_related("user_event__url_code")
-        .prefetch_related(
-            Prefetch(
-                "user_event__date_timeslots",
-                queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
-            ),
-            Prefetch(
-                "user_event__weekday_timeslots",
-                queryset=EventWeekdayTimeslot.objects.order_by(
-                    "weekday", "local_timeslot"
-                ),
-            ),
-            Prefetch(
-                "user_event__calendar_timeslots",
-                queryset=EventCalendarTimeslot.objects.order_by("date"),
-            ),
-            Prefetch(
-                "user_event__participants",
-                queryset=EventParticipant.objects.order_by("created_at"),
-            ),
-        )
-    )
 
+    events = list(events)
+    prefetch_timeslots(events)
+
+    # Events that the user both created and participated in only count as created
     my_events = []
-    for event in created_events:
-        my_events.append(format_event_info(event, include_participants=True))
     their_events = []
-    for event in participations:
-        their_events.append(
-            format_event_info(event.user_event, include_participants=True)
-        )
+    for event in events:
+        event_info = format_event_info(event, include_participants=True)
+        if event.user_account_id == user.user_account_id:
+            my_events.append(event_info)
+        else:
+            their_events.append(event_info)
 
     return Response(
         {"created_events": my_events, "participated_events": their_events}, status=200

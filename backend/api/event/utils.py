@@ -1,28 +1,19 @@
-import logging
 import random
 import re
 import string
 from calendar import monthrange
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from django.db.models import Prefetch
-
-from api.models import (
-    EventCalendarTimeslot,
-    EventDateTimeslot,
-    EventWeekdayTimeslot,
-    UrlCode,
-    UserEvent,
-)
+from api.models import UrlCode, UserEvent
 from api.settings import (
     MAX_CALENDAR_EVENT_DAYS,
     MAX_DATE_TIME_EVENT_DAYS,
     RAND_URL_CODE_ATTEMPTS,
     RAND_URL_CODE_LENGTH,
+    URL_CODE_TOUCH_INTERVAL_SECONDS,
 )
-
-logger = logging.getLogger("api")
+from api.utils import prefetch_timeslots
 
 
 def check_code_available(code):
@@ -214,22 +205,13 @@ def event_lookup_prefetch(event_code: str):
     """
     Looks up an event by its URL code.
 
-    Also prefetches related timeslot data for efficiency.
+    Also loads the URL code and prefetches the event's timeslots for efficiency.
     """
-    return UserEvent.objects.prefetch_related(
-        Prefetch(
-            "date_timeslots",
-            queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
-        ),
-        Prefetch(
-            "weekday_timeslots",
-            queryset=EventWeekdayTimeslot.objects.order_by("weekday", "local_timeslot"),
-        ),
-        Prefetch(
-            "calendar_timeslots",
-            queryset=EventCalendarTimeslot.objects.order_by("date"),
-        ),
-    ).get(url_code__url_code__iexact=event_code)
+    event = UserEvent.objects.select_related("url_code").get(
+        url_code__url_code__iexact=event_code
+    )
+    prefetch_timeslots([event])
+    return event
 
 
 def js_weekday(weekday: int) -> int:
@@ -239,11 +221,15 @@ def js_weekday(weekday: int) -> int:
     return (weekday + 1) % 7
 
 
-def touch_url_code(url_code: str):
+def touch_url_code(url_code: UrlCode):
     """
     Updates the last_used timestamp for a URL code.
+
+    The write is skipped if the code was last used within
+    `URL_CODE_TOUCH_INTERVAL_SECONDS`.
     """
-    try:
-        UrlCode.objects.get(url_code__iexact=url_code).save()
-    except UrlCode.DoesNotExist:
-        logger.error(f"URL code {url_code} not found when attempting to touch.")
+    touch_due = url_code.last_used < datetime.now() - timedelta(
+        seconds=URL_CODE_TOUCH_INTERVAL_SECONDS
+    )
+    if touch_due:
+        url_code.save(update_fields=["last_used"])

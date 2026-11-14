@@ -6,6 +6,7 @@ import {
 } from "@/lib/utils/date-time-format";
 
 export function processEventData(eventData: EventDetails): {
+  trueCode: string;
   eventName: string;
   eventRange: EventRange;
   timeslots: Date[];
@@ -24,6 +25,7 @@ export function processEventData(eventData: EventDetails): {
       },
     };
     return {
+      trueCode: eventData.event_code,
       eventName: eventData.title,
       eventRange,
       // Calendar dates are represented as UTC midnight so they stay the same date
@@ -105,6 +107,7 @@ export function processEventData(eventData: EventDetails): {
   }
 
   return {
+    trueCode: eventData.event_code,
     eventName: eventData.title,
     eventRange,
     timeslots,
