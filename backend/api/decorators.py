@@ -131,7 +131,10 @@ def require_account_auth(func):
     def wrapper(request, *args, **kwargs):
         auth = authenticate(request, allow_guest=False)
         if not auth.session:
-            return Response({"error": {"general": ["Account required."]}}, status=401)
+            response = Response(
+                {"error": {"general": ["Account required."]}}, status=401
+            )
+            return finalize_auth_response(response, auth)
         request.user = auth.session.user_account
         response = func(request, *args, **kwargs)
         return finalize_auth_response(response, auth)
