@@ -101,6 +101,9 @@
     transparent
   );
 
+  /* HEADER */
+  --header-height: 88px;
+
   /* FONTS */
   --font-modak: var(--font-modak);
   --font-nunito: var(--font-nunito);

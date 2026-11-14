@@ -76,7 +76,7 @@ export default function CalendarGrid({
     >
       <div
         className={cn(
-          "flex flex-col gap-2 px-2 pb-2",
+          "flex flex-col gap-1 px-2 pb-2",
           mode === "preview" && "cursor-not-allowed",
         )}
         onMouseLeave={() => {
