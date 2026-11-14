@@ -650,6 +650,14 @@ async def get_live_updates(request, event_code):
     The connection can fail if there are too many concurrent connections, either globally
     or for the specific event. In that case, a 503 response is returned.
     """
+    # Get current user ID from cookies
+    auth = await sync_to_async(authenticate)(request)
+    user_id = auth.session.user_account_id if auth.session else -1
+
+    # Return the database connection to the pool now, otherwise it stays checked out until
+    # the stream ends.
+    await sync_to_async(close_old_connections)()
+
     # Using async Redis client
     client: Redis = Redis(connection_pool=async_pool)
 
@@ -682,14 +690,6 @@ async def get_live_updates(request, event_code):
             },
             status=503,
         )
-
-    # Get current user ID from cookies
-    auth = await sync_to_async(authenticate)(request)
-    user_id = auth.session.user_account_id if auth.session else -1
-
-    # Return the database connection to the pool now, otherwise it stays checked out until
-    # the stream ends.
-    await sync_to_async(close_old_connections)()
 
     async def event_generator():
         pubsub = client.pubsub()
