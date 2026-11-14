@@ -9,6 +9,6 @@ import LinkButton from "@/features/button/components/link";
  * Each element can be either an `ActionButton` or `LinkButton` component.
  */
 export type ButtonArray = (
-    | ReactElement<ComponentProps<typeof ActionButton>>
-    | ReactElement<ComponentProps<typeof LinkButton>>
+  | ReactElement<ComponentProps<typeof ActionButton>>
+  | ReactElement<ComponentProps<typeof LinkButton>>
 )[];

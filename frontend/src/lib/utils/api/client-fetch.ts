@@ -16,7 +16,7 @@ const baseUrl =
 export async function clientGet<T extends { url: string }>(
   endpoint: T,
   params?: InferReq<T>,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<InferRes<T>> {
   let queryString = "";
   if (params && Object.keys(params).length > 0) {
@@ -34,7 +34,7 @@ export async function clientGet<T extends { url: string }>(
     ...options,
   };
 
-  return (await fetchJson(url, requestOptions) as InferRes<T>);
+  return (await fetchJson(url, requestOptions)) as InferRes<T>;
 }
 
 /**
@@ -47,7 +47,7 @@ export async function clientGet<T extends { url: string }>(
 export async function clientPost<T extends { url: string }>(
   endpoint: T,
   body?: InferReq<T>,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<InferRes<T>> {
   const url = `${baseUrl}${endpoint.url}`;
 
@@ -61,5 +61,5 @@ export async function clientPost<T extends { url: string }>(
     ...options,
   };
 
-  return (await fetchJson(url, requestOptions) as InferRes<T>);
+  return (await fetchJson(url, requestOptions)) as InferRes<T>;
 }

@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { useRouter } from "next/navigation";
 
 import PasswordValidation from "@/features/auth/components/password-validation";
 import { useToast } from "@/features/system-feedback";
@@ -16,6 +18,7 @@ export type ChangePasswordStepProps = {
 
 export function useChangePasswordFlow() {
   const { addToast } = useToast();
+  const router = useRouter();
   const { errors, handleError, clearAllErrors } = useFormErrors();
 
   const [open, setOpen] = useState(false);
@@ -61,6 +64,43 @@ export function useChangePasswordFlow() {
       clearAllErrors();
     }
   };
+
+  const invalidForm = useMemo(() => {
+    if (step === "CHANGE") {
+      return !form.currentPassword || !form.newPassword
+        ? MESSAGES.FORM_NOT_FILLED
+        : !passwordIsStrong
+          ? MESSAGES.ERROR_PASSWORD_WEAK
+          : !form.confirmPassword
+            ? MESSAGES.FORM_NOT_FILLED
+            : form.newPassword !== form.confirmPassword
+              ? MESSAGES.ERROR_PASSWORD_MISMATCH
+              : Object.keys(errors).length
+                ? MESSAGES.FORM_HAS_ERRORS
+                : undefined;
+    }
+    if (step === "OTP") {
+      return !form.resetCode
+        ? "Please enter the reset code."
+        : Object.keys(errors).length
+          ? MESSAGES.FORM_HAS_ERRORS
+          : undefined;
+    }
+    if (step === "RESET") {
+      return !form.newPassword
+        ? MESSAGES.FORM_NOT_FILLED
+        : !passwordIsStrong
+          ? MESSAGES.ERROR_PASSWORD_WEAK
+          : !form.confirmPassword
+            ? MESSAGES.FORM_NOT_FILLED
+            : form.newPassword !== form.confirmPassword
+              ? MESSAGES.ERROR_PASSWORD_MISMATCH
+              : Object.keys(errors).length
+                ? MESSAGES.FORM_HAS_ERRORS
+                : undefined;
+    }
+    return undefined;
+  }, [step, form, passwordIsStrong, errors]);
 
   // --- API FUNCTIONS ---
   const handleForgotPassword = async () => {
@@ -117,6 +157,7 @@ export function useChangePasswordFlow() {
       });
       handleOpenChange(false);
       addToast("success", MESSAGES.SUCCESS_PASSWORD_CHANGED);
+      router.refresh();
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -155,6 +196,7 @@ export function useChangePasswordFlow() {
       });
       handleOpenChange(false);
       addToast("success", MESSAGES.SUCCESS_PASSWORD_CHANGED);
+      router.refresh();
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
@@ -175,6 +217,7 @@ export function useChangePasswordFlow() {
     setStep,
     form,
     updateForm,
+    invalidForm,
     errors,
     criteria,
     showCriteria,

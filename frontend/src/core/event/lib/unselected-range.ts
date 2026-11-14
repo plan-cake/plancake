@@ -7,20 +7,21 @@ import { EventRange } from "@/core/event/types";
  * @returns `true` if the event range has unselected dates or times, `false` otherwise
  */
 export default function checkUnselectedRange(eventRange: EventRange) {
+  const unselectedTimes =
+    eventRange.timeRange.from === null || eventRange.timeRange.to === null;
+
   if (eventRange.type === "specific") {
-    if (
-      eventRange.dateRange.from === null ||
-      eventRange.dateRange.to === null
-    ) {
+    if (!eventRange.dates.size || unselectedTimes) {
+      return true;
+    }
+  } else if (eventRange.type === "weekday") {
+    if (!eventRange.weekdays.size || unselectedTimes) {
       return true;
     }
   } else {
-    if (eventRange.weekdays.length === 0) {
+    if (!eventRange.dates.size) {
       return true;
     }
-  }
-  if (eventRange.timeRange.from === null || eventRange.timeRange.to === null) {
-    return true;
   }
   return false;
 }

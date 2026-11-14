@@ -287,7 +287,40 @@ export const VERSION_DATA: VersionHistoryData = [
           "Header buttons no longer shift when switching pages",
         ],
       },
+      {
+        version: "v0.5.2",
+        releaseDate: { year: 2026, month: 10, day: 17 },
+        added: ["An option was added to display more days per grid page"],
+        changed: [
+          "Submit buttons are now disabled on desktop if fields are empty or have errors",
+        ],
+        fixed: [
+          "Weekday events viewed from a different time zone no longer display duplicated days",
+          "Weekday event timeslots now convert between time zones correctly on the painting page",
+          'The time label for midnight now displays "12 AM" instead of "12 PM"',
+        ],
+      },
     ],
+  },
+  {
+    version: "v1.0",
+    releaseDate: { year: 2026, month: 11, day: 1 },
+    tag: "Full Release",
+    added: [
+      "The landing page was completely redesigned",
+      "Date-only events were added",
+      "Events are no longer restricted to a single consecutive range of days",
+      "Emails are now formatted to match the site",
+      "Active sessions can now be managed from account settings",
+      "Date selectors now have presets",
+    ],
+    changed: [
+      "The scrollbar gutter is now persistent to avoid layout shifts",
+      "Drawer, dropdown, and popover styling was slightly adjusted",
+      "Event types were renamed to be more descriptive",
+    ],
+    fixed: [],
+    minorVersions: [],
   },
 ] as const;
 

@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db.models import Q
 
 from api.models import (
+    EventCalendarTimeslot,
     EventDateTimeslot,
     EventParticipant,
     EventWeekdayTimeslot,
@@ -16,9 +17,13 @@ def get_timeslots(event):
         timeslots = EventDateTimeslot.objects.filter(user_event=event).order_by(
             "utc_timeslot"
         )
-    else:
+    elif event.date_type == UserEvent.EventType.GENERIC:
         timeslots = EventWeekdayTimeslot.objects.filter(user_event=event).order_by(
             "weekday", "local_timeslot"
+        )
+    elif event.date_type == UserEvent.EventType.CALENDAR:
+        timeslots = EventCalendarTimeslot.objects.filter(user_event=event).order_by(
+            "date"
         )
 
     return timeslots

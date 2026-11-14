@@ -1,4 +1,4 @@
-export type EventType = "specific" | "weekday";
+export type EventType = "specific" | "weekday" | "calendar";
 
 export type EventInformation = {
   title: string;
@@ -18,7 +18,7 @@ type BaseEventRange = {
 };
 
 // discriminated union for event ranges - this is your single source of truth
-export type EventRange = SpecificDateRange | WeekdayRange;
+export type EventRange = SpecificDateRange | WeekdayRange | CalendarRange;
 
 // represents selected weekdays
 export type Weekday = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
@@ -36,15 +36,17 @@ export const ALL_WEEKDAYS: Weekday[] = [
 
 export type SpecificDateRange = BaseEventRange & {
   type: "specific";
-  dateRange: {
-    from: string | null;
-    to: string | null;
-  };
+  dates: Set<string>;
 };
 
 export type WeekdayRange = BaseEventRange & {
   type: "weekday";
-  weekdays: Weekday[];
+  weekdays: Set<Weekday>;
+};
+
+export type CalendarRange = BaseEventRange & {
+  type: "calendar";
+  dates: Set<string>;
 };
 
 /* SLOTS TYPES FOR UI */

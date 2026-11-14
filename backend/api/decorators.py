@@ -14,8 +14,6 @@ from api.settings import (
     ACCOUNT_COOKIE_NAME,
     CF_TURNSTILE_SECRET_KEY,
     CF_TURNSTILE_VERIFY_URL,
-    DEBUG,
-    GENERIC_ERR_RESPONSE,
     GUEST_COOKIE_NAME,
     ThrottleScopes,
 )
@@ -23,6 +21,7 @@ from api.utils import (
     RateLimitError,
     check_rate_limit,
     delete_session_cookie,
+    generic_error_response,
     get_client_ip_address,
     get_metadata,
     get_session,
@@ -52,10 +51,10 @@ def api_endpoint(method):
                 return e.response
             except DatabaseError as e:
                 logger.db_error(e)
-                return GENERIC_ERR_RESPONSE
+                return generic_error_response()
             except Exception as e:
                 logger.error(e)
-                return GENERIC_ERR_RESPONSE
+                return generic_error_response()
 
         drf_view = api_view([method])(wrapper)
         metadata = get_metadata(func)
@@ -492,7 +491,7 @@ def validate_output(serializer_class):
                         return response
                     else:
                         logger.error("Output validation failed: %s", serializer.errors)
-                        return GENERIC_ERR_RESPONSE
+                        return generic_error_response()
                 else:
                     validate_error_format(
                         response.data, get_metadata(wrapper).input_serializer_class
@@ -502,7 +501,7 @@ def validate_output(serializer_class):
                     return response
             else:
                 logger.critical("Response is not a valid Response object.")
-                return GENERIC_ERR_RESPONSE
+                return generic_error_response()
 
         get_metadata(wrapper).output_serializer_class = serializer_class
         return wrapper
@@ -562,7 +561,7 @@ def require_captcha(func):
                 )
         except Exception as e:
             logger.warning("CAPTCHA verification had a problem: %s", e)
-            return GENERIC_ERR_RESPONSE
+            return generic_error_response()
 
         return func(request, *args, **kwargs)
 

@@ -1,9 +1,4 @@
-import {
-  CheckIcon,
-  CopyIcon,
-  InfoIcon,
-  TriangleAlertIcon,
-} from "lucide-react";
+import { CheckIcon, CopyIcon, InfoIcon, TriangleAlertIcon } from "lucide-react";
 
 export const TOAST_CONFIG = {
   error: {

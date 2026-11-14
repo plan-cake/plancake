@@ -1,10 +1,12 @@
 import json
 import logging
 from abc import ABC, abstractmethod
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from enum import Enum
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+import requests
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
 from ipware import get_client_ip
 from redis import Redis
@@ -17,10 +19,13 @@ from api.models import UserAccount, UserEvent, UserSession
 from api.redis_pools import sync_pool
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
+    BASE_URL,
     COOKIE_DOMAIN,
     DEBUG,
+    EMAIL_BRIDGE_SECRET,
     GUEST_COOKIE_NAME,
     LONG_SESS_EXP_SECONDS,
+    SEND_EMAILS,
     SESS_EXP_SECONDS,
     TEST_ENVIRONMENT,
     ThrottleScope,
@@ -113,6 +118,12 @@ def delete_session_cookie(response, key):
     response.delete_cookie(key, domain=COOKIE_DOMAIN)
 
 
+def generic_error_response():
+    return Response(
+        {"error": {"general": ["An unknown error has occurred."]}}, status=500
+    )
+
+
 class MessageOutputSerializer(serializers.Serializer):
     message = serializers.ListField(child=serializers.CharField())
 
@@ -140,76 +151,75 @@ def get_event_type(date_type):
             return "Date"
         case UserEvent.EventType.GENERIC:
             return "Week"
+        case UserEvent.EventType.CALENDAR:
+            return "Calendar"
 
 
-class EventBounds:
+class EventRange:
     def __init__(
         self,
-        start_date: datetime.date,
-        end_date: datetime.date,
-        start_time: datetime.time,
-        end_time: datetime.time,
+        dates: list[date],
+        start_time: time,
+        end_time: time,
     ):
-        self.start_date = start_date
-        self.end_date = end_date
+        self.dates = dates
         self.start_time = start_time
         self.end_time = end_time
 
 
-def get_event_bounds(event: UserEvent) -> EventBounds:
+def get_event_range(event: UserEvent) -> EventRange:
     """
-    Finds the start and end date/time bounds for an event.
+    Finds the list of dates and start/end times for an event.
 
     For query efficiency, the event's timeslots should be prefetched.
     """
-    all_timeslots: list[datetime] = []
+    times: set[time] = set()
+    dates: set[date] = set()
     event_time_zone = ZoneInfo(event.time_zone)
 
-    event_type = get_event_type(event.date_type)
     match event.date_type:
         case UserEvent.EventType.SPECIFIC:
-            # Sort the timeslots by the EVENT'S time zone to get the creator's min/max
-            all_timeslots = [
-                ts.utc_timeslot.astimezone(event_time_zone)
-                for ts in event.date_timeslots.all()
-            ]
+            # Convert the timeslots to the EVENT'S time zone to get dates/times relative
+            # to the creator
+            for ts in event.date_timeslots.all():
+                current = ts.utc_timeslot.astimezone(event_time_zone)
+                times.add(current.time())
+                dates.add(current.date())
         case UserEvent.EventType.GENERIC:
-            all_timeslots = [
-                get_weekday_date(ts.weekday, ts.local_timeslot)
-                for ts in event.weekday_timeslots.all()
-            ]
+            for ts in event.weekday_timeslots.all():
+                current = get_weekday_date(ts.weekday, ts.local_timeslot)
+                times.add(current.time())
+                dates.add(current.date())
+        case UserEvent.EventType.CALENDAR:
+            for ts in event.calendar_timeslots.all():
+                current = to_datetime(ts.date)
+                dates.add(current.date())
 
-    if not all_timeslots:
+    if not dates or (event.date_type != UserEvent.EventType.CALENDAR and not times):
         logger.critical(
-            f"Event {event.id} has no timeslots when formatting for dashboard."
+            f"Event {event.user_event_id} has no timeslots when formatting for dashboard."
         )
         raise ValueError("Event has no timeslots.")
 
-    # Earliest weekday is also sorted by date
-    start_date = min(ts.date() for ts in all_timeslots)
-    end_date = max(ts.date() for ts in all_timeslots)
-    start_time = min(ts.time() for ts in all_timeslots)
-    end_time = max(ts.time() for ts in all_timeslots)
-    # End time should be 15 minutes after the last timeslot
-    end_time = (datetime.combine(datetime.min, end_time) + timedelta(minutes=15)).time()
+    if event.date_type == UserEvent.EventType.CALENDAR:
+        return EventRange(
+            dates=list(dates),
+            start_time=time(hour=0, minute=0, second=0),
+            end_time=time(hour=0, minute=0, second=0),
+        )
+    else:
+        start_time = min(times)
+        end_time = max(times)
+        # End time is 15 minutes after the last timeslot
+        end_time = (datetime.combine(date.min, end_time) + timedelta(minutes=15)).time()
 
-    # datetime.combine has no time zone info, so we include the event's time zone to
-    # make sure it doesn't convert twice
-    start_datetime = datetime.combine(start_date, start_time).replace(
-        tzinfo=event_time_zone
-    )
-    end_datetime = datetime.combine(end_date, end_time).replace(tzinfo=event_time_zone)
-    if event.date_type == UserEvent.EventType.SPECIFIC:
-        # Convert to UTC for date events, not week events since those stay in local time
-        start_datetime = start_datetime.astimezone(ZoneInfo("UTC"))
-        end_datetime = end_datetime.astimezone(ZoneInfo("UTC"))
-
-    return EventBounds(
-        start_date=start_datetime.date(),
-        end_date=end_datetime.date(),
-        start_time=start_datetime.time(),
-        end_time=end_datetime.time(),
-    )
+        # Dates and times are left in the event's time zone, and the frontend handles the
+        # conversion
+        return EventRange(
+            dates=list(dates),
+            start_time=start_time,
+            end_time=end_time,
+        )
 
 
 def format_event_info(event: UserEvent, include_participants: bool = False) -> dict:
@@ -221,13 +231,12 @@ def format_event_info(event: UserEvent, include_participants: bool = False) -> d
     If `include_participants` is `True`, the event's participants should also be
     prefetched.
     """
-    bounds = get_event_bounds(event)
+    bounds = get_event_range(event)
 
     data = {
         "title": event.title,
         "event_type": get_event_type(event.date_type),
-        "start_date": bounds.start_date,
-        "end_date": bounds.end_date,
+        "dates": bounds.dates,
         "start_time": bounds.start_time,
         "end_time": bounds.end_time,
         "time_zone": event.time_zone,
@@ -473,3 +482,83 @@ def notify_live_update(event: LiveUpdateEvent):
         f"event_{event.event_code}",
         event.dumps(),
     )
+
+
+def to_datetime(date):
+    """
+    Converts a date object to a datetime object at midnight.
+
+    If the input is already a datetime object, it is returned unchanged.
+    """
+    if isinstance(date, datetime):
+        return date
+    return datetime(date.year, date.month, date.day)
+
+
+class EmailTemplateKey(str, Enum):
+    EMAIL_IN_USE = "email_in_use"
+    EMAIL_VERIFICATION = "email_verification"
+    PASSWORD_RESET = "password_reset"
+    PASSWORD_RESET_CODE = "password_reset_code"
+
+
+def send_templated_email(to_email, template_key: EmailTemplateKey, context) -> bool:
+    """
+    Fetches rendered HTML from Next.js and sends it as an email.
+
+    Returns True if the email was sent successfully, False otherwise.
+
+    This function will check the SEND_EMAILS environment variable, and if set to False
+    then the email will not be sent and True will be returned every time.
+    """
+    if not SEND_EMAILS:
+        return True
+
+    url = BASE_URL
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {EMAIL_BRIDGE_SECRET}",
+    }
+    payload = {
+        "template_key": template_key,
+        "context": context,
+    }
+
+    html_content = None
+    text_fallback = None
+    msg_subject = None
+    success = False
+
+    try:
+        response = requests.post(
+            url + "/api/render-email/", json=payload, headers=headers, timeout=5
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            html_content = data.get("html")
+            text_fallback = data.get("text")
+            msg_subject = data.get("subject")
+            success = True
+            logger.info(f"Successfully rendered email for template '{template_key}'")
+        else:
+            logger.error(
+                f"Failed to render email for template '{template_key}'. "
+                f"Status code: {response.status_code}, Response: {response.text}"
+            )
+    except requests.RequestException as e:
+        logger.error(f"Error rendering email for template '{template_key}': {e}")
+
+    try:
+        if html_content:
+            EmailMultiAlternatives(
+                subject=msg_subject,
+                body=text_fallback,
+                alternatives=[(html_content, "text/html")],
+                to=[to_email],
+            ).send()
+    except Exception as e:
+        logger.error(f"Error sending email: {e}")
+        success = False
+
+    return success

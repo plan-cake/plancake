@@ -15,7 +15,7 @@ type ButtonType = "action" | "link" | "empty";
 export type BaseButtonProps = {
   /**
    * The type of the button, determining its behavior and required props.
-   * 
+   *
    * This is only used internally.
    */
   _buttontype: ButtonType;
@@ -90,7 +90,9 @@ export type BaseButtonProps = {
    * `loadOnSuccess` is `true`, indicating whether the action was successful. Otherwise,
    * the function is always assumed to be successful.
    */
-  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => Promise<void | boolean> | void | boolean;
+  onClick?: (
+    e?: React.MouseEvent<HTMLButtonElement>,
+  ) => Promise<void | boolean> | void | boolean;
   /**
    * If specified, the button will stay in a loading state after a successful action. This
    * behavior should be used for buttons that trigger navigation, to avoid multiple clicks
@@ -100,6 +102,10 @@ export type BaseButtonProps = {
    * `onClick`.
    */
   loadOnSuccess?: boolean;
+  /**
+   * If `true`, the button will expand to fill the width of its container.
+   */
+  fullWidth?: boolean;
   /**
    * Additional className to apply to the button, for further customization.
    */
@@ -124,12 +130,16 @@ type CommonButtonProps = {
   /** @inheritdoc BaseButtonProps */
   disabled?: boolean;
   /** @inheritdoc BaseButtonProps */
+  fullWidth?: boolean;
+  /** @inheritdoc BaseButtonProps */
   className?: string;
 };
 
 export type ActionButtonProps = CommonButtonProps & {
   /** @inheritdoc BaseButtonProps */
-  onClick: (e?: React.MouseEvent<HTMLButtonElement>) => Promise<void | boolean> | void | boolean;
+  onClick: (
+    e?: React.MouseEvent<HTMLButtonElement>,
+  ) => Promise<void | boolean> | void | boolean;
   /** @inheritdoc BaseButtonProps */
   loadOnSuccess?: boolean;
 };

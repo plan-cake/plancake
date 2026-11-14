@@ -1,0 +1,187 @@
+"use client";
+
+import { Fragment, useMemo } from "react";
+
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+
+import ActionButton from "@/features/button/components/action";
+import { SIDE_WIDTH, TIME_LABEL_WIDTH } from "@/features/event/grid/constants";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { cn } from "@/lib/utils/classname";
+
+interface DateHeaderProps {
+  preview?: boolean;
+  visibleDays: { dayKey: string; dayDisplay: string }[];
+  currentPage: number;
+  totalPages: number;
+  dateBlockGaps: {
+    startGap: boolean;
+    endGap: boolean;
+    middleGaps: Set<number>;
+  };
+  scrollbarPresent?: boolean;
+  isStatic?: boolean;
+  isWeekdayEvent?: boolean;
+  onPrevPage: () => void;
+  onNextPage: () => void;
+  direction?: number;
+}
+
+const variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? "50%" : "-50%",
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? "50%" : "-50%",
+    opacity: 0,
+  }),
+};
+
+const MONTH_TO_NUM: Record<string, number> = {
+  Jan: 1,
+  Feb: 2,
+  Mar: 3,
+  Apr: 4,
+  May: 5,
+  Jun: 6,
+  Jul: 7,
+  Aug: 8,
+  Sep: 9,
+  Oct: 10,
+  Nov: 11,
+  Dec: 12,
+} as const;
+const condenseMonth = (month: string) => {
+  return MONTH_TO_NUM[month] ?? month;
+};
+const condenseWeekday = (weekday: string) => {
+  return weekday === "Thu" ? "R" : weekday === "Sun" ? "U" : weekday[0];
+};
+
+export default function DateHeader({
+  preview = false,
+  visibleDays,
+  currentPage,
+  totalPages,
+  dateBlockGaps,
+  scrollbarPresent = false,
+  isStatic = false,
+  isWeekdayEvent = false,
+  onPrevPage,
+  onNextPage,
+  direction = 0,
+}: DateHeaderProps) {
+  const isMobile = useCheckMobile();
+  const compact = useMemo(
+    () => (isMobile ? visibleDays.length > 4 : visibleDays.length > 7),
+    [isMobile, visibleDays.length],
+  );
+
+  return (
+    <div
+      className={cn(
+        "z-10 col-span-2 grid h-[50px] w-full items-center justify-center pr-2",
+        preview ? "bg-background md:bg-panel" : "bg-background",
+        scrollbarPresent && "pr-5",
+        !isStatic && "sticky top-[var(--header-height)] md:top-0",
+      )}
+      style={{
+        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 0}px`,
+      }}
+    >
+      <div>
+        {currentPage > 0 && (
+          <ActionButton
+            buttonStyle="semi-transparent"
+            icon={<ChevronLeftIcon />}
+            onClick={onPrevPage}
+            className="ml-3 p-1.5"
+            aria-label="Previous Page"
+            tooltip="Previous Page"
+          />
+        )}
+      </div>
+
+      {/* This container takes up the '1fr' space */}
+      <div className="relative grid h-full select-none overflow-hidden">
+        <AnimatePresence initial={false} custom={direction} mode="popLayout">
+          <motion.div
+            key={currentPage}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ type: "tween", ease: "easeInOut" }}
+            className="absolute inset-0 flex h-full w-full items-center"
+          >
+            {dateBlockGaps.startGap && <div className="w-2" />}
+
+            {visibleDays.map(({ dayDisplay }, i) => {
+              const [weekday, month, day] = dayDisplay.split(" ");
+
+              return (
+                <Fragment key={`header-fragment-${i}`}>
+                  <div
+                    className={cn(
+                      "flex flex-1 flex-col items-center justify-center text-sm leading-tight",
+                      ["Sat", "Sun"].includes(weekday) && "opacity-60",
+                      compact && "tracking-tighter lg:tracking-normal",
+                    )}
+                  >
+                    <div>
+                      <span className={compact ? "lg:hidden" : "hidden"}>
+                        {condenseWeekday(weekday)}
+                      </span>
+                      <span className={compact ? "hidden lg:block" : ""}>
+                        {weekday}
+                      </span>
+                    </div>
+                    {!isWeekdayEvent && (
+                      <div className="flex">
+                        <span className={compact ? "xl:hidden" : "hidden"}>
+                          {condenseMonth(month)}/
+                        </span>
+                        <span
+                          className={
+                            compact ? "hidden xl:mr-1 xl:block" : "mr-1"
+                          }
+                        >
+                          {month}
+                        </span>
+                        <span>{day.replace(/^0+/, "")}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {dateBlockGaps.middleGaps.has(i) && <div className="w-2" />}
+                </Fragment>
+              );
+            })}
+
+            {dateBlockGaps.endGap && <div className="w-2" />}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div>
+        {currentPage < totalPages - 1 && (
+          <ActionButton
+            buttonStyle="semi-transparent"
+            icon={<ChevronRightIcon />}
+            onClick={onNextPage}
+            className="p-1.5"
+            aria-label="Next Page"
+            tooltip="Next Page"
+          />
+        )}
+      </div>
+    </div>
+  );
+}

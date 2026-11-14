@@ -8,7 +8,11 @@ import { serverPost } from "@/lib/utils/api/server-fetch";
 
 export async function deleteEvent(eventCode: string) {
   try {
-    await serverPost(ROUTES.event.delete, { event_code: eventCode }, { cache: "no-store" });
+    await serverPost(
+      ROUTES.event.delete,
+      { event_code: eventCode },
+      { cache: "no-store" },
+    );
     revalidatePath(`/dashboard`);
     return { success: true };
   } catch (e) {
