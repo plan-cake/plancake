@@ -27,6 +27,7 @@ import useGridPageDays from "@/features/event/grid/date-time/lib/use-page-days";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import FormSelectorField from "@/features/selector/components/selector-field";
 import { RateLimitBanner } from "@/features/system-feedback";
+import ShortcutTrigger from "@/features/system-feedback/hotkeys/components/shortcut-trigger";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { MESSAGES } from "@/lib/messages";
 import submitEvent from "@/lib/utils/api/submit-event";
@@ -168,11 +169,12 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
   };
 
   // REUSED COMPONENTS
-  const cancelButton = (
+  const cancelButton = (desktop: boolean) => (
     <LinkButton
       buttonStyle="transparent"
       label="Cancel Edits"
       href={`/${initialData?.customCode}`}
+      hotkey={desktop ? { keys: "c", type: "shortcut" } : undefined}
     />
   );
 
@@ -184,6 +186,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       onClick={submitEventInfo}
       disabled={(desktop && !!invalidForm) || captchaInitError}
       loadOnSuccess
+      hotkey={desktop ? { keys: "mod+enter" } : undefined}
     />
   );
   const grid = (
@@ -228,22 +231,28 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
 
       <div className="-mb-1 flex w-full items-center justify-between">
         <div className="mb-4 w-full md:w-1/2">
-          <TextInputField
-            id={"event-name"}
-            type="text"
-            label="Event Name"
-            value={title}
-            onChange={setTitle}
-            error={errors.title || errors.api}
-            className="text-2xl font-semibold"
-            maxLength={{
-              length: MAX_TITLE_LENGTH,
-              error: MESSAGES.ERROR_EVENT_NAME_LENGTH,
-            }}
-          />
+          <ShortcutTrigger
+            hotkey="n"
+            selector="#event-name"
+            tooltipSide="right"
+          >
+            <TextInputField
+              id={"event-name"}
+              type="text"
+              label="Event Name"
+              value={title}
+              onChange={setTitle}
+              error={errors.title || errors.api}
+              className="text-2xl font-semibold"
+              maxLength={{
+                length: MAX_TITLE_LENGTH,
+                error: MESSAGES.ERROR_EVENT_NAME_LENGTH,
+              }}
+            />
+          </ShortcutTrigger>
         </div>
         <div className="hidden gap-2 md:flex">
-          {type === "edit" && cancelButton}
+          {type === "edit" && cancelButton(true)}
           {submitButton(true)}
         </div>
       </div>
@@ -270,23 +279,35 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
             </div>
             <div className="flex flex-col gap-2 md:col-start-1 md:row-span-8 md:row-start-3">
               <FormSelectorField label="FROM" htmlFor="from-time-dropdown">
-                <TimeSelector
-                  id="from-time-dropdown"
-                  value={eventRange.timeRange.from}
-                  onChange={setStartTime}
-                  placeholder="Start Time"
-                  dialogTitle="Select Start Time"
-                />
+                <ShortcutTrigger
+                  hotkey="s"
+                  selector="#from-time-dropdown"
+                  tooltipSide="right"
+                >
+                  <TimeSelector
+                    id="from-time-dropdown"
+                    value={eventRange.timeRange.from}
+                    onChange={setStartTime}
+                    placeholder="Start Time"
+                    dialogTitle="Select Start Time"
+                  />
+                </ShortcutTrigger>
               </FormSelectorField>
 
               <FormSelectorField label="UNTIL" htmlFor="to-time-dropdown">
-                <TimeSelector
-                  id="to-time-dropdown"
-                  value={eventRange.timeRange.to}
-                  onChange={setEndTime}
-                  placeholder="End Time"
-                  dialogTitle="Select End Time"
-                />
+                <ShortcutTrigger
+                  hotkey="e"
+                  selector="#to-time-dropdown"
+                  tooltipSide="right"
+                >
+                  <TimeSelector
+                    id="to-time-dropdown"
+                    value={eventRange.timeRange.to}
+                    onChange={setEndTime}
+                    placeholder="End Time"
+                    dialogTitle="Select End Time"
+                  />
+                </ShortcutTrigger>
               </FormSelectorField>
             </div>
           </div>
@@ -311,6 +332,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
                         value={gridPageDays}
                         options={gridPageDaysOptions}
                         onChange={setGridPageDays}
+                        useShortcut={false}
                       />
                     </div>
                   )}
@@ -339,6 +361,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
                   value={gridPageDays}
                   options={gridPageDaysOptions}
                   onChange={setGridPageDays}
+                  useShortcut={false}
                 />
               </div>
             )}
@@ -349,7 +372,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
       {/* This z-index is necessary to avoid the time column overlapping */}
       <div className="z-10">
         <MobileFooterIsland
-          leftButtons={type === "edit" ? [cancelButton] : undefined}
+          leftButtons={type === "edit" ? [cancelButton(false)] : undefined}
           rightButtons={[submitButton(false)]}
         >
           <SegmentedControl

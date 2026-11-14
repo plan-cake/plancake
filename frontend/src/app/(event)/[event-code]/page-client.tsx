@@ -33,6 +33,7 @@ import {
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import ShareMenu from "@/features/share-menu/menu";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { cn } from "@/lib/utils/classname";
 import { getDatesFromTimeslots } from "@/lib/utils/date-time-format";
@@ -93,6 +94,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
   );
 
   /* MOBILE DRAWER SPACING */
+  const isMobile = useCheckMobile();
   const [drawerSnap, setDrawerSnap] = useState<number | string | null>(0.22);
   const getSpacerHeight = () => {
     const defaultHeight = "25svh";
@@ -141,16 +143,28 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
       onClick={() => {
         doViewTransition(`/${eventCode}/painting`, GRID_ID_SELECTOR);
       }}
+      hotkey={{
+        keys: "a",
+        type: "shortcut",
+      }}
       loadOnSuccess
     />
   );
 
-  const editButton = (buttonStyle: HeaderButtonStyle) => (
+  const editButton = (buttonStyle: HeaderButtonStyle, desktop: boolean) => (
     <LinkButton
       buttonStyle={buttonStyle}
       icon={<PencilIcon />}
       label="Edit Event"
       href={`/${eventCode}/edit`}
+      hotkey={
+        desktop
+          ? {
+              keys: "e",
+              type: "shortcut",
+            }
+          : undefined
+      }
     />
   );
 
@@ -163,6 +177,10 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
           buttonStyle="secondary"
           icon={<ShareIcon />}
           label="Share Event"
+          hotkey={{
+            keys: "s",
+            type: "shortcut",
+          }}
         />
       }
     />
@@ -187,6 +205,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
               value={gridPageDays}
               options={gridPageDaysOptions}
               onChange={setGridPageDays}
+              useShortcut={desktop}
             />
           </div>
         )}
@@ -199,6 +218,7 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
             id={"timezone-select-" + (desktop ? "desktop" : "mobile")}
             value={timezone}
             onChange={handleTZChange}
+            useShortcut={desktop}
           />
         </div>
       </div>
@@ -214,12 +234,12 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
 
         {isCreator && (
           <div className="md:hidden">
-            <KebabMenu>{editButton("frosted glass inset")}</KebabMenu>
+            <KebabMenu>{editButton("frosted glass inset", false)}</KebabMenu>
           </div>
         )}
 
         <div className="ml-auto hidden flex-wrap justify-end gap-2 md:flex">
-          {isCreator && editButton("secondary")}
+          {isCreator && editButton("secondary", true)}
           {shareButton}
           {paintingButton}
         </div>
@@ -244,25 +264,26 @@ function EventResults({ eventData }: { eventData: EventInformation }) {
         {displaySettings(false)}
 
         {/* Mobile Spacer & Drawer */}
-        <div
-          className="w-full md:hidden"
-          style={{ height: getSpacerHeight() }}
-        />
-        <div className="md:hidden">
-          <AttendeesDrawer
-            onSnapChange={setDrawerSnap}
-            eventTitle={eventTitle}
-            eventCode={eventCode}
-            numParticipants={participants.length}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none fixed left-0 right-0 top-[100vh] w-[100vw]"
-            style={{
-              viewTransitionName: "painting-island",
-            }}
-          />
-        </div>
+        {isMobile && (
+          <>
+            <div className="w-full" style={{ height: getSpacerHeight() }} />
+            <div className="md:hidden">
+              <AttendeesDrawer
+                onSnapChange={setDrawerSnap}
+                eventTitle={eventTitle}
+                eventCode={eventCode}
+                numParticipants={participants.length}
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none fixed left-0 right-0 top-[100vh] w-screen"
+                style={{
+                  viewTransitionName: "painting-island",
+                }}
+              />
+            </div>
+          </>
+        )}
 
         {/* Desktop Sidebar */}
         <div
