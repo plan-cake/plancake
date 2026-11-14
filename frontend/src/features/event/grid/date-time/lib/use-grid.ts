@@ -218,6 +218,7 @@ function organizeGridView(
         startGap: false,
         endGap: false,
         middleGaps: new Set<number>(),
+        endSpacerSize: 0,
       },
       visibleDays: [],
       totalPages: 1,
@@ -238,6 +239,7 @@ function organizeGridView(
     startGap: false,
     endGap: false,
     middleGaps: new Set<number>(),
+    endSpacerSize: 0,
   };
 
   const currentBlocks = dateBlocks.filter((block) => {
@@ -273,6 +275,10 @@ function organizeGridView(
       numDays: blockDays.length,
       timeBlocks: processedTimeBlocks,
     });
+  }
+
+  if (currentPage > 0 && visibleDays.length < daysPerPage) {
+    dateBlockGaps.endSpacerSize = daysPerPage - visibleDays.length;
   }
 
   return {

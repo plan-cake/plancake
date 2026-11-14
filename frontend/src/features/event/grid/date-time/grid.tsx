@@ -278,6 +278,10 @@ export default function DateTimeGrid({
 
               {dateBlockGaps.endGap && <div className="w-2" />}
 
+              {!!dateBlockGaps.endSpacerSize && (
+                <div style={{ flex: dateBlockGaps.endSpacerSize }} />
+              )}
+
               {hasNextPage && (
                 <GridPageIndicator
                   side="right"

@@ -19,6 +19,7 @@ interface DateHeaderProps {
     startGap: boolean;
     endGap: boolean;
     middleGaps: Set<number>;
+    endSpacerSize: number;
   };
   scrollbarPresent?: boolean;
   isStatic?: boolean;
@@ -166,6 +167,10 @@ export default function DateHeader({
             })}
 
             {dateBlockGaps.endGap && <div className="w-2" />}
+
+            {!!dateBlockGaps.endSpacerSize && (
+              <div style={{ flex: dateBlockGaps.endSpacerSize }} />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
