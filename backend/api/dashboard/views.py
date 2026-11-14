@@ -1,6 +1,6 @@
 import logging
 
-from django.db.models import Exists, OuterRef, Prefetch, Q
+from django.db.models import Prefetch
 from rest_framework import serializers
 from rest_framework.response import Response
 
@@ -63,15 +63,14 @@ def get_dashboard(request):
             status=200,
         )
 
-    # Create a queryset to be used as a subquery
-    is_participant = EventParticipant.objects.filter(
-        user_event=OuterRef("pk"), user_account=user
+    # A UNION instead of an OR, so that both halves can use their user_account index
+    event_ids = (
+        UserEvent.objects.filter(user_account=user)
+        .values("pk")
+        .union(EventParticipant.objects.filter(user_account=user).values("user_event"))
     )
     events = (
-        UserEvent.objects.filter(
-            Q(user_account=user) | Q(Exists(is_participant)),
-            url_code__isnull=False,
-        )
+        UserEvent.objects.filter(pk__in=event_ids, url_code__isnull=False)
         .order_by("-created_at")
         .select_related("url_code")
         .prefetch_related(
