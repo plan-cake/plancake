@@ -114,7 +114,6 @@ export default function AdvancedOptionsContent({
           disabled={isEditing}
           className={cn(
             "border-b-1 border-foreground/60 w-full focus:outline-none",
-            !isEditing && "text-accent-text",
             isEditing && "cursor-not-allowed opacity-50",
             errors.customCode ? "border-error placeholder:text-error" : "",
           )}
