@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+import { EllipsisIcon, TriangleAlertIcon } from "lucide-react";
+
+import { useEventContext } from "@/core/event/context";
 import EmptyButton from "@/features/button/components/empty";
 import { FloatingDrawer } from "@/features/drawer";
 import AdvancedOptionsContent from "@/features/event/editor/advanced-options/content";
@@ -10,13 +13,22 @@ import { cn } from "@/lib/utils/classname";
 
 export default function AdvancedOptions(props: AdvancedOptionsProps) {
   const isMobile = useCheckMobile();
+  const { errors } = useEventContext();
   const [open, setOpen] = useState(false);
+
+  // Centralized error status if other fields get added that can have errors
+  const hasErrors = !!errors.customCode;
 
   const button = (
     <EmptyButton
       buttonStyle="semi-transparent"
+      icon={hasErrors ? <TriangleAlertIcon /> : <EllipsisIcon />}
       label="Advanced Options"
-      className={cn("border", open ? "border-accent" : "border-transparent")}
+      className={cn(
+        "border",
+        open ? "border-accent" : "border-transparent",
+        hasErrors && "text-error",
+      )}
     />
   );
 
