@@ -292,7 +292,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           </div>
         )}
 
-        <div className="md:content md:col-start-1 md:row-start-10 md:flex md:max-w-[250px] md:items-end">
+        <div className="md:content pt-1 md:col-start-1 md:row-start-10 md:flex md:max-w-[250px] md:items-end">
           <AdvancedOptions isEditing={type === "edit"} errors={errors} />
         </div>
         <div className="h-16 md:hidden" />
