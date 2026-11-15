@@ -57,6 +57,7 @@ export default function AdvancedOptionsContent({
               <span className="font-bold">breakfast</span>
             </span>
           </div>
+          <div>Custom codes are subject to availability.</div>
         </>
       )}
     </div>
@@ -94,7 +95,7 @@ export default function AdvancedOptionsContent({
             title="Custom Event Codes"
             description="More information about custom event codes"
             tooltipContent={
-              <div className="max-w-3xs p-1">{customCodeInfo}</div>
+              <div className="max-w-xs p-1">{customCodeInfo}</div>
             }
             drawerContent={customCodeInfo}
             className="h-5 w-5 opacity-75"
