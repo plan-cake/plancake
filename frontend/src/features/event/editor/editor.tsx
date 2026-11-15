@@ -16,7 +16,7 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import GridPageDaysSelector from "@/features/event/components/selectors/grid-page-days";
 import TimeSelector from "@/features/event/components/selectors/time";
-import AdvancedOptions from "@/features/event/editor/advanced-options";
+import AdvancedOptions from "@/features/event/editor/advanced-options/advanced-options";
 import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
 import DateRangeSelection from "@/features/event/editor/dates/date-selector";
 import { EventEditorType } from "@/features/event/editor/types";

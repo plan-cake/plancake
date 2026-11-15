@@ -1,60 +1,20 @@
-import React, { useState } from "react";
-
-import * as Collapsible from "@radix-ui/react-collapsible";
-import {
-  ChevronRightIcon,
-  GlobeIcon,
-  LinkIcon,
-  TriangleAlertIcon,
-} from "lucide-react";
+import { GlobeIcon, LinkIcon, TriangleAlertIcon } from "lucide-react";
 import { useDebouncedCallback } from "use-debounce";
 
 import InfoPoint from "@/components/info-point";
 import { useEventContext } from "@/core/event/context";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
+import { AdvancedOptionsProps } from "@/features/event/editor/advanced-options/props";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import { cn } from "@/lib/utils/classname";
 
-type AdvancedOptionsProps = {
-  isEditing?: boolean;
-  errors: Record<string, string>;
-};
-
-export default function AdvancedOptions(props: AdvancedOptionsProps) {
-  const [open, setOpen] = useState(false);
-  return (
-    <Collapsible.Root open={open} onOpenChange={setOpen}>
-      <Collapsible.Trigger asChild>
-        <div
-          className={cn(
-            "group flex w-fit cursor-pointer items-center gap-2 rounded-full",
-            "bg-panel p-2 pr-4",
-          )}
-        >
-          <div
-            className={cn(
-              "transition-transform duration-200",
-              "group-hover:bg-accent/25 group-active:bg-accent/40 rounded-full p-1",
-              open && "rotate-90",
-            )}
-          >
-            <ChevronRightIcon className="h-4 w-4" />
-          </div>
-          <span>Advanced Options</span>
-        </div>
-      </Collapsible.Trigger>
-
-      <Collapsible.Content className="collapsible-content mt-2 flex flex-col gap-2">
-        <Options {...props} />
-      </Collapsible.Content>
-    </Collapsible.Root>
-  );
-}
-
-function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
+export default function AdvancedOptionsContent({
+  isEditing,
+  errors,
+}: AdvancedOptionsProps) {
   const {
     state: { customCode, eventRange },
     setTimezone,
@@ -103,7 +63,7 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
   );
 
   return (
-    <>
+    <div className="flex flex-col gap-4 p-2">
       <div className="flex flex-col gap-1">
         <label
           htmlFor="timezone-select"
@@ -160,6 +120,6 @@ function Options({ isEditing = false, errors }: AdvancedOptionsProps) {
           )}
         />
       </div>
-    </>
+    </div>
   );
 }
