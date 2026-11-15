@@ -9,8 +9,10 @@ from api.models import UrlCode, UserEvent
 from api.settings import (
     MAX_CALENDAR_EVENT_DAYS,
     MAX_DATE_TIME_EVENT_DAYS,
+    MAX_URL_CODE_LENGTH,
     RAND_URL_CODE_ATTEMPTS,
     RAND_URL_CODE_LENGTH,
+    URL_CODE_FORMAT_REGEX,
     URL_CODE_TOUCH_INTERVAL_SECONDS,
 )
 from api.utils import prefetch_timeslots
@@ -27,9 +29,9 @@ def check_code_available(code):
 
 
 def check_custom_code(code):
-    if len(code) > 255:
-        return "Code must be 255 characters or less."
-    if not re.fullmatch(r"[A-Za-z0-9\-]+", code):
+    if len(code) > MAX_URL_CODE_LENGTH:
+        return f"Code must be {MAX_URL_CODE_LENGTH} characters or less."
+    if not re.fullmatch(URL_CODE_FORMAT_REGEX, code):
         return "Code must contain only alphanumeric characters and dashes."
 
     RESERVED_KEYWORDS = [
