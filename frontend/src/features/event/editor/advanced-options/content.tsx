@@ -63,7 +63,7 @@ export default function AdvancedOptionsContent({
   );
 
   return (
-    <div className="flex flex-col gap-4 p-2">
+    <div className="flex w-80 flex-col gap-4 p-2">
       <div className="flex flex-col gap-1">
         <label
           htmlFor="timezone-select"
