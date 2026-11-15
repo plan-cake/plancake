@@ -63,7 +63,7 @@ export default function AdvancedOptionsContent({
   );
 
   return (
-    <div className="flex w-80 flex-col gap-4 p-2">
+    <div className="flex flex-col gap-4 p-2 md:w-80">
       <div className="flex flex-col gap-1">
         <label
           htmlFor="timezone-select"
@@ -82,28 +82,23 @@ export default function AdvancedOptionsContent({
       </div>
 
       <div className="flex flex-col gap-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor="custom-code-input"
-              className="flex items-center gap-2 font-bold"
-            >
-              <LinkIcon className="h-4 w-4" strokeWidth={2} />
-              {!isEditing && "Custom"} Event Code
-            </label>
-            <InfoPoint
-              title="Custom Event Codes"
-              description="More information about custom event codes"
-              tooltipContent={
-                <div className="max-w-3xs p-1">{customCodeInfo}</div>
-              }
-              drawerContent={customCodeInfo}
-              className="h-5 w-5 opacity-75"
-            />
-          </div>
-          {errors.customCode && (
-            <TriangleAlertIcon className="text-error h-4 w-4" strokeWidth={2} />
-          )}
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="custom-code-input"
+            className="flex items-center gap-2 font-bold"
+          >
+            <LinkIcon className="h-4 w-4" strokeWidth={2} />
+            {!isEditing && "Custom"} Event Code
+          </label>
+          <InfoPoint
+            title="Custom Event Codes"
+            description="More information about custom event codes"
+            tooltipContent={
+              <div className="max-w-3xs p-1">{customCodeInfo}</div>
+            }
+            drawerContent={customCodeInfo}
+            className="h-5 w-5 opacity-75"
+          />
         </div>
         <input
           id="custom-code-input"
@@ -118,6 +113,15 @@ export default function AdvancedOptionsContent({
             errors.customCode ? "border-error placeholder:text-error" : "",
           )}
         />
+        {errors.customCode && (
+          <div className="text-error flex items-center gap-1 text-sm">
+            <TriangleAlertIcon
+              className="inline h-4 w-4 shrink-0"
+              strokeWidth={2}
+            />
+            {errors.customCode}
+          </div>
+        )}
       </div>
     </div>
   );
