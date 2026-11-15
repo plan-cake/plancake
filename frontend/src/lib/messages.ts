@@ -31,7 +31,7 @@ export const MESSAGES = {
   // event errors
   ERROR_EVENT_NAME_MISSING: "Missing event name.",
   ERROR_EVENT_NAME_LENGTH: `Event name must be ${MAX_TITLE_LENGTH} characters or less.`,
-  ERROR_EVENT_CODE_TAKEN: "This code is unavailable. Please choose another.",
+  ERROR_EVENT_CODE_TAKEN: "This code is not available.",
   ERROR_EVENT_DATES_MISSING: "Please select possible dates for this event.",
   ERROR_EVENT_WEEKDAYS_MISSING: "Please select possible days for this event.",
   ERROR_EVENT_TIMES_MISSING: "Please select possible times for this event.",
