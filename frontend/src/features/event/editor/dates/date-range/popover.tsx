@@ -3,7 +3,6 @@ import { useRef, useState } from "react";
 import { TriangleAlertIcon } from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
-import DatePopover from "@/features/event/editor/dates/date-popover";
 import {
   Calendar,
   CalendarHandle,
@@ -11,6 +10,7 @@ import {
 import { SpecificDateRangeDisplayProps } from "@/features/event/editor/dates/date-range/date-range-props";
 import DateRangePresets from "@/features/event/editor/dates/date-range/presets";
 import SpecificDateRangeDisplay from "@/features/event/editor/dates/date-range/specific-date-display";
+import EventEditorPopover from "@/features/event/editor/popover";
 import { MESSAGES } from "@/lib/messages";
 
 export default function DateRangePopover({
@@ -22,7 +22,7 @@ export default function DateRangePopover({
   const calendarRef = useRef<CalendarHandle>(null);
 
   return (
-    <DatePopover
+    <EventEditorPopover
       open={open}
       setOpen={setOpen}
       trigger={<SpecificDateRangeDisplay dates={dates} open={open} />}
@@ -53,6 +53,6 @@ export default function DateRangePopover({
           )}
         </div>
       </div>
-    </DatePopover>
+    </EventEditorPopover>
   );
 }

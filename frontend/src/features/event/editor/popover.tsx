@@ -4,7 +4,7 @@ import * as Popover from "@radix-ui/react-popover";
 
 import { cn } from "@/lib/utils/classname";
 
-export default function DatePopover({
+export default function EventEditorPopover({
   trigger,
   open,
   setOpen,
