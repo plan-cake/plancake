@@ -32,9 +32,11 @@ export default function AdvancedOptions(props: AdvancedOptionsProps) {
     </FloatingDrawer>
   ) : (
     <EventEditorPopover
+      trigger={button}
+      align="end"
+      side="right"
       open={open}
       setOpen={setOpen}
-      trigger={button}
       ariaLabel="Advanced options menu"
     >
       <AdvancedOptionsContent {...props} />

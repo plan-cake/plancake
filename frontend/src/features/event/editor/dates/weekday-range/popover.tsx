@@ -23,6 +23,8 @@ export default function WeekdayRangePopover({
           <WeekdayRangeDisplay weekdays={weekdays} open={open} />
         </button>
       }
+      align="start"
+      side="bottom"
       open={open}
       setOpen={setOpen}
       ariaLabel="Weekday range picker"

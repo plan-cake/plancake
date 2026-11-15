@@ -6,12 +6,16 @@ import { cn } from "@/lib/utils/classname";
 
 export default function EventEditorPopover({
   trigger,
+  align,
+  side,
   open,
   setOpen,
   ariaLabel,
   children,
 }: {
   trigger: ReactNode;
+  align: Popover.PopoverContentProps["align"];
+  side: Popover.PopoverContentProps["side"];
   open: boolean;
   setOpen: (open: boolean) => void;
   ariaLabel: string;
@@ -24,7 +28,8 @@ export default function EventEditorPopover({
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
-          align="start"
+          align={align}
+          side={side}
           sideOffset={8}
           className={cn(
             "bg-background border-accent z-50 rounded-3xl border p-4 shadow-lg",

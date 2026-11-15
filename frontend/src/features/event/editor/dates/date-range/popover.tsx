@@ -23,13 +23,15 @@ export default function DateRangePopover({
 
   return (
     <EventEditorPopover
-      open={open}
-      setOpen={setOpen}
       trigger={
         <button>
           <SpecificDateRangeDisplay dates={dates} open={open} />
         </button>
       }
+      align="start"
+      side="bottom"
+      open={open}
+      setOpen={setOpen}
       ariaLabel="Date range picker"
     >
       <div className="flex flex-col gap-2">
