@@ -115,6 +115,7 @@ export default function AdvancedOptionsContent({
               <div className="max-w-xs p-1">{customCodeInfo}</div>
             }
             drawerContent={customCodeInfo}
+            drawerNesting={1}
             className="h-5 w-5 opacity-75"
           />
         </div>
