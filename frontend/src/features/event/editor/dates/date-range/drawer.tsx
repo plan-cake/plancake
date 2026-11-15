@@ -40,7 +40,7 @@ export default function DateRangeDrawer({
       title="Select Date Range"
       description="Select dates using the calendar below"
       trigger={
-        <button onClick={() => setOpen(!open)}>
+        <button>
           <SpecificDateRangeDisplay dates={dates} open={open} />
         </button>
       }

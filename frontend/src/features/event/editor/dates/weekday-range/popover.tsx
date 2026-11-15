@@ -18,7 +18,11 @@ export default function WeekdayRangePopover({
 
   return (
     <EventEditorPopover
-      trigger={<WeekdayRangeDisplay weekdays={weekdays} open={open} />}
+      trigger={
+        <button>
+          <WeekdayRangeDisplay weekdays={weekdays} open={open} />
+        </button>
+      }
       open={open}
       setOpen={setOpen}
       ariaLabel="Weekday range picker"

@@ -19,7 +19,7 @@ export default function EventEditorPopover({
 }) {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger className="hover:cursor-pointer">
+      <Popover.Trigger asChild className="hover:cursor-pointer">
         {trigger}
       </Popover.Trigger>
       <Popover.Portal>
