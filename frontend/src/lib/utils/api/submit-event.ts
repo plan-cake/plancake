@@ -86,6 +86,12 @@ export default async function submitEvent(
       handleError("rate_limit", error.formattedMessage);
     } else if (error.captchaFailed) {
       handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
+    } else if (error.data.error["custom_code"]) {
+      const codeErrors = error.data.error["custom_code"];
+      handleError("customCode", codeErrors[0]);
+      codeErrors.forEach((err: string) => {
+        handleError("toast", err);
+      });
     } else {
       handleError("toast", error.formattedMessage);
     }
