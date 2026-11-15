@@ -5,6 +5,10 @@ import InfoPoint from "@/components/info-point";
 import { useEventContext } from "@/core/event/context";
 import TimeZoneSelector from "@/features/event/components/selectors/timezone";
 import { AdvancedOptionsProps } from "@/features/event/editor/advanced-options/props";
+import {
+  MAX_EVENT_CODE_LENGTH,
+  VALID_EVENT_CODE_REGEX,
+} from "@/features/event/editor/constants";
 import { MESSAGES } from "@/lib/messages";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -21,8 +25,19 @@ export default function AdvancedOptionsContent({
     setCustomCode,
     handleError,
   } = useEventContext();
+
+  const checkCodeValidity = (code: string): boolean => {
+    if (code.length > MAX_EVENT_CODE_LENGTH) {
+      handleError("customCode", MESSAGES.ERROR_EVENT_CODE_LENGTH);
+      return false;
+    } else if (!VALID_EVENT_CODE_REGEX.test(code)) {
+      handleError("customCode", MESSAGES.ERROR_EVENT_CODE_FORMAT);
+      return false;
+    }
+    return true;
+  };
   const checkCodeAvailability = useDebouncedCallback(async (code: string) => {
-    if (isEditing || !code) return;
+    if (isEditing || !code || errors.customCode) return;
 
     try {
       await clientPost(ROUTES.event.checkCode, { custom_code: code });
@@ -39,7 +54,9 @@ export default function AdvancedOptionsContent({
   const handleCustomCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setCustomCode(newValue);
-    checkCodeAvailability(newValue);
+    if (newValue && checkCodeValidity(newValue)) {
+      checkCodeAvailability(newValue);
+    }
   };
 
   const customCodeInfo = (
