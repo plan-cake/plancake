@@ -69,10 +69,8 @@ export default function AdvancedOptionsContent({
           <div>
             For example, the link for custom code{" "}
             <span className="font-bold">breakfast</span> would be:{" "}
-            <span className="underline">
-              {typeof window === "undefined" ? "" : window.location.host}/
-              <span className="font-bold">breakfast</span>
-            </span>
+            {typeof window === "undefined" ? "" : window.location.host}/
+            <span className="font-bold">breakfast</span>
           </div>
           <div>Custom codes are subject to availability.</div>
         </>
