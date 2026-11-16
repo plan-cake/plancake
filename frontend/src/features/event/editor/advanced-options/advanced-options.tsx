@@ -22,7 +22,9 @@ export default function AdvancedOptions(props: AdvancedOptionsProps) {
   const button = (
     <EmptyButton
       buttonStyle="semi-transparent"
-      icon={hasErrors ? <TriangleAlertIcon /> : <Settings2Icon />}
+      icon={
+        hasErrors ? <TriangleAlertIcon strokeWidth={2} /> : <Settings2Icon />
+      }
       label="Advanced Options"
       className={cn(
         "border",
