@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { ExternalLinkIcon, TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
@@ -32,7 +32,10 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
   const { addToast } = useToast();
   const router = useRouter();
 
+  // CONFIRMATION DIALOG STATE
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const dialogResolver = useRef<((confirmed: boolean) => void) | null>(null);
+
   const [importPayload, setImportPayload] = useState<{
     [public_id: string]: AvailabilityImportChoice;
   }>(
@@ -64,7 +67,15 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
     }));
   };
 
-  const submitImport = async () => {
+  const handleSubmitImport = async () => {
+    setConfirmOpen(true);
+    const userConfirmed = await new Promise<boolean>((resolve) => {
+      dialogResolver.current = resolve;
+    });
+    if (!userConfirmed) {
+      return false;
+    }
+
     try {
       await clientPost(ROUTES.guestImport.importData, {
         availability_choices: importPayload,
@@ -95,13 +106,14 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
     <ActionButton
       buttonStyle="primary"
       label="Import Data"
-      onClick={() => setConfirmOpen(true)}
+      onClick={handleSubmitImport}
       disabled={unresolvedConflicts > 0}
       tooltip={
         unresolvedConflicts > 0
           ? "Please resolve conflicts before importing."
           : undefined
       }
+      loadOnSuccess
     />
   );
 
@@ -222,8 +234,25 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
         title="Import Guest Data"
         description="Are you sure? This action cannot be undone."
         open={confirmOpen}
-        onOpenChange={setConfirmOpen}
-        onConfirm={submitImport}
+        onOpenChange={(open) => {
+          setConfirmOpen(open);
+          if (!open) {
+            // Delay close trigger to allow onConfirm to execute first if confirm was clicked
+            setTimeout(() => {
+              if (dialogResolver.current) {
+                dialogResolver.current(false);
+                dialogResolver.current = null;
+              }
+            }, 0);
+          }
+        }}
+        onConfirm={async () => {
+          if (dialogResolver.current) {
+            dialogResolver.current(true);
+            dialogResolver.current = null;
+          }
+          return true;
+        }}
       />
     </div>
   );
