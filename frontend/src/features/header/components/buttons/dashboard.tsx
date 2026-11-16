@@ -14,6 +14,10 @@ export default function DashboardButton() {
         icon={<LayoutDashboardIcon className="h-5 w-5" />}
         href="/dashboard"
         tooltip="Dashboard"
+        hotkey={{
+          keys: "shift+d",
+          type: "shortcut",
+        }}
       />
     </ShrinkingHeaderButton>
   );

@@ -104,6 +104,15 @@ export default function DateHeader({
             className="ml-3 p-1.5"
             aria-label="Previous Page"
             tooltip="Previous Page"
+            hotkey={{
+              keys: "arrowleft",
+              badgeDisplay: "tooltip",
+              options: {
+                enableOnContentEditable: false,
+                enableOnFormTags: false,
+                preventDefault: false,
+              },
+            }}
           />
         )}
       </div>
@@ -179,6 +188,15 @@ export default function DateHeader({
             className="p-1.5"
             aria-label="Next Page"
             tooltip="Next Page"
+            hotkey={{
+              keys: "arrowright",
+              badgeDisplay: "tooltip",
+              options: {
+                enableOnContentEditable: false,
+                enableOnFormTags: false,
+                preventDefault: false,
+              },
+            }}
           />
         )}
       </div>
