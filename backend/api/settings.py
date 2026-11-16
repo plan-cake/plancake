@@ -313,8 +313,10 @@ class PlancakeLogger(logging.Logger):
 # Now any logger in the project will have access to this class
 logging.setLoggerClass(PlancakeLogger)
 
-RAND_URL_CODE_LENGTH = 8
+MAX_URL_CODE_LENGTH = 32
+URL_CODE_FORMAT_REGEX = r"[A-Za-z0-9\-]+"
 
+RAND_URL_CODE_LENGTH = 8
 RAND_URL_CODE_ATTEMPTS = 4
 
 MAX_DATE_TIME_EVENT_DAYS = 64

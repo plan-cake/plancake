@@ -3,6 +3,7 @@ import { useState } from "react";
 import { CircleQuestionMarkIcon } from "lucide-react";
 
 import { FloatingDrawer } from "@/features/drawer";
+import { FloatingDrawerProps } from "@/features/drawer/props";
 import Tooltip, { TooltipSide } from "@/features/system-feedback/tooltip/base";
 import usePointerType from "@/lib/hooks/use-pointer-type";
 
@@ -30,6 +31,10 @@ type InfoPointProps = {
    */
   drawerContent: React.ReactNode;
   /**
+   * The nesting level of the drawer displayed on mobile.
+   */
+  drawerNesting?: FloatingDrawerProps["nested"];
+  /**
    * Optional styling for the info point icon. Does not affect the content in the tooltip
    * or drawer.
    */
@@ -42,6 +47,7 @@ export default function InfoPoint({
   description,
   tooltipContent,
   drawerContent,
+  drawerNesting,
   className,
 }: InfoPointProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -62,6 +68,7 @@ export default function InfoPoint({
         onOpenChange={setDrawerOpen}
         title={title}
         description={description}
+        nested={drawerNesting}
       >
         {drawerContent}
       </FloatingDrawer>

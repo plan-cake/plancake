@@ -32,7 +32,7 @@ export default function WeekdayRangeDrawer({
       title="Select Days of the Week"
       description="Select days of the week below"
       trigger={
-        <button onClick={() => setOpen(!open)}>
+        <button>
           <WeekdayRangeDisplay weekdays={weekdays} open={open} />
         </button>
       }
