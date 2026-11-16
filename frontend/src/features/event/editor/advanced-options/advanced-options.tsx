@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { EllipsisIcon, TriangleAlertIcon } from "lucide-react";
+import { Settings2Icon, TriangleAlertIcon } from "lucide-react";
 
 import { useEventContext } from "@/core/event/context";
 import EmptyButton from "@/features/button/components/empty";
@@ -22,7 +22,7 @@ export default function AdvancedOptions(props: AdvancedOptionsProps) {
   const button = (
     <EmptyButton
       buttonStyle="semi-transparent"
-      icon={hasErrors ? <TriangleAlertIcon /> : <EllipsisIcon />}
+      icon={hasErrors ? <TriangleAlertIcon /> : <Settings2Icon />}
       label="Advanced Options"
       className={cn(
         "border",
