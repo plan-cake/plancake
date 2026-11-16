@@ -1,9 +1,0 @@
-/* CENTERED ABSOLUTE ELEMENTS */
-
-/* Instead of defining a class with traditional CSS rules, this operates within Tailwind's
-framework where it will combine transform rules instead of overriding */
-@layer components {
-  .centered-absolute {
-    @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
-  }
-}
