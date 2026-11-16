@@ -17,6 +17,10 @@ export default async function Page() {
             If you created events or submitted availability while not signed in,
             you can transfer that data to your account here.
           </p>
+          <p className="mt-2 text-sm leading-tight opacity-75">
+            Guest data is saved per browser, so sign in on each device you{"'"}
+            ve used to import everything.
+          </p>
         </div>
 
         {events > 0 || availabilities > 0 ? (
