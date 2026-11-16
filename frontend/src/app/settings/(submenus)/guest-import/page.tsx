@@ -18,7 +18,7 @@ export default async function Page() {
             you can transfer that data to your account here.
           </p>
           <p className="mt-2 text-sm leading-tight opacity-75">
-            Guest data is saved per browser, so sign in on each device you{"'"}
+            Guest data is saved per browser, so sign in on one you{"'"}
             ve used to import everything.
           </p>
         </div>
