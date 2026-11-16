@@ -11,7 +11,11 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import HeaderSpacer from "@/features/header/components/header-spacer";
 import Selector from "@/features/selector/components/selector";
-import { Banner, useToast } from "@/features/system-feedback";
+import {
+  Banner,
+  ConfirmationDialog,
+  useToast,
+} from "@/features/system-feedback";
 import Tooltip from "@/features/system-feedback/tooltip/base";
 import { clientPost } from "@/lib/utils/api/client-fetch";
 import { ROUTES } from "@/lib/utils/api/endpoints";
@@ -28,6 +32,7 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
   const { addToast } = useToast();
   const router = useRouter();
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [importPayload, setImportPayload] = useState<{
     [public_id: string]: AvailabilityImportChoice;
   }>(
@@ -66,6 +71,7 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
       });
       addToast("success", "Guest data imported successfully.");
       router.push("/dashboard");
+      return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
       addToast(
@@ -73,6 +79,7 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
         error.formattedMessage ||
           "Something went wrong with your request. Please refresh the page and try again.",
       );
+      return false;
     }
   };
 
@@ -88,7 +95,7 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
     <ActionButton
       buttonStyle="primary"
       label="Import Data"
-      onClick={submitImport}
+      onClick={() => setConfirmOpen(true)}
       disabled={unresolvedConflicts > 0}
       tooltip={
         unresolvedConflicts > 0
@@ -96,13 +103,6 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
           : undefined
       }
     />
-  );
-
-  const actionText = (
-    <div className="text-center font-semibold">
-      Are you sure you want to import this guest data? This action cannot be
-      undone.
-    </div>
   );
 
   const noneText = (
@@ -119,7 +119,6 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
           {importButton}
         </div>
       </div>
-      <h2 className="hidden text-lg md:block">{actionText}</h2>
       <div className="flex flex-col gap-4 md:flex-row">
         <DataSection title="Events">
           {guestData.created_events.length === 0 && noneText}
@@ -205,24 +204,27 @@ export default function ClientPage({ guestData }: { guestData: GuestData }) {
           })}
         </DataSection>
       </div>
+
       <MobileFooterIsland
         leftButtons={[cancelButton]}
         rightButtons={[importButton]}
       >
-        <div className="px-1">
-          {unresolvedConflicts > 0 ? (
-            <div className="text-error flex items-center justify-center gap-1 font-bold">
-              <TriangleAlertIcon
-                className="h-4 w-4 flex-none"
-                strokeWidth={2}
-              />
-              Please resolve conflicts.
-            </div>
-          ) : (
-            actionText
-          )}
-        </div>
+        {unresolvedConflicts > 0 && (
+          <div className="text-error flex items-center justify-center gap-1 px-1 font-bold">
+            <TriangleAlertIcon className="h-4 w-4 flex-none" strokeWidth={2} />
+            Please resolve conflicts.
+          </div>
+        )}
       </MobileFooterIsland>
+
+      <ConfirmationDialog
+        type="warning"
+        title="Import Guest Data"
+        description="Are you sure? This action cannot be undone."
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        onConfirm={submitImport}
+      />
     </div>
   );
 }

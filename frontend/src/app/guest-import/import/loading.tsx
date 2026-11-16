@@ -4,9 +4,7 @@ export default function Loading() {
   return (
     <div className="flex min-h-screen flex-col gap-4 px-6 pb-4">
       <HeaderSpacer />
-      <h1 className="text-2xl font-bold">Guest Import</h1>
-
-      <div className="hidden h-9 md:block" />
+      <h1 className="h-10 text-2xl font-bold">Guest Import</h1>
 
       <div className="flex flex-col gap-4 md:flex-row">
         <div className="bg-panel h-fit w-full space-y-4 rounded-3xl p-4">
