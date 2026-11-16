@@ -2,6 +2,7 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.db.models import Q
 from rest_framework.response import Response
 
 from api.decorators import (
@@ -20,7 +21,12 @@ from api.models import (
     EventParticipant,
     UserEvent,
 )
-from api.utils import MessageOutputSerializer
+from api.utils import (
+    LiveUpdateEvent,
+    LiveUpdateRemoveData,
+    MessageOutputSerializer,
+    notify_live_update,
+)
 
 logger = logging.getLogger("api")
 
@@ -211,18 +217,35 @@ def import_data(request):
                 case "guest":
                     guest_chosen.append(public_id)
 
-        # Start by removing the guest's submissions from events that have "account" specified
-        EventParticipant.objects.filter(
-            user_account=guest_user, user_event__public_id__in=account_chosen
-        ).delete()
-        # Then remove the account's submissions from events that have "guest" specified
-        EventParticipant.objects.filter(
-            user_account=account_user, user_event__public_id__in=guest_chosen
-        ).delete()
+        # Remove the guest's submissions from events that have "account" specified, and
+        # the account's submissions from events that have "guest" specified
+        discarded = EventParticipant.objects.filter(
+            Q(user_account=guest_user, user_event__public_id__in=account_chosen)
+            | Q(user_account=account_user, user_event__public_id__in=guest_chosen)
+        )
+        # Save the info for live updates before deleting
+        removed = list(
+            discarded.values_list(
+                "public_id", "user_account_id", "user_event__url_code__url_code"
+            )
+        )
+        discarded.delete()
 
         # Then of all the remaining guest submissions transfer ownership to the account
         EventParticipant.objects.filter(user_account=guest_user).update(
             user_account=account_user
+        )
+
+    # Notify after the transaction commits so a rollback never sends a false removal
+    for public_id, user_id, event_code in removed:
+        if event_code is None:
+            continue
+        notify_live_update(
+            LiveUpdateEvent(
+                user_id=user_id,
+                event_code=event_code,
+                data=LiveUpdateRemoveData(public_id=str(public_id)),
+            )
         )
 
     response.data = {"message": ["Guest data imported successfully."]}
