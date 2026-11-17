@@ -74,6 +74,10 @@ def event_not_found_error():
     return Response({"error": {"general": ["Event not found."]}}, status=404)
 
 
+def unauthorized_error():
+    return Response({"error": {"general": ["User must be event creator."]}}, status=403)
+
+
 @api_endpoint("POST")
 @require_auth
 @validate_json_input(EventCreateSerializer)
@@ -317,9 +321,13 @@ def edit_date_event(request):
             # Find the event
             event = UserEvent.objects.get(
                 url_code__url_code__iexact=event_code,
-                user_account=user,
                 date_type=UserEvent.EventType.SPECIFIC,
             )
+
+            # Check that the user is the creator
+            if event.user_account != user:
+                return unauthorized_error()
+
             # Get the earliest timeslot
             earliest_timeslot = (
                 EventDateTimeslot.objects.filter(user_event=event)
@@ -412,9 +420,12 @@ def edit_week_event(request):
             # Find the event
             event = UserEvent.objects.get(
                 url_code__url_code__iexact=event_code,
-                user_account=user,
                 date_type=UserEvent.EventType.GENERIC,
             )
+
+            # Check that the user is the creator
+            if event.user_account != user:
+                return unauthorized_error()
 
             errors = validate_weekday_timeslots(timeslots)
             if errors.keys():
@@ -490,9 +501,13 @@ def edit_calendar_event(request):
             # Find the event
             event = UserEvent.objects.get(
                 url_code__url_code__iexact=event_code,
-                user_account=user,
                 date_type=UserEvent.EventType.CALENDAR,
             )
+
+            # Check that the user is the creator
+            if event.user_account != user:
+                return unauthorized_error()
+
             # Get the earliest timeslot
             earliest_timeslot = (
                 EventCalendarTimeslot.objects.filter(user_event=event)
