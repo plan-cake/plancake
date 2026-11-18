@@ -1,8 +1,38 @@
+import { get } from "@vercel/edge-config";
 import { NextRequest, NextResponse } from "next/server";
 
 const protectedRoutes = ["/settings", "/guest-import"];
 
-export function middleware(request: NextRequest) {
+// Paths that stay reachable while maintenance mode is on
+const maintenanceFiles = ["/maintenance.html", "/maintenance.css"];
+
+/**
+ * Maintenance mode is toggled with the `maintenance` key in Vercel Edge Config, so it
+ * can be changed from the dashboard without a redeploy. `MAINTENANCE_MODE` is an
+ * environment variable to override this for local testing.
+ */
+async function isMaintenanceMode(): Promise<boolean> {
+  if (process.env.MAINTENANCE_MODE === "true") return true;
+  if (!process.env.EDGE_CONFIG) return false;
+
+  try {
+    return (await get<boolean>("maintenance")) === true;
+  } catch {
+    return false;
+  }
+}
+
+export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+
+  const isMaintenanceFile = maintenanceFiles.includes(path);
+
+  if (!isMaintenanceFile && (await isMaintenanceMode())) {
+    // Rewrite instead of redirect so the URL is unchanged and users can refresh and get
+    // to their page when maintenance ends
+    return NextResponse.rewrite(new URL("/maintenance.html", request.url));
+  }
+
   // Clone the request headers and inject the exact pathname into a custom header.
   // This allows server-side code (like getSession()) to determine the user's
   // intended destination.
@@ -15,7 +45,6 @@ export function middleware(request: NextRequest) {
     },
   });
 
-  const path = request.nextUrl.pathname;
   const hasAccountSessToken = request.cookies.has("account_sess_token");
 
   const isProtectedRoute = protectedRoutes.some((route) =>
