@@ -1,4 +1,4 @@
-Last updated: October 28, 2026
+Last updated: November 3, 2026
 
 This Privacy Policy describes how Plancake (“we”, “us”, or “our”) collects, uses, and discloses information when You use our services and website (the "Service").
 
@@ -141,6 +141,7 @@ We do not disclose any information you provide to any third parties other than a
 - **Business Transfers:** In connection with any merger, sale of company assets, financing, or acquisition of all or a portion of our business by another company.
 - **To protect the Service:** To protect the rights, property, or safety of Plancake, our members, or any other third parties. This includes exchanging information with other companies and organisations for the purposes of fraud protection and credit risk reduction.
 - **Providers:** We share your information with third-party vendors that host our infrastructure, provide analytics, or secure our application.
+  - We use Cloudflare Turnstile to protect certain forms on the Service from bots. Turnstile collects device and browser signals, including your IP address. For more information, see [Cloudflare’s Turnstile Privacy Addendum](https://www.cloudflare.com/turnstile-privacy-policy/).
 
 Other than as set out above, we shall not disclose any of your personal information unless you give us permission to do so.
 

@@ -2,6 +2,7 @@ import { Metadata } from "next";
 
 import ClientPage from "@/app/(event)/[event-code]/page-client";
 import { EventCodePageProps } from "@/features/event/code-page-props";
+import SyncEventCodeUrl from "@/features/event/components/sync-event-code-url";
 import { getCachedEventDetails } from "@/features/event/editor/fetch-data";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
@@ -9,7 +10,6 @@ import handleErrorResponse from "@/lib/utils/api/handle-api-error";
 import { processAvailabilityData } from "@/lib/utils/api/processors/process-availability-data";
 import { processEventData } from "@/lib/utils/api/processors/process-event-data";
 import { serverGet } from "@/lib/utils/api/server-fetch";
-import checkEventCode from "@/lib/utils/check-event-code";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
 
 export async function generateMetadata({
@@ -37,8 +37,6 @@ export async function generateMetadata({
 export default async function Page({ params }: EventCodePageProps) {
   const { "event-code": eventCode } = await params;
 
-  await checkEventCode(eventCode, (trueCode) => `/${trueCode}`);
-
   const [initialEventData, initialAvailabilityData] = await Promise.all([
     getCachedEventDetails(eventCode),
     serverGet(
@@ -53,7 +51,7 @@ export default async function Page({ params }: EventCodePageProps) {
     }),
   ]);
 
-  const { eventName, eventRange, timeslots, isCreator } =
+  const { trueCode, eventName, eventRange, timeslots, isCreator } =
     processEventData(initialEventData);
 
   const availabilityData = processAvailabilityData(
@@ -63,22 +61,25 @@ export default async function Page({ params }: EventCodePageProps) {
   );
 
   return (
-    <ClientPage
-      eventData={{
-        title: eventName,
-        customCode: eventCode,
-        eventRange,
-        timeslots,
-      }}
-      initialAvailabilityData={{
-        eventType: eventRange.type,
-        timezone: eventRange.timezone,
-        participants: availabilityData.participants,
-        availability: availabilityData.availability,
-        currentUser: availabilityData.user_display_name,
-        eventCode: eventCode,
-        isCreator,
-      }}
-    />
+    <>
+      <SyncEventCodeUrl urlCode={eventCode} trueCode={trueCode} />
+      <ClientPage
+        eventData={{
+          title: eventName,
+          customCode: trueCode,
+          eventRange,
+          timeslots,
+        }}
+        initialAvailabilityData={{
+          eventType: eventRange.type,
+          timezone: eventRange.timezone,
+          participants: availabilityData.participants,
+          availability: availabilityData.availability,
+          currentUser: availabilityData.user_display_name,
+          eventCode: trueCode,
+          isCreator,
+        }}
+      />
+    </>
   );
 }

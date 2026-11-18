@@ -1,8 +1,4 @@
-import {
-  CheckIcon,
-  InfoIcon,
-  TriangleAlertIcon,
-} from "lucide-react";
+import { CheckIcon, InfoIcon, TriangleAlertIcon } from "lucide-react";
 
 export const BANNER_CONFIG = {
   success: { icon: CheckIcon },
