@@ -55,7 +55,7 @@ export function generateMetadata(): Metadata {
       description: description,
       type: "website",
       locale: "en_US",
-      url: "https://plancake.org",
+      url: process.env.BASE_URL,
       siteName: "Plancake",
     },
   };
