@@ -109,10 +109,10 @@ export default function ClientPage({
             drawerContent={guestModeInfoContent()}
             tooltipContent={guestModeInfoContent("max-w-md p-1")}
           >
-            <div className="bg-accent/50 text-accent-text flex select-none items-center gap-1.5 rounded-full p-1 px-2 pl-3">
+            <button className="bg-accent/50 text-accent-text flex select-none items-center gap-1.5 rounded-full p-1 px-2 pl-3">
               <span className="font-bold">Guest Mode</span>
               <CircleQuestionMarkIcon className="size-5" />
-            </div>
+            </button>
           </InfoPoint>
         )}
       </div>
