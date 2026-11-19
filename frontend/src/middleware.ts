@@ -7,16 +7,16 @@ const protectedRoutes = ["/settings", "/guest-import"];
 const maintenanceFiles = ["/maintenance.html", "/maintenance.css"];
 
 /**
- * Maintenance mode is toggled with the `maintenance` key in Vercel Global Config, so it
- * can be changed from the dashboard without a redeploy. `MAINTENANCE_MODE` is an
- * environment variable to override this for local testing.
+ * Maintenance mode is toggled with the `maintenance_mode` key in Vercel Global Config, so
+ * it can be changed without a redeploy. `MAINTENANCE_MODE` is an environment variable to
+ * override this for local testing.
  */
 async function isMaintenanceMode(): Promise<boolean> {
   if (process.env.MAINTENANCE_MODE === "true") return true;
   if (!process.env.GLOBAL_CONFIG) return false;
 
   try {
-    return (await get<boolean>("maintenance")) === true;
+    return (await get<boolean>("maintenance_mode")) === true;
   } catch {
     return false;
   }
