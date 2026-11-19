@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Plancake - Under Maintenance</title>
+
+    <script>
+      try {
+        const theme = localStorage.getItem("theme") ?? "system";
+        const isDark =
+          theme === "dark" ||
+          (theme === "system" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
+        if (isDark) document.documentElement.classList.add("dark");
+      } catch {}
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Modak&family=Nunito:wght@400;700&display=swap"
+    />
+    <link rel="stylesheet" href="/maintenance.css" />
+  </head>
+
+  <body class="antialiased">
+    <main
+      class="flex min-h-dvh flex-col items-center justify-center gap-4 p-8 text-center"
+    >
+      <h1
+        class="font-display text-lion select-none text-7xl font-normal [-webkit-text-stroke:3px_black]"
+      >
+        <div>plan</div>
+        <div>cake</div>
+      </h1>
+      <h2 class="text-2xl font-bold">We'll be right back!</h2>
+      <p class="max-w-sm">
+        Plancake is under maintenance right now. Come back in a little while to
+        see what we're cooking up!
+      </p>
+    </main>
+  </body>
+</html>
