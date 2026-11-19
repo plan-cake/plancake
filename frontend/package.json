@@ -12,7 +12,8 @@
     "check-format": "prettier --check .",
     "postinstall": "patch-package",
     "build:maintenance": "tailwindcss -i src/styles/maintenance.css -o public/maintenance.css --minify",
-    "prebuild": "npm run build:maintenance"
+    "prebuild": "npm run build:maintenance",
+    "predev": "npm run build:maintenance"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "1.5.3",
