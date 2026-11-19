@@ -39,9 +39,12 @@ export default function Tooltip({
           side={side}
           align="center"
           sideOffset={4}
+          collisionPadding={16}
           className={cn(
+            // 16px from each side of padding + 12px for the persistent scrollbar
+            "max-w-[calc(100vw_-_(16px_+_16px_+_12px))]",
             "bg-foreground text-background text-sm",
-            "max-w-screen z-[100] rounded-2xl",
+            "z-[100] rounded-2xl",
             "shadow-lg will-change-transform",
             "data-[state=delayed-open]:animate-tooltipOpen",
             "data-[state=instant-open]:animate-tooltipOpen",
