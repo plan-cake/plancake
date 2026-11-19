@@ -39,6 +39,7 @@ export default function Tooltip({
           side={side}
           align="center"
           sideOffset={4}
+          collisionPadding={16}
           className={cn(
             "bg-foreground text-background text-sm",
             "max-w-screen z-[100] rounded-2xl",
