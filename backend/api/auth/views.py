@@ -38,11 +38,12 @@ from api.settings import (
 from api.utils import (
     EmailTemplateKey,
     MessageOutputSerializer,
+    authenticate,
     check_rate_limit,
     delete_session_cookie,
+    finalize_auth_response,
     get_client_ip_address,
     get_client_user_agent,
-    get_session,
     send_templated_email,
     set_session_cookie,
 )
@@ -210,31 +211,15 @@ def login(request):
     password = request.validated_data.get("password")
     remember_me = request.validated_data.get("remember_me")
 
-    # Check if the user is already logged in
-    acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-    if acct_token:
-        try:
-            with transaction.atomic():
-                session = get_session(acct_token)
-                if not session:
-                    raise UserSession.DoesNotExist
-                session.save()  # To update last_used to now
-
-            # At this point the account is authenticated
-            logger.info("User %s is already logged in.", session.user_account.email)
-            response = Response(
-                {"error": {"general": ["You are already logged in."]}}, status=400
-            )
-            # Refresh the session token cookie
-            set_session_cookie(
-                response,
-                ACCOUNT_COOKIE_NAME,
-                session.session_token,
-                session.is_extended,
-            )
-            return response
-        except UserSession.DoesNotExist:
-            logger.info("Account session expired.")
+    # Check if the user is already logged in. An expired account cookie is ignored here,
+    # since logging in replaces it.
+    auth = authenticate(request, allow_guest=False)
+    if auth.session:
+        logger.info("User %s is already logged in.", auth.session.user_account.email)
+        response = Response(
+            {"error": {"general": ["You are already logged in."]}}, status=400
+        )
+        return finalize_auth_response(response, auth)
 
     check_rate_limit(request, ThrottleScopes.LOGIN)
 

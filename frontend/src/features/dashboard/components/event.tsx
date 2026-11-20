@@ -63,10 +63,9 @@ export default function DashboardEvent({
   const dateDetails = useMemo(() => {
     // Calendar event dates aren't converted
     if (type === "calendar") {
-      const sortedDates = [...dateTimeProps.dates].sort();
       return {
-        startDate: sortedDates[0],
-        endDate: sortedDates[sortedDates.length - 1],
+        startDate: dateTimeProps.dates[0],
+        endDate: dateTimeProps.dates[dateTimeProps.dates.length - 1],
         startTime: "",
         endTime: "",
         weekdays: new Set<number>(),
@@ -76,13 +75,9 @@ export default function DashboardEvent({
     // Extract the dates from the start time on each day
     // Dates and times are in the event's timezone
     const weekdays = new Set<number>();
-    let eventStartDate = null;
     let localStartDate = null;
     let localEndDate = null;
     for (const singleDate of dateTimeProps.dates) {
-      if (!eventStartDate || singleDate < eventStartDate)
-        eventStartDate = singleDate;
-
       // Convert the single date to the local timezone from the event timezone
       const { date, weekday } = getTimezoneDetails({
         time: dateTimeProps.startTime,
@@ -98,12 +93,12 @@ export default function DashboardEvent({
     // Convert the times using the first date in the event's timezone
     const startTime = getTimezoneDetails({
       time: dateTimeProps.startTime,
-      date: eventStartDate!,
+      date: dateTimeProps.dates[0],
       fromTZ: timezone,
     }).time;
     const endTime = getTimezoneDetails({
       time: dateTimeProps.endTime,
-      date: eventStartDate!,
+      date: dateTimeProps.dates[0],
       fromTZ: timezone,
     }).time;
 
