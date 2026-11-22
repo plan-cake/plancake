@@ -63,6 +63,8 @@ docker-compose*.yml
 # Documentation
 *.md
 docs/
+# Legal pages are rendered from markdown at build time
+!src/features/legal/content/*.md
 
 # CI/CD configuration files
 .github/
