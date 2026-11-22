@@ -9,14 +9,27 @@ FROM node:${NODE_VERSION} AS dependencies
 
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies. The patches are needed for the patch-package postinstall step.
 COPY package.json package-lock.json* ./
+COPY patches ./patches
 RUN npm ci
 
 ## BUILD IMAGE
 FROM node:${NODE_VERSION} AS builder
 
 WORKDIR /app
+
+# NEXT_PUBLIC_* variables are inlined into the client bundle at build time, so they
+# must be passed in as build arguments (.env is excluded from the build context).
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY
+ARG NEXT_PUBLIC_FEEDBACK_FORM_URL
+ARG NEXT_PUBLIC_DEBUG=false
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
+    NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY} \
+    NEXT_PUBLIC_FEEDBACK_FORM_URL=${NEXT_PUBLIC_FEEDBACK_FORM_URL} \
+    NEXT_PUBLIC_DEBUG=${NEXT_PUBLIC_DEBUG} \
+    NEXT_STANDALONE=true
 
 COPY --from=dependencies /app/node_modules ./node_modules
 
