@@ -73,7 +73,20 @@ DATABASES = {
         "PASSWORD": env("DB_PASSWORD"),
         "HOST": env("DB_HOST"),
         "PORT": env("DB_PORT"),
-        "CONN_MAX_AGE": 0 if DEBUG else 600,  # Don't persist connections in development
+        # Under ASGI each request runs in its own thread, so Django's per-thread
+        # persistent connections (CONN_MAX_AGE > 0) never get reused. Instead, each
+        # worker process keeps a shared psycopg pool, which requires CONN_MAX_AGE = 0.
+        "CONN_MAX_AGE": 0,
+        "OPTIONS": {
+            "pool": {
+                # The sizes are defined in environment variables with defaults to allow
+                # some processes (like Celery) to have different values.
+                "min_size": env.int("DB_POOL_MIN_SIZE", default=1),
+                "max_size": env.int("DB_POOL_MAX_SIZE", default=4),
+                "timeout": 10,  # Seconds to wait for a free connection
+                "max_idle": 300,  # Close extra connections idle for 5 minutes
+            },
+        },
     }
 }
 
@@ -144,6 +157,12 @@ PWD_RESET_EXP_SECONDS = 600  # 10 minutes
 AUTHED_PWD_RESET_EXP_SECONDS = 600  # 10 minutes
 
 URL_CODE_EXP_SECONDS = 1209600  # 14 days
+
+# Touch intervals, which are the minimum time between writes of the last used time. This
+# could result in these objects expiring slightly earlier than intended, but it avoids a
+# database write on every request.
+SESS_TOUCH_INTERVAL_SECONDS = 60
+URL_CODE_TOUCH_INTERVAL_SECONDS = 3600
 
 ACCOUNT_COOKIE_NAME = "account_sess_token"
 GUEST_COOKIE_NAME = "guest_sess_token"

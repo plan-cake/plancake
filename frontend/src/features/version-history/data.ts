@@ -320,7 +320,18 @@ export const VERSION_DATA: VersionHistoryData = [
       "Event types were renamed to be more descriptive",
     ],
     fixed: [],
-    minorVersions: [],
+    minorVersions: [
+      {
+        version: "v1.0.1",
+        releaseDate: { year: 2026, month: 11, day: 14 },
+        added: [],
+        changed: ["Various backend operations were optimized"],
+        fixed: [
+          "Dragging on the mobile date picker no longer scrolls the page",
+          "Quickly tapping multiple days on the mobile date picker no longer retoggles days",
+        ],
+      },
+    ],
   },
 ] as const;
 

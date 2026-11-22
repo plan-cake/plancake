@@ -3,13 +3,13 @@ import { notFound } from "next/navigation";
 
 import ClientPage from "@/app/(event)/[event-code]/painting/page-client";
 import { EventCodePageProps } from "@/features/event/code-page-props";
+import SyncEventCodeUrl from "@/features/event/components/sync-event-code-url";
 import { getCachedEventDetails } from "@/features/event/editor/fetch-data";
 import { ROUTES } from "@/lib/utils/api/endpoints";
 import { ApiErrorResponse } from "@/lib/utils/api/fetch-wrapper";
 import handleErrorResponse from "@/lib/utils/api/handle-api-error";
 import { processEventData } from "@/lib/utils/api/processors/process-event-data";
 import { serverGet } from "@/lib/utils/api/server-fetch";
-import checkEventCode from "@/lib/utils/check-event-code";
 import { constructMetadata } from "@/lib/utils/construct-metadata";
 import { getSession } from "@/lib/utils/get-session";
 
@@ -17,8 +17,6 @@ export async function generateMetadata({
   params,
 }: EventCodePageProps): Promise<Metadata> {
   const { "event-code": eventCode } = await params;
-
-  await checkEventCode(eventCode, (trueCode) => `/${trueCode}/painting`);
 
   const initialEventData = await getCachedEventDetails(eventCode);
 
@@ -62,16 +60,20 @@ export default async function Page({ params }: EventCodePageProps) {
       handleErrorResponse(error.status, error.data);
     }),
   ]);
-  const { eventName, eventRange, timeslots } = processEventData(eventData);
+  const { trueCode, eventName, eventRange, timeslots } =
+    processEventData(eventData);
 
   return (
-    <ClientPage
-      session={session}
-      eventCode={eventCode}
-      eventName={eventName}
-      eventRange={eventRange}
-      timeslots={timeslots}
-      initialData={initialAvailabilityData}
-    />
+    <>
+      <SyncEventCodeUrl urlCode={eventCode} trueCode={trueCode} />
+      <ClientPage
+        session={session}
+        eventCode={trueCode}
+        eventName={eventName}
+        eventRange={eventRange}
+        timeslots={timeslots}
+        initialData={initialAvailabilityData}
+      />
+    </>
   );
 }

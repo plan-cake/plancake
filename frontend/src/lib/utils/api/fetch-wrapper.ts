@@ -47,17 +47,20 @@ export class ApiErrorResponse extends Error {
 
 /**
  * A fetch API wrapper that directly returns JSON data.
- * 
+ *
  * If either the status is not in the 200-299 range, an error is thrown with the error
  * data from the response.
- * 
+ *
  * If the fetch call itself fails, a 503 error is thrown.
- * 
+ *
  * @param url The URL to fetch.
  * @param options The options to pass to the fetch call.
  * @returns The JSON data from the response, if the call was successful.
  */
-export async function fetchJson(url: string, options: RequestInit): Promise<object> {
+export async function fetchJson(
+  url: string,
+  options: RequestInit,
+): Promise<object> {
   let response;
   let data;
 
@@ -65,7 +68,9 @@ export async function fetchJson(url: string, options: RequestInit): Promise<obje
     response = await fetch(url, options);
     data = await response.json();
   } catch {
-    throw new ApiErrorResponse(503, { error: { general: ["Service unavailable, please try again later."] } });
+    throw new ApiErrorResponse(503, {
+      error: { general: ["Service unavailable, please try again later."] },
+    });
   }
 
   if (response.ok) {

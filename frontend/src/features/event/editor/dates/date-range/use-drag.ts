@@ -20,6 +20,20 @@ export default function useDateRangeDrag({
     endDate: Date | null;
   }>({ isEnabling: true, startDate: null, endDate: null });
 
+  useEffect(() => {
+    const preventScroll = (e: TouchEvent) => {
+      if (isDragging.current) {
+        if (e.cancelable) e.preventDefault();
+      }
+    };
+
+    // { passive: false } tells the browser "I might cancel this event, wait for me."
+    window.addEventListener("touchmove", preventScroll, { passive: false });
+    return () => {
+      window.removeEventListener("touchmove", preventScroll);
+    };
+  }, []);
+
   const getDateString = (date: Date) => {
     return format(date, "yyyy-MM-dd");
   };
