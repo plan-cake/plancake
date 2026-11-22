@@ -11,6 +11,8 @@ on:
 env:
   HEAD_REF: ${{ github.head_ref }}
 
+# The version checks live in the check-version composite action
+# (.github/actions/check-version), shared with publish-images.yml.
 jobs:
   check_branch:
     runs-on: ubuntu-latest
@@ -18,24 +20,37 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      # --- PRs into main (releases) ---
       - name: Check branch
         if: github.base_ref == 'main'
         run: |
           if [[ ! "$HEAD_REF" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Error: You can only merge to main from version branches (e.g. v1.2.3)."
+            echo "::error::You can only merge to main from version branches (e.g. v1.2.3)."
             exit 1
           fi
 
       - name: Check package version
         if: github.base_ref == 'main'
-        run: |
-          # Extract the version from package.json
-          PACKAGE_VERSION=$(jq -r '.version' frontend/package.json)
+        uses: ./.github/actions/check-version
+        with:
+          check: matches
+          branch: ${{ github.head_ref }}
 
-          # Extract the version from the branch name
-          BRANCH_VERSION="${HEAD_REF#v}"
+      # A release must be a new version, newer than what's already on main
+      - name: Check version is not already released
+        if: github.base_ref == 'main'
+        uses: ./.github/actions/check-version
+        with:
+          check: unreleased
+          branch: ${{ github.head_ref }}
 
-          if [[ "$PACKAGE_VERSION" != "$BRANCH_VERSION" ]]; then
-            echo "Error: The version in package.json ($PACKAGE_VERSION) does not match the version in the branch name ($BRANCH_VERSION)."
-            exit 1
-          fi
+      # --- PRs into version branches ---
+      # Once a version is released, its branch is frozen: follow-up changes go on a new
+      # version branch. publish-images.yml enforces the same rule for direct pushes.
+      - name: Check target version branch is not released
+        if: github.base_ref != 'main'
+        uses: ./.github/actions/check-version
+        with:
+          check: unreleased
+          branch: ${{ github.base_ref }}
+          only-version-branches: "true"

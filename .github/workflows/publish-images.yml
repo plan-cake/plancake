@@ -22,6 +22,43 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      # frontend/package.json is the source of truth for the image version, since that's
+      # what `make up` uses to decide which tag to pull. On a version branch:
+      #   - the branch name must match it, otherwise we'd publish the wrong tag, and
+      #   - the version must not be released yet, otherwise we'd move the released vX.Y.Z
+      #     tag onto a build that never went through main.
+      # The checks live in the check-version composite action (.github/actions/check-version),
+      # shared with merge-protect.yml.
+      - name: Check version matches branch
+        if: github.ref_name != 'main'
+        uses: ./.github/actions/check-version
+        with:
+          check: matches
+          branch: ${{ github.ref_name }}
+
+      - name: Check version is not already released
+        if: github.ref_name != 'main'
+        uses: ./.github/actions/check-version
+        with:
+          check: unreleased
+          branch: ${{ github.ref_name }}
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' frontend/package.json)
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::frontend/package.json version ($VERSION) is not in X.Y.Z format."
+            exit 1
+          fi
+
+          IFS=. read -r MAJOR MINOR PATCH <<< "$VERSION"
+          {
+            echo "version=$VERSION"
+            echo "minor=$MAJOR.$MINOR"
+            echo "major=$MAJOR"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
 
@@ -35,14 +72,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Tags:
+      #   version branch (vX.Y.Z): vX.Y.Z
+      #   main (release):          vX.Y.Z, vX.Y, vX, latest
+      # The minor/major tags only move on release, so they always point at a released
+      # image rather than in-progress work on a version branch.
+
       # --- BACKEND ---
       - name: Extract metadata for Backend
         id: meta-backend
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
           images: ghcr.io/plan-cake/plancake-backend
+          flavor: latest=false
           tags: |
-            type=ref,event=branch
+            type=raw,value=v${{ steps.version.outputs.version }}
+            type=raw,value=v${{ steps.version.outputs.minor }},enable={{is_default_branch}}
+            type=raw,value=v${{ steps.version.outputs.major }},enable={{is_default_branch}}
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Backend
@@ -65,8 +111,11 @@ jobs:
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
           images: ghcr.io/plan-cake/plancake-frontend
+          flavor: latest=false
           tags: |
-            type=ref,event=branch
+            type=raw,value=v${{ steps.version.outputs.version }}
+            type=raw,value=v${{ steps.version.outputs.minor }},enable={{is_default_branch}}
+            type=raw,value=v${{ steps.version.outputs.major }},enable={{is_default_branch}}
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Frontend
