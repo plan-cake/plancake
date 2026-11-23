@@ -10,12 +10,16 @@ export const HeaderContext = createContext<{
   expand: () => void;
   activeMenu: string | null;
   setActiveMenu: (menu: string | null) => void;
+  useLoginCallback: boolean;
+  setUseLoginCallback: (value: boolean) => void;
 }>({
   isFullSize: true,
   shrinkAmount: new MotionValue(0),
   expand: () => {},
   activeMenu: null,
   setActiveMenu: () => {},
+  useLoginCallback: false,
+  setUseLoginCallback: () => {},
 });
 
 export function useHeader() {
