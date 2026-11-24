@@ -10,7 +10,10 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "build:maintenance": "tailwindcss -i src/styles/maintenance.css -o public/maintenance.css --minify",
+    "prebuild": "npm run build:maintenance",
+    "predev": "npm run build:maintenance"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "1.5.3",
@@ -27,6 +30,7 @@
     "@radix-ui/react-tooltip": "^1.2.9",
     "@thesvg/react": "^3.2.7",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/global-config": "^1.5.1",
     "@vercel/speed-insights": "^2.0.0",
     "clsx": "^2.1.1",
     "date-fns-tz": "^3.2.0",
@@ -53,6 +57,7 @@
     "@eslint/eslintrc": "^3",
     "@microsoft/eslint-formatter-sarif": "^3.1.0",
     "@next/eslint-plugin-next": "^15.5.6",
+    "@tailwindcss/cli": "^4.1.4",
     "@tailwindcss/postcss": "^4.1.4",
     "@types/node": "^20",
     "@types/react": "^19",
