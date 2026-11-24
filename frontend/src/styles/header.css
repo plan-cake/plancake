@@ -1,5 +1,0 @@
-@utility header-transition-* {
-  transition-property: --value([*]);
-  transition-duration: 250ms;
-  transition-timing-function: var(--ease-out);
-}

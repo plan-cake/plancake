@@ -5,10 +5,12 @@ import { Fragment, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
+import PageDots from "@/components/page-dots";
 import ActionButton from "@/features/button/components/action";
 import { SIDE_WIDTH, TIME_LABEL_WIDTH } from "@/features/event/grid/constants";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
+import { formatDateRange } from "@/lib/utils/date-time-format";
 
 interface DateHeaderProps {
   preview?: boolean;
@@ -23,8 +25,7 @@ interface DateHeaderProps {
   scrollbarPresent?: boolean;
   isStatic?: boolean;
   isWeekdayEvent?: boolean;
-  onPrevPage: () => void;
-  onNextPage: () => void;
+  paginate: (direction: number) => void;
   direction?: number;
 }
 
@@ -73,8 +74,7 @@ export default function DateHeader({
   scrollbarPresent = false,
   isStatic = false,
   isWeekdayEvent = false,
-  onPrevPage,
-  onNextPage,
+  paginate,
   direction = 0,
 }: DateHeaderProps) {
   const isMobile = useCheckMobile();
@@ -83,104 +83,139 @@ export default function DateHeader({
     [isMobile, visibleDays.length],
   );
 
+  const rightPadding = useMemo(() => {
+    const pageIndicatorWidth = currentPage < totalPages - 1 ? SIDE_WIDTH : 0;
+    const scrollbarWidth = scrollbarPresent ? 20 : 8;
+    return pageIndicatorWidth + scrollbarWidth;
+  }, [currentPage, totalPages, scrollbarPresent]);
+
+  const rangeDisplay = useMemo(() => {
+    if (isWeekdayEvent) {
+      const startWeekday = visibleDays[0].dayDisplay.split(" ")[0];
+      const endWeekday =
+        visibleDays[visibleDays.length - 1].dayDisplay.split(" ")[0];
+      return startWeekday === endWeekday
+        ? startWeekday
+        : `${startWeekday} - ${endWeekday}`;
+    } else {
+      return formatDateRange(
+        visibleDays[0].dayKey,
+        visibleDays[visibleDays.length - 1].dayKey,
+      );
+    }
+  }, [visibleDays, isWeekdayEvent]);
+
   return (
     <div
       className={cn(
-        "z-10 col-span-2 grid h-[50px] w-full items-center justify-center pr-2",
+        "z-10 flex w-full flex-col gap-2",
         preview ? "bg-background md:bg-panel" : "bg-background",
-        scrollbarPresent && "pr-5",
-        !isStatic && "sticky top-[var(--header-height)] md:top-0",
+        !isStatic && "sticky top-0",
       )}
-      style={{
-        gridTemplateColumns: `${TIME_LABEL_WIDTH}px 1fr ${currentPage < totalPages - 1 ? SIDE_WIDTH : 0}px`,
-      }}
     >
-      <div>
-        {currentPage > 0 && (
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between gap-4 px-2 pt-2 md:justify-center">
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronLeftIcon />}
-            onClick={onPrevPage}
-            className="ml-3 p-1.5"
+            onClick={() => paginate(-1)}
             aria-label="Previous Page"
             tooltip="Previous Page"
+            disabled={currentPage === 0}
+            className="p-1"
           />
-        )}
-      </div>
 
-      {/* This container takes up the '1fr' space */}
-      <div className="relative grid h-full select-none overflow-hidden">
-        <AnimatePresence initial={false} custom={direction} mode="popLayout">
-          <motion.div
-            key={currentPage}
-            custom={direction}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ type: "tween", ease: "easeInOut" }}
-            className="absolute inset-0 flex h-full w-full items-center"
-          >
-            {dateBlockGaps.startGap && <div className="w-2" />}
+          <div className="flex min-w-0 flex-col items-center md:min-w-48">
+            <div className="text-sm font-semibold" role="status">
+              {rangeDisplay}
+            </div>
+            <PageDots
+              count={totalPages}
+              activeIndex={currentPage}
+              onSelect={(index) => {
+                if (index !== currentPage) {
+                  paginate(index - currentPage);
+                }
+              }}
+              itemLabel="page"
+            />
+          </div>
 
-            {visibleDays.map(({ dayDisplay }, i) => {
-              const [weekday, month, day] = dayDisplay.split(" ");
-
-              return (
-                <Fragment key={`header-fragment-${i}`}>
-                  <div
-                    className={cn(
-                      "flex flex-1 flex-col items-center justify-center text-sm leading-tight",
-                      ["Sat", "Sun"].includes(weekday) && "opacity-60",
-                      compact && "tracking-tighter lg:tracking-normal",
-                    )}
-                  >
-                    <div>
-                      <span className={compact ? "lg:hidden" : "hidden"}>
-                        {condenseWeekday(weekday)}
-                      </span>
-                      <span className={compact ? "hidden lg:block" : ""}>
-                        {weekday}
-                      </span>
-                    </div>
-                    {!isWeekdayEvent && (
-                      <div className="flex">
-                        <span className={compact ? "xl:hidden" : "hidden"}>
-                          {condenseMonth(month)}/
-                        </span>
-                        <span
-                          className={
-                            compact ? "hidden xl:mr-1 xl:block" : "mr-1"
-                          }
-                        >
-                          {month}
-                        </span>
-                        <span>{day.replace(/^0+/, "")}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {dateBlockGaps.middleGaps.has(i) && <div className="w-2" />}
-                </Fragment>
-              );
-            })}
-
-            {dateBlockGaps.endGap && <div className="w-2" />}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      <div>
-        {currentPage < totalPages - 1 && (
           <ActionButton
             buttonStyle="semi-transparent"
             icon={<ChevronRightIcon />}
-            onClick={onNextPage}
-            className="p-1.5"
+            onClick={() => paginate(1)}
             aria-label="Next Page"
             tooltip="Next Page"
+            disabled={currentPage === totalPages - 1}
+            className="p-1"
           />
-        )}
+        </div>
+      )}
+      <div
+        className="h-[50px]"
+        style={{
+          gridTemplateColumns: `1fr`,
+          paddingLeft: `${TIME_LABEL_WIDTH}px`,
+          paddingRight: `${rightPadding}px`,
+        }}
+      >
+        <div className="relative grid h-full select-none overflow-hidden">
+          <AnimatePresence initial={false} custom={direction} mode="popLayout">
+            <motion.div
+              key={currentPage}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "tween", ease: "easeInOut" }}
+              className="absolute inset-0 flex h-full w-full items-center"
+            >
+              {dateBlockGaps.startGap && <div className="w-2" />}
+              {visibleDays.map(({ dayDisplay }, i) => {
+                const [weekday, month, day] = dayDisplay.split(" ");
+                return (
+                  <Fragment key={`header-fragment-${i}`}>
+                    <div
+                      className={cn(
+                        "flex flex-1 flex-col items-center justify-center text-sm leading-tight",
+                        ["Sat", "Sun"].includes(weekday) && "opacity-60",
+                        compact && "tracking-tighter lg:tracking-normal",
+                      )}
+                    >
+                      <div>
+                        <span className={compact ? "lg:hidden" : "hidden"}>
+                          {condenseWeekday(weekday)}
+                        </span>
+                        <span className={compact ? "hidden lg:block" : ""}>
+                          {weekday}
+                        </span>
+                      </div>
+                      {!isWeekdayEvent && (
+                        <div className="flex">
+                          <span className={compact ? "xl:hidden" : "hidden"}>
+                            {condenseMonth(month)}/
+                          </span>
+                          <span
+                            className={
+                              compact ? "hidden xl:mr-1 xl:block" : "mr-1"
+                            }
+                          >
+                            {month}
+                          </span>
+                          <span>{day.replace(/^0+/, "")}</span>
+                        </div>
+                      )}
+                    </div>
+                    {dateBlockGaps.middleGaps.has(i) && <div className="w-2" />}
+                  </Fragment>
+                );
+              })}
+              {dateBlockGaps.endGap && <div className="w-2" />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

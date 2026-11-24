@@ -2,30 +2,26 @@
 
 import { useEffect, useState } from "react";
 
-import { LayoutGroup, motion, useTransform } from "framer-motion";
+import { LayoutGroup, motion } from "framer-motion";
+import { LayoutDashboardIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-import DashboardButton from "@/features/header/components/buttons/dashboard";
+import LinkButton from "@/features/button/components/link";
 import NewEventButton from "@/features/header/components/buttons/new-event";
+import ThemeButton from "@/features/header/components/buttons/theme";
 import LogoArea from "@/features/header/components/logo-area";
-import ThemePicker from "@/features/header/components/theme-picker";
 import { useHeader } from "@/features/header/context";
 import { cn } from "@/lib/utils/classname";
 
-export default function ShrinkingHeader({
+export default function ClientHeader({
   children: accountButton,
 }: {
   children: React.ReactNode;
 }) {
   const [mounted, setMounted] = useState(false);
 
-  const { isFullSize, shrinkAmount, expand, activeMenu } = useHeader();
+  const { activeMenu } = useHeader();
   const pathname = usePathname();
-
-  const headerButtonSpacing = useTransform(shrinkAmount, [0, 1], {
-    padding: [8, 4],
-    gap: ["8px", "4px"],
-  });
 
   useEffect(() => {
     setMounted(true);
@@ -34,21 +30,8 @@ export default function ShrinkingHeader({
   if (!mounted) return null;
 
   return (
-    <header
-      className={cn("fixed top-0 z-40 h-[var(--header-height)] w-full pt-4")}
-    >
-      <nav
-        className={cn(
-          "flex w-full max-w-[1440px] justify-between px-4",
-          !isFullSize ? "cursor-pointer" : "",
-        )}
-        onClickCapture={(e) => {
-          if (isFullSize) return;
-          e.preventDefault();
-          e.stopPropagation();
-          expand();
-        }}
-      >
+    <header className="h-(--header-height) absolute top-0 z-40 w-full pt-4 md:fixed">
+      <nav className="flex w-full max-w-[1440px] justify-between px-4">
         <LogoArea />
 
         {/* Adding this key prevents Framer from trying to animate on page switch */}
@@ -56,18 +39,21 @@ export default function ShrinkingHeader({
           <motion.div
             animate={{ scale: activeMenu ? 0.95 : 1 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={cn(
-              "relative isolate flex h-fit items-center rounded-full",
-            )}
-            style={headerButtonSpacing}
+            className="relative isolate flex h-fit items-center gap-2 rounded-full p-2"
           >
             <div
               className="frosted-glass pointer-events-none absolute inset-0 -z-10 rounded-full"
               aria-hidden="true"
             />
             <NewEventButton />
-            <ThemePicker />
-            <DashboardButton />
+            <ThemeButton />
+            <LinkButton
+              buttonStyle="frosted glass inset"
+              icon={<LayoutDashboardIcon className="h-5 w-5" />}
+              href="/dashboard"
+              tooltip="Dashboard"
+              aria-label="Dashboard"
+            />
             {accountButton}
             <div
               className={cn(

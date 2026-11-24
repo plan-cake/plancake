@@ -5,7 +5,6 @@ import Markdown, { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import HeaderSpacer from "@/features/header/components/header-spacer";
-import { cn } from "@/lib/utils/classname";
 
 const CONTENT_DIR = path.join(process.cwd(), "src/features/legal/content");
 
@@ -61,12 +60,7 @@ export default async function LegalDocument({
   return (
     <div className="flex flex-col px-6 pb-4">
       <HeaderSpacer />
-      <div
-        className={cn(
-          "sticky top-[var(--header-height)]",
-          "bg-background z-15 pb-2 pt-4",
-        )}
-      >
+      <div className="sticky-to-header-desktop bg-background z-15 pb-2 pt-4">
         <h1 className="text-2xl font-bold">{title}</h1>
       </div>
       <article>

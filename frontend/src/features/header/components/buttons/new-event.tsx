@@ -3,7 +3,6 @@ import { usePathname } from "next/navigation";
 
 import LinkButton from "@/features/button/components/link";
 import { ButtonStyle } from "@/features/button/props";
-import ShrinkingHeaderButton from "@/features/header/components/buttons/shrinking-header";
 
 export default function NewEventButton() {
   const pathname = usePathname();
@@ -19,14 +18,12 @@ export default function NewEventButton() {
   }
 
   return (
-    <ShrinkingHeaderButton buttonStyle={style} icon={<PlusIcon />}>
-      <LinkButton
-        buttonStyle={style}
-        icon={<PlusIcon />}
-        label="New Event"
-        shrinkOnMobile
-        href="/new-event"
-      />
-    </ShrinkingHeaderButton>
+    <LinkButton
+      buttonStyle={style}
+      icon={<PlusIcon />}
+      label="New Event"
+      shrinkOnMobile
+      href="/new-event"
+    />
   );
 }
