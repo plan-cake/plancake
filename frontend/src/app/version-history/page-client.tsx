@@ -14,7 +14,6 @@ import {
 
 import ActionButton from "@/features/button/components/action";
 import HeaderSpacer from "@/features/header/components/header-spacer";
-import { useHeader } from "@/features/header/context";
 import {
   MajorVersionData,
   MinorVersionData,
@@ -30,15 +29,11 @@ export default function ClientPage({
   currentVersion: string;
 }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const { expand } = useHeader();
 
   // On load, scroll to the bottom
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "instant" });
-
-    // Also expand the header on load
-    expand();
-  }, [expand]);
+  }, []);
 
   // Section expansion management
   const allVersions = useMemo(() => {
@@ -85,7 +80,7 @@ export default function ClientPage({
       <HeaderSpacer />
       <div
         className={cn(
-          "sticky top-[var(--header-height)]",
+          "sticky-to-header-desktop",
           "flex w-full items-center justify-between",
           "bg-background z-15 px-6 pb-2 pt-4",
         )}
