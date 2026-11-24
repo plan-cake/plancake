@@ -5,6 +5,21 @@ import { InferReq, InferRes } from "@/lib/utils/api/endpoints";
 import { fetchJson } from "@/lib/utils/api/fetch-wrapper";
 
 /**
+ * Resolves the backend API base URL, throwing a configuration error if
+ * neither environment variable is set.
+ */
+function getApiBaseUrl(): string {
+  const baseUrl =
+    process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
+  if (!baseUrl) {
+    throw new Error(
+      "API base URL is not configured. Set INTERNAL_API_URL or NEXT_PUBLIC_API_URL.",
+    );
+  }
+  return baseUrl;
+}
+
+/**
  * Extracts headers for User-Agent and X-Forwarded-For from the incoming request
  */
 async function getForwardedHeaders(): Promise<Record<string, string>> {
@@ -32,7 +47,7 @@ export async function serverGet<T extends { url: string }>(
   params?: InferReq<T>,
   options?: RequestInit,
 ): Promise<InferRes<T>> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const baseUrl = getApiBaseUrl();
 
   let queryString = "";
   if (params && Object.keys(params).length > 0) {
@@ -69,7 +84,7 @@ export async function serverPost<T extends { url: string }>(
   body?: InferReq<T>,
   options?: RequestInit,
 ): Promise<InferRes<T>> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const baseUrl = getApiBaseUrl();
   const url = `${baseUrl}${endpoint.url}`;
   const cookieString = await getAuthCookieString();
   const forwardedHeaders = await getForwardedHeaders();

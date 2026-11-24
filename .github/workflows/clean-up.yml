@@ -1,0 +1,43 @@
+name: Weekly Image Cleanup
+
+on:
+  schedule:
+    - cron: "0 0 * * 0" # run every sunday at midnight
+  workflow_dispatch:
+
+# don't cancel in-progress runs, since this is a weekly cleanup job
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+# Only untagged images are deleted, so every tagged image is kept as version history.
+#
+# Tags move to the newest build on every push, so older builds lose their tags:
+#   - Each push to a version branch moves its vX.Y.Z tag, untagging the previous build.
+#   - On release, the push to main moves vX.Y.Z (plus vX.Y, vX, latest) onto the main
+#     build, untagging the version branch's last build.
+# That leaves one tagged image per released version, plus the in-progress version
+# branches. Transition builds become untagged and are deleted here.
+#
+# v3.1.0 automatically protects the per-platform children of kept multi-arch images, so
+# deleting untagged versions won't break tagged ones.
+#
+# Requires the repository to have the Admin role in each package's settings
+# (Package settings -> Manage Actions access).
+jobs:
+  clean-registry:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    steps:
+      - name: Clean up untagged Plancake images
+        uses: snok/container-retention-policy@d3bdcf5ce9b05f685154e4a16c39233b245e3d53 # v3.1.0
+        with:
+          account: plan-cake
+          token: ${{ secrets.GITHUB_TOKEN }}
+          image-names: plancake-frontend plancake-backend
+          tag-selection: untagged
+          cut-off: 1w
+          timestamp-to-use: updated_at
+          dry-run: false

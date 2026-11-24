@@ -1,0 +1,36 @@
+name: Check version
+description: >
+  Version checks for version branches (vX.Y.Z), based on frontend/package.json.
+  "matches" fails unless the branch matches package.json's version. "unreleased" fails
+  if the branch's version has already been released to main. Requires the repo to be
+  checked out first.
+
+inputs:
+  check:
+    description: Which check to run, "matches" or "unreleased".
+    required: true
+  branch:
+    description: The branch name to check, e.g. v1.2.3.
+    required: true
+  only-version-branches:
+    description: >
+      If "true", skip the check (and pass) when the branch isn't a version branch,
+      instead of failing.
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Run ${{ inputs.check }} check
+      shell: bash
+      env:
+        CHECK: ${{ inputs.check }}
+        BRANCH: ${{ inputs.branch }}
+        ONLY_VERSION_BRANCHES: ${{ inputs.only-version-branches }}
+      run: |
+        if [[ "$ONLY_VERSION_BRANCHES" == "true" && ! "$BRANCH" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "$BRANCH is not a version branch, nothing to check."
+          exit 0
+        fi
+        bash "$GITHUB_ACTION_PATH/check-version.sh" "$CHECK" "$BRANCH"
