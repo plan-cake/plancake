@@ -33,6 +33,7 @@ export default function HeaderProvider({
   const pathname = usePathname();
 
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [useLoginCallback, setUseLoginCallback] = useState(false);
 
   const [isFullSize, setIsFullSize] = useState(true);
   const { scrollY } = useScroll();
@@ -128,6 +129,8 @@ export default function HeaderProvider({
         expand,
         activeMenu,
         setActiveMenu,
+        useLoginCallback,
+        setUseLoginCallback,
       }}
     >
       {children}

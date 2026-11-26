@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -32,6 +32,7 @@ import {
 } from "@/features/event/results/context";
 import { ResultsInformation } from "@/features/event/results/lib/types";
 import HeaderSpacer from "@/features/header/components/header-spacer";
+import { useHeader } from "@/features/header/context"; // Import header context
 import ShareMenu from "@/features/share-menu/menu";
 import { useViewTransition } from "@/lib/hooks/use-view-transition";
 import { cn } from "@/lib/utils/classname";
@@ -44,6 +45,15 @@ export default function ClientPage({
   eventData: EventInformation;
   initialAvailabilityData: ResultsInformation;
 }) {
+  const { setUseLoginCallback } = useHeader();
+
+  useEffect(() => {
+    setUseLoginCallback(true);
+    return () => {
+      setUseLoginCallback(false);
+    };
+  }, [setUseLoginCallback]);
+
   return (
     <ResultsProvider initialData={initialAvailabilityData}>
       <EventResults eventData={eventData} />

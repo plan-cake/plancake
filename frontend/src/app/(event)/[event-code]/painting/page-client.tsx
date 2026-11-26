@@ -22,6 +22,7 @@ import { GRID_ID_SELECTOR } from "@/features/event/grid/constants";
 import DateTimeGrid from "@/features/event/grid/date-time/grid";
 import useGridPageDays from "@/features/event/grid/date-time/lib/use-page-days";
 import HeaderSpacer from "@/features/header/components/header-spacer";
+import { useHeader } from "@/features/header/context";
 import {
   ConfirmationDialog,
   RateLimitBanner,
@@ -56,6 +57,15 @@ export default function ClientPage({
   timeslots: Date[];
   initialData: SelfAvailability | null;
 }) {
+  const { setUseLoginCallback } = useHeader();
+
+  useEffect(() => {
+    setUseLoginCallback(true);
+    return () => {
+      setUseLoginCallback(false);
+    };
+  }, [setUseLoginCallback]);
+
   const Grid = eventRange.type === "calendar" ? CalendarGrid : DateTimeGrid;
 
   const doViewTransition = useViewTransition();
