@@ -8,9 +8,11 @@ export default function useKeyboardHeight() {
     if (!visualViewport) return;
 
     const updateKeyboardHeight = () => {
-      // The layout viewport height is window.innerHeight.
-      // The visual viewport shrinks when the keyboard opens.
-      const heightDiff = window.innerHeight - visualViewport.height;
+      // This used to compare against innerHeight, which iOS Safari sometimes would shrink
+      // along with the keyboard, causing the keyboard to seem 0px tall. Instead,
+      // comparing against clientHeight avoids this issue.
+      const heightDiff =
+        document.documentElement.clientHeight - visualViewport.height;
 
       // Subtract offsetTop to account for the browser automatically panning
       // the page when an input is focused.

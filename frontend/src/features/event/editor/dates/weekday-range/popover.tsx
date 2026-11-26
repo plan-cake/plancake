@@ -2,10 +2,10 @@ import { useState } from "react";
 
 import { useEventContext } from "@/core/event/context";
 import { Weekday } from "@/core/event/types";
-import DatePopover from "@/features/event/editor/dates/date-popover";
 import Calendar from "@/features/event/editor/dates/weekday-range/calendar";
 import WeekdayRangePresets from "@/features/event/editor/dates/weekday-range/presets";
 import WeekdayRangeDisplay from "@/features/event/editor/dates/weekday-range/weekday-range-display";
+import EventEditorPopover from "@/features/event/editor/popover";
 import { MESSAGES } from "@/lib/messages";
 
 export default function WeekdayRangePopover({
@@ -17,8 +17,14 @@ export default function WeekdayRangePopover({
   const [open, setOpen] = useState(false);
 
   return (
-    <DatePopover
-      trigger={<WeekdayRangeDisplay weekdays={weekdays} open={open} />}
+    <EventEditorPopover
+      trigger={
+        <button>
+          <WeekdayRangeDisplay weekdays={weekdays} open={open} />
+        </button>
+      }
+      align="start"
+      side="bottom"
       open={open}
       setOpen={setOpen}
       ariaLabel="Weekday range picker"
@@ -33,6 +39,6 @@ export default function WeekdayRangePopover({
           {MESSAGES.INFO_DRAG_DATES}
         </p>
       </div>
-    </DatePopover>
+    </EventEditorPopover>
   );
 }

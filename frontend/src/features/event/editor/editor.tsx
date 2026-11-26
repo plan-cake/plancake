@@ -16,7 +16,7 @@ import ActionButton from "@/features/button/components/action";
 import LinkButton from "@/features/button/components/link";
 import GridPageDaysSelector from "@/features/event/components/selectors/grid-page-days";
 import TimeSelector from "@/features/event/components/selectors/time";
-import AdvancedOptions from "@/features/event/editor/advanced-options";
+import AdvancedOptions from "@/features/event/editor/advanced-options/advanced-options";
 import { MAX_TITLE_LENGTH } from "@/features/event/editor/constants";
 import DateRangeSelection from "@/features/event/editor/dates/date-selector";
 import { EventEditorType } from "@/features/event/editor/types";
@@ -293,7 +293,7 @@ function EventEditorContent({ type, initialData }: EventEditorProps) {
           </div>
         )}
 
-        <div className="md:content md:col-start-1 md:row-start-10 md:flex md:max-w-[250px] md:items-end">
+        <div className="md:content pt-1 md:col-start-1 md:row-start-10 md:flex md:max-w-[250px] md:items-end">
           <AdvancedOptions isEditing={type === "edit"} errors={errors} />
         </div>
         <div className="h-16 md:hidden" />
