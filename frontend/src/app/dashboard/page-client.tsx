@@ -3,9 +3,9 @@
 import { startTransition, useOptimistic, useRef, useState } from "react";
 
 import { CircleQuestionMarkIcon } from "lucide-react";
-import Link from "next/link";
 
 import InfoPoint from "@/components/info-point";
+import LinkText from "@/components/link-text";
 import SegmentedControl from "@/components/segmented-control";
 import { DashboardEventProps } from "@/features/dashboard/components/event";
 import EventGrid from "@/features/dashboard/components/event-grid";
@@ -14,7 +14,6 @@ import HeaderSpacer from "@/features/header/components/header-spacer";
 import { ConfirmationDialog, useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
-import LinkText from "@/components/link-text";
 
 type DashboardTab = "created" | "participated";
 
