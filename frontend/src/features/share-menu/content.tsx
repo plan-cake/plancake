@@ -65,10 +65,6 @@ export default function ShareMenuContent({
       icon={<CopyIcon />}
       label="Copy Link"
       onClick={copyToClipboard}
-      hotkey={{
-        keys: "mod+c",
-        badgeDisplay: "tooltip",
-      }}
     />
   );
 
