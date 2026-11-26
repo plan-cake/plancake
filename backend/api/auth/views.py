@@ -348,9 +348,8 @@ def start_password_reset(request):
     )
 
 
-INVALID_RESET_CODE_RESPONSE = Response(
-    {"error": {"general": ["Invalid code."]}}, status=400
-)
+def invalid_reset_code_response():
+    return Response({"error": {"general": ["Invalid code."]}}, status=400)
 
 
 @api_endpoint("POST")
@@ -377,13 +376,13 @@ def check_password_reset_code(request):
         logger.info(
             "Password reset code check failed for %s: User does not exist.", email
         )
-        return INVALID_RESET_CODE_RESPONSE
+        return invalid_reset_code_response()
     except PasswordResetCode.DoesNotExist:
         logger.info(
             "Password reset code check failed for %s: Invalid or expired reset code.",
             email,
         )
-        return INVALID_RESET_CODE_RESPONSE
+        return invalid_reset_code_response()
 
     return Response({"message": ["Password reset code is valid."]}, status=200)
 
@@ -476,7 +475,7 @@ def reset_password(request):
             logger.info(
                 "Password reset failed for %s: Invalid reset code or email.", email
             )
-        return INVALID_RESET_CODE_RESPONSE
+        return invalid_reset_code_response()
 
     return Response({"message": ["Password reset successfully."]}, status=200)
 
