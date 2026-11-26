@@ -2,19 +2,18 @@
 
 import { startTransition, useOptimistic, useRef, useState } from "react";
 
-import Link from "next/link";
+import { CircleQuestionMarkIcon } from "lucide-react";
 
+import InfoPoint from "@/components/info-point";
+import LinkText from "@/components/link-text";
 import SegmentedControl from "@/components/segmented-control";
 import { DashboardEventProps } from "@/features/dashboard/components/event";
 import EventGrid from "@/features/dashboard/components/event-grid";
 import { deleteEvent } from "@/features/dashboard/delete-event";
 import HeaderSpacer from "@/features/header/components/header-spacer";
-import {
-  Banner,
-  ConfirmationDialog,
-  useToast,
-} from "@/features/system-feedback";
+import { ConfirmationDialog, useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
+import { cn } from "@/lib/utils/classname";
 
 type DashboardTab = "created" | "participated";
 
@@ -76,25 +75,41 @@ export default function ClientPage({
     setConfirmationOpen(true);
   };
 
+  const guestModeInfoContent = (className?: string) => (
+    <div className={cn("flex flex-col gap-1", className)}>
+      <p>
+        Your events and availability are saved{" "}
+        <span className="italic">only on this browser</span>.{" "}
+        <LinkText>Create an account</LinkText> to access them from anywhere, and
+        you{"'"}ll be prompted to import this data after logging in.
+      </p>
+      <p className="italic opacity-75">
+        Plancake will always work without an account. Just be mindful where you
+        create events and fill out availability so you can access it all from
+        the same place later!
+      </p>
+    </div>
+  );
+
   return (
     <div className="flex min-h-screen flex-col gap-4 px-6 pb-4">
       <HeaderSpacer />
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      {!logged_in && (
-        <Banner type="info" title="Currently in Guest Mode">
-          <div>
-            This data is only available from this browser,{" "}
-            <Link
-              href="/register"
-              className="text-accent cursor-pointer font-bold hover:underline"
-            >
-              create an account
-            </Link>{" "}
-            to sync across devices. You can import this data into your account
-            at any time in account settings.
-          </div>
-        </Banner>
-      )}
+      <div className="flex items-start justify-between">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        {!logged_in && (
+          <InfoPoint
+            title="Guest Mode"
+            description="About guest mode"
+            drawerContent={guestModeInfoContent()}
+            tooltipContent={guestModeInfoContent("max-w-md p-1")}
+          >
+            <button className="bg-accent/50 text-accent-text flex select-none items-center gap-1.5 rounded-full p-1 px-2 pl-3">
+              <span className="font-bold">Guest Mode</span>
+              <CircleQuestionMarkIcon className="size-5" />
+            </button>
+          </InfoPoint>
+        )}
+      </div>
       <div className="bg-panel flex w-full flex-col gap-4 rounded-3xl p-4">
         <SegmentedControl
           value={tab}

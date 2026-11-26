@@ -1,5 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
+import { Slot } from "@radix-ui/react-slot";
 import { CircleQuestionMarkIcon } from "lucide-react";
 
 import { FloatingDrawer } from "@/features/drawer";
@@ -34,6 +35,10 @@ type InfoPointProps = {
    * or drawer.
    */
   className?: string;
+  /**
+   * An optional custom trigger.
+   */
+  children?: React.ReactNode;
 };
 
 export default function InfoPoint({
@@ -43,19 +48,22 @@ export default function InfoPoint({
   tooltipContent,
   drawerContent,
   className,
+  children,
 }: InfoPointProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pointerType = usePointerType();
 
+  const Trigger = children ? Slot : "button";
+
   return (
     <>
       <Tooltip side={tooltipSide} content={tooltipContent}>
-        <button
+        <Trigger
           onClick={() => setDrawerOpen(pointerType === "coarse")}
           aria-label={description}
         >
-          <CircleQuestionMarkIcon className={className} />
-        </button>
+          {children ?? <CircleQuestionMarkIcon className={className} />}
+        </Trigger>
       </Tooltip>
       <FloatingDrawer
         open={drawerOpen}
