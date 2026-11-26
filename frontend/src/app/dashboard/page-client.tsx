@@ -14,6 +14,7 @@ import HeaderSpacer from "@/features/header/components/header-spacer";
 import { ConfirmationDialog, useToast } from "@/features/system-feedback";
 import { MESSAGES } from "@/lib/messages";
 import { cn } from "@/lib/utils/classname";
+import LinkText from "@/components/link-text";
 
 type DashboardTab = "created" | "participated";
 
@@ -79,15 +80,9 @@ export default function ClientPage({
     <div className={cn("flex flex-col gap-1", className)}>
       <p>
         Your events and availability are saved{" "}
-        <span className="font-bold">only on this browser.</span>{" "}
-        <Link
-          href="/register"
-          className="text-accent cursor-pointer font-bold hover:underline"
-        >
-          Create an account
-        </Link>{" "}
-        to access them from anywhere, and you{"'"}ll be prompted to import this
-        data after logging in.
+        <span className="italic">only on this browser</span>.{" "}
+        <LinkText>Create an account</LinkText> to access them from anywhere, and
+        you{"'"}ll be prompted to import this data after logging in.
       </p>
       <p className="italic opacity-75">
         Plancake will always work without an account. Just be mindful where you
