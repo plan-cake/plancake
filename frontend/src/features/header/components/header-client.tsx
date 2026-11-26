@@ -11,6 +11,7 @@ import NewEventButton from "@/features/header/components/buttons/new-event";
 import ThemeButton from "@/features/header/components/buttons/theme";
 import LogoArea from "@/features/header/components/logo-area";
 import { useHeader } from "@/features/header/context";
+import useCheckMobile from "@/lib/hooks/use-check-mobile";
 import { cn } from "@/lib/utils/classname";
 
 export default function ClientHeader({
@@ -22,6 +23,8 @@ export default function ClientHeader({
 
   const { activeMenu } = useHeader();
   const pathname = usePathname();
+  const isMobile = useCheckMobile();
+  const isMobileLanding = pathname === "/" && isMobile;
 
   useEffect(() => {
     setMounted(true);
@@ -29,8 +32,13 @@ export default function ClientHeader({
 
   if (!mounted) return null;
 
-  return (
-    <header className="h-(--header-height) absolute top-0 z-40 w-full pt-4 md:fixed">
+  const header = (
+    <header
+      className={cn(
+        "h-(--header-height) top-0 z-40 w-full pt-4 md:fixed",
+        isMobileLanding ? "sticky" : "absolute",
+      )}
+    >
       <nav className="flex w-full max-w-[1440px] justify-between px-4">
         <LogoArea />
 
@@ -67,5 +75,17 @@ export default function ClientHeader({
         </LayoutGroup>
       </nav>
     </header>
+  );
+
+  /**
+   * Mobile landing page "exception", where the header is sticky until the scroll
+   * animation finishes (after 150vh).
+   */
+  return isMobileLanding ? (
+    <div className="absolute top-0 h-[calc(150vh+var(--header-height))] w-full">
+      {header}
+    </div>
+  ) : (
+    header
   );
 }
