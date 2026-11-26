@@ -262,16 +262,16 @@ function getStyleClasses(
       switch (state) {
         case "rest":
           styleClasses =
-            "text-accent-text font-bold bg-accent/15 hover:bg-accent/25 active:bg-accent/40 border-2 border-accent";
+            "text-accent-text bg-accent/15 hover:bg-accent/25 active:bg-accent/40 border-2 border-accent";
           paddingShrink = 0.5;
           break;
         case "loading":
-          styleClasses = "font-bold bg-accent/20 border-2 border-accent";
+          styleClasses = "bg-accent/20 border-2 border-accent";
           paddingShrink = 0.5;
           break;
         case "disabled":
           styleClasses =
-            "font-bold text-[#ffffff] dark:text-gray-400 bg-gray-200 dark:bg-gray-400/25";
+            "text-[#ffffff] dark:text-gray-400 bg-gray-200 dark:bg-gray-400/25";
           break;
       }
       spinnerClasses = "border-accent-text";
@@ -280,14 +280,14 @@ function getStyleClasses(
       switch (state) {
         case "rest":
           styleClasses =
-            "text-accent-text font-bold bg-accent/15 hover:bg-accent/25 active:bg-accent/40";
+            "text-accent-text bg-accent/15 hover:bg-accent/25 active:bg-accent/40";
           break;
         case "loading":
-          styleClasses = "font-bold bg-accent/20";
+          styleClasses = "bg-accent/20";
           break;
         case "disabled":
           styleClasses =
-            "font-bold text-[#ffffff] dark:text-gray-400 bg-gray-200 dark:bg-gray-400/25";
+            "text-[#ffffff] dark:text-gray-400 bg-gray-200 dark:bg-gray-400/25";
           break;
       }
       spinnerClasses = "border-accent-text";
