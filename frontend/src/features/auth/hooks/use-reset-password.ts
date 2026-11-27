@@ -119,8 +119,10 @@ export function useResetPasswordFlow() {
       refreshCaptcha();
       if (error.rateLimited) {
         handleError("rate_limit", error.formattedMessage);
+      } else if (error.data.error.email) {
+        handleError("email", error.data.error.email[0]);
       } else {
-        handleError("toast", error.formattedMessage);
+        handleError("api", error.formattedMessage);
       }
       return false;
     }
@@ -183,7 +185,7 @@ export function useResetPasswordFlow() {
       } else if (error.rateLimited) {
         handleError("rate_limit", error.formattedMessage);
       } else {
-        handleError("toast", error.formattedMessage);
+        handleError("api", error.formattedMessage);
       }
       return false;
     }
