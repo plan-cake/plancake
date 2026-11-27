@@ -148,7 +148,7 @@ export function useChangePasswordFlow() {
         handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       } else {
         refreshCaptcha();
-        handleError("toast", error.formattedMessage);
+        handleError("api", error.formattedMessage);
       }
       return false;
     }

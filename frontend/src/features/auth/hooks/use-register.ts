@@ -126,7 +126,7 @@ export function useRegisterFlow() {
         handleError("captcha", MESSAGES.ERROR_CAPTCHA_FAILED);
       } else {
         refreshCaptcha();
-        handleError("toast", error.formattedMessage);
+        handleError("api", error.formattedMessage);
       }
       return false;
     }
@@ -140,7 +140,7 @@ export function useRegisterFlow() {
       addToast("success", "Email resent.");
       return true;
     } catch (e) {
-      handleError("toast", (e as ApiErrorResponse).formattedMessage);
+      handleError("api", (e as ApiErrorResponse).formattedMessage);
       return false;
     }
   };
