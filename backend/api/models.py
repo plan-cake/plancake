@@ -59,6 +59,11 @@ class UserSession(models.Model):
 
 
 class PasswordResetCode(models.Model):
+    """
+    The first phase of a password reset, where the user verifies their identity using
+    their email.
+    """
+
     user_account = models.OneToOneField(
         UserAccount,
         on_delete=models.CASCADE,
@@ -71,6 +76,11 @@ class PasswordResetCode(models.Model):
 
 
 class PasswordResetToken(models.Model):
+    """
+    The second phase of a password reset, sent to the user after they are verified. This
+    is used to actually change the password.
+    """
+
     user_account = models.OneToOneField(
         UserAccount,
         on_delete=models.CASCADE,
