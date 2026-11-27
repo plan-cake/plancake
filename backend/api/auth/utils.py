@@ -1,10 +1,12 @@
 import random
 import string
+from datetime import datetime, timedelta
 
 from django.db import transaction
 from rest_framework.response import Response
 
-from api.settings import MAX_VERIFICATION_CODE_ATTEMPTS
+from api.models import PasswordResetCode
+from api.settings import MAX_VERIFICATION_CODE_ATTEMPTS, PWD_RESET_EXP_SECONDS
 
 
 def validate_password(password):
@@ -79,3 +81,10 @@ def attempt_verification_code(queryset, code):
         else:
             ver_code_obj.save(update_fields=["failed_attempts"])
         return None
+
+
+def password_reset_code_queryset(email):
+    return PasswordResetCode.objects.select_related("user_account").filter(
+        user_account__email=email,
+        created_at__gte=datetime.now() - timedelta(seconds=PWD_RESET_EXP_SECONDS),
+    )

@@ -19,6 +19,7 @@ from api.auth.utils import (
     generate_verification_code,
     invalid_verification_code_response,
     list_failed_criteria,
+    password_reset_code_queryset,
     validate_password,
 )
 from api.decorators import (
@@ -39,7 +40,6 @@ from api.models import (
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
     EMAIL_CODE_EXP_SECONDS,
-    PWD_RESET_EXP_SECONDS,
     ThrottleScopes,
 )
 from api.utils import (
@@ -316,7 +316,11 @@ def start_password_reset(request):
         with transaction.atomic():
             PasswordResetCode.objects.update_or_create(
                 user_account=user,
-                defaults={"verification_code": ver_code, "created_at": datetime.now()},
+                defaults={
+                    "verification_code": ver_code,
+                    "failed_attempts": 0,
+                    "created_at": datetime.now(),
+                },
             )
         logger.debug("Password reset code for %s: %s", email, ver_code)
 
@@ -352,19 +356,7 @@ def check_password_reset_code(request):
 
     check_rate_limit(request, ThrottleScopes.CODE_CHECK)
 
-    try:
-        user = UserAccount.objects.get(email=email)
-        PasswordResetCode.objects.get(
-            user_account=user,
-            verification_code=ver_code,
-            created_at__gte=datetime.now() - timedelta(seconds=PWD_RESET_EXP_SECONDS),
-        )
-    except UserAccount.DoesNotExist:
-        logger.info(
-            "Password reset code check failed for %s: User does not exist.", email
-        )
-        return invalid_verification_code_response()
-    except PasswordResetCode.DoesNotExist:
+    if attempt_verification_code(password_reset_code_queryset(email), ver_code) is None:
         logger.info(
             "Password reset code check failed for %s: Invalid or expired verification code.",
             email,
@@ -417,55 +409,45 @@ def reset_password(request):
             {"error": {"new_password": list_failed_criteria(criteria)}}, status=400
         )
 
-    try:
-        with transaction.atomic():
-            ver_code_obj = PasswordResetCode.objects.select_for_update().get(
-                user_account__email=email,
-                verification_code=ver_code,
-                created_at__gte=datetime.now()
-                - timedelta(seconds=PWD_RESET_EXP_SECONDS),
-            )
-            user = ver_code_obj.user_account
-
-            # Check if the new password is actually new
-            if bcrypt.checkpw(new_password.encode(), user.password_hash.encode()):
-                logger.info("Password reset failed: New password was not new.")
-                return Response(
-                    {
-                        "error": {
-                            "new_password": [
-                                "New password must be different from old password."
-                            ]
-                        }
-                    },
-                    status=400,
-                )
-
-            user.password_hash = bcrypt.hashpw(
-                new_password.encode(), bcrypt.gensalt()
-            ).decode()
-            user.save()
-            ver_code_obj.delete()  # Make sure to remove the verification code after use
-
-            if prune_sessions:
-                if has_account_auth:
-                    # Remove all active sessions except the current one
-                    prune_account_sessions(request)
-                else:
-                    # Remove all active sessions for the user
-                    UserSession.objects.filter(user_account=user).delete()
-
-    except PasswordResetCode.DoesNotExist:
-        if has_account_auth:
+    with transaction.atomic():
+        ver_code_obj = attempt_verification_code(
+            password_reset_code_queryset(email), ver_code
+        )
+        if ver_code_obj is None:
             logger.info(
-                "Password reset failed for %s: Invalid verification code.", user.email
-            )
-        else:
-            logger.info(
-                "Password reset failed for %s: Invalid verification code or email.",
+                "Password reset failed for %s: Invalid or expired verification code.",
                 email,
             )
-        return invalid_verification_code_response()
+            return invalid_verification_code_response()
+        user = ver_code_obj.user_account
+
+        # Check if the new password is actually new
+        if bcrypt.checkpw(new_password.encode(), user.password_hash.encode()):
+            logger.info("Password reset failed: New password was not new.")
+            return Response(
+                {
+                    "error": {
+                        "new_password": [
+                            "New password must be different from old password."
+                        ]
+                    }
+                },
+                status=400,
+            )
+
+        user.password_hash = bcrypt.hashpw(
+            new_password.encode(), bcrypt.gensalt()
+        ).decode()
+        user.save()
+        ver_code_obj.delete()  # Make sure to remove the verification code after use
+
+        if prune_sessions:
+            if has_account_auth:
+                # Remove all active sessions except the current one
+                prune_account_sessions(request)
+            else:
+                # Remove all active sessions for the user
+                UserSession.objects.filter(user_account=user).delete()
 
     return Response({"message": ["Password reset successfully."]}, status=200)
 
