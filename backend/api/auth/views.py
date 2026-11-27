@@ -344,6 +344,7 @@ def start_password_reset(request):
 
 
 @api_endpoint("POST")
+@check_auth
 @validate_json_input(VerificationCodeSerializer)
 @validate_output(MessageOutputSerializer)
 def check_password_reset_code(request):
@@ -351,10 +352,24 @@ def check_password_reset_code(request):
     Checks if the provided password reset code is valid for the account associated with
     the provided email address.
     """
+    user = request.user
     email = request.validated_data.get("email")
     ver_code = request.validated_data.get("verification_code")
 
     check_rate_limit(request, ThrottleScopes.CODE_CHECK)
+
+    if user is not None and not user.is_guest and user.email != email:
+        logger.info(
+            "Password reset code check failed: Authenticated user email %s does not match provided email %s.",
+            user.email,
+            email,
+        )
+        # It's okay to say the email does not match because the user is already
+        # authenticated.
+        return Response(
+            {"error": {"email": ["Provided email does not match account."]}},
+            status=400,
+        )
 
     if attempt_verification_code(password_reset_code_queryset(email), ver_code) is None:
         logger.info(
@@ -395,8 +410,8 @@ def reset_password(request):
             user.email,
             email,
         )
-        # This is the one time it's okay to say the email does not match because the user
-        # is already authenticated.
+        # It's okay to say the email does not match because the user is already
+        # authenticated.
         return Response(
             {"error": {"email": ["Provided email does not match account."]}},
             status=400,
