@@ -29,12 +29,12 @@ export type LoginData = {
 
 export type PasswordResetCodeCheckData = {
   email: string;
-  reset_code: string;
+  verification_code: string;
 };
 
 export type PasswordResetData = {
   email: string;
-  reset_code: string;
+  verification_code: string;
   new_password: string;
   prune_sessions?: boolean;
 };

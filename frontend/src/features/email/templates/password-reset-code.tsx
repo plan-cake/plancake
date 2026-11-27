@@ -13,7 +13,7 @@ export async function passwordResetCode({
   code: string;
 }): Promise<EmailRenderResponse> {
   if (!code) {
-    throw new EmailContextError("Missing reset code.");
+    throw new EmailContextError("Missing verification code.");
   }
 
   return {

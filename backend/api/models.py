@@ -64,7 +64,7 @@ class PasswordResetCode(models.Model):
         related_name="password_reset_code",
         primary_key=True,
     )
-    reset_code = models.CharField(max_length=6)
+    verification_code = models.CharField(max_length=6)
     created_at = DateTimeNoTZField(auto_now_add=True)
 
 

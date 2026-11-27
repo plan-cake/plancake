@@ -8,14 +8,18 @@ from rest_framework.response import Response
 
 from api.auth.serializers import (
     AccountDetailsSerializer,
-    CodeCheckSerializer,
     EmailSerializer,
-    EmailVerifySerializer,
     LoginSerializer,
     PasswordResetSerializer,
     RegisterAccountSerializer,
+    VerificationCodeSerializer,
 )
-from api.auth.utils import generate_auth_code, list_failed_criteria, validate_password
+from api.auth.utils import (
+    generate_verification_code,
+    invalid_verification_code_response,
+    list_failed_criteria,
+    validate_password,
+)
 from api.decorators import (
     api_endpoint,
     check_auth,
@@ -95,7 +99,7 @@ def register(request):
         )
     else:
         # Create an unverified user account
-        ver_code = generate_auth_code()
+        ver_code = generate_verification_code()
         with transaction.atomic():
             UnverifiedUserAccount.objects.filter(email=email).delete()
             UnverifiedUserAccount.objects.create(
@@ -159,7 +163,7 @@ def resend_register_email(request):
 
 
 @api_endpoint("POST")
-@validate_json_input(EmailVerifySerializer)
+@validate_json_input(VerificationCodeSerializer)
 @validate_output(MessageOutputSerializer)
 def verify_email(request):
     """
@@ -195,7 +199,7 @@ def verify_email(request):
 
     except UnverifiedUserAccount.DoesNotExist:
         logger.info("Verification code or email is invalid for %s.", email)
-        return Response({"error": {"verification_code": ["Invalid code."]}}, status=400)
+        return invalid_verification_code_response()
 
     return Response({"message": ["Email verified successfully."]}, status=200)
 
@@ -298,7 +302,7 @@ def start_password_reset(request):
     If the email address is not associated with a user account, nothing will happen.
 
     To resend the email, this endpoint can be called again with the same input. A new
-    reset code will be generated and the old one invalidated.
+    verification code will be generated and the old one invalidated.
     """
     email = request.validated_data.get("email")
 
@@ -306,18 +310,18 @@ def start_password_reset(request):
 
     try:
         user = UserAccount.objects.get(email=email)
-        reset_code = generate_auth_code()
+        ver_code = generate_verification_code()
         with transaction.atomic():
             PasswordResetCode.objects.update_or_create(
                 user_account=user,
-                defaults={"reset_code": reset_code, "created_at": datetime.now()},
+                defaults={"verification_code": ver_code, "created_at": datetime.now()},
             )
-        logger.debug("Password reset code for %s: %s", email, reset_code)
+        logger.debug("Password reset code for %s: %s", email, ver_code)
 
         send_templated_email(
             to_email=email,
             template_key=EmailTemplateKey.PASSWORD_RESET_CODE,
-            context={"code": reset_code},
+            context={"code": ver_code},
         )
 
     except UserAccount.DoesNotExist:
@@ -333,12 +337,8 @@ def start_password_reset(request):
     )
 
 
-def invalid_reset_code_response():
-    return Response({"error": {"general": ["Invalid code."]}}, status=400)
-
-
 @api_endpoint("POST")
-@validate_json_input(CodeCheckSerializer)
+@validate_json_input(VerificationCodeSerializer)
 @validate_output(MessageOutputSerializer)
 def check_password_reset_code(request):
     """
@@ -346,7 +346,7 @@ def check_password_reset_code(request):
     the provided email address.
     """
     email = request.validated_data.get("email")
-    reset_code = request.validated_data.get("reset_code")
+    ver_code = request.validated_data.get("verification_code")
 
     check_rate_limit(request, ThrottleScopes.CODE_CHECK)
 
@@ -354,20 +354,20 @@ def check_password_reset_code(request):
         user = UserAccount.objects.get(email=email)
         PasswordResetCode.objects.get(
             user_account=user,
-            reset_code=reset_code,
+            verification_code=ver_code,
             created_at__gte=datetime.now() - timedelta(seconds=PWD_RESET_EXP_SECONDS),
         )
     except UserAccount.DoesNotExist:
         logger.info(
             "Password reset code check failed for %s: User does not exist.", email
         )
-        return invalid_reset_code_response()
+        return invalid_verification_code_response()
     except PasswordResetCode.DoesNotExist:
         logger.info(
-            "Password reset code check failed for %s: Invalid or expired reset code.",
+            "Password reset code check failed for %s: Invalid or expired verification code.",
             email,
         )
-        return invalid_reset_code_response()
+        return invalid_verification_code_response()
 
     return Response({"message": ["Password reset code is valid."]}, status=200)
 
@@ -387,7 +387,7 @@ def reset_password(request):
     """
     user = request.user
     email = request.validated_data.get("email")
-    reset_code = request.validated_data.get("reset_code")
+    ver_code = request.validated_data.get("verification_code")
     new_password = request.validated_data.get("new_password")
     prune_sessions = request.validated_data.get("prune_sessions")
 
@@ -417,13 +417,13 @@ def reset_password(request):
 
     try:
         with transaction.atomic():
-            reset_code_obj = PasswordResetCode.objects.select_for_update().get(
+            ver_code_obj = PasswordResetCode.objects.select_for_update().get(
                 user_account__email=email,
-                reset_code=reset_code,
+                verification_code=ver_code,
                 created_at__gte=datetime.now()
                 - timedelta(seconds=PWD_RESET_EXP_SECONDS),
             )
-            user = reset_code_obj.user_account
+            user = ver_code_obj.user_account
 
             # Check if the new password is actually new
             if bcrypt.checkpw(new_password.encode(), user.password_hash.encode()):
@@ -443,7 +443,7 @@ def reset_password(request):
                 new_password.encode(), bcrypt.gensalt()
             ).decode()
             user.save()
-            reset_code_obj.delete()  # Make sure to remove the reset code after use
+            ver_code_obj.delete()  # Make sure to remove the verification code after use
 
             if prune_sessions:
                 if has_account_auth:
@@ -455,12 +455,15 @@ def reset_password(request):
 
     except PasswordResetCode.DoesNotExist:
         if has_account_auth:
-            logger.info("Password reset failed for %s: Invalid reset code.", user.email)
+            logger.info(
+                "Password reset failed for %s: Invalid verification code.", user.email
+            )
         else:
             logger.info(
-                "Password reset failed for %s: Invalid reset code or email.", email
+                "Password reset failed for %s: Invalid verification code or email.",
+                email,
             )
-        return invalid_reset_code_response()
+        return invalid_verification_code_response()
 
     return Response({"message": ["Password reset successfully."]}, status=200)
 

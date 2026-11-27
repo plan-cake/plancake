@@ -1,8 +1,8 @@
 import { MAX_DEFAULT_NAME_LENGTH } from "@/features/account/constants";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/event/availability/constants";
 import {
-  MAX_DATE_TIME_DURATION,
   MAX_CALENDAR_DURATION,
+  MAX_DATE_TIME_DURATION,
   MAX_TITLE_LENGTH,
 } from "@/features/event/editor/constants";
 
@@ -20,7 +20,6 @@ export const MESSAGES = {
   ERROR_PASSWORD_REUSE: "Cannot reuse old password.",
   ERROR_PASSWORD_WEAK: "Password is not strong enough.",
   ERROR_PASSWORD_MISMATCH: "Passwords do not match.",
-  ERROR_RESET_CODE_INVALID: "Invalid or expired reset code.",
 
   // availability errors
   ERROR_NAME_LENGTH: `Name must be ${MAX_DISPLAY_NAME_LENGTH} characters or less.`,

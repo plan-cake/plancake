@@ -31,7 +31,7 @@ export function useChangePasswordFlow() {
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-    resetCode: "",
+    verificationCode: "",
     pruneSessions: false,
   });
 
@@ -72,7 +72,7 @@ export function useChangePasswordFlow() {
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
-        resetCode: "",
+        verificationCode: "",
         pruneSessions: false,
       });
       setShowCriteria(false);
@@ -96,8 +96,8 @@ export function useChangePasswordFlow() {
                 : undefined;
     }
     if (step === "OTP") {
-      return !form.resetCode
-        ? "Please enter the reset code."
+      return !form.verificationCode
+        ? "Please enter the verification code."
         : Object.keys(errors).length
           ? MESSAGES.FORM_HAS_ERRORS
           : undefined;
@@ -156,16 +156,16 @@ export function useChangePasswordFlow() {
 
   const handleVerifyOTP = async (code?: string) => {
     clearAllErrors();
-    const codeToVerify = code ?? form.resetCode;
+    const codeToVerify = code ?? form.verificationCode;
 
     if (!codeToVerify) {
-      handleError("resetCode", "Please enter the code.");
+      handleError("verificationCode", "Please enter the code.");
       return false;
     }
     try {
       await clientPost(ROUTES.auth.checkPasswordResetCode, {
         email,
-        reset_code: codeToVerify,
+        verification_code: codeToVerify,
       });
       setStep("RESET");
       return false;
@@ -175,8 +175,8 @@ export function useChangePasswordFlow() {
         handleError("rate_limit", error.formattedMessage);
       } else {
         handleError(
-          "resetCode",
-          error.formattedMessage.split("Reset Code: ")[1] ||
+          "verificationCode",
+          error.formattedMessage.split("Verification Code: ")[1] ||
             error.formattedMessage,
         );
       }
@@ -202,7 +202,7 @@ export function useChangePasswordFlow() {
     try {
       await clientPost(ROUTES.auth.resetPassword, {
         email,
-        reset_code: form.resetCode,
+        verification_code: form.verificationCode,
         new_password: form.newPassword,
         prune_sessions: form.pruneSessions,
       });
@@ -250,9 +250,7 @@ export function useChangePasswordFlow() {
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
-      if (error.status === 404)
-        handleError("api", MESSAGES.ERROR_RESET_CODE_INVALID);
-      else if (error.data?.error?.["password"])
+      if (error.data?.error?.["password"])
         handleError("currentPassword", MESSAGES.ERROR_PASSWORD_WRONG);
       else if (error.data?.error?.["new_password"])
         handleError("newPassword", MESSAGES.ERROR_PASSWORD_REUSE);

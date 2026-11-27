@@ -18,7 +18,7 @@ export function useResetPasswordFlow() {
 
   const [form, setForm] = useState({
     email: "",
-    resetCode: "",
+    verificationCode: "",
     newPassword: "",
     confirmPassword: "",
   });
@@ -59,8 +59,8 @@ export function useResetPasswordFlow() {
               ? MESSAGES.FORM_HAS_ERRORS
               : undefined;
       case "OTP":
-        return !form.resetCode || !form.resetCode.trim()
-          ? "Please enter the reset code."
+        return !form.verificationCode || !form.verificationCode.trim()
+          ? "Please enter the verification code."
           : Object.keys(errors).length
             ? MESSAGES.FORM_HAS_ERRORS
             : undefined;
@@ -128,24 +128,24 @@ export function useResetPasswordFlow() {
 
   const handleVerifyOTP = async (code?: string) => {
     clearAllErrors();
-    const codeToVerify = code || form.resetCode;
+    const codeToVerify = code || form.verificationCode;
 
     if (!codeToVerify) {
-      handleError("resetCode", "Please enter the code.");
+      handleError("verificationCode", "Please enter the code.");
       return false;
     }
     try {
       await clientPost(ROUTES.auth.checkPasswordResetCode, {
         email: form.email,
-        reset_code: codeToVerify,
+        verification_code: codeToVerify,
       });
       setStep("RESET");
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
       handleError(
-        "resetCode",
-        error.formattedMessage.split("Reset Code: ")[1] ||
+        "verificationCode",
+        error.formattedMessage.split("Verification Code: ")[1] ||
           error.formattedMessage,
       );
       return false;
@@ -170,7 +170,7 @@ export function useResetPasswordFlow() {
     try {
       await clientPost(ROUTES.auth.resetPassword, {
         email: form.email,
-        reset_code: form.resetCode,
+        verification_code: form.verificationCode,
         new_password: form.newPassword,
         prune_sessions: true,
       });

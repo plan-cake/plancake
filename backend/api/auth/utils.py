@@ -1,6 +1,8 @@
 import random
 import string
 
+from rest_framework.response import Response
+
 
 def validate_password(password):
     MIN_LENGTH = 8
@@ -43,8 +45,12 @@ def list_failed_criteria(criteria):
     return [f"Password must {crit}." for crit, passed in criteria.items() if not passed]
 
 
-def generate_auth_code():
+def generate_verification_code():
     """
     Generates a random 6-digit code.
     """
     return "".join(random.SystemRandom().choices(string.digits, k=6))
+
+
+def invalid_verification_code_response():
+    return Response({"error": {"verification_code": ["Invalid code."]}}, status=400)

@@ -12,15 +12,11 @@ class EmailSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
 
-class ResetCodeSerializer(serializers.Serializer):
-    reset_code = SIX_DIGIT_CODE_FIELD
-
-
 class RegisterAccountSerializer(EmailSerializer):
     password = serializers.CharField(required=True)
 
 
-class EmailVerifySerializer(EmailSerializer):
+class VerificationCodeSerializer(EmailSerializer):
     verification_code = SIX_DIGIT_CODE_FIELD
 
 
@@ -28,11 +24,7 @@ class LoginSerializer(RegisterAccountSerializer):
     remember_me = serializers.BooleanField(default=False, required=False)
 
 
-class CodeCheckSerializer(EmailSerializer, ResetCodeSerializer):
-    pass
-
-
-class PasswordResetSerializer(EmailSerializer, ResetCodeSerializer):
+class PasswordResetSerializer(VerificationCodeSerializer):
     new_password = serializers.CharField(required=True)
     prune_sessions = serializers.BooleanField(default=False, required=False)
 

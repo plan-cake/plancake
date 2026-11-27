@@ -96,11 +96,11 @@ export default function Page() {
           >
             {captcha}
             <OTPModule
-              value={flow.form.resetCode}
-              onValueChange={(val) => flow.updateForm("resetCode", val)}
+              value={flow.form.verificationCode}
+              onValueChange={(val) => flow.updateForm("verificationCode", val)}
               email={flow.form.email}
               relevantError={
-                flow.errors.resetCode ||
+                flow.errors.verificationCode ||
                 flow.errors.api ||
                 flow.errors.rate_limit
               }
