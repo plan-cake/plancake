@@ -38,6 +38,7 @@ class UnverifiedUserAccount(models.Model):
     email = models.EmailField(unique=True, primary_key=True)
     password_hash = models.CharField(max_length=255)
     verification_code = models.CharField(max_length=6)
+    failed_attempts = models.PositiveSmallIntegerField(default=0)
     created_at = DateTimeNoTZField(auto_now_add=True)
 
 
@@ -65,6 +66,7 @@ class PasswordResetCode(models.Model):
         primary_key=True,
     )
     verification_code = models.CharField(max_length=6)
+    failed_attempts = models.PositiveSmallIntegerField(default=0)
     created_at = DateTimeNoTZField(auto_now_add=True)
 
 
