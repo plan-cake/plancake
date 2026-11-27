@@ -1,7 +1,10 @@
 import random
 import string
 
+from django.db import transaction
 from rest_framework.response import Response
+
+from api.settings import MAX_VERIFICATION_CODE_ATTEMPTS
 
 
 def validate_password(password):
@@ -54,3 +57,25 @@ def generate_verification_code():
 
 def invalid_verification_code_response():
     return Response({"error": {"verification_code": ["Invalid code."]}}, status=400)
+
+
+def attempt_verification_code(queryset, code):
+    """
+    `queryset` must be filtered to the unexpired code row (either `UnverifiedUserAccount`
+    or `PasswordResetCode`) for the user's account.
+
+    Returns the row if `code` matches, else `None`. A wrong guess increments
+    `failed_attempts`, and deletes the row once the max attempts is reached.
+    """
+    with transaction.atomic():
+        ver_code_obj = queryset.select_for_update().first()
+        if ver_code_obj is None:
+            return None
+        if ver_code_obj.verification_code == code:
+            return ver_code_obj
+        ver_code_obj.failed_attempts += 1
+        if ver_code_obj.failed_attempts >= MAX_VERIFICATION_CODE_ATTEMPTS:
+            ver_code_obj.delete()
+        else:
+            ver_code_obj.save(update_fields=["failed_attempts"])
+        return None
