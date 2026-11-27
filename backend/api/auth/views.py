@@ -15,6 +15,7 @@ from api.auth.serializers import (
     VerificationCodeSerializer,
 )
 from api.auth.utils import (
+    attempt_verification_code,
     generate_verification_code,
     invalid_verification_code_response,
     list_failed_criteria,
@@ -179,27 +180,28 @@ def verify_email(request):
 
     check_rate_limit(request, ThrottleScopes.CODE_CHECK)
 
-    try:
-        unverified_user = UnverifiedUserAccount.objects.get(
-            email=email,
-            verification_code=ver_code,
-            created_at__gte=datetime.now() - timedelta(seconds=EMAIL_CODE_EXP_SECONDS),
+    with transaction.atomic():
+        unverified_user = attempt_verification_code(
+            UnverifiedUserAccount.objects.filter(
+                email=email,
+                created_at__gte=datetime.now()
+                - timedelta(seconds=EMAIL_CODE_EXP_SECONDS),
+            ),
+            ver_code,
         )
+        if unverified_user is None:
+            logger.info("Verification code or email is invalid for %s.", email)
+            return invalid_verification_code_response()
 
-        with transaction.atomic():
-            # Create the user account
-            UserAccount.objects.create(
-                email=unverified_user.email,
-                password_hash=unverified_user.password_hash,
-                is_guest=False,
-            )
-            # Delete the unverified user account
-            unverified_user.delete()
-        logger.info("Account successfully created for %s.", unverified_user.email)
-
-    except UnverifiedUserAccount.DoesNotExist:
-        logger.info("Verification code or email is invalid for %s.", email)
-        return invalid_verification_code_response()
+        # Create the user account
+        UserAccount.objects.create(
+            email=unverified_user.email,
+            password_hash=unverified_user.password_hash,
+            is_guest=False,
+        )
+        # Delete the unverified user account
+        unverified_user.delete()
+    logger.info("Account successfully created for %s.", unverified_user.email)
 
     return Response({"message": ["Email verified successfully."]}, status=200)
 
