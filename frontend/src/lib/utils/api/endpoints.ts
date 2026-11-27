@@ -25,7 +25,6 @@ import {
   RegisterData,
   SelfAvailability,
   SessionId,
-  TrueCode,
 } from "@/lib/utils/api/types";
 
 /**
@@ -73,7 +72,9 @@ export const ROUTES = {
      * @method POST
      * @throws 400 - If the verification code is invalid.
      */
-    verifyEmail: route<MessageResponse, EmailVerification>("/auth/verify-email/"),
+    verifyEmail: route<MessageResponse, EmailVerification>(
+      "/auth/verify-email/",
+    ),
     /**
      * Logs in a user account.
      * @method POST
@@ -99,7 +100,9 @@ export const ROUTES = {
      * @method POST
      * @throws 400 - If the reset code is invalid.
      */
-    checkPasswordResetCode: route<MessageResponse, PasswordResetCodeCheckData>("/auth/check-password-reset-code/"),
+    checkPasswordResetCode: route<MessageResponse, PasswordResetCodeCheckData>(
+      "/auth/check-password-reset-code/",
+    ),
     /**
      * Given a valid password reset code, resets the password for a user account.
      * @method POST
@@ -150,12 +153,6 @@ export const ROUTES = {
      * @throws 400 - If the custom code is not available or invalid.
      */
     checkCode: route<MessageResponse, CustomCode>("/event/check-code/"),
-    /**
-     * Gets the true URL code for an event, given the event code.
-     * @method GET
-     * @throws 404 - If the event does not exist.
-     */
-    getTrueCode: route<TrueCode, EventCode>("/event/get-true-code/"),
     /**
      * Edits the details of a 'date' type event.
      * @method POST

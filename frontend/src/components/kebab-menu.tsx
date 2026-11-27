@@ -36,6 +36,8 @@ export default function KebabMenu({
 }) {
   const id = useId();
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef(false);
 
   /* OPEN STATE MANAGEMENT */
   const [internalOpen, setInternalOpen] = useState(false);
@@ -59,12 +61,32 @@ export default function KebabMenu({
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
+        restoreFocusRef.current = false;
+        handleOpenChange(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        restoreFocusRef.current = true;
         handleOpenChange(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [handleOpenChange, open]);
+
+  // When closed with the keyboard, move focus back to the remounted trigger
+  useEffect(() => {
+    if (open || !restoreFocusRef.current) return;
+    restoreFocusRef.current = false;
+    triggerRef.current
+      ?.querySelector<HTMLElement>("button, [tabindex]")
+      ?.focus();
+  }, [open]);
 
   return (
     <div className="relative" ref={containerRef}>
@@ -87,6 +109,7 @@ export default function KebabMenu({
           <motion.div
             layout
             key="trigger"
+            ref={triggerRef}
             layoutId={"popover-morph-" + id}
             transition={morphTransition}
             className={cn(

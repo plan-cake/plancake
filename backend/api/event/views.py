@@ -5,13 +5,12 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from asgiref.sync import sync_to_async
-from django.db import transaction
+from django.db import close_old_connections, transaction
 from django.db.models import Q
 from django.http import JsonResponse, StreamingHttpResponse
 from redis.asyncio import Redis
 from rest_framework.response import Response
 
-from api.availability.utils import get_weekday_date
 from api.decorators import (
     api_endpoint,
     check_auth,
@@ -28,7 +27,6 @@ from api.event.serializers import (
     EventDetailSerializer,
     EventEditSerializer,
     RequiredCustomCodeSerializer,
-    TrueCodeSerializer,
 )
 from api.event.utils import (
     check_custom_code,
@@ -49,8 +47,6 @@ from api.models import (
 )
 from api.redis_pools import async_pool
 from api.settings import (
-    ACCOUNT_COOKIE_NAME,
-    GUEST_COOKIE_NAME,
     LIVE_UPDATES_HEARTBEAT_SECONDS,
     MAX_LIVE_CONNECTIONS_EVENT,
     MAX_LIVE_CONNECTIONS_GLOBAL,
@@ -60,11 +56,13 @@ from api.utils import (
     LiveUpdateEvent,
     LiveUpdateEventEditData,
     MessageOutputSerializer,
+    authenticate,
     check_rate_limit,
     event_lookup,
     format_event_info,
     generic_error_response,
-    get_session,
+    get_weekday_date,
+    live_update_channel,
     notify_live_update,
     to_datetime,
 )
@@ -74,6 +72,10 @@ logger = logging.getLogger("api")
 
 def event_not_found_error():
     return Response({"error": {"general": ["Event not found."]}}, status=404)
+
+
+def unauthorized_error():
+    return Response({"error": {"general": ["User must be event creator."]}}, status=403)
 
 
 @api_endpoint("POST")
@@ -293,29 +295,6 @@ def check_code(request):
     return Response({"message": ["Custom code is valid and available."]}, status=200)
 
 
-@api_endpoint("GET")
-@validate_query_param_input(EventCodeSerializer)
-@validate_output(TrueCodeSerializer)
-def get_true_code(request):
-    """
-    Gets the true URL code for an event.
-
-    The true code is the URL code with the same capitalization that the event creator
-    used when creating the event. This ensures that certain caches work properly by having
-    all instances use identically-capitalized URLs.
-
-    If the event does not exist, a 404 error is returned.
-    """
-    event_code = request.validated_data.get("event_code")
-
-    try:
-        true_code = UrlCode.objects.get(url_code__iexact=event_code).url_code
-    except UrlCode.DoesNotExist:
-        return event_not_found_error()
-
-    return Response({"true_code": true_code}, status=200)
-
-
 @api_endpoint("POST")
 @check_auth
 @validate_json_input(EventEditSerializer)
@@ -342,9 +321,13 @@ def edit_date_event(request):
             # Find the event
             event = UserEvent.objects.get(
                 url_code__url_code__iexact=event_code,
-                user_account=user,
                 date_type=UserEvent.EventType.SPECIFIC,
             )
+
+            # Check that the user is the creator
+            if event.user_account != user:
+                return unauthorized_error()
+
             # Get the earliest timeslot
             earliest_timeslot = (
                 EventDateTimeslot.objects.filter(user_event=event)
@@ -437,9 +420,12 @@ def edit_week_event(request):
             # Find the event
             event = UserEvent.objects.get(
                 url_code__url_code__iexact=event_code,
-                user_account=user,
                 date_type=UserEvent.EventType.GENERIC,
             )
+
+            # Check that the user is the creator
+            if event.user_account != user:
+                return unauthorized_error()
 
             errors = validate_weekday_timeslots(timeslots)
             if errors.keys():
@@ -515,9 +501,13 @@ def edit_calendar_event(request):
             # Find the event
             event = UserEvent.objects.get(
                 url_code__url_code__iexact=event_code,
-                user_account=user,
                 date_type=UserEvent.EventType.CALENDAR,
             )
+
+            # Check that the user is the creator
+            if event.user_account != user:
+                return unauthorized_error()
+
             # Get the earliest timeslot
             earliest_timeslot = (
                 EventCalendarTimeslot.objects.filter(user_event=event)
@@ -629,7 +619,7 @@ def get_event_details(request):
 
     try:
         event = event_lookup_prefetch(event_code)
-        touch_url_code(event_code)
+        touch_url_code(event.url_code)
         data = format_event_info(event)
         match event.date_type:
             case UserEvent.EventType.SPECIFIC:
@@ -650,7 +640,8 @@ def get_event_details(request):
     return Response(
         {
             **data,
-            "is_creator": event.user_account == user,
+            "is_creator": user is not None
+            and event.user_account_id == user.user_account_id,
         },
         status=200,
     )
@@ -674,11 +665,19 @@ async def get_live_updates(request, event_code):
     The connection can fail if there are too many concurrent connections, either globally
     or for the specific event. In that case, a 503 response is returned.
     """
+    # Get current user ID from cookies
+    auth = await sync_to_async(authenticate)(request)
+    user_id = auth.session.user_account_id if auth.session else -1
+
+    # Return the database connection to the pool now, otherwise it stays checked out until
+    # the stream ends.
+    await sync_to_async(close_old_connections)()
+
     # Using async Redis client
     client: Redis = Redis(connection_pool=async_pool)
 
     GLOBAL_COUNT = "live_updates_global_count"
-    EVENT_COUNT = f"live_updates_event_{event_code}_count"
+    EVENT_COUNT = f"live_updates_{live_update_channel(event_code)}_count"
 
     # Check global limit
     global_count = await client.incr(GLOBAL_COUNT)
@@ -707,20 +706,9 @@ async def get_live_updates(request, event_code):
             status=503,
         )
 
-    # Get current user ID from cookies
-    aget_session = sync_to_async(get_session)
-    session = None
-    user_id = -1
-    if ACCOUNT_COOKIE_NAME in request.COOKIES:
-        session = await aget_session(request.COOKIES[ACCOUNT_COOKIE_NAME])
-    if session is None and GUEST_COOKIE_NAME in request.COOKIES:
-        session = await aget_session(request.COOKIES[GUEST_COOKIE_NAME])
-    if session:
-        user_id = session.user_account_id
-
     async def event_generator():
         pubsub = client.pubsub()
-        await pubsub.subscribe(f"event_{event_code}")
+        await pubsub.subscribe(live_update_channel(event_code))
 
         try:
             while True:
@@ -751,7 +739,7 @@ async def get_live_updates(request, event_code):
 
                 await asyncio.sleep(LIVE_UPDATES_HEARTBEAT_SECONDS)
         except Exception:
-            await pubsub.unsubscribe(f"event_{event_code}")
+            await pubsub.unsubscribe(live_update_channel(event_code))
         finally:
             await client.decr(GLOBAL_COUNT)
             await client.decr(EVENT_COUNT)

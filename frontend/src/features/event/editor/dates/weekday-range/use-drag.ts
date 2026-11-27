@@ -19,6 +19,20 @@ export default function useWeekdayRangeDrag({
     endDay: Weekday | null;
   }>({ isEnabling: true, startDay: null, endDay: null });
 
+  useEffect(() => {
+    const preventScroll = (e: TouchEvent) => {
+      if (isDragging.current) {
+        if (e.cancelable) e.preventDefault();
+      }
+    };
+
+    // { passive: false } tells the browser "I might cancel this event, wait for me."
+    window.addEventListener("touchmove", preventScroll, { passive: false });
+    return () => {
+      window.removeEventListener("touchmove", preventScroll);
+    };
+  }, []);
+
   const dragRange = useMemo(() => {
     if (!dragState.startDay || !dragState.endDay) return new Set<Weekday>();
     const startIndex = ALL_WEEKDAYS.indexOf(dragState.startDay);

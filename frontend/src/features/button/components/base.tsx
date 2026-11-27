@@ -120,7 +120,7 @@ const BaseButton = forwardRef<Ref, BaseButtonProps>(
         )}
         {isLoading && (
           <LoadingSpinner
-            className={cn("centered-absolute h-5 w-5", spinnerClasses)}
+            className={cn("centered-absolute h-6 w-6", spinnerClasses)}
           />
         )}
       </div>
@@ -189,7 +189,7 @@ function getStyleClasses(
 ) {
   let paddingShrink = 0;
   let styleClasses;
-  let spinnerClasses = "border-white";
+  let spinnerClasses = "text-white";
   switch (style) {
     case "primary":
       switch (state) {
@@ -225,7 +225,7 @@ function getStyleClasses(
           break;
       }
       paddingShrink = 0.5;
-      spinnerClasses = "border-foreground";
+      spinnerClasses = "text-foreground";
       break;
     case "frosted glass":
       switch (state) {
@@ -240,7 +240,7 @@ function getStyleClasses(
           break;
       }
       paddingShrink = 0.25;
-      spinnerClasses = "border-foreground";
+      spinnerClasses = "text-foreground";
       break;
     case "frosted glass inset":
       switch (state) {
@@ -256,7 +256,7 @@ function getStyleClasses(
             "frosted-glass-inset text-violet/40 dark:text-white/40";
           break;
       }
-      spinnerClasses = "border-foreground";
+      spinnerClasses = "text-foreground";
       break;
     case "bordered semi-transparent":
       switch (state) {
@@ -274,7 +274,7 @@ function getStyleClasses(
             "font-bold text-[#ffffff] dark:text-gray-400 bg-gray-200 dark:bg-gray-400/25";
           break;
       }
-      spinnerClasses = "border-accent-text";
+      spinnerClasses = "text-accent-text";
       break;
     case "semi-transparent":
       switch (state) {
@@ -290,7 +290,7 @@ function getStyleClasses(
             "font-bold text-[#ffffff] dark:text-gray-400 bg-gray-200 dark:bg-gray-400/25";
           break;
       }
-      spinnerClasses = "border-accent-text";
+      spinnerClasses = "text-accent-text";
       break;
     case "transparent":
       switch (state) {
@@ -305,7 +305,7 @@ function getStyleClasses(
           styleClasses = "font-bold text-gray-300 dark:text-gray-400";
           break;
       }
-      spinnerClasses = "border-accent";
+      spinnerClasses = "text-accent";
       break;
     case "danger":
       switch (state) {

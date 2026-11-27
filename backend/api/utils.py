@@ -1,21 +1,30 @@
 import json
 import logging
+import uuid
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from enum import Enum
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import requests
 from django.core.mail import EmailMultiAlternatives
-from django.db.models import Q
+from django.db import transaction
+from django.db.models import Prefetch, Q, prefetch_related_objects
 from ipware import get_client_ip
 from redis import Redis
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.throttling import SimpleRateThrottle
 
-from api.availability.utils import get_weekday_date
-from api.models import UserAccount, UserEvent, UserSession
+from api.models import (
+    EventCalendarTimeslot,
+    EventDateTimeslot,
+    EventWeekdayTimeslot,
+    UserAccount,
+    UserEvent,
+    UserSession,
+)
 from api.redis_pools import sync_pool
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
@@ -27,8 +36,10 @@ from api.settings import (
     LONG_SESS_EXP_SECONDS,
     SEND_EMAILS,
     SESS_EXP_SECONDS,
+    SESS_TOUCH_INTERVAL_SECONDS,
     TEST_ENVIRONMENT,
     ThrottleScope,
+    ThrottleScopes,
 )
 
 logger = logging.getLogger("api")
@@ -63,7 +74,8 @@ def get_metadata(func):
 
 def get_session(token):
     """
-    Retrieves a session by its token, ensuring it is still valid.
+    Retrieves a session (and the associated user account) by its token, ensuring it is
+    still valid.
     """
     return (
         UserSession.objects.filter(session_token=token)
@@ -80,6 +92,7 @@ def get_session(token):
                 & Q(last_used__gte=datetime.now() - timedelta(seconds=SESS_EXP_SECONDS))
             )
         )
+        .select_related("user_account")
         .first()
     )
 
@@ -203,7 +216,7 @@ def get_event_range(event: UserEvent) -> EventRange:
 
     if event.date_type == UserEvent.EventType.CALENDAR:
         return EventRange(
-            dates=list(dates),
+            dates=sorted(dates),
             start_time=time(hour=0, minute=0, second=0),
             end_time=time(hour=0, minute=0, second=0),
         )
@@ -216,10 +229,35 @@ def get_event_range(event: UserEvent) -> EventRange:
         # Dates and times are left in the event's time zone, and the frontend handles the
         # conversion
         return EventRange(
-            dates=list(dates),
+            dates=sorted(dates),
             start_time=start_time,
             end_time=end_time,
         )
+
+
+def prefetch_timeslots(events: list[UserEvent]):
+    """
+    Prefetches the ordered timeslots for already-fetched events.
+
+    Only the tables that the events actually need are queried.
+    """
+    timeslot_prefetches = {
+        UserEvent.EventType.SPECIFIC: Prefetch(
+            "date_timeslots",
+            queryset=EventDateTimeslot.objects.order_by("utc_timeslot"),
+        ),
+        UserEvent.EventType.GENERIC: Prefetch(
+            "weekday_timeslots",
+            queryset=EventWeekdayTimeslot.objects.order_by("weekday", "local_timeslot"),
+        ),
+        UserEvent.EventType.CALENDAR: Prefetch(
+            "calendar_timeslots",
+            queryset=EventCalendarTimeslot.objects.order_by("date"),
+        ),
+    }
+    for event_type, prefetch in timeslot_prefetches.items():
+        events_of_type = [event for event in events if event.date_type == event_type]
+        prefetch_related_objects(events_of_type, prefetch)
 
 
 def format_event_info(event: UserEvent, include_participants: bool = False) -> dict:
@@ -266,16 +304,9 @@ class PlancakeThrottle(SimpleRateThrottle):
         if isinstance(request.user, UserAccount):
             user = request.user
         else:
-            acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
-            guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
-            if acct_token:
-                session = get_session(acct_token)
-                if session:
-                    user = session.user_account
-            if not user and guest_token:
-                session = get_session(guest_token)
-                if session:
-                    user = session.user_account
+            auth = authenticate(request, touch=False)
+            if auth.session:
+                user = auth.session.user_account
 
         # If the user is either logged in or using a guest account, use their ID
         if user:
@@ -356,13 +387,123 @@ def update_session_metadata(request, session: UserSession):
     """
     Updates the session's metadata (IP address, user agent, and last used time) based on
     the incoming request.
+
+    The write is skipped if the metadata is unchanged and the session was last used
+    within `SESS_TOUCH_INTERVAL_SECONDS`.
     """
-    # Since the session is being updated anyway, we don't have to check if the metadata
-    # has changed before updating it
-    session.ip_address = get_client_ip_address(request)
-    session.user_agent_raw = get_client_user_agent(request)
-    # Auto-updates last_used
-    session.save()
+    ip_address = get_client_ip_address(request)
+    user_agent_raw = get_client_user_agent(request)
+    touch_due = session.last_used < datetime.now() - timedelta(
+        seconds=SESS_TOUCH_INTERVAL_SECONDS
+    )
+
+    if (
+        touch_due
+        or session.ip_address != ip_address
+        or session.user_agent_raw != user_agent_raw
+    ):
+        session.ip_address = ip_address
+        session.user_agent_raw = user_agent_raw
+        session.save(update_fields=["ip_address", "user_agent_raw", "last_used"])
+
+
+@dataclass
+class AuthResult:
+    """
+    The outcome of checking a request's session cookies.
+    """
+
+    session: UserSession | None = None
+    # The name of the cookie that holds the session's token, to refresh it later
+    cookie_name: str | None = None
+    # Whether an account session token was sent but is no longer valid
+    account_expired: bool = False
+
+
+def touch_session(request, token):
+    """
+    Returns the valid session for a token, updating its metadata, or `None` if the session
+    doesn't exist or has expired.
+    """
+    session = get_session(token)
+    if session:
+        update_session_metadata(request, session)
+    return session
+
+
+def authenticate(request, allow_guest=True, touch=True):
+    """
+    Finds the session for a request from its cookies, checking the account session first
+    and falling back to the guest session if `allow_guest` is true.
+
+    If `touch` is true, the session's metadata is updated (see `update_session_metadata`).
+    Use `touch=False` for lookups that shouldn't count as session activity.
+
+    This does NOT create a guest account, or make the user available on the request.
+    """
+
+    def find(token):
+        return touch_session(request, token) if touch else get_session(token)
+
+    acct_token = request.COOKIES.get(ACCOUNT_COOKIE_NAME)
+    if acct_token:
+        logger.debug("Account session token: %s", acct_token)
+        session = find(acct_token)
+        if session:
+            return AuthResult(session, ACCOUNT_COOKIE_NAME)
+        if touch:
+            logger.info("Account session expired.")
+
+    # At this point the account session either expired or did not exist
+    result = AuthResult(account_expired=bool(acct_token))
+    if not allow_guest:
+        return result
+
+    guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
+    if guest_token:
+        logger.debug("Guest session token: %s", guest_token)
+        session = find(guest_token)
+        if session:
+            result.session = session
+            result.cookie_name = GUEST_COOKIE_NAME
+        else:
+            logger.info("Guest session expired.")
+    return result
+
+
+def create_guest_session(request):
+    """
+    Creates a new guest account with an extended session, subject to the guest account
+    creation rate limit.
+    """
+    check_rate_limit(request, ThrottleScopes.GUEST_ACCOUNT_CREATION)
+    with transaction.atomic():
+        guest_account = UserAccount.objects.create(is_guest=True)
+        guest_session = UserSession.objects.create(
+            session_token=str(uuid.uuid4()),
+            user_account=guest_account,
+            is_extended=True,
+        )
+    logger.debug("New guest session token: %s", guest_session.session_token)
+    return guest_session
+
+
+def finalize_auth_response(response, auth: AuthResult):
+    """
+    Refreshes the session token cookie on the response, and if the account session
+    expired, deletes its cookie and adds a message saying so.
+    """
+    if auth.session:
+        set_session_cookie(
+            response,
+            auth.cookie_name,
+            auth.session.session_token,
+            auth.session.is_extended,
+        )
+    if auth.account_expired:
+        response.data.setdefault("message", []).append("Account session expired.")
+        delete_session_cookie(response, ACCOUNT_COOKIE_NAME)
+    return response
 
 
 class LiveUpdateAction(str, Enum):
@@ -477,9 +618,19 @@ class LiveUpdateEvent:
         )
 
 
+def live_update_channel(event_code: str) -> str:
+    """
+    Returns the Redis channel for an event's live updates.
+
+    URL codes are case-insensitive, so the channel is lowercased to make every
+    capitalization of a code share it.
+    """
+    return f"event_{event_code.lower()}"
+
+
 def notify_live_update(event: LiveUpdateEvent):
     Redis(connection_pool=sync_pool).publish(
-        f"event_{event.event_code}",
+        live_update_channel(event.event_code),
         event.dumps(),
     )
 
@@ -493,6 +644,14 @@ def to_datetime(date):
     if isinstance(date, datetime):
         return date
     return datetime(date.year, date.month, date.day)
+
+
+def get_weekday_date(weekday, timeslot):
+    """
+    Places a weekday (0 = Sunday) and time of day on a reference week, January 1-7, 2012,
+    which starts on a Sunday.
+    """
+    return datetime(2012, 1, weekday + 1, timeslot.hour, timeslot.minute)
 
 
 class EmailTemplateKey(str, Enum):

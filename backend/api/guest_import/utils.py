@@ -1,10 +1,7 @@
 import logging
 
-from django.db import transaction
-
-from api.models import UserSession
 from api.settings import GUEST_COOKIE_NAME
-from api.utils import get_session, set_session_cookie, update_session_metadata
+from api.utils import set_session_cookie, touch_session
 
 logger = logging.getLogger("api")
 
@@ -19,20 +16,14 @@ def get_guest_account(request, response):
     This does NOT make the guest user available on the `request` object.
     """
     guest_token = request.COOKIES.get(GUEST_COOKIE_NAME)
+    if not guest_token:
+        return None
 
-    if guest_token:
-        logger.debug("Guest session token: %s", guest_token)
-        try:
-            with transaction.atomic():
-                session = get_session(guest_token)
-                if not session:
-                    raise UserSession.DoesNotExist
+    logger.debug("Guest session token: %s", guest_token)
+    session = touch_session(request, guest_token)
+    if not session:
+        logger.info("Guest session expired.")
+        return None
 
-                update_session_metadata(request, session)
-        except UserSession.DoesNotExist:
-            logger.info("Guest session expired.")
-        else:
-            set_session_cookie(response, GUEST_COOKIE_NAME, session.session_token, True)
-            return session.user_account
-
-    return None
+    set_session_cookie(response, GUEST_COOKIE_NAME, session.session_token, True)
+    return session.user_account
