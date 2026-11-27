@@ -70,6 +70,17 @@ class PasswordResetCode(models.Model):
     created_at = DateTimeNoTZField(auto_now_add=True)
 
 
+class PasswordResetToken(models.Model):
+    user_account = models.OneToOneField(
+        UserAccount,
+        on_delete=models.CASCADE,
+        related_name="password_reset_token",
+        primary_key=True,
+    )
+    token_hash = models.CharField(max_length=64, unique=True)
+    created_at = DateTimeNoTZField(auto_now_add=True)
+
+
 class UserLogin(models.Model):
     user_login_id = models.AutoField(primary_key=True)
     user_account = models.ForeignKey(
