@@ -6,7 +6,7 @@ from django.db import transaction
 from rest_framework.response import Response
 
 from api.models import PasswordResetCode
-from api.settings import MAX_VERIFICATION_CODE_ATTEMPTS, PWD_RESET_EXP_SECONDS
+from api.settings import MAX_VERIFICATION_CODE_ATTEMPTS, PWD_RESET_CODE_EXP_SECONDS
 
 
 def validate_password(password):
@@ -86,5 +86,5 @@ def attempt_verification_code(queryset, code):
 def password_reset_code_queryset(email):
     return PasswordResetCode.objects.select_related("user_account").filter(
         user_account__email=email,
-        created_at__gte=datetime.now() - timedelta(seconds=PWD_RESET_EXP_SECONDS),
+        created_at__gte=datetime.now() - timedelta(seconds=PWD_RESET_CODE_EXP_SECONDS),
     )

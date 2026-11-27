@@ -11,7 +11,7 @@ from api.models import (
 from api.settings import (
     EMAIL_CODE_EXP_SECONDS,
     LONG_SESS_EXP_SECONDS,
-    PWD_RESET_EXP_SECONDS,
+    PWD_RESET_CODE_EXP_SECONDS,
     SESS_EXP_SECONDS,
 )
 
@@ -49,7 +49,7 @@ def password_reset_code_cleanup():
     Removes expired password reset codes.
     """
     PasswordResetCode.objects.filter(
-        created_at__lt=datetime.now() - timedelta(seconds=PWD_RESET_EXP_SECONDS)
+        created_at__lt=datetime.now() - timedelta(seconds=PWD_RESET_CODE_EXP_SECONDS)
     ).delete()
 
 
