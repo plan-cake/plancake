@@ -201,7 +201,7 @@ def verify_email(request):
         )
         # Delete the unverified user account
         unverified_user.delete()
-    logger.info("Account successfully created for %s.", unverified_user.email)
+    logger.info("Account successfully created for %s.", email)
 
     return Response({"message": ["Email verified successfully."]}, status=200)
 
