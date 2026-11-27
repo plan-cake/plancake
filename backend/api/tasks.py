@@ -5,6 +5,7 @@ from django.db.models import Q
 
 from api.models import (
     PasswordResetCode,
+    PasswordResetToken,
     UnverifiedUserAccount,
     UserSession,
 )
@@ -12,6 +13,7 @@ from api.settings import (
     EMAIL_CODE_EXP_SECONDS,
     LONG_SESS_EXP_SECONDS,
     PWD_RESET_CODE_EXP_SECONDS,
+    PWD_RESET_TOKEN_EXP_SECONDS,
     SESS_EXP_SECONDS,
 )
 
@@ -53,6 +55,15 @@ def password_reset_code_cleanup():
     ).delete()
 
 
+def password_reset_token_cleanup():
+    """
+    Removes expired password reset tokens.
+    """
+    PasswordResetToken.objects.filter(
+        created_at__lt=datetime.now() - timedelta(seconds=PWD_RESET_TOKEN_EXP_SECONDS)
+    ).delete()
+
+
 @shared_task
 def daily_duties():
     """
@@ -62,3 +73,4 @@ def daily_duties():
     session_cleanup()
     unverified_user_cleanup()
     password_reset_code_cleanup()
+    password_reset_token_cleanup()
