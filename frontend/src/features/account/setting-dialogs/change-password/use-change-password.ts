@@ -191,6 +191,13 @@ export function useChangePasswordFlow() {
     }
   };
 
+  const handleTokenExpired = () => {
+    setResetToken(null);
+    handleForgotPassword(false);
+    // Displays above the OTP field and clears when the user types
+    handleError("verificationCode", MESSAGES.ERROR_RESET_TOKEN_EXPIRED);
+  };
+
   const handleAuthedReset = async () => {
     clearAllErrors();
     if (!form.newPassword)
@@ -218,9 +225,15 @@ export function useChangePasswordFlow() {
       return true;
     } catch (e) {
       const error = e as ApiErrorResponse;
-      if (error.data?.error?.["new_password"])
+      if (error.data?.error?.["new_password"]) {
         handleError("newPassword", MESSAGES.ERROR_PASSWORD_REUSE);
-      else handleError("api", error.formattedMessage);
+      } else if (error.rateLimited) {
+        handleError("rate_limit", error.formattedMessage);
+      } else if (error.data?.error?.reset_token) {
+        handleTokenExpired();
+      } else {
+        handleError("api", error.formattedMessage);
+      }
       return false;
     }
   };

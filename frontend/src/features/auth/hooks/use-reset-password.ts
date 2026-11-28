@@ -160,6 +160,13 @@ export function useResetPasswordFlow() {
     }
   };
 
+  const handleTokenExpired = () => {
+    setResetToken(null);
+    handleEmailSubmit(false);
+    // Displays above the OTP field and clears when the user types
+    handleError("verificationCode", MESSAGES.ERROR_RESET_TOKEN_EXPIRED);
+  };
+
   const handleResetPassword = async () => {
     clearAllErrors();
 
@@ -189,6 +196,8 @@ export function useResetPasswordFlow() {
         handleError("newPassword", MESSAGES.ERROR_PASSWORD_REUSE);
       } else if (error.rateLimited) {
         handleError("rate_limit", error.formattedMessage);
+      } else if (error.data?.error?.reset_token) {
+        handleTokenExpired();
       } else {
         handleError("api", error.formattedMessage);
       }
