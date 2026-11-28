@@ -154,6 +154,7 @@ export default function Page() {
           rateLimitError={flow.errors.rate_limit}
         >
           <div className="flex flex-col items-center gap-4">
+            {captcha}
             <div className="text-sm opacity-75">
               This will sign out your account on all devices.
             </div>
