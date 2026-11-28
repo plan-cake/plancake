@@ -319,6 +319,8 @@ def start_password_reset(request):
         user = UserAccount.objects.get(email=email)
         ver_code = generate_verification_code()
         with transaction.atomic():
+            PasswordResetToken.objects.filter(user_account=user).delete()
+
             PasswordResetCode.objects.update_or_create(
                 user_account=user,
                 defaults={
