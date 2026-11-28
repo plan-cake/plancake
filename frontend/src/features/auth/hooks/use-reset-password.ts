@@ -162,6 +162,7 @@ export function useResetPasswordFlow() {
 
   const handleTokenExpired = () => {
     setResetToken(null);
+    // Send a new OTP code via email
     handleEmailSubmit(false);
     // Displays above the OTP field and clears when the user types
     handleError("verificationCode", MESSAGES.ERROR_RESET_TOKEN_EXPIRED);
