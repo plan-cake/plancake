@@ -391,7 +391,7 @@ def check_password_reset_code(request):
 
         reset_token = token_urlsafe(32)
         PasswordResetToken.objects.update_or_create(
-            user_account=user,
+            user_account=ver_code_obj.user_account,
             defaults={
                 "token_hash": sha256(reset_token.encode()).hexdigest(),
                 "created_at": datetime.now(),
