@@ -20,6 +20,10 @@ class VerificationCodeSerializer(EmailSerializer):
     verification_code = SIX_DIGIT_CODE_FIELD
 
 
+class PasswordResetTokenSerializer(serializers.Serializer):
+    reset_token = serializers.CharField(required=True)
+
+
 class LoginSerializer(RegisterAccountSerializer):
     remember_me = serializers.BooleanField(default=False, required=False)
 

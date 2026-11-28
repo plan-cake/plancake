@@ -1,6 +1,8 @@
 import logging
 import uuid
 from datetime import datetime, timedelta
+from hashlib import sha256
+from secrets import token_urlsafe
 
 import bcrypt
 from django.db import transaction
@@ -11,6 +13,7 @@ from api.auth.serializers import (
     EmailSerializer,
     LoginSerializer,
     PasswordResetSerializer,
+    PasswordResetTokenSerializer,
     RegisterAccountSerializer,
     VerificationCodeSerializer,
 )
@@ -32,6 +35,7 @@ from api.decorators import (
 )
 from api.models import (
     PasswordResetCode,
+    PasswordResetToken,
     UnverifiedUserAccount,
     UserAccount,
     UserLogin,
@@ -346,11 +350,14 @@ def start_password_reset(request):
 @api_endpoint("POST")
 @check_auth
 @validate_json_input(VerificationCodeSerializer)
-@validate_output(MessageOutputSerializer)
+@validate_output(PasswordResetTokenSerializer)
 def check_password_reset_code(request):
     """
-    Checks if the provided password reset code is valid for the account associated with
-    the provided email address.
+    Validates the provided password reset code for the account associated with the
+    provided email address.
+
+    If the code is correct, it will be deleted in the database and a password reset token
+    is created and returned.
     """
     user = request.user
     email = request.validated_data.get("email")
@@ -371,14 +378,29 @@ def check_password_reset_code(request):
             status=400,
         )
 
-    if attempt_verification_code(password_reset_code_queryset(email), ver_code) is None:
-        logger.info(
-            "Password reset code check failed for %s: Invalid or expired verification code.",
-            email,
+    with transaction.atomic():
+        ver_code_obj = attempt_verification_code(
+            password_reset_code_queryset(email), ver_code
         )
-        return invalid_verification_code_response()
+        if ver_code_obj is None:
+            logger.info(
+                "Password reset code check failed for %s: Invalid or expired verification code.",
+                email,
+            )
+            return invalid_verification_code_response()
 
-    return Response({"message": ["Password reset code is valid."]}, status=200)
+        reset_token = token_urlsafe(32)
+        PasswordResetToken.objects.update_or_create(
+            user_account=user,
+            defaults={
+                "token_hash": sha256(reset_token.encode()).hexdigest(),
+                "created_at": datetime.now(),
+            },
+        )
+
+        ver_code_obj.delete()
+
+    return Response({"reset_token": reset_token}, status=200)
 
 
 @api_endpoint("POST")

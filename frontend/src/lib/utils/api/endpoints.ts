@@ -22,6 +22,7 @@ import {
   PasswordChangeData,
   PasswordResetCodeCheckData,
   PasswordResetData,
+  PasswordResetToken,
   RegisterData,
   SelfAvailability,
   SessionId,
@@ -100,9 +101,10 @@ export const ROUTES = {
      * @method POST
      * @throws 400 - If the verification code is invalid.
      */
-    checkPasswordResetCode: route<MessageResponse, PasswordResetCodeCheckData>(
-      "/auth/check-password-reset-code/",
-    ),
+    checkPasswordResetCode: route<
+      PasswordResetToken,
+      PasswordResetCodeCheckData
+    >("/auth/check-password-reset-code/"),
     /**
      * Given a valid password reset code, resets the password for a user account.
      * @method POST

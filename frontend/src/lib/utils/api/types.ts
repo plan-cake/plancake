@@ -32,6 +32,10 @@ export type PasswordResetCodeCheckData = {
   verification_code: string;
 };
 
+export type PasswordResetToken = {
+  reset_token: string;
+};
+
 export type PasswordResetData = {
   email: string;
   verification_code: string;
