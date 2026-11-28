@@ -22,6 +22,7 @@ export function useResetPasswordFlow() {
     newPassword: "",
     confirmPassword: "",
   });
+  const [resetToken, setResetToken] = useState<string | null>(null);
 
   const updateForm = (field: keyof typeof form, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -137,10 +138,15 @@ export function useResetPasswordFlow() {
       return false;
     }
     try {
-      await clientPost(ROUTES.auth.checkPasswordResetCode, {
-        email: form.email,
-        verification_code: codeToVerify,
-      });
+      const { reset_token } = await clientPost(
+        ROUTES.auth.checkPasswordResetCode,
+        {
+          email: form.email,
+          verification_code: codeToVerify,
+        },
+      );
+      setResetToken(reset_token);
+      setForm((prev) => ({ ...prev, verificationCode: "" }));
       setStep("RESET");
       return true;
     } catch (e) {
@@ -171,8 +177,7 @@ export function useResetPasswordFlow() {
     }
     try {
       await clientPost(ROUTES.auth.resetPassword, {
-        email: form.email,
-        verification_code: form.verificationCode,
+        reset_token: resetToken!,
         new_password: form.newPassword,
         prune_sessions: true,
       });

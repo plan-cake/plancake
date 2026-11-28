@@ -34,6 +34,7 @@ export function useChangePasswordFlow() {
     verificationCode: "",
     pruneSessions: false,
   });
+  const [resetToken, setResetToken] = useState<string | null>(null);
 
   // Helper to update form fields and auto-clear their specific errors
   const updateForm = (field: keyof typeof form, value: string | boolean) => {
@@ -75,6 +76,7 @@ export function useChangePasswordFlow() {
         verificationCode: "",
         pruneSessions: false,
       });
+      setResetToken(null);
       setShowCriteria(false);
       setStep("CHANGE");
       clearAllErrors();
@@ -163,10 +165,15 @@ export function useChangePasswordFlow() {
       return false;
     }
     try {
-      await clientPost(ROUTES.auth.checkPasswordResetCode, {
-        email,
-        verification_code: codeToVerify,
-      });
+      const { reset_token } = await clientPost(
+        ROUTES.auth.checkPasswordResetCode,
+        {
+          email,
+          verification_code: codeToVerify,
+        },
+      );
+      setResetToken(reset_token);
+      setForm((prev) => ({ ...prev, verificationCode: "" }));
       setStep("RESET");
       return false;
     } catch (e) {
@@ -201,8 +208,7 @@ export function useChangePasswordFlow() {
 
     try {
       await clientPost(ROUTES.auth.resetPassword, {
-        email,
-        verification_code: form.verificationCode,
+        reset_token: resetToken!,
         new_password: form.newPassword,
         prune_sessions: form.pruneSessions,
       });
