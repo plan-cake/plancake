@@ -97,7 +97,7 @@ export const ROUTES = {
       "/auth/start-password-reset/",
     ),
     /**
-     * Checks if a password reset code is valid for a given email address.
+     * Exchanges a password reset code for a password reset token.
      * @method POST
      * @throws 400 - If the verification code is invalid.
      */
@@ -106,11 +106,11 @@ export const ROUTES = {
       PasswordResetCodeCheckData
     >("/auth/check-password-reset-code/"),
     /**
-     * Given a valid password reset code, resets the password for a user account.
+     * Given a valid password reset token, resets the password for a user account.
      * @method POST
      * @throws 400 - If the new password is not strong enough.
      * @throws 400 - If the new password is the same as the old password.
-     * @throws 400 - If the verification code is invalid.
+     * @throws 400 - If the reset token is invalid.
      */
     resetPassword: route<MessageResponse, PasswordResetData>(
       "/auth/reset-password/",
