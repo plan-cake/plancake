@@ -13,7 +13,6 @@ export type OTPModuleProps = Omit<OTPFieldProps, "onValueChange"> & {
   onValueChange: (val: string) => void;
   email: string;
   relevantError: string | undefined;
-  onVerify: (code: string) => void;
   onResend: () => boolean | Promise<boolean>;
   className?: string;
 };
@@ -28,7 +27,6 @@ const OTPModule = forwardRef<HTMLDivElement, OTPModuleProps>(
       onValueChange,
       email,
       relevantError,
-      onVerify,
       onResend,
       className,
       ...otpProps
@@ -64,17 +62,8 @@ const OTPModule = forwardRef<HTMLDivElement, OTPModuleProps>(
             length={length}
             value={value}
             error={!!relevantError}
-            onValueChange={(val) => {
-              onValueChange(val);
-
-              // Auto submit OTP on the last character, giving a small delay for the UI
-              // to update and show the last character entered
-              if (val.length === length) {
-                setTimeout(() => {
-                  onVerify(val);
-                }, 10);
-              }
-            }}
+            onValueChange={onValueChange}
+            autoSubmit
             className="mt-2"
           />
         </div>

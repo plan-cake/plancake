@@ -9,13 +9,16 @@ import LinkText from "@/components/link-text";
 import TextInputField from "@/components/text-input-field";
 import { useRegisterFlow } from "@/features/auth/hooks/use-register";
 import ActionButton from "@/features/button/components/action";
+import EmptyButton from "@/features/button/components/empty";
 import LinkButton from "@/features/button/components/link";
 import OTPModule from "@/features/otp/otp-module";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { useGuardedSubmit } from "@/lib/hooks/use-guarded-submit";
 
 export default function Page() {
   const isMobile = useCheckMobile();
   const flow = useRegisterFlow();
+  const verify = useGuardedSubmit(() => flow.handleVerifyOTP());
 
   switch (flow.step) {
     case "REGISTRATION":
@@ -106,7 +109,10 @@ export default function Page() {
       );
     case "OTP":
       return (
-        <div className="flex h-screen items-center justify-center">
+        <form
+          onSubmit={verify.handleSubmit}
+          className="flex h-screen items-center justify-center"
+        >
           <MessagePage
             title="Email Verification"
             buttons={[
@@ -116,11 +122,12 @@ export default function Page() {
                 label="Back to Login"
                 href="/login"
               />,
-              <ActionButton
+              <EmptyButton
                 key="1"
+                type="submit"
                 buttonStyle="primary"
                 label="Verify Code"
-                onClick={() => flow.handleVerifyOTP()}
+                loading={verify.submitting}
               />,
             ]}
           >
@@ -133,11 +140,10 @@ export default function Page() {
                 flow.errors.api ||
                 flow.errors.rate_limit
               }
-              onVerify={flow.handleVerifyOTP}
               onResend={flow.handleResendEmail}
             />
           </MessagePage>
-        </div>
+        </form>
       );
     case "SUCCESS":
       return (

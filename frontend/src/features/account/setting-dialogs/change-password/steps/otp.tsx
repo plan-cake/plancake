@@ -15,7 +15,6 @@ export default function OtpStep({ flow }: ChangePasswordStepProps) {
         flow.errors.rate_limit
       }
       onValueChange={(val) => flow.updateForm("verificationCode", val)}
-      onVerify={(code) => flow.handleVerifyOTP(code)}
       onResend={() => flow.handleForgotPassword(true)}
     />
   );
