@@ -36,7 +36,7 @@ export default function InboxLinks({ email }: { email: string }) {
   );
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className="w-70 mx-auto flex flex-col gap-2">
       {isGmail && gmailButton}
       {isOutlook && outlookButton}
       {!isGmail && !isOutlook && (

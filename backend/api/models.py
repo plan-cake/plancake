@@ -35,9 +35,10 @@ class UserAccount(models.Model):
 
 
 class UnverifiedUserAccount(models.Model):
-    verification_code = models.CharField(max_length=255, primary_key=True)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, primary_key=True)
     password_hash = models.CharField(max_length=255)
+    verification_code = models.CharField(max_length=6)
+    failed_attempts = models.PositiveSmallIntegerField(default=0)
     created_at = DateTimeNoTZField(auto_now_add=True)
 
 
@@ -57,22 +58,36 @@ class UserSession(models.Model):
         indexes = [models.Index(fields=["is_extended", "last_used"])]
 
 
-class PasswordResetToken(models.Model):
-    reset_token = models.CharField(max_length=255, primary_key=True)
-    user_account = models.ForeignKey(
-        UserAccount, on_delete=models.CASCADE, related_name="password_reset_tokens"
-    )
-    created_at = DateTimeNoTZField(auto_now_add=True)
+class PasswordResetCode(models.Model):
+    """
+    The first phase of a password reset, where the user verifies their identity using
+    their email.
+    """
 
-
-class AuthedPasswordResetCode(models.Model):
     user_account = models.OneToOneField(
         UserAccount,
         on_delete=models.CASCADE,
-        related_name="authed_password_reset_code",
+        related_name="password_reset_code",
         primary_key=True,
     )
-    reset_code = models.CharField(max_length=6)
+    verification_code = models.CharField(max_length=6)
+    failed_attempts = models.PositiveSmallIntegerField(default=0)
+    created_at = DateTimeNoTZField(auto_now_add=True)
+
+
+class PasswordResetToken(models.Model):
+    """
+    The second phase of a password reset, sent to the user after they are verified. This
+    is used to actually change the password.
+    """
+
+    user_account = models.OneToOneField(
+        UserAccount,
+        on_delete=models.CASCADE,
+        related_name="password_reset_token",
+        primary_key=True,
+    )
+    token_hash = models.CharField(max_length=64, unique=True)
     created_at = DateTimeNoTZField(auto_now_add=True)
 
 

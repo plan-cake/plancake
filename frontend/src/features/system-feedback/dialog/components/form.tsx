@@ -8,6 +8,7 @@ import BaseModal from "@/features/system-feedback/dialog/components/base";
 import { DIALOG_CONFIG } from "@/features/system-feedback/dialog/config";
 import { FormDialogProps } from "@/features/system-feedback/dialog/props";
 import useCheckMobile from "@/lib/hooks/use-check-mobile";
+import { useGuardedSubmit } from "@/lib/hooks/use-guarded-submit";
 import { cn } from "@/lib/utils/classname";
 
 export default function FormDialog({
@@ -45,16 +46,12 @@ export default function FormDialog({
     [isControlled, onOpenChange],
   );
 
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      const success = await onSubmit();
-      if (success) {
-        handleOpenChange(false);
-      }
-    },
-    [onSubmit, handleOpenChange],
-  );
+  const { submitting, handleSubmit } = useGuardedSubmit(async () => {
+    if (submitDisabled) return;
+    if (await onSubmit()) {
+      handleOpenChange(false);
+    }
+  });
 
   return (
     <BaseModal
@@ -72,7 +69,7 @@ export default function FormDialog({
     >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center gap-6"
+        className="flex flex-col items-center gap-4"
       >
         {children}
 
@@ -88,6 +85,7 @@ export default function FormDialog({
             buttonStyle={config.buttonStyle}
             label={submitLabel}
             disabled={submitDisabled}
+            loading={submitting}
             tooltip={submitTooltip}
           />
         </div>

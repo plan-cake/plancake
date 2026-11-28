@@ -1,6 +1,7 @@
 import logging
 import uuid
 from datetime import datetime, timedelta
+from secrets import token_urlsafe
 
 import bcrypt
 from django.db import transaction
@@ -9,20 +10,31 @@ from rest_framework.response import Response
 from api.auth.serializers import (
     AccountDetailsSerializer,
     EmailSerializer,
-    EmailVerifySerializer,
     LoginSerializer,
     PasswordResetSerializer,
+    PasswordResetTokenSerializer,
     RegisterAccountSerializer,
+    VerificationCodeSerializer,
 )
-from api.auth.utils import list_failed_criteria, validate_password
+from api.auth.utils import (
+    attempt_verification_code,
+    generate_verification_code,
+    hash_reset_token,
+    invalid_verification_code_response,
+    list_failed_criteria,
+    password_reset_code_queryset,
+    validate_password,
+)
 from api.decorators import (
     api_endpoint,
+    check_auth,
     require_account_auth,
     require_captcha,
     validate_json_input,
     validate_output,
 )
 from api.models import (
+    PasswordResetCode,
     PasswordResetToken,
     UnverifiedUserAccount,
     UserAccount,
@@ -32,7 +44,7 @@ from api.models import (
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
     EMAIL_CODE_EXP_SECONDS,
-    PWD_RESET_EXP_SECONDS,
+    PWD_RESET_TOKEN_EXP_SECONDS,
     ThrottleScopes,
 )
 from api.utils import (
@@ -44,6 +56,7 @@ from api.utils import (
     finalize_auth_response,
     get_client_ip_address,
     get_client_user_agent,
+    prune_account_sessions,
     send_templated_email,
     set_session_cookie,
 )
@@ -60,7 +73,7 @@ def register(request):
     Registers a new user account as an "unverified user" that cannot be used until the
     email address is verified.
 
-    If the email address is available, it will send an email with a link to verify.
+    If the email address is available, it will send an email with a code to verify.
 
     If the email address is already used for an unverified user, it will update the
     verification code and send a new email.
@@ -92,7 +105,7 @@ def register(request):
         )
     else:
         # Create an unverified user account
-        ver_code = str(uuid.uuid4())
+        ver_code = generate_verification_code()
         with transaction.atomic():
             UnverifiedUserAccount.objects.filter(email=email).delete()
             UnverifiedUserAccount.objects.create(
@@ -104,7 +117,7 @@ def register(request):
 
         send_templated_email(
             to_email=email,
-            template_key=EmailTemplateKey.EMAIL_VERIFICATION,
+            template_key=EmailTemplateKey.EMAIL_VERIFICATION_CODE,
             context={"code": ver_code},
         )
 
@@ -145,7 +158,7 @@ def resend_register_email(request):
 
         send_templated_email(
             to_email=email,
-            template_key=EmailTemplateKey.EMAIL_VERIFICATION,
+            template_key=EmailTemplateKey.EMAIL_VERIFICATION_CODE,
             context={"code": unverified_user.verification_code},
         )
 
@@ -156,43 +169,44 @@ def resend_register_email(request):
 
 
 @api_endpoint("POST")
-@validate_json_input(EmailVerifySerializer)
+@validate_json_input(VerificationCodeSerializer)
 @validate_output(MessageOutputSerializer)
 def verify_email(request):
     """
-    Verifies the email address of an unverified user account.
+    Verifies an unverified user account given an email and verification code.
 
-    If the verification code is valid, it creates a verified user account with the
+    If the given information is valid, it creates a verified user account with the
     information given when initially registering.
 
     This endpoint does NOT automatically log in the user after verifying.
     """
+    email = request.validated_data.get("email")
     ver_code = request.validated_data.get("verification_code")
 
     check_rate_limit(request, ThrottleScopes.CODE_CHECK)
 
-    try:
-        unverified_user = UnverifiedUserAccount.objects.get(
-            verification_code=ver_code,
-            created_at__gte=datetime.now() - timedelta(seconds=EMAIL_CODE_EXP_SECONDS),
+    with transaction.atomic():
+        unverified_user = attempt_verification_code(
+            UnverifiedUserAccount.objects.filter(
+                email=email,
+                created_at__gte=datetime.now()
+                - timedelta(seconds=EMAIL_CODE_EXP_SECONDS),
+            ),
+            ver_code,
         )
+        if unverified_user is None:
+            logger.info("Verification code or email is invalid for %s.", email)
+            return invalid_verification_code_response()
 
-        with transaction.atomic():
-            # Create the user account
-            UserAccount.objects.create(
-                email=unverified_user.email,
-                password_hash=unverified_user.password_hash,
-                is_guest=False,
-            )
-            # Delete the unverified user account
-            unverified_user.delete()
-        logger.info("Account successfully created for %s.", unverified_user.email)
-
-    except UnverifiedUserAccount.DoesNotExist:
-        logger.info("Verification code is invalid.")
-        return Response(
-            {"error": {"verification_code": ["Invalid verification code."]}}, status=404
+        # Create the user account
+        UserAccount.objects.create(
+            email=unverified_user.email,
+            password_hash=unverified_user.password_hash,
+            is_guest=False,
         )
+        # Delete the unverified user account
+        unverified_user.delete()
+    logger.info("Account successfully created for %s.", email)
 
     return Response({"message": ["Email verified successfully."]}, status=200)
 
@@ -289,13 +303,13 @@ def check_account_auth(request):
 @validate_output(MessageOutputSerializer)
 def start_password_reset(request):
     """
-    Starts the password reset process by sending a password reset link to the specified
+    Starts the password reset process by sending a password reset code to the specified
     email.
 
     If the email address is not associated with a user account, nothing will happen.
 
     To resend the email, this endpoint can be called again with the same input. A new
-    reset token will be generated and the old one invalidated.
+    verification code will be generated and the old one invalidated.
     """
     email = request.validated_data.get("email")
 
@@ -303,18 +317,24 @@ def start_password_reset(request):
 
     try:
         user = UserAccount.objects.get(email=email)
-        reset_token = str(uuid.uuid4())
+        ver_code = generate_verification_code()
         with transaction.atomic():
             PasswordResetToken.objects.filter(user_account=user).delete()
-            PasswordResetToken.objects.create(
-                reset_token=reset_token, user_account=user
+
+            PasswordResetCode.objects.update_or_create(
+                user_account=user,
+                defaults={
+                    "verification_code": ver_code,
+                    "failed_attempts": 0,
+                    "created_at": datetime.now(),
+                },
             )
-        logger.debug("Password reset token for %s: %s", email, reset_token)
+        logger.debug("Password reset code for %s: %s", email, ver_code)
 
         send_templated_email(
             to_email=email,
-            template_key=EmailTemplateKey.PASSWORD_RESET,
-            context={"token": reset_token},
+            template_key=EmailTemplateKey.PASSWORD_RESET_CODE,
+            context={"code": ver_code},
         )
 
     except UserAccount.DoesNotExist:
@@ -331,19 +351,77 @@ def start_password_reset(request):
 
 
 @api_endpoint("POST")
+@check_auth
+@validate_json_input(VerificationCodeSerializer)
+@validate_output(PasswordResetTokenSerializer)
+def check_password_reset_code(request):
+    """
+    Validates the provided password reset code for the account associated with the
+    provided email address.
+
+    If the code is correct, it will be deleted in the database and a password reset token
+    is created and returned.
+    """
+    user = request.user
+    email = request.validated_data.get("email")
+    ver_code = request.validated_data.get("verification_code")
+
+    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
+
+    if user is not None and not user.is_guest and user.email != email:
+        logger.info(
+            "Password reset code check failed: Authenticated user email %s does not match provided email %s.",
+            user.email,
+            email,
+        )
+        # It's okay to say the email does not match because the user is already
+        # authenticated.
+        return Response(
+            {"error": {"email": ["Provided email does not match account."]}},
+            status=400,
+        )
+
+    with transaction.atomic():
+        ver_code_obj = attempt_verification_code(
+            password_reset_code_queryset(email), ver_code
+        )
+        if ver_code_obj is None:
+            logger.info(
+                "Password reset code check failed for %s: Invalid or expired verification code.",
+                email,
+            )
+            return invalid_verification_code_response()
+
+        reset_token = token_urlsafe(32)
+        PasswordResetToken.objects.update_or_create(
+            user_account=ver_code_obj.user_account,
+            defaults={
+                "token_hash": hash_reset_token(reset_token),
+                "created_at": datetime.now(),
+            },
+        )
+
+        ver_code_obj.delete()
+
+    return Response({"reset_token": reset_token}, status=200)
+
+
+@api_endpoint("POST")
+@check_auth
 @validate_json_input(PasswordResetSerializer)
 @validate_output(MessageOutputSerializer)
 def reset_password(request):
     """
     Resets the password for a user account given a valid password reset token.
 
-    Also removes all currently active sessions as a security measure. This means that you
-    probably shouldn't call this endpoint while the user is currently logged in.
+    If "prune_sessions" is true, all active sessions for this account will be removed,
+    unless the user is logged into an account. If that is the case, the current session
+    will be preserved.
     """
+    user = request.user
     reset_token = request.validated_data.get("reset_token")
     new_password = request.validated_data.get("new_password")
-
-    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
+    prune_sessions = request.validated_data.get("prune_sessions")
 
     is_strong, criteria = validate_password(new_password)
     if not is_strong:
@@ -352,43 +430,66 @@ def reset_password(request):
             {"error": {"new_password": list_failed_criteria(criteria)}}, status=400
         )
 
-    try:
-        with transaction.atomic():
-            reset_token_obj = PasswordResetToken.objects.get(
-                reset_token=reset_token,
+    INVALID_TOKEN_RESPONSE = Response(
+        {"error": {"reset_token": ["Invalid token."]}}, status=400
+    )
+
+    with transaction.atomic():
+        token_obj = (
+            PasswordResetToken.objects.select_for_update()
+            .select_related("user_account")
+            .filter(
+                token_hash=hash_reset_token(reset_token),
                 created_at__gte=datetime.now()
-                - timedelta(seconds=PWD_RESET_EXP_SECONDS),
+                - timedelta(seconds=PWD_RESET_TOKEN_EXP_SECONDS),
             )
-            user = reset_token_obj.user_account
-
-            # Check if the new password is actually new
-            if bcrypt.checkpw(new_password.encode(), user.password_hash.encode()):
-                logger.info("Password reset failed: New password was not new.")
-                return Response(
-                    {
-                        "error": {
-                            "new_password": [
-                                "New password must be different from old password."
-                            ]
-                        }
-                    },
-                    status=400,
-                )
-
-            user.password_hash = bcrypt.hashpw(
-                new_password.encode(), bcrypt.gensalt()
-            ).decode()
-            user.save()
-            reset_token_obj.delete()  # Make sure to remove the reset token after use
-
-            # Remove all active sessions for the user
-            UserSession.objects.filter(user_account=user).delete()
-
-    except PasswordResetToken.DoesNotExist:
-        logger.info("Password reset failed: Invalid reset token.")
-        return Response(
-            {"error": {"reset_token": ["Invalid reset token."]}}, status=404
+            .first()
         )
+        if token_obj is None:
+            logger.info(
+                "Password reset failed: Invalid or expired token.",
+            )
+            return INVALID_TOKEN_RESPONSE
+
+        has_account_auth = user is not None and not user.is_guest
+
+        if has_account_auth and user.pk != token_obj.user_account_id:
+            logger.info(
+                "Password reset failed: Authenticated user %s does not match token account %s.",
+                user.email,
+                token_obj.user_account.email,
+            )
+            return INVALID_TOKEN_RESPONSE
+
+        user = token_obj.user_account
+
+        # Check if the new password is actually new
+        if bcrypt.checkpw(new_password.encode(), user.password_hash.encode()):
+            logger.info("Password reset failed: New password was not new.")
+            return Response(
+                {
+                    "error": {
+                        "new_password": [
+                            "New password must be different from old password."
+                        ]
+                    }
+                },
+                status=400,
+            )
+
+        user.password_hash = bcrypt.hashpw(
+            new_password.encode(), bcrypt.gensalt()
+        ).decode()
+        user.save()
+        token_obj.delete()  # Remove the reset token after use
+
+        if prune_sessions:
+            if has_account_auth:
+                # Remove all active sessions except the current one
+                prune_account_sessions(request)
+            else:
+                # Remove all active sessions for the user
+                UserSession.objects.filter(user_account=user).delete()
 
     return Response({"message": ["Password reset successfully."]}, status=200)
 

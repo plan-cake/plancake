@@ -106,7 +106,7 @@ export type FormDialogProps = CommonDialogProps & {
   /** Text for the submit button (Defaults to "Save" or "Submit") */
   submitLabel?: string;
 
-  /** Whether to disable the submit button */
+  /** Whether the submit button is disabled */
   submitDisabled?: boolean;
 
   /** Optional tooltip for the submit button */

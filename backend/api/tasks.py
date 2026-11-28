@@ -4,16 +4,16 @@ from celery import shared_task
 from django.db.models import Q
 
 from api.models import (
-    AuthedPasswordResetCode,
+    PasswordResetCode,
     PasswordResetToken,
     UnverifiedUserAccount,
     UserSession,
 )
 from api.settings import (
-    AUTHED_PWD_RESET_EXP_SECONDS,
     EMAIL_CODE_EXP_SECONDS,
     LONG_SESS_EXP_SECONDS,
-    PWD_RESET_EXP_SECONDS,
+    PWD_RESET_CODE_EXP_SECONDS,
+    PWD_RESET_TOKEN_EXP_SECONDS,
     SESS_EXP_SECONDS,
 )
 
@@ -46,21 +46,21 @@ def unverified_user_cleanup():
     ).delete()
 
 
+def password_reset_code_cleanup():
+    """
+    Removes expired password reset codes.
+    """
+    PasswordResetCode.objects.filter(
+        created_at__lt=datetime.now() - timedelta(seconds=PWD_RESET_CODE_EXP_SECONDS)
+    ).delete()
+
+
 def password_reset_token_cleanup():
     """
     Removes expired password reset tokens.
     """
     PasswordResetToken.objects.filter(
-        created_at__lt=datetime.now() - timedelta(seconds=PWD_RESET_EXP_SECONDS)
-    ).delete()
-
-
-def authed_password_reset_code_cleanup():
-    """
-    Removes expired authed password reset codes.
-    """
-    AuthedPasswordResetCode.objects.filter(
-        created_at__lt=datetime.now() - timedelta(seconds=AUTHED_PWD_RESET_EXP_SECONDS)
+        created_at__lt=datetime.now() - timedelta(seconds=PWD_RESET_TOKEN_EXP_SECONDS)
     ).delete()
 
 
@@ -72,5 +72,5 @@ def daily_duties():
     """
     session_cleanup()
     unverified_user_cleanup()
+    password_reset_code_cleanup()
     password_reset_token_cleanup()
-    authed_password_reset_code_cleanup()

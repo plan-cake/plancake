@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import Captcha from "@/components/captcha";
 import ChangeStep from "@/features/account/setting-dialogs/change-password/steps/change";
 import OtpStep from "@/features/account/setting-dialogs/change-password/steps/otp";
 import ResetStep from "@/features/account/setting-dialogs/change-password/steps/reset";
@@ -40,8 +41,8 @@ export default function ChangePasswordDialog() {
     onConfirmHandler = flow.handleChangePassword;
     dialogContent = <ChangeStep flow={flow} />;
   } else if (displayStep === "OTP") {
-    dialogTitle = "Enter Reset Code";
-    dialogDescriptionText = "Please enter the code sent to your email.";
+    dialogTitle = "Verify It's You";
+    dialogDescriptionText = "We sent a code to your email, input it below.";
     submitLabel = "Verify Code";
     onConfirmHandler = () => flow.handleVerifyOTP();
     dialogContent = <OtpStep flow={flow} />;
@@ -67,6 +68,13 @@ export default function ChangePasswordDialog() {
       submitDisabled={!isMobile && !!flow.invalidForm}
     >
       {dialogContent}
+      <Captcha
+        key={flow.captchaKey}
+        backendVerificationFailed={!!flow.errors.captcha}
+        onTokenChange={flow.setCaptchaToken}
+        onClearBackendError={() => flow.handleError("captcha", "")}
+        onInitError={() => flow.setCaptchaInitError(true)}
+      />
     </FormDialog>
   );
 }

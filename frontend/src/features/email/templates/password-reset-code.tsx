@@ -13,7 +13,7 @@ export async function passwordResetCode({
   code: string;
 }): Promise<EmailRenderResponse> {
   if (!code) {
-    throw new EmailContextError("Missing reset code.");
+    throw new EmailContextError("Missing verification code.");
   }
 
   return {
@@ -29,10 +29,10 @@ export async function passwordResetCode({
             <Text className="text-accent text-2xl font-bold">{code}</Text>
           </Section>
           <Text className="opacity-75">{CONTENT.CODE_EXPIRE}</Text>
-          <Text className="mb-0">{CONTENT.CHANGE_PASSWORD}</Text>
         </>
       ),
+      footerText: CONTENT.CAN_IGNORE,
     }),
-    text: CONTENT_TEXT + "\n\n" + code + "\n\n" + CONTENT.CHANGE_PASSWORD,
+    text: CONTENT_TEXT + "\n\n" + code + "\n\n" + CONTENT.CAN_IGNORE,
   };
 }

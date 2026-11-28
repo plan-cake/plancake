@@ -656,8 +656,7 @@ def get_weekday_date(weekday, timeslot):
 
 class EmailTemplateKey(str, Enum):
     EMAIL_IN_USE = "email_in_use"
-    EMAIL_VERIFICATION = "email_verification"
-    PASSWORD_RESET = "password_reset"
+    EMAIL_VERIFICATION_CODE = "email_verification_code"
     PASSWORD_RESET_CODE = "password_reset_code"
 
 

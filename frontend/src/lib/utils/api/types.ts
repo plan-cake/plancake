@@ -11,7 +11,8 @@ export type Email = {
   email: string;
 };
 
-export type VerificationCode = {
+export type EmailVerification = {
+  email: string;
   verification_code: string;
 };
 
@@ -26,9 +27,19 @@ export type LoginData = {
   remember_me?: boolean;
 };
 
+export type PasswordResetCodeCheckData = {
+  email: string;
+  verification_code: string;
+};
+
+export type PasswordResetToken = {
+  reset_token: string;
+};
+
 export type PasswordResetData = {
   reset_token: string;
   new_password: string;
+  prune_sessions?: boolean;
 };
 
 export type PasswordChangeData = {
@@ -168,16 +179,6 @@ export type ActiveSessionList = {
 
 export type SessionId = {
   session_id: string;
-};
-
-export type AuthedPasswordResetCode = {
-  reset_code: string;
-};
-
-export type AuthedPasswordResetData = {
-  reset_code: string;
-  new_password: string;
-  prune_sessions?: boolean;
 };
 
 export type GuestDataSummary = {
