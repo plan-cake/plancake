@@ -160,10 +160,10 @@ export function useResetPasswordFlow() {
     }
   };
 
-  const handleTokenExpired = () => {
+  const handleTokenExpired = async () => {
     setResetToken(null);
     // Send a new OTP code via email
-    handleEmailSubmit(false);
+    await handleEmailSubmit(false);
     // Displays above the OTP field and clears when the user types
     handleError("api", MESSAGES.ERROR_RESET_TOKEN_EXPIRED);
   };
@@ -198,7 +198,7 @@ export function useResetPasswordFlow() {
       } else if (error.rateLimited) {
         handleError("rate_limit", error.formattedMessage);
       } else if (error.data?.error?.reset_token) {
-        handleTokenExpired();
+        await handleTokenExpired();
       } else {
         handleError("api", error.formattedMessage);
       }
