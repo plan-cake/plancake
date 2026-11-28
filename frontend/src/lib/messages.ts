@@ -20,8 +20,7 @@ export const MESSAGES = {
   ERROR_PASSWORD_REUSE: "Cannot reuse old password.",
   ERROR_PASSWORD_WEAK: "Password is not strong enough.",
   ERROR_PASSWORD_MISMATCH: "Passwords do not match.",
-  ERROR_RESET_TOKEN_EXPIRED:
-    "Password reset token expired. Please verify again.",
+  ERROR_RESET_TOKEN_EXPIRED: "Reset session expired, we sent you a new code.",
 
   // availability errors
   ERROR_NAME_LENGTH: `Name must be ${MAX_DISPLAY_NAME_LENGTH} characters or less.`,
