@@ -28,7 +28,7 @@ class LoginSerializer(RegisterAccountSerializer):
     remember_me = serializers.BooleanField(default=False, required=False)
 
 
-class PasswordResetSerializer(VerificationCodeSerializer):
+class PasswordResetSerializer(PasswordResetTokenSerializer):
     new_password = serializers.CharField(required=True)
     prune_sessions = serializers.BooleanField(default=False, required=False)
 

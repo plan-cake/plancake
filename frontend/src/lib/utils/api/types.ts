@@ -37,8 +37,7 @@ export type PasswordResetToken = {
 };
 
 export type PasswordResetData = {
-  email: string;
-  verification_code: string;
+  reset_token: string;
   new_password: string;
   prune_sessions?: boolean;
 };

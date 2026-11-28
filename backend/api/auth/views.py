@@ -1,7 +1,6 @@
 import logging
 import uuid
 from datetime import datetime, timedelta
-from hashlib import sha256
 from secrets import token_urlsafe
 
 import bcrypt
@@ -20,6 +19,7 @@ from api.auth.serializers import (
 from api.auth.utils import (
     attempt_verification_code,
     generate_verification_code,
+    hash_reset_token,
     invalid_verification_code_response,
     list_failed_criteria,
     password_reset_code_queryset,
@@ -44,6 +44,7 @@ from api.models import (
 from api.settings import (
     ACCOUNT_COOKIE_NAME,
     EMAIL_CODE_EXP_SECONDS,
+    PWD_RESET_TOKEN_EXP_SECONDS,
     ThrottleScopes,
 )
 from api.utils import (
@@ -393,7 +394,7 @@ def check_password_reset_code(request):
         PasswordResetToken.objects.update_or_create(
             user_account=ver_code_obj.user_account,
             defaults={
-                "token_hash": sha256(reset_token.encode()).hexdigest(),
+                "token_hash": hash_reset_token(reset_token),
                 "created_at": datetime.now(),
             },
         )
@@ -409,35 +410,16 @@ def check_password_reset_code(request):
 @validate_output(MessageOutputSerializer)
 def reset_password(request):
     """
-    Resets the password for a user account given a valid combination of email and password
-    reset code.
+    Resets the password for a user account given a valid password reset token.
 
     If "prune_sessions" is true, all active sessions for this account will be removed,
     unless the user is logged into an account. If that is the case, the current session
     will be preserved.
     """
     user = request.user
-    email = request.validated_data.get("email")
-    ver_code = request.validated_data.get("verification_code")
+    reset_token = request.validated_data.get("reset_token")
     new_password = request.validated_data.get("new_password")
     prune_sessions = request.validated_data.get("prune_sessions")
-
-    check_rate_limit(request, ThrottleScopes.CODE_CHECK)
-
-    has_account_auth = user is not None and not user.is_guest
-
-    if has_account_auth and user.email != email:
-        logger.info(
-            "Password reset failed: Authenticated user email %s does not match provided email %s.",
-            user.email,
-            email,
-        )
-        # It's okay to say the email does not match because the user is already
-        # authenticated.
-        return Response(
-            {"error": {"email": ["Provided email does not match account."]}},
-            status=400,
-        )
 
     is_strong, criteria = validate_password(new_password)
     if not is_strong:
@@ -446,17 +428,38 @@ def reset_password(request):
             {"error": {"new_password": list_failed_criteria(criteria)}}, status=400
         )
 
+    INVALID_TOKEN_RESPONSE = Response(
+        {"error": {"reset_token": ["Invalid token."]}}, status=400
+    )
+
     with transaction.atomic():
-        ver_code_obj = attempt_verification_code(
-            password_reset_code_queryset(email), ver_code
-        )
-        if ver_code_obj is None:
-            logger.info(
-                "Password reset failed for %s: Invalid or expired verification code.",
-                email,
+        token_obj = (
+            PasswordResetToken.objects.select_for_update()
+            .select_related("user_account")
+            .filter(
+                token_hash=hash_reset_token(reset_token),
+                created_at__gte=datetime.now()
+                - timedelta(seconds=PWD_RESET_TOKEN_EXP_SECONDS),
             )
-            return invalid_verification_code_response()
-        user = ver_code_obj.user_account
+            .first()
+        )
+        if token_obj is None:
+            logger.info(
+                "Password reset failed: Invalid or expired token.",
+            )
+            return INVALID_TOKEN_RESPONSE
+
+        has_account_auth = user is not None and not user.is_guest
+
+        if has_account_auth and user.pk != token_obj.user_account_id:
+            logger.info(
+                "Password reset failed: Authenticated user %s does not match token account %s.",
+                user.email,
+                token_obj.user_account.email,
+            )
+            return INVALID_TOKEN_RESPONSE
+
+        user = token_obj.user_account
 
         # Check if the new password is actually new
         if bcrypt.checkpw(new_password.encode(), user.password_hash.encode()):
@@ -476,7 +479,7 @@ def reset_password(request):
             new_password.encode(), bcrypt.gensalt()
         ).decode()
         user.save()
-        ver_code_obj.delete()  # Make sure to remove the verification code after use
+        token_obj.delete()  # Remove the reset token after use
 
         if prune_sessions:
             if has_account_auth:

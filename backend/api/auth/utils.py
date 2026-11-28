@@ -1,6 +1,7 @@
 import random
 import string
 from datetime import datetime, timedelta
+from hashlib import sha256
 
 from django.db import transaction
 from rest_framework.response import Response
@@ -88,3 +89,7 @@ def password_reset_code_queryset(email):
         user_account__email=email,
         created_at__gte=datetime.now() - timedelta(seconds=PWD_RESET_CODE_EXP_SECONDS),
     )
+
+
+def hash_reset_token(token):
+    return sha256(token.encode()).hexdigest()
